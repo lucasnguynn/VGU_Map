@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VGUMap</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
@@ -18,15 +17,29 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--bl)
 }
 
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
-.vh{background:var(--bl);height:50px;display:flex;align-items:center;padding:0 20px;gap:12px; position: sticky; top: 0; z-index: 10;}
+.vh {
+  background: var(--wh);
+  height: 54px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 12px;
+  position: sticky;
+  top: 10px;
+  z-index: 10;
+  margin: 10px 15px;
+  border: 1.5px solid var(--bl);
+  border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(0, 37, 84, 0.06);
+  transition: all 0.3s ease;
+}
 
-/* CSS mới cho Logo */
-.logo-nav { height: 32px; width: auto; filter: brightness(0) invert(1); }
+.logo-nav { height: 32px; width: auto; }
 .logo-hero { max-width: 320px; width: 100%; height: auto; margin: 0 auto 24px auto; display: block; }
 .logo-login { max-width: 220px; width: 100%; height: auto; filter: brightness(0) invert(1); margin: 0 auto; display: block; }
 
-.vd{width:1.5px;height:20px;background:rgba(255,255,255,.2)}
-.vt{margin-left:auto;font-size:11px;color:rgba(255,255,255,.35)}
+.vd { width: 1.5px; height: 20px; background: rgba(0, 37, 84, 0.15); }
+.vt { margin-left: auto; font-size: 13px; font-weight: 600; color: var(--bl); letter-spacing: 0.02em; }
 .ob{height:4px;background:var(--or)}
 
 /* Login */
@@ -128,7 +141,7 @@ g[onclick] {
 
 g[onclick]:hover polygon,
 g[onclick]:hover polyline {
-  filter: brightness(0.8) contrast(1.2); 
+  filter: brightness(1.2) contrast(1.2); 
   stroke: #002554 !important; 
   stroke-width: 2px !important;
 }
