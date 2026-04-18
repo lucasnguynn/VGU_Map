@@ -17,6 +17,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--bl)
 }
 
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+  /* hover style */
 .vh {
   background: var(--wh);
   height: 54px;
@@ -25,12 +26,9 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--bl)
   padding: 0 20px;
   gap: 12px;
   position: sticky;
-  top: 10px;
-  z-index: 10;
-  margin: 10px 15px;
   border: 1.5px solid var(--bl);
-  border-radius: 8px;
-  box-shadow: 0 6px 16px rgba(0, 37, 84, 0.06);
+  border-radius: 11px;
+  box-shadow: 0 10px 24px rgba(0, 37, 84, 0.15);
   transition: all 0.3s ease;
 }
 
@@ -39,8 +37,12 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--bl)
 .logo-login { max-width: 220px; width: 100%; height: auto; filter: brightness(0) invert(1); margin: 0 auto; display: block; }
 
 .vd { width: 1.5px; height: 20px; background: rgba(0, 37, 84, 0.15); }
-.vt { margin-left: auto; font-size: 13px; font-weight: 600; color: var(--bl); letter-spacing: 0.02em; }
-.ob{height:4px;background:var(--or)}
+.vt { 
+  font-size: 15px; /* Tăng cỡ chữ lên cho rõ */
+  font-weight: 800; 
+  color: var(--bl); 
+  letter-spacing: 0.02em; 
+}.ob{height:4px;background:var(--or)}
 
 /* Login */
 .lw{min-height:calc(100vh - 54px);display:flex;align-items:center;justify-content:center;padding:30px 18px}
@@ -156,13 +158,13 @@ g[onclick]:hover polyline {
   <div class="vh">
     <img src="VGU-Full-Color-logo-05-_1_.svg" alt="VGU Logo" class="logo-nav">
     <div class="vd"></div>
-    <div class="vt">VGUMap</div>
+    <div class="vt">Trang Đăng Nhập VGUMap</div>
   </div>
   <div class="ob"></div>
   <div class="lw"><div class="lc">
     <div class="lt">
       <img src="VGU-Full-Color-logo-05-_1_.svg" alt="VGU Logo" class="logo-login">
-      <div class="lp">Trang Đăng Nhập VGUMap</div>
+      </div>
     </div>
     <div class="lb">
       <div class="lf"><label>Email</label><input type="email" placeholder="example@vgu.edu.vn"></div>
@@ -178,7 +180,7 @@ g[onclick]:hover polyline {
 <!-- HOME -->
 <div class="page" id="pg-h">
   <div class="vh">
-    <div class="vt">VGUMap</div>
+    <div class="vt">Trang Tìm kiếm VGUMap</div>
   </div>
   <div class="ob"></div>
   <div class="hw">
@@ -230,7 +232,7 @@ g[onclick]:hover polyline {
   <div class="vh">
     <img src="VGU-Full-Color-logo-05-_1_.svg" alt="VGU Logo" class="logo-nav">
     <div class="vd"></div>
-    <div class="vt">VGUMap</div>
+    <div class="vt">Thông tin phòng VGUMap</div>
   </div>
   <div class="ob"></div>
   <div class="ph"><div class="phi">
