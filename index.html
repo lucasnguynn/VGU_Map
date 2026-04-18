@@ -117,9 +117,21 @@ select:focus{outline:none;border-color:var(--or); box-shadow: 0 0 0 3px rgba(245
 .bnp{padding:7px 14px;border:none;border-radius:4px;background:var(--or);font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:600;color:var(--wh);cursor:pointer;transition:all .2s}
 .bnp:hover{background:#c9661a; transform: translateY(-1px)}
 
-polygon{transition:all .2s ease; transform-origin: center;}
-g[onclick]{cursor:pointer;}
-g[onclick]:hover polygon{opacity:.85; stroke-width: 2.5px;}
+/* Thiết lập hiệu ứng chuyển đổi mượt mà cho cả polygon và polyline */
+polygon, polyline { 
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+}
+
+g[onclick] { 
+  cursor: pointer; 
+}
+g[onclick]:hover polygon,
+g[onclick]:hover polyline {
+  fill: #F58220 !important;       
+  stroke: #002554 !important;     
+  stroke-width: 2.5px !important; 
+  opacity: 0.9;
+}
 </style>
 </head>
 <body>
