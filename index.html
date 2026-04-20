@@ -588,22 +588,58 @@ function rC(rid){
   show('pg-r');
 }
 
-function sT(tab,rd){
-  rd=rd||ST.rd;if(!rd)return;ST.tab=tab;
-  document.getElementById('t2d').classList.toggle('on',tab==='2D');
-  document.getElementById('t3d').classList.toggle('on',tab==='3D');
-  const f=document.getElementById('ifr');
-  const cfg={
-    '2D':{bg:'#e8eef9',ic:'📐',l:'Sơ đồ mặt bằng 2D'},
-    '3D':{bg:'#fff3e6',ic:'🏛',l:'Phối cảnh 3D nội thất'}
-  }[tab];
-  f.style.background=cfg.bg;
-  f.innerHTML=`<div style="text-align:center;padding:24px 16px">
-    <div style="font-size:44px;margin-bottom:10px">${cfg.ic}</div>
-    <div style="font-size:13px;font-weight:700;color:#002554;margin-bottom:3px">${cfg.l}</div>
-    <div style="font-size:11px;color:#8896a8;margin-bottom:10px">${ST.rid} — ${rd.name}</div>
-    <div style="font-size:10px;color:#8896a8;background:rgba(0,37,84,.06);display:inline-block;padding:3px 12px;border-radius:2px">Google Drive · Wix Gallery</div>
-  </div>`;
+// Hàm hỗ trợ tự động chuyển link Google Drive thành Direct Link
+function getDirectImageUrl(url) {
+  if (!url) return '';
+  const driveRegex = /\/file\/d\/(.*?)\//;
+  const match = url.match(driveRegex);
+  if (match && match[1]) {
+    return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+  }
+  return url; 
+}
+
+function sT(tab, rd) {
+  rd = rd || ST.rd;
+  if (!rd) return;
+  ST.tab = tab;
+  
+  document.getElementById('t2d').classList.toggle('on', tab === '2D');
+  document.getElementById('t3d').classList.toggle('on', tab === '3D');
+  const f = document.getElementById('ifr');
+
+  // --- BẠN DÁN LINK GOOGLE DRIVE CỦA TỪNG PHÒNG VÀO ĐÂY ---
+  const imageMap2D = {
+    'AD-201': 'https://drive.google.com/file/d/1bQoe1I3csXQAHzKVnTHPsh2fGV8rUTpz/view?usp=drive_link',
+    'AD-204': 'https://drive.google.com/file/d/1-xAD0yDrRK5h5y2TsVCz0n16laB9Qk6K/view?usp=drive_link',
+    'AD-205': 'https://drive.google.com/file/d/1Ecu_loG6Z5liBup9UQkrbqhEv5VdDRnY/view?usp=drive_link
+    // Cứ enter xuống dòng và thêm các phòng khác theo cấu trúc trên
+  };
+
+  const imageMap3D = {};
+
+  // Tự động chuyển đổi link
+  let rawUrl = tab === '2D' ? imageMap2D[ST.rid] : imageMap3D[ST.rid];
+  let currentImgUrl = getDirectImageUrl(rawUrl);
+
+  // Render giao diện
+  if (currentImgUrl) {
+    f.style.background = '#fff';
+    f.innerHTML = `<img src="${currentImgUrl}" alt="${tab} - ${ST.rid}" style="width:100%; height:100%; object-fit:contain; border-radius:4px; padding:8px;">`;
+  } else {
+    const cfg = {
+      '2D': { bg: '#e8eef9', ic: '📐', l: 'Sơ đồ mặt bằng 2D' },
+      '3D': { bg: '#fff3e6', ic: '🏛', l: 'Phối cảnh 3D nội thất' }
+    }[tab];
+    
+    f.style.background = cfg.bg;
+    f.innerHTML = `<div style="text-align:center;padding:24px 16px">
+      <div style="font-size:44px;margin-bottom:10px">${cfg.ic}</div>
+      <div style="font-size:13px;font-weight:700;color:#002554;margin-bottom:3px">${cfg.l}</div>
+      <div style="font-size:11px;color:#8896a8;margin-bottom:10px">${ST.rid} — ${rd.name}</div>
+      <div style="font-size:10px;color:#8896a8;background:rgba(0,37,84,.06);display:inline-block;padding:3px 12px;border-radius:2px">Đang cập nhật hình ảnh</div>
+    </div>`;
+  }
 }
 </script>
 </body>
