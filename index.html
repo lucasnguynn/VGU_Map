@@ -9,184 +9,180 @@
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--or:#F58220;--bl:#002554;--wh:#fff;--bg:#f5f6f9;--gl:#dde2ec;--mt:#4a5568;--ht:#8896a8}
 body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--bl)}
-
-.page{display:none;}
-.page.active{display:block;animation:fu .35s cubic-bezier(0.2,0.8,0.2,1) forwards}
-@keyframes fu{
-  from{opacity:0;transform:translateY(12px) scale(0.99)}
-  to{opacity:1;transform:translateY(0) scale(1)}
-}
+.page{display:none}
+.page.active{display:block;animation:fu .35s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes fu{from{opacity:0;transform:translateY(12px) scale(.99)}to{opacity:1;transform:none}}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
 
 /* ── HEADER ── */
-.vh{
-  background:var(--wh);height:66px;display:flex;align-items:center;
-  padding:0 24px;gap:12px;
-  border:2.5px solid var(--bl);border-radius:11px;
-  box-shadow:0 10px 24px rgba(0,37,84,0.15);
-  transition:all .3s ease;
-}
-.logo-nav{height:38px;width:auto}
-.logo-hero{max-width:320px;width:100%;height:auto;margin:0 auto 24px;display:block}
-.logo-login{max-width:220px;width:100%;height:auto;filter:brightness(0) invert(1);margin:0 auto;display:block}
+.vh{background:var(--wh);height:62px;display:flex;align-items:center;padding:0 24px;gap:12px;
+  border:2px solid var(--bl);border-radius:10px;box-shadow:0 8px 24px rgba(0,37,84,.12);
+  transition:all .3s ease}
+.logo-nav{height:36px;width:auto}
+.logo-hero{max-width:280px;width:100%;height:auto;margin:0 auto 22px;display:block}
+.logo-login{max-width:200px;width:100%;height:auto;filter:brightness(0) invert(1);margin:0 auto;display:block}
 .vd{width:1.5px;height:20px;background:rgba(0,37,84,.15)}
-.vt{font-size:16px;font-weight:800;color:var(--bl);letter-spacing:.02em}
-.ob{height:4px;background:var(--or)}
+.vt{font-size:15px;font-weight:800;color:var(--bl);letter-spacing:.02em}
 
 /* ── LOGIN ── */
-.lw{min-height:calc(100vh - 66px);display:flex;align-items:center;justify-content:center;padding:30px 18px}
-.lc{background:var(--wh);border-radius:6px;width:100%;max-width:400px;border:1px solid var(--gl);overflow:hidden;box-shadow:0 10px 30px rgba(0,37,84,.05)}
-.lt{background:var(--bl);padding:32px 30px 24px;text-align:center}
-.lp{font-size:15px;font-weight:600;color:var(--wh);margin-top:16px;letter-spacing:.04em}
+.lw{min-height:calc(100vh - 62px);display:flex;align-items:center;justify-content:center;padding:28px 18px}
+.lc{background:var(--wh);border-radius:8px;width:100%;max-width:400px;border:1px solid var(--gl);overflow:hidden;box-shadow:0 12px 32px rgba(0,37,84,.06)}
+.lt{background:var(--bl);padding:30px 30px 22px;text-align:center}
+.lp{font-size:14px;font-weight:600;color:var(--wh);margin-top:14px;letter-spacing:.04em;opacity:.85}
 .lb{padding:24px 30px 28px}
-.lf{margin-bottom:15px}
+.lf{margin-bottom:14px}
 .lf label{display:block;font-size:14px;font-weight:600;color:var(--bl);margin-bottom:5px}
-.lf input{width:100%;height:45px;border:1.5px solid var(--gl);border-radius:4px;padding:0 12px;font-family:'IBM Plex Sans',sans-serif;font-size:15px;color:var(--bl);transition:all .2s ease}
+.lf input{width:100%;height:44px;border:1.5px solid var(--gl);border-radius:4px;padding:0 12px;font-family:'IBM Plex Sans',sans-serif;font-size:15px;color:var(--bl);transition:all .2s}
 .lf input:focus{outline:none;border-color:var(--or);box-shadow:0 0 0 3px rgba(245,130,32,.15)}
 .lf input::placeholder{color:var(--ht)}
-.lsep{display:flex;align-items:center;gap:10px;margin:13px 0}
+.lsep{display:flex;align-items:center;gap:10px;margin:12px 0}
 .lsl{flex:1;height:1px;background:var(--gl)}
 .lsep span{font-size:11px;color:var(--ht)}
-.bls{width:100%;height:45px;border:none;border-radius:4px;font-family:'IBM Plex Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s cubic-bezier(.4,0,.2,1)}
+.bls{width:100%;height:44px;border:none;border-radius:4px;font-family:'IBM Plex Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s}
 .bls.solid{background:var(--or);color:var(--wh)}
-.bls.solid:hover{background:#c9661a;transform:translateY(-1px);box-shadow:0 4px 10px rgba(245,130,32,.2)}
+.bls.solid:hover{background:#c9661a;transform:translateY(-1px);box-shadow:0 4px 12px rgba(245,130,32,.25)}
 .bls.out{background:var(--wh);border:2px solid var(--bl);color:var(--bl);margin-top:9px}
 .bls.out:hover{background:var(--bl);color:var(--wh);transform:translateY(-1px)}
-.lnote{font-size:11px;color:var(--ht);text-align:center;margin-top:13px;line-height:1.6}
+.lnote{font-size:11px;color:var(--ht);text-align:center;margin-top:12px;line-height:1.6}
 
 /* ── HOME ── */
-.hw{max-width:580px;margin:0 auto;padding:46px 20px 70px}
-.hh{font-size:clamp(22px,4vw,28px);font-weight:700;color:var(--bl);line-height:1.25;margin-bottom:8px}
+.hw{max-width:560px;margin:0 auto;padding:44px 20px 70px}
+.hh{font-size:clamp(21px,3.8vw,27px);font-weight:700;color:var(--bl);line-height:1.25;margin-bottom:8px}
 .hh em{color:var(--or);font-style:normal}
 .hsub{font-size:14px;color:var(--mt);line-height:1.6}
-.sc{background:var(--wh);border:1px solid var(--gl);border-radius:6px;padding:24px 22px 20px;box-shadow:0 4px 20px rgba(0,37,84,.03)}
-.sc-t{font-size:12px;font-weight:700;color:var(--bl);text-transform:uppercase;letter-spacing:.06em;margin-bottom:18px;padding-bottom:8px;border-bottom:2px solid var(--or);display:inline-block}
-.fg{margin-bottom:14px}
+.sc{background:var(--wh);border:1px solid var(--gl);border-radius:8px;padding:24px 22px 20px;box-shadow:0 4px 20px rgba(0,37,84,.04);margin-top:28px}
+.sc-t{font-size:11px;font-weight:700;color:var(--bl);text-transform:uppercase;letter-spacing:.06em;margin-bottom:18px;padding-bottom:8px;border-bottom:2px solid var(--or);display:inline-block}
+.fg{margin-bottom:13px}
 .fg label{display:block;font-size:14px;font-weight:600;color:var(--bl);margin-bottom:5px}
 .fg label small{font-weight:400;color:var(--ht);font-size:12px;text-transform:none;letter-spacing:0}
 .req{color:var(--or)}
-select{width:100%;height:45px;border:1.5px solid var(--gl);border-radius:4px;padding:0 34px 0 11px;font-family:'IBM Plex Sans',sans-serif;font-size:15px;color:var(--bl);background:var(--wh) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23002554' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E") no-repeat right 10px center;appearance:none;cursor:pointer;transition:all .2s ease}
+select{width:100%;height:44px;border:1.5px solid var(--gl);border-radius:4px;padding:0 32px 0 11px;font-family:'IBM Plex Sans',sans-serif;font-size:15px;color:var(--bl);background:var(--wh) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23002554' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E") no-repeat right 10px center;appearance:none;cursor:pointer;transition:all .2s}
 select:disabled{opacity:.38;cursor:not-allowed;background-color:#f1f3fa}
 select:focus{outline:none;border-color:var(--or);box-shadow:0 0 0 3px rgba(245,130,32,.15)}
-.bgo{width:100%;height:46px;border:none;border-radius:4px;background:var(--bl);font-family:'IBM Plex Sans',sans-serif;font-size:16px;font-weight:600;color:var(--wh);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s cubic-bezier(.4,0,.2,1);margin-top:4px}
-.bgo:hover{background:#0a3d82;transform:translateY(-1px);box-shadow:0 4px 10px rgba(0,37,84,.2)}
+.bgo{width:100%;height:46px;border:none;border-radius:4px;background:var(--bl);font-family:'IBM Plex Sans',sans-serif;font-size:15px;font-weight:600;color:var(--wh);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;margin-top:4px}
+.bgo:hover{background:#0a3d82;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,37,84,.2)}
 .ht2{font-size:12px;color:#c0392b;margin-top:5px;font-weight:500}
-.upd{background:#fffbf0;border:1.5px solid var(--or);border-radius:4px;padding:13px 15px;margin-top:10px;display:none}
-.upd.show{display:block;animation:fu .3s ease}
+.upd{background:#fffbf0;border:1.5px solid var(--or);border-radius:4px;padding:13px 15px;margin-top:10px;display:none;animation:fu .3s ease}
+.upd.show{display:block}
 .upd h4{font-size:13px;font-weight:700;color:var(--or);margin-bottom:2px}
 .upd p{font-size:12px;color:var(--mt)}
 
 /* ── PAGE HEADER ── */
-.ph{background:var(--bl);padding:0 20px}
-.phi{max-width:1350px;margin:0 auto;padding:12px 0;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.pb{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:4px;color:rgba(255,255,255,.8);padding:6px 13px;font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}
-.pb:hover{background:rgba(255,255,255,.25);color:#fff;transform:translateX(-2px)}
+.ph{background:var(--bl)}
+.phi{max-width:1100px;margin:0 auto;padding:0 20px;height:52px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.pb{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:4px;color:rgba(255,255,255,.85);padding:6px 14px;font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}
+.pb:hover{background:rgba(255,255,255,.22);color:#fff;transform:translateX(-2px)}
 .pt{font-size:16px;font-weight:700;color:var(--wh)}
 .ps{font-size:11px;color:rgba(255,255,255,.5);margin-top:1px}
-.pc{max-width:1350px;margin:0 auto;padding:16px 20px 50px}
+.pbc{margin-left:auto;font-size:11px;color:rgba(255,255,255,.4)}
+.pbc b{color:rgba(255,255,255,.78)}
+.pc{max-width:1100px;margin:0 auto;padding:20px 20px 60px}
 
-/* ── FLOOR MAP ── */
-.mleg{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:11px}
+/* ── FLOOR MAP — responsive, no horizontal scroll ── */
+.map-wrap{
+  width:100%;
+  background:#edf0f8;
+  border:1.5px solid var(--gl);
+  border-radius:8px;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:12px;
+}
+.map-wrap svg{width:100%;height:auto;display:block}
+.map-wrap.portrait svg{max-width:560px;margin:0 auto}
+.mleg{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}
 .lgi{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--mt)}
-.lgd{width:11px;height:11px;border-radius:2px;border:1px solid rgba(0,0,0,.1);flex-shrink:0}
-.mout{overflow-x:auto;border:1.5px solid var(--gl);border-radius:4px;background:#edf0f8;cursor:grab;-webkit-overflow-scrolling:touch}
-.mout:active{cursor:grabbing}
-.mtip{margin-top:8px;background:var(--wh);border:1px solid var(--gl);border-radius:4px;padding:9px 12px;font-size:12px;color:var(--mt);display:flex;align-items:center;gap:6px}
+.lgd{width:10px;height:10px;border-radius:2px;border:1px solid rgba(0,0,0,.1);flex-shrink:0}
+.mtip{margin-top:10px;background:var(--wh);border:1px solid var(--gl);border-radius:6px;padding:9px 14px;font-size:12px;color:var(--mt);display:flex;align-items:center;gap:7px}
 
 /* ── ROOM INFO ── */
-.rg{display:grid;grid-template-columns:1fr 1fr;gap:22px}
-@media(max-width:580px){.rg{grid-template-columns:1fr}}
-.itab{display:flex;gap:6px;margin-bottom:9px}
-.it{padding:5px 16px;border-radius:4px;border:1.5px solid var(--gl);background:var(--wh);font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:500;color:var(--mt);cursor:pointer;transition:all .2s}
+.rg{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:600px){.rg{grid-template-columns:1fr}}
+.itab{display:flex;gap:6px;margin-bottom:10px}
+.it{padding:6px 18px;border-radius:4px;border:1.5px solid var(--gl);background:var(--wh);font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:500;color:var(--mt);cursor:pointer;transition:all .2s}
 .it:hover{background:#f5f7fb}
 .it.on{background:var(--bl);color:var(--wh);border-color:var(--bl)}
-.ifrm{border-radius:4px;border:1.5px solid var(--gl);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:background .3s ease}
-.mrow{display:flex;margin-top:9px;border:1px solid var(--gl);border-radius:4px;overflow:hidden}
-.mv{flex:1;padding:11px 6px;text-align:center;border-right:1px solid var(--gl);background:var(--wh)}
+.ifrm{border-radius:6px;border:1.5px solid var(--gl);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:background .3s ease}
+.mrow{display:flex;margin-top:10px;border:1px solid var(--gl);border-radius:6px;overflow:hidden}
+.mv{flex:1;padding:12px 8px;text-align:center;border-right:1px solid var(--gl);background:var(--wh)}
 .mv:last-child{border-right:none}
 .mvn{font-size:20px;font-weight:700;color:var(--bl)}
 .mvl{font-size:9px;color:var(--ht);margin-top:2px}
-.rbdg{display:inline-block;padding:3px 11px;border-radius:2px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:8px}
+.rbdg{display:inline-block;padding:3px 12px;border-radius:2px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:8px}
 .rnum{font-size:12px;color:var(--mt);font-weight:500;margin-bottom:4px}
 .rnm{font-size:clamp(15px,2vw,22px);font-weight:700;color:var(--bl);line-height:1.2;margin-bottom:14px}
 .ib{margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--gl)}
 .ib:last-child{border-bottom:none;margin-bottom:0}
-.il{font-size:10px;font-weight:700;color:var(--or);letter-spacing:.07em;text-transform:uppercase;margin-bottom:3px}
+.il{font-size:10px;font-weight:700;color:var(--or);letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px}
 .iv{font-size:13px;color:var(--bl);line-height:1.5}
 .eq{display:flex;flex-direction:column;gap:4px}
-.ei{font-size:12px;color:var(--bl);padding:5px 10px;background:#f5f7fb;border-radius:3px;border-left:3px solid var(--or)}
-.nb{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
-.bno{padding:7px 14px;border:1.5px solid var(--bl);border-radius:4px;background:var(--wh);font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:500;color:var(--bl);cursor:pointer;transition:all .2s}
+.ei{font-size:12px;color:var(--bl);padding:6px 10px;background:#f5f7fb;border-radius:3px;border-left:3px solid var(--or)}
+.nb{display:flex;gap:7px;flex-wrap:wrap;margin-top:16px}
+.bno{padding:8px 16px;border:1.5px solid var(--bl);border-radius:4px;background:var(--wh);font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:500;color:var(--bl);cursor:pointer;transition:all .2s}
 .bno:hover{background:var(--bl);color:var(--wh);transform:translateY(-1px)}
-.bnp{padding:7px 14px;border:none;border-radius:4px;background:var(--or);font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:600;color:var(--wh);cursor:pointer;transition:all .2s}
+.bnp{padding:8px 16px;border:none;border-radius:4px;background:var(--or);font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:600;color:var(--wh);cursor:pointer;transition:all .2s}
 .bnp:hover{background:#c9661a;transform:translateY(-1px)}
 
-/* ── SVG HOVER ── */
-polygon,polyline{transition:all .2s cubic-bezier(.4,0,.2,1)}
+/* SVG hover */
 g[onclick]{cursor:pointer}
-g[onclick]:hover polygon,
-g[onclick]:hover polyline{
-  filter:brightness(1.2) contrast(1.2);
-  stroke:#002554 !important;
-  stroke-width:2px !important;
+g[onclick]:hover polygon,g[onclick]:hover polyline{
+  filter:brightness(.88) contrast(1.1);
+  stroke:#002554!important;stroke-width:2px!important
 }
+polygon,polyline{transition:all .18s cubic-bezier(.4,0,.2,1)}
+
+@media(max-width:680px){.phi{height:auto;padding:10px 16px;gap:8px}}
 </style>
 </head>
 <body>
 <h2 class="sr-only">VGUMap — Hệ thống tra cứu Kiến trúc & Phòng ốc VGU</h2>
 
-<!-- ══════════════ TRANG ĐĂNG NHẬP ══════════════ -->
+<!-- ═══ LOGIN ═══ -->
 <div class="page active" id="pg-l">
   <div class="vh">
     <img src="VGU-Full-Color-logo-05-_1_.svg" alt="VGU Logo" class="logo-nav">
     <div class="vd"></div>
     <div class="vt">Trang Đăng Nhập VGUMap</div>
   </div>
-  <div class="lw">
-    <div class="lc">
-      <div class="lt">
-        <img src="VGU-Full-Color-logo-05-_1_.svg" alt="VGU Logo" class="logo-login">
-        <p class="lp">VGUMap — Tra cứu Phòng ốc</p>
-      </div>
-      <div class="lb">
-        <div class="lf"><label>Email</label><input type="email" placeholder="example@vgu.edu.vn"></div>
-        <div class="lf"><label>Mật khẩu</label><input type="password" placeholder="Nhập mật khẩu"></div>
-        <div class="lsep"><div class="lsl"></div><span>hoặc</span><div class="lsl"></div></div>
-        <button class="bls solid" onclick="gH()">Đăng nhập</button>
-        <button class="bls out" onclick="gH()">Đăng nhập dưới dạng khách</button>
-        <div class="lnote">Mọi phương thức đều truy cập ở chế độ xem.<br>Không lưu thông tin cá nhân.</div>
-      </div>
+  <div class="lw"><div class="lc">
+    <div class="lt">
+      <img src="VGU-Full-Color-logo-05-_1_.svg" alt="VGU Logo" class="logo-login">
+      <p class="lp">VGUMap — Tra cứu Phòng ốc</p>
     </div>
-  </div>
+    <div class="lb">
+      <div class="lf"><label>Email</label><input type="email" placeholder="example@vgu.edu.vn"></div>
+      <div class="lf"><label>Mật khẩu</label><input type="password" placeholder="Nhập mật khẩu"></div>
+      <div class="lsep"><div class="lsl"></div><span>hoặc</span><div class="lsl"></div></div>
+      <button class="bls solid" onclick="gH()">Đăng nhập</button>
+      <button class="bls out" onclick="gH()">Đăng nhập dưới dạng khách</button>
+      <div class="lnote">Mọi phương thức đều truy cập ở chế độ xem.</div>
+    </div>
+  </div></div>
 </div>
 
-<!-- ══════════════ TRANG CHỦ ══════════════ -->
+<!-- ═══ HOME ═══ -->
 <div class="page" id="pg-h">
   <div class="vh">
     <img src="VGU-Full-Color-logo-05-_1_.svg" alt="VGU Logo" class="logo-nav">
     <div class="vd"></div>
-    <div class="vt">Trang Tìm kiếm VGUMap</div>
+    <div class="vt">VGUMap</div>
   </div>
   <div class="hw">
-    <div style="text-align:center;margin-bottom:35px">
+    <div style="text-align:center;margin-bottom:6px">
       <img src="VGU-Full-Color-logo-05-_1_.svg" alt="VGU Logo" class="logo-hero">
       <h1 class="hh">Tra cứu Kiến trúc &amp; Phòng ốc</h1>
-      <p class="hsub">Bản đồ tầng với tọa độ chính xác từ bản vẽ kỹ thuật CAD.</p>
+      <p class="hsub">Bản đồ tầng chính xác từ bản vẽ kỹ thuật CAD.</p>
     </div>
     <div class="sc">
       <div class="sc-t">Tìm kiếm phòng</div>
-      <div class="fg">
-        <label>Khu vực / Tòa nhà <span class="req">*</span></label>
-        <select id="sbl" onchange="oBl()"><option value="">— Chọn khu vực —</option></select>
-      </div>
-      <div class="fg">
-        <label>Tầng <span class="req">*</span></label>
-        <select id="sfl" disabled onchange="oFl()"><option value="">— Chọn tầng —</option></select>
-      </div>
-      <div class="fg">
-        <label>Số phòng <small>(không bắt buộc)</small></label>
-        <select id="srm" disabled><option value="">— Xem toàn bộ bản đồ tầng —</option></select>
-      </div>
+      <div class="fg"><label>Khu vực / Tòa nhà <span class="req">*</span></label>
+        <select id="sbl" onchange="oBl()"><option value="">— Chọn khu vực —</option></select></div>
+      <div class="fg"><label>Tầng <span class="req">*</span></label>
+        <select id="sfl" disabled onchange="oFl()"><option value="">— Chọn tầng —</option></select></div>
+      <div class="fg"><label>Số phòng <small>(không bắt buộc)</small></label>
+        <select id="srm" disabled><option value="">— Xem toàn bộ bản đồ tầng —</option></select></div>
       <div class="ht2" id="ht"></div>
       <div class="upd" id="upd"><h4>Khu vực đang cập nhật</h4><p>Dữ liệu sẽ sớm được bổ sung.</p></div>
       <button class="bgo" onclick="doG()">
@@ -197,7 +193,7 @@ g[onclick]:hover polyline{
   </div>
 </div>
 
-<!-- ══════════════ TRANG BẢN ĐỒ TẦNG ══════════════ -->
+<!-- ═══ FLOOR MAP ═══ -->
 <div class="page" id="pg-m">
   <div class="vh">
     <img src="VGU-Full-Color-logo-05-_1_.svg" alt="VGU Logo" class="logo-nav">
@@ -206,39 +202,35 @@ g[onclick]:hover polyline{
   </div>
   <div class="ph"><div class="phi">
     <button class="pb" onclick="gH()">← Trang chủ</button>
-    <div>
-      <div class="pt" id="mpt">Bản đồ tầng</div>
-      <div class="ps">Nhấn vào phòng để xem chi tiết</div>
-    </div>
+    <div><div class="pt" id="mpt">Bản đồ tầng</div><div class="ps">Nhấn vào phòng để xem chi tiết</div></div>
+    <div class="pbc" id="mpbc"></div>
   </div></div>
   <div class="pc">
-    <div class="mleg" id="map-legend">
+    <div class="mleg" id="mleg">
       <div class="lgi"><div class="lgd" style="background:#eef2fc;border-color:#8fa0c0"></div>Văn phòng / Phòng làm việc</div>
-      <div class="lgi"><div class="lgd" style="background:#e8edff;border-color:#6070b0"></div>Hội trường (AD-201)</div>
-      <div class="lgi"><div class="lgd" style="background:#e6f5ec;border-color:#408060"></div>Phòng lớn</div>
-      <div class="lgi"><div class="lgd" style="background:#fff0e2;border-color:#b87830"></div>Phòng chức năng (LB)</div>
+      <div class="lgi"><div class="lgd" style="background:#e6f5ec;border-color:#408060"></div>Phòng lớn / Hội trường</div>
       <div class="lgi"><div class="lgd" style="background:#cce8f4;border-color:#4a8fb0"></div>Nhà vệ sinh (WC)</div>
-      <div class="lgi"><div class="lgd" style="background:#e4e8f5;border-color:#8a9ab8"></div>Hành lang / Cầu thang (CR)</div>
+      <div class="lgi"><div class="lgd" style="background:#e4e8f5;border-color:#8a9ab8"></div>Hành lang / Sảnh (LB/CR)</div>
     </div>
-    <div class="mout" id="mout"></div>
+    <div class="map-wrap" id="mout"></div>
     <div class="mtip">
       <svg width="13" height="13" fill="none" stroke="#F58220" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      Kéo ngang để xem toàn bộ sơ đồ. Nhấn vào phòng để xem thông tin chi tiết.
+      Bản đồ tự động điều chỉnh theo màn hình. Nhấn vào phòng để xem thông tin chi tiết.
     </div>
   </div>
 </div>
 
-<!-- ══════════════ TRANG THÔNG TIN PHÒNG ══════════════ -->
+<!-- ═══ ROOM INFO ═══ -->
 <div class="page" id="pg-r">
   <div class="vh">
     <img src="VGU-Full-Color-logo-05-_1_.svg" alt="VGU Logo" class="logo-nav">
     <div class="vd"></div>
-    <div class="vt">Thông tin phòng VGUMap</div>
+    <div class="vt">Thông tin phòng</div>
   </div>
   <div class="ph"><div class="phi">
     <button class="pb" onclick="gH()">← Trang chủ</button>
     <button class="pb" onclick="gM()">Bản đồ tầng</button>
-    <div style="margin-left:auto;font-size:11px;color:rgba(255,255,255,.4)" id="rbc"></div>
+    <div class="pbc" id="rbc"></div>
   </div></div>
   <div class="pc">
     <div class="rg">
@@ -271,7 +263,7 @@ g[onclick]:hover polyline{
 </div>
 
 <script>
-// ── DỮ LIỆU TÒA NHÀ ────────────────────────────────────────────────────────
+// ── BUILDINGS ──────────────────────────────────────────────────────────────
 const BLDS=[
   {id:'bld_ad',name:'Admin Building',act:true,fl:6},
   {id:'bld_lh',name:'Lecture Hall',act:false,fl:4},
@@ -291,192 +283,336 @@ const BLDS=[
 ];
 const FLN={bld_ad:['Tầng 1 — Bãi giữ xe','Tầng 2','Tầng 3','Tầng 4','Tầng 5','Tầng 6']};
 
-// ── SVG TẦNG 2 — TỌA ĐỘ CHÍNH XÁC TỪ CSV CAD ──────────────────────────────
-// scale=0.02149, SVG 2700×758, Y-flipped từ hệ tọa độ CAD
-const F2_SVG=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2700 758" style="width:2700px;height:758px;display:block;min-width:2700px">
-<rect width="2700" height="758" fill="#edf0f8"/>
-<g style="cursor:default"><polygon points="1398.9,195.6 1369.2,195.6 1369.2,234.4 1396.9,234.4 1396.9,222.1 1407.6,222.1 1407.6,234.4 1568.8,234.4 1568.8,222.1 1579.6,222.1 1579.6,234.4 1740.8,234.4 1740.8,222.1 1751.5,222.1 1751.5,195.6 1725.4,195.6 1599.3,195.6 1566.4,195.6 1558.0,195.6 1525.0,195.6" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1.2"/><text x="1560.3" y="215.0" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#2a3456" pointer-events="none">CR1</text></g>
-<g style="cursor:default"><polygon points="365.3,699.2 365.3,681.1 427.4,681.1 427.4,699.2 537.2,699.2 548.0,699.2 548.0,720.0 593.8,720.0 593.8,623.3 548.0,623.3 548.0,647.3 548.0,653.4 418.9,653.4 418.9,647.3 418.9,642.7 386.9,642.7 378.5,642.7 346.5,642.7 346.5,647.3 346.5,653.4 219.5,653.4 183.4,653.4 171.1,653.4 125.4,653.4 125.4,696.4 123.3,696.4 123.3,718.0 193.4,718.0 193.4,699.2 204.1,699.2 204.1,720.0 365.3,720.0" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1.2"/><text x="358.5" y="671.6" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#2a3456" pointer-events="none">CR10</text></g>
-<g style="cursor:default"><polygon points="2524.0,422.2 2608.6,422.2 2643.4,422.2 2643.4,402.6 2643.4,381.1 2643.4,374.1 2569.5,374.1 2569.5,308.0 2595.2,308.0 2595.2,236.4 2524.0,236.4 2524.0,242.6 2524.0,308.8" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1.2"/><text x="2583.7" y="329.3" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#2a3456" pointer-events="none">CR2</text></g>
-<g style="cursor:default"><polygon points="2578.3,544.2 2466.6,544.2 2466.6,587.7 2578.3,587.7" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1.2"/><text x="2522.4" y="566.0" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#2a3456" pointer-events="none">CR3</text></g>
-<g style="cursor:default"><polygon points="2257.5,588.1 2261.9,588.1 2261.9,561.6 2256.5,561.6 2256.5,549.7 2095.4,549.7 2095.4,561.6 2084.6,561.6 2084.6,549.7 2026.3,549.7 2026.3,588.1 2071.7,588.1 2092.0,588.1 2138.9,588.1 2143.4,588.1 2190.2,588.1 2238.2,588.1" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1.2"/><text x="2144.1" y="568.9" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#2a3456" pointer-events="none">CR4</text></g>
-<g style="cursor:default"><polygon points="891.3,549.3 891.3,561.6 880.5,561.6 880.5,547.3 719.3,547.3 719.3,561.6 708.5,561.6 708.5,587.7 1138.2,587.7 1138.2,549.9 1063.9,549.9 1063.9,561.6 1053.1,561.6 1053.1,549.3" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1.2"/><text x="923.4" y="567.5" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#2a3456" pointer-events="none">CR5</text></g>
-<g style="cursor:default"><polygon points="547.6,130.1 547.6,193.7 547.2,193.7 547.2,197.0 547.2,221.0 547.2,242.6 536.4,242.6 536.4,242.9 527.4,242.9 527.4,275.1 547.6,275.1 547.6,380.6 547.2,380.6 547.2,398.1 593.1,398.1 593.1,391.4 593.1,321.1 593.1,321.0 592.7,321.0 592.7,317.8 592.7,244.6 592.7,229.7 595.3,229.7 595.3,242.9 695.8,242.9 695.8,221.0 706.6,221.0 706.6,194.9 592.7,194.9 592.7,130.1 592.7,64.6 547.2,64.6 547.2,83.5 547.6,83.5" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1.2"/><text x="617.3" y="231.3" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#2a3456" pointer-events="none">CR6</text></g>
-<g style="cursor:default"><polygon points="204.1,220.8 364.9,220.8 364.9,221.0 375.7,221.0 375.7,220.8 525.8,220.8 536.4,220.8 536.4,221.0 547.2,221.0 547.2,194.9 423.1,194.9 362.4,194.9 362.4,195.6 268.5,195.6 204.1,195.6" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1.2"/><text x="375.7" y="208.2" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="6" font-weight="600" fill="#2a3456" pointer-events="none">CR7</text></g>
-<g style="cursor:default"><polygon points="124.3,241.9 124.3,296.7 124.3,391.0 124.3,456.2 124.3,523.3 124.3,587.7 126.3,587.7 170.7,587.7 182.9,587.7 199.6,587.7 199.6,561.6 193.0,561.6 193.0,562.0 170.3,562.0 170.3,539.9 190.0,539.9 190.0,507.7 170.3,507.7 170.3,391.4 170.3,275.5 190.0,275.5 190.0,242.9 170.3,242.9 170.3,220.8 193.0,220.8 193.0,221.0 199.6,221.0 199.6,195.6 183.2,195.6 170.7,195.6 124.3,195.6 124.3,238.5" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1.2"/><text x="161.9" y="391.0" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="6" font-weight="600" fill="#2a3456" pointer-events="none">CR8</text></g>
-<g style="cursor:default"><polygon points="547.6,402.1 547.6,507.3 527.4,507.3 527.4,539.5 536.4,539.5 536.4,539.8 547.2,539.8 547.2,561.3 536.4,561.3 536.4,561.7 525.8,561.7 375.7,561.7 375.7,561.3 364.9,561.3 364.9,561.7 204.1,561.7 204.1,587.7 219.5,587.7 378.5,587.7 386.9,587.7 547.2,587.7 547.2,619.0 593.1,619.0 593.1,587.7 708.5,587.7 708.5,561.6 695.8,561.6 695.8,539.9 595.3,539.9 595.3,553.4 592.7,553.4 592.7,538.6 592.7,465.4 592.7,461.9 593.1,461.9 593.1,402.1" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1.2"/><text x="456.2" y="510.7" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#2a3456" pointer-events="none">CR9</text></g>
-<g onclick="rC('AD-2.LB1')"><polygon points="1073.2,293.1 1076.2,294.2 1234.3,352.9 1253.9,360.2 1294.1,251.6 1237.9,230.7 1213.3,296.9 1156.3,275.8 1088.6,250.8" fill="#fff0e2" stroke="#b87830" stroke-width="1.5"/><text x="1183.8" y="295.4" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#6a3a00" pointer-events="none">LB1</text></g>
-<g onclick="rC('AD-2.LB2')"><polygon points="1556.0,570.9 1562.5,553.4 1566.9,541.4 1588.0,484.5 1652.1,508.3 1716.3,532.2 1731.9,489.9 1728.9,488.8 1570.6,430.1 1549.0,422.0 1508.8,530.6 1501.2,550.9" fill="#fff0e2" stroke="#b87830" stroke-width="1.5"/><text x="1617.0" y="496.5" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#6a3a00" pointer-events="none">LB2</text></g>
-<g onclick="rC('AD-2.LB3')"><polygon points="1369.2,194.3 1369.2,129.9 1399.0,129.9 1402.3,129.9 1402.3,83.5 1396.9,83.5 1396.9,62.1 1402.3,62.1 1402.3,44.2 1207.8,44.2 1207.8,184.7 1244.3,198.3 1308.0,221.8 1303.6,233.5 1369.2,233.5 1225.1,62.1 1225.1,83.5 1235.8,83.5 1235.8,62.1" fill="#fff0e2" stroke="#b87830" stroke-width="1.5"/><text x="1305.2" y="138.8" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#6a3a00" pointer-events="none">LB3</text></g>
-<g onclick="rC('AD-2.LB4')"><polygon points="2440.5,426.0 2263.7,426.0 2263.7,540.1 2270.4,540.1 2349.9,539.8 2393.0,541.1 2431.4,539.8 2442.2,540.1 2450.8,540.1 2450.8,426.0" fill="#fff0e2" stroke="#b87830" stroke-width="1.5"/><text x="2357.3" y="483.5" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#6a3a00" pointer-events="none">LB4</text></g>
-<g onclick="rC('AD-2.LB5')"><polygon points="1138.2,589.2 1138.2,718.0 1225.1,718.0 1225.1,699.2 1231.8,699.2 1231.8,561.6 1225.1,561.6 1225.1,549.9 1138.2,549.9 1138.2,585.9" fill="#fff0e2" stroke="#b87830" stroke-width="1.5"/><text x="1185.0" y="633.9" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#6a3a00" pointer-events="none">LB5</text></g>
-<g onclick="rC('AD-2.LB6')"><polygon points="719.3,83.5 719.6,130.1 719.6,194.9 706.6,194.9 706.6,221.0 719.3,221.0 719.3,235.5 814.0,235.5 814.0,64.6 719.3,64.6" fill="#fff0e2" stroke="#b87830" stroke-width="1.5"/><text x="760.5" y="150.0" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#6a3a00" pointer-events="none">LB6</text></g>
-<g onclick="rC('AD-2.LB7')"><polygon points="53.3,64.6 53.3,139.9 170.7,139.9 201.6,139.9 201.7,139.9 201.7,129.3 235.6,129.3 235.6,137.7 269.0,137.7 302.5,137.7 302.5,129.3 336.3,129.3 336.3,62.8 204.1,62.8 204.1,83.5 193.4,83.5 193.4,64.6" fill="#fff0e2" stroke="#b87830" stroke-width="1.5"/><text x="194.8" y="101.2" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#6a3a00" pointer-events="none">LB7</text></g>
-<g style="cursor:default"><polygon points="1401.4,136.4 1401.4,190.5 1524.4,190.5 1524.4,173.4 1526.3,173.4 1526.3,190.5 1557.4,190.5 1557.4,143.2 1526.3,143.2 1526.3,149.3 1524.4,149.3 1524.4,136.4" fill="#cce8f4" stroke="#4a8fb0" stroke-width="1.2"/><text x="1479.4" y="163.4" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#143a50" pointer-events="none">WC1</text></g>
-<g style="cursor:default"><polygon points="1600.4,190.5 1723.4,190.5 1723.4,136.4 1600.4,136.4 1600.4,149.3 1598.4,149.3 1598.4,143.2 1567.5,143.2 1567.5,190.5 1598.4,190.5 1598.4,173.4 1600.4,173.4" fill="#cce8f4" stroke="#4a8fb0" stroke-width="1.2"/><text x="1645.4" y="163.4" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#143a50" pointer-events="none">WC2</text></g>
-<g style="cursor:default"><polygon points="2237.6,592.3 2193.7,592.3 2193.7,646.5 2237.6,646.5" fill="#cce8f4" stroke="#4a8fb0" stroke-width="1.2"/><text x="2215.6" y="619.4" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="6" font-weight="600" fill="#143a50" pointer-events="none">WC3</text></g>
-<g style="cursor:default"><polygon points="2189.5,592.3 2145.6,592.3 2145.6,646.5 2189.5,646.5" fill="#cce8f4" stroke="#4a8fb0" stroke-width="1.2"/><text x="2167.5" y="619.4" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="6" font-weight="600" fill="#143a50" pointer-events="none">WC4</text></g>
-<g style="cursor:default"><polygon points="2139.2,592.3 2095.3,592.3 2095.3,646.5 2139.2,646.5" fill="#cce8f4" stroke="#4a8fb0" stroke-width="1.2"/><text x="2117.2" y="619.4" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="6" font-weight="600" fill="#143a50" pointer-events="none">WC5</text></g>
-<g style="cursor:default"><polygon points="303.4,141.8 271.1,141.8 271.1,190.5 361.0,190.5 361.0,170.6 334.5,170.6 334.5,141.8" fill="#cce8f4" stroke="#4a8fb0" stroke-width="1.2"/><text x="316.0" y="166.2" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="6" font-weight="600" fill="#143a50" pointer-events="none">WC6</text></g>
-<g style="cursor:default"><polygon points="204.1,141.8 204.1,190.5 267.5,190.5 267.5,141.8 235.3,141.8" fill="#cce8f4" stroke="#4a8fb0" stroke-width="1.2"/><text x="235.8" y="166.2" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="6" font-weight="600" fill="#143a50" pointer-events="none">WC7</text></g>
-<g style="cursor:default"><polygon points="377.5,592.3 221.3,592.3 221.3,646.5 344.5,646.5 344.5,619.6 346.5,619.6 346.5,638.9 377.5,638.9" fill="#cce8f4" stroke="#4a8fb0" stroke-width="1.2"/><text x="299.4" y="619.4" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#143a50" pointer-events="none">WC8</text></g>
-<g style="cursor:default"><polygon points="387.8,592.3 387.8,638.9 418.9,638.9 418.9,619.6 420.9,619.6 420.9,646.5 544.0,646.5 544.0,621.5 544.0,592.3" fill="#cce8f4" stroke="#4a8fb0" stroke-width="1.2"/><text x="465.9" y="619.4" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#143a50" pointer-events="none">WC9</text></g>
-<g onclick="rC('AD-201')"><polygon points="1402.3,129.9 1526.3,129.9 1598.4,129.9 1725.4,129.9 1751.5,129.9 1751.5,234.4 1912.5,234.4 1912.5,221.0 1923.3,221.0 1923.3,234.4 2084.6,234.4 2084.6,221.0 2095.4,221.0 2095.4,234.4 2256.5,234.4 2256.5,221.0 2267.3,221.0 2267.3,242.6 2259.2,242.6 2259.2,380.6 2267.3,380.6 2267.3,402.1 2260.6,402.1 2260.6,421.7 2435.4,421.7 2435.4,402.1 2428.8,402.1 2428.8,380.6 2435.4,380.6 2435.4,242.6 2428.8,242.6 2428.8,221.0 2434.2,221.0 2434.2,178.1 2428.5,178.1 2428.5,83.5 2428.8,83.5 2428.8,62.1 2428.5,62.1 2428.5,27.0 2428.8,27.0 2428.8,17.5 2267.3,17.5 2267.3,27.0 2260.7,27.0 2260.7,62.1 2267.3,62.1 2267.3,83.5 2256.5,83.5 2095.4,83.5 2084.6,83.5 2030.5,83.5 2030.5,44.7 1402.3,44.7 1402.3,62.1 1407.6,62.1 1407.6,83.5 1402.3,83.5 1923.3,62.1 1923.3,83.5 1912.5,83.5 1912.5,62.1 1751.5,62.1 1751.5,83.5 1740.8,83.5 1740.8,62.1 1579.6,62.1 1579.6,83.5 1568.8,83.5 1568.8,62.1" fill="#e8edff" stroke="#6070b0" stroke-width="1.5"/><text x="1919.2" y="219.8" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="11" font-weight="700" fill="#001060" pointer-events="none">AD-201</text></g>
-<g onclick="rC('AD-204')"><polygon points="2643.4,18.5 2439.3,18.5 2439.3,27.0 2430.8,27.0 2430.8,62.1 2439.3,62.1 2439.3,83.5 2430.8,83.5 2430.8,175.3 2434.2,175.3 2440.0,178.1 2434.2,178.1 2434.2,221.0 2439.3,221.0 2439.3,241.4 2521.6,241.4 2521.6,220.6 2524.0,220.6 2524.0,233.4 2597.2,233.4 2632.7,234.1 2632.7,205.0 2643.4,205.0" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="2541.0" y="129.7" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#002554" pointer-events="none">204</text></g>
-<g onclick="rC('AD-205')"><polygon points="2439.3,243.9 2439.3,307.5 2521.6,307.5 2521.6,243.9" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="2480.4" y="275.7" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#002554" pointer-events="none">205</text></g>
-<g onclick="rC('AD-206')"><polygon points="2439.3,310.1 2439.3,421.7 2469.9,421.7 2521.6,421.7 2521.6,310.1" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="2480.4" y="365.9" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#002554" pointer-events="none">206</text></g>
-<g onclick="rC('AD-207')"><polygon points="2522.8,426.0 2452.1,426.0 2452.1,510.1 2469.9,510.1 2469.9,540.1 2608.6,540.1 2608.6,426.0" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="2530.4" y="483.0" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">207</text></g>
-<g onclick="rC('AD-211')"><polygon points="2071.7,651.6 2090.0,647.3 2090.0,590.1 2071.7,590.1 2071.7,588.1 2026.3,588.1 2026.3,681.0 2071.7,681.0" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="2058.1" y="634.5" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#002554" pointer-events="none">211</text></g>
-<g onclick="rC('AD-212')"><polygon points="1916.6,562.0 1916.6,600.8 2023.6,600.8 2023.6,550.6 1923.5,550.6 1923.5,562.0" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="1970.1" y="575.7" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">212</text></g>
-<g onclick="rC('AD-213')"><polygon points="1916.6,603.3 1916.6,680.6 2023.6,680.6 2023.6,603.3" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="1970.1" y="642.0" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">213</text></g>
-<g onclick="rC('AD-214')"><polygon points="2071.7,689.8 2025.0,683.6 1916.6,683.6 1916.6,699.2 1923.5,699.2 1923.5,721.4 1916.6,721.4 1916.6,737.6 2084.3,737.6 2084.3,689.8" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="2000.4" y="710.6" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">214</text></g>
-<g onclick="rC('AD-216')"><polygon points="2088.7,721.4 2088.7,737.6 2174.7,737.6 2174.7,653.4 2092.0,653.4 2073.5,653.4 2073.5,687.3 2084.4,687.3 2088.7,687.3 2088.7,699.2 2095.6,699.2 2095.6,721.4" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="2124.1" y="695.6" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#002554" pointer-events="none">216</text></g>
-<g onclick="rC('AD-217')"><polygon points="2263.7,737.6 2256.7,721.4 2256.7,699.2 2263.7,699.2 2263.7,653.4 2177.5,653.4 2177.5,737.6" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="2220.6" y="695.5" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#002554" pointer-events="none">217</text></g>
-<g onclick="rC('AD-218')"><polygon points="2349.9,541.1 2267.3,542.5 2267.3,561.6 2261.9,561.6 2261.9,588.1 2267.3,590.1 2258.5,651.6 2267.3,651.6 2267.3,721.2 2428.8,740.6 2466.6,737.6 2466.6,544.2 2431.4,542.5 2393.0,541.1" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="2363.4" y="640.8" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#002554" pointer-events="none">218</text></g>
-<g onclick="rC('AD-219')"><polygon points="2578.3,590.3 2469.4,590.3 2469.4,737.6 2578.3,737.6" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="2523.9" y="664.0" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">219</text></g>
-<g onclick="rC('AD-220')"><polygon points="883.3,590.7 883.3,699.2 891.8,699.2 891.8,716.7 1052.5,716.7 1052.5,699.2 1063.9,699.2 1063.9,716.7 1135.2,716.7 1135.2,590.7" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="1009.2" y="653.7" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#002554" pointer-events="none">220</text></g>
-<g onclick="rC('AD-224')"><polygon points="880.1,590.7 741.6,590.7 741.6,716.7 880.1,716.7" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="810.8" y="653.7" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">224</text></g>
-<g onclick="rC('AD-226')"><polygon points="597.0,716.7 695.4,716.7 695.4,699.2 719.3,699.2 719.3,716.7 737.9,716.7 737.9,590.7 597.0,590.7" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="667.5" y="653.7" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">226</text></g>
-<g onclick="rC('AD-228')"><polygon points="595.3,466.3 595.3,536.9 715.2,536.9 715.2,466.3" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="655.2" y="501.6" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">228</text></g>
-<g onclick="rC('AD-229')"><polygon points="597.0,463.8 715.2,463.8 715.2,402.1 695.8,402.1 695.8,392.6 596.6,392.6 596.6,461.9 597.0,461.9" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="655.9" y="428.3" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">229</text></g>
-<g onclick="rC('AD-230')"><polygon points="596.6,319.3 596.6,390.1 695.8,390.1 695.8,380.6 715.2,380.6 715.2,319.3" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="655.9" y="360.5" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">230</text></g>
-<g onclick="rC('AD-231')"><polygon points="595.3,316.8 715.2,316.8 715.2,246.2 695.8,246.2 595.3,246.2" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="655.2" y="281.5" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">231</text></g>
-<g onclick="rC('AD-232')"><polygon points="595.3,131.4 595.3,192.5 707.0,192.5 717.2,192.5 717.2,131.4" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="656.2" y="161.9" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">232</text></g>
-<g onclick="rC('AD-234')"><polygon points="695.4,66.2 595.3,66.2 595.3,128.8 717.2,128.8 717.2,83.5 695.4,83.5" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="656.2" y="97.5" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">234</text></g>
-<g onclick="rC('AD-235')"><polygon points="536.4,66.2 424.2,66.2 424.2,128.8 545.0,128.8 545.0,83.5 536.4,83.5" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="484.6" y="97.5" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">235</text></g>
-<g onclick="rC('AD-236')"><polygon points="424.2,192.5 545.0,192.5 545.0,131.4 424.2,131.4" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="484.6" y="161.9" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">236</text></g>
-<g onclick="rC('AD-237')"><polygon points="364.9,192.5 422.2,192.5 422.2,66.2 364.9,66.2 364.9,83.5 338.5,83.5 338.5,166.7 364.9,166.7" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="380.4" y="129.3" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#002554" pointer-events="none">237</text></g>
-<g onclick="rC('AD-240')"><polygon points="53.3,139.9 53.3,240.6 124.3,240.6 124.3,195.6 170.7,195.6 182.3,193.7 182.3,141.8 171.1,141.8 171.1,139.9" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="117.5" y="190.3" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#002554" pointer-events="none">240</text></g>
-<g onclick="rC('AD-241')"><polygon points="51.3,242.9 18.4,242.9 18.4,295.5 122.2,295.5 122.2,243.2 51.3,243.2" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="70.3" y="269.2" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">241</text></g>
-<g onclick="rC('AD-242')"><polygon points="18.4,298.0 18.4,390.1 122.2,390.1 122.2,298.0" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="70.3" y="344.0" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">242</text></g>
-<g onclick="rC('AD-243')"><polygon points="18.4,392.6 18.4,455.3 122.2,455.3 122.2,392.6" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="70.3" y="423.9" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">243</text></g>
-<g onclick="rC('AD-244')"><polygon points="18.4,457.9 18.4,522.3 122.2,522.3 122.2,457.9" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="70.3" y="490.1" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">244</text></g>
-<g onclick="rC('AD-245')"><polygon points="18.4,524.9 18.4,587.4 101.7,587.7 122.2,587.7 122.2,524.9" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="70.3" y="556.5" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">245</text></g>
-<g onclick="rC('AD-246')"><polygon points="102.4,590.3 17.0,590.3 17.0,718.0 122.5,718.0 122.5,696.4 120.5,653.4 102.0,653.4 102.0,651.4 120.5,651.4 120.5,622.2 102.4,622.2" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="69.7" y="654.4" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">246</text></g>
-<g onclick="rC('AD-247')"><polygon points="364.9,223.4 204.1,223.4 204.1,242.6 193.0,242.6 193.0,277.4 173.0,277.4 173.0,391.0 191.0,391.0 191.0,298.8 193.0,298.8 193.0,380.2 204.1,380.2 204.1,389.6 364.9,389.6 364.9,380.2 364.5,242.6 364.9,242.6" fill="#e6f5ec" stroke="#408060" stroke-width="1.5"/><text x="268.9" y="307.2" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#083a18" pointer-events="none">247</text></g>
-<g onclick="rC('AD-248')"><polygon points="204.1,559.0 364.9,559.0 364.9,539.8 364.5,402.1 364.9,392.6 204.1,392.6 204.1,402.1 193.0,402.1 193.0,483.4 191.0,483.4 191.0,402.1 173.0,402.1 173.0,505.0 193.0,505.0 193.0,539.8 204.1,539.8" fill="#e6f5ec" stroke="#408060" stroke-width="1.5"/><text x="268.9" y="475.2" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#083a18" pointer-events="none">248</text></g>
-<g onclick="rC('AD-249')"><polygon points="125.4,587.7 125.4,653.4 170.7,653.4 170.7,651.6 182.0,651.6 182.0,590.1 170.7,590.1 170.7,587.7" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/><text x="153.7" y="620.5" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#002554" pointer-events="none">249</text></g>
-<g onclick="rC('AD-251')"><polygon points="545.9,505.0 545.9,402.1 537.0,402.1 537.0,380.6 545.9,380.6 545.9,277.4 525.4,277.4 525.4,223.4 375.7,223.4 375.7,242.6 367.2,242.6 367.2,380.6 375.7,380.6 375.7,402.1 367.2,402.1 367.2,539.8 375.7,539.8 375.7,559.0 525.4,559.0 525.4,505.0 525.4,298.8 527.6,298.8 527.6,483.4 525.4,483.4" fill="#e6f5ec" stroke="#408060" stroke-width="1.5"/><text x="456.6" y="391.0" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#083a18" pointer-events="none">251</text></g>
-</svg>`;
+// ── FLOOR ROOMS FOR DROPDOWNS ──────────────────────────────────────────────
+const FLOOR_ROOMS={
+  'bld_ad_f1':['AD-101','AD-103','AD-104'],
+  'bld_ad_f2':['AD-201','AD-204','AD-205','AD-206','AD-207','AD-211','AD-212',
+    'AD-213','AD-214','AD-216','AD-217','AD-218','AD-219','AD-220','AD-224',
+    'AD-226','AD-228','AD-229','AD-230','AD-231','AD-232','AD-234','AD-235',
+    'AD-236','AD-237','AD-240','AD-241','AD-242','AD-243','AD-244','AD-245',
+    'AD-246','AD-247','AD-248','AD-249','AD-251',
+    'AD-2.LB1','AD-2.LB2','AD-2.LB3','AD-2.LB4','AD-2.LB5','AD-2.LB6','AD-2.LB7'],
+  'bld_ad_f6':['AD-601','AD-604','AD-605','AD-608','AD-609','AD-610',
+    'AD-611','AD-612','AD-613','AD-614','AD-615','AD-616','AD-617']
+};
 
-// ── DỮ LIỆU CHI TIẾT PHÒNG ──────────────────────────────────────────────────
-const F6_SVG=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1129" style="width:900px;height:1129px;display:block;min-width:900px">
-<rect width="900" height="1129" fill="#edf0f8"/>
-<g style="cursor:default"><polygon points="20.0,222.8 20.0,446.2 28.6,449.4 34.9,432.4 57.5,371.5 205.8,426.5 224.5,376.2 156.8,351.0 76.2,321.1 98.9,260.1 101.5,253.1 31.1,299.0 49.0,299.0" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1.2"/>
-<text x="122.2" y="336.1" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#2a3456" pointer-events="none">CR3</text>
+// ── SVG MAPS — viewBox responsive, no horizontal scroll ────────────────────
+const SVGS={};
+
+SVGS['bld_ad_f1']=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 260" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;display:block;max-width:900px">
+<rect width="900" height="260" fill="#edf0f8"/>
+<g style="cursor:default"><polygon points="355.0,163.8 345.7,188.8 450.1,227.6 459.4,202.5 481.2,210.6 504.4,219.2 527.6,227.8 528.7,228.3 534.6,212.3 533.5,211.8 473.6,189.6 465.3,186.5 474.2,162.6 474.6,161.5 348.0,114.5 338.7,139.5 317.2,131.5 292.5,122.4 291.6,122.0 285.6,138.0 286.8,138.5 346.6,160.7 412.2,171.1 412.2,179.2 408.1,179.2 408.1,171.1" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1"/>
+<text x="410.1" y="171.4" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#2a3456" pointer-events="none">LB1</text>
 </g>
-<g style="cursor:default"><polygon points="878.6,743.8 878.6,527.6 871.0,524.7 863.7,544.2 841.1,605.1 649.2,533.8 622.9,524.1 648.5,455.1 430.9,374.4 430.9,374.4 427.5,376.5 356.5,350.2 371.8,309.1 347.3,300.0 338.0,296.6 313.5,287.5 298.3,328.5 249.0,310.2 225.9,372.6 224.5,376.2 205.8,426.5 249.5,442.7 275.7,452.5 267.0,476.1 330.5,499.7 424.5,534.6 503.7,564.0 595.8,598.2 604.8,574.0 669.6,598.0 669.6,598.0 673.1,600.0 746.0,627.0 822.4,655.4 800.4,714.8 440.4,488.3 458.3,488.3 849.6,677.5 867.5,677.5" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1.2"/>
-<text x="542.2" y="515.6" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#2a3456" pointer-events="none">LB1</text>
+<g onclick="rC('AD-101')" style="cursor:pointer"><polygon points="472.1,231.8 479.5,211.7 460.3,204.5 451.5,228.0 470.8,235.2" fill="#e6f5ec" stroke="#408060" stroke-width="1.5"/>
+<text x="465.5" y="219.8" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#083a18" pointer-events="none">101</text>
 </g>
-<g style="cursor:default"><polygon points="446.3,333.0 445.0,336.5 430.9,374.4 648.5,455.1 653.5,441.6 679.8,451.3 746.2,476.0 762.4,432.5 645.8,389.2 553.0,354.8 452.1,317.3 446.3,332.8" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1.2"/>
-<text x="596.6" y="396.6" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#2a3456" pointer-events="none">LB2</text>
+<g onclick="rC('AD-103')" style="cursor:pointer"><polygon points="803.9,24.8 803.9,33.3 803.9,37.4 803.9,50.8 803.9,57.4 878.0,57.4 878.0,50.8 878.0,37.4 878.0,33.3 878.0,24.8" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="841.0" y="41.1" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#002554" pointer-events="none">103</text>
 </g>
-<g style="cursor:default"><polygon points="249.0,294.1 254.2,296.1 250.7,305.7 295.4,322.3 309.8,283.5 309.8,283.4 294.9,277.8 295.7,275.7 312.9,282.1 338.6,291.6 375.9,191.1 286.4,157.9 277.3,182.6 279.4,183.4 251.3,259.2 258.4,261.8 265.7,264.5 264.9,266.7 259.8,264.8" fill="#cce8f4" stroke="#4a8fb0" stroke-width="1.2"/>
-<text x="312.4" y="240.1" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#143a50" pointer-events="none">WC1</text>
-</g>
-<g style="cursor:default"><polygon points="477.3,228.8 387.4,195.4 350.1,295.9 375.7,305.4 393.0,311.8 392.2,314.0 377.2,308.4 377.2,308.5 362.8,347.3 426.9,371.1 441.4,332.2 422.2,325.1 423.0,322.9 440.0,329.3 448.0,307.8 440.4,299.0 454.1,291.4" fill="#cce8f4" stroke="#4a8fb0" stroke-width="1.2"/>
-<text x="413.7" y="283.2" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#143a50" pointer-events="none">WC2</text>
-</g>
-<g onclick="rC('AD-601')" style="cursor:pointer"><polygon points="20.0,19.5 20.0,219.6 102.5,250.2 104.8,244.0 110.8,228.0 117.7,209.5 117.7,209.3 50.6,184.4 51.4,182.3 120.8,208.0 188.4,233.1 214.4,163.0 229.8,121.6 231.6,116.6 237.7,100.3 31.1,48.3 49.0,48.3" fill="#e6f5ec" stroke="#408060" stroke-width="1.8"/>
-<text x="128.8" y="134.8" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#083a18" pointer-events="none">601</text>
-</g>
-<g onclick="rC('AD-609')" style="cursor:pointer"><polygon points="372.8,921.2 878.6,1109.0 878.6,747.1 799.3,717.7 797.3,723.2 792.0,737.4 790.6,741.1 767.3,803.9 638.5,756.0 615.2,747.4 550.9,723.5 527.0,714.6 528.0,711.7 482.5,694.8 481.4,697.7 458.9,689.3 440.4,928.2 458.3,928.2 645.0,928.2 662.9,928.2 849.6,928.2 867.5,928.2 645.0,1004.2 662.9,1004.2 849.6,1080.1 867.5,1080.1" fill="#e6f5ec" stroke="#408060" stroke-width="1.8"/>
-<text x="625.7" y="899.1" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#083a18" pointer-events="none">609</text>
-</g>
-<g onclick="rC('AD-614')" style="cursor:pointer"><polygon points="20.0,451.4 20.0,790.3 369.9,920.1 456.5,686.8 457.0,685.5 454.8,684.7 440.4,677.6 458.1,675.7 460.3,676.6 480.2,622.9 461.3,615.9 462.4,613.0 416.8,596.1 415.7,599.0 402.4,594.0 308.4,559.2 293.3,553.5 294.4,550.7 248.8,533.8 247.8,536.6 241.3,534.2 241.5,533.6 218.8,525.2 41.3,459.3 26.9,454.0 31.1,677.5 49.0,677.5 31.1,776.3 49.0,776.3 235.7,852.2 253.6,852.2" fill="#e6f5ec" stroke="#408060" stroke-width="1.8"/>
-<text x="250.1" y="685.8" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#083a18" pointer-events="none">614</text>
-</g>
-<g onclick="rC('AD-604')" style="cursor:pointer"><polygon points="596.4,233.4 496.9,196.5 486.2,225.3 484.0,231.4 460.8,293.7 458.5,292.8 457.5,295.4 458.3,299.0 453.2,307.0 452.3,309.6 454.6,310.5 453.2,314.4 552.7,351.3" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/>
-<text x="524.4" y="273.9" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#002554" pointer-events="none">604</text>
-</g>
-<g onclick="rC('AD-605')" style="cursor:pointer"><polygon points="689.2,267.9 599.3,234.5 555.6,352.4 645.5,385.8 645.0,276.2 662.9,276.2" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/>
-<text x="622.4" y="310.1" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#002554" pointer-events="none">605</text>
-</g>
-<g onclick="rC('AD-608')" style="cursor:pointer"><polygon points="880.0,500.4 878.6,500.8 878.6,338.2 692.1,269.0 648.4,386.9 766.3,430.7 749.1,477.1 857.4,517.2 871.8,522.6 849.6,352.2 867.5,352.2 706.4,299.0 724.3,299.0" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/>
-<text x="764.2" y="395.8" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#002554" pointer-events="none">608</text>
-</g>
-<g onclick="rC('AD-610')" style="cursor:pointer"><polygon points="617.7,745.0 639.5,753.1 638.5,756.0 767.3,803.9 791.6,738.5 640.9,682.6" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/>
-<text x="704.7" y="743.2" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#002554" pointer-events="none">610</text>
-</g>
-<g onclick="rC('AD-611')" style="cursor:pointer"><polygon points="553.4,721.2 614.8,744.0 638.4,680.4 639.0,680.6 643.0,670.0 587.7,649.5 573.8,686.9 567.1,684.4" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/>
-<text x="598.2" y="696.8" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">611</text>
-</g>
-<g onclick="rC('AD-612')" style="cursor:pointer"><polygon points="594.8,601.1 504.1,567.4 484.2,621.1 483.6,622.6 463.2,677.6 459.9,686.5 482.5,694.8 528.0,711.7 550.6,720.1 564.2,683.3 548.6,677.5 549.7,674.6 566.7,681.0 572.0,682.9 584.8,648.4 579.6,646.4 562.5,640.1 563.6,637.2 579.2,643.0" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/>
-<text x="527.3" y="643.8" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#002554" pointer-events="none">612</text>
-</g>
-<g onclick="rC('AD-613')" style="cursor:pointer"><polygon points="644.0,667.1 644.3,666.4 668.6,600.9 606.6,577.9 598.2,600.7 582.1,644.1 587.3,646.0" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/>
-<text x="625.4" y="622.5" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">613</text>
-</g>
-<g onclick="rC('AD-615')" style="cursor:pointer"><polygon points="265.9,479.0 246.4,531.4 245.9,532.7 248.8,533.8 294.4,550.7 308.1,555.7 328.0,502.0" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/>
-<text x="286.9" y="517.4" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">615</text>
-</g>
-<g onclick="rC('AD-616')" style="cursor:pointer"><polygon points="422.0,536.9 330.9,503.1 310.9,556.8 402.1,590.6" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/>
-<text x="366.4" y="546.9" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">616</text>
-</g>
-<g onclick="rC('AD-617')" style="cursor:pointer"><polygon points="501.2,566.3 424.9,538.0 404.9,591.7 416.8,596.1 462.4,613.0 481.3,620.1" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.2"/>
-<text x="453.0" y="579.0" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">617</text>
+<g onclick="rC('AD-104')" style="cursor:pointer"><polygon points="83.0,112.5 22.0,112.5 22.0,119.1 22.0,149.9 83.0,149.9 83.0,119.1 83.0,119.1" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="52.5" y="131.2" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#002554" pointer-events="none">104</text>
 </g>
 </svg>`;
 
+SVGS['bld_ad_f2']=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 420" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;display:block;max-width:900px">
+<rect width="900" height="420" fill="#edf0f8"/>
+<g style="cursor:default"><polygon points="471.1,150.4 461.4,150.4 461.4,163.0 470.4,163.0 470.4,159.0 473.9,159.0 473.9,163.0 526.4,163.0 526.4,159.0 529.9,159.0 529.9,163.0 582.3,163.0 582.3,159.0 585.8,159.0 585.8,150.4 577.3,150.4 536.3,150.4 525.6,150.4 522.8,150.4 512.1,150.4" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1"/>
+</g>
+<g style="cursor:default"><polygon points="135.0,314.1 135.0,308.3 155.2,308.3 155.2,314.1 190.9,314.1 194.4,314.1 194.4,320.9 209.3,320.9 209.3,289.5 194.4,289.5 194.4,297.2 194.4,299.2 152.4,299.2 152.4,297.2 152.4,295.7 142.0,295.7 139.3,295.7 128.8,295.7 128.8,297.2 128.8,299.2 87.5,299.2 75.8,299.2 71.8,299.2 56.9,299.2 56.9,313.2 56.3,313.2 56.3,320.2 79.0,320.2 79.0,314.1 82.5,314.1 82.5,320.9 135.0,320.9" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1"/>
+<text x="132.8" y="305.2" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#2a3456" pointer-events="none">CR10</text>
+</g>
+<g style="cursor:default"><polygon points="837.0,224.0 864.5,224.0 875.8,224.0 875.8,217.7 875.8,210.7 875.8,208.4 851.8,208.4 851.8,186.9 860.2,186.9 860.2,163.6 837.0,163.6 837.0,165.6 837.0,187.2" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1"/>
+<text x="856.4" y="193.8" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="6" font-weight="600" fill="#2a3456" pointer-events="none">CR2</text>
+</g>
+<g style="cursor:default"><polygon points="854.7,263.7 818.3,263.7 818.3,277.9 854.7,277.9" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1"/>
+<text x="836.5" y="270.8" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#2a3456" pointer-events="none">CR3</text>
+</g>
+<g style="cursor:default"><polygon points="750.3,278.0 751.8,278.0 751.8,269.4 750.0,269.4 750.0,265.5 697.6,265.5 697.6,269.4 694.1,269.4 694.1,265.5 675.1,265.5 675.1,278.0 689.9,278.0 696.5,278.0 711.8,278.0 713.2,278.0 728.5,278.0 744.0,278.0" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1"/>
+</g>
+<g style="cursor:default"><polygon points="306.2,265.4 306.2,269.4 302.7,269.4 302.7,264.7 250.3,264.7 250.3,269.4 246.8,269.4 246.8,277.9 386.3,277.9 386.3,265.6 362.1,265.6 362.1,269.4 358.6,269.4 358.6,265.4" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1"/>
+</g>
+<g style="cursor:default"><polygon points="194.5,129.4 194.5,150.1 194.4,150.1 194.4,151.1 194.4,159.0 194.4,166.0 190.9,166.0 190.9,166.1 188.0,166.1 188.0,176.5 194.5,176.5 194.5,210.7 194.4,210.7 194.4,216.3 209.3,216.3 209.3,214.2 209.3,191.3 209.3,191.3 209.1,191.3 209.1,190.2 209.1,166.5 209.1,161.7 210.0,161.7 210.0,166.1 242.7,166.1 242.7,159.0 246.2,159.0 246.2,150.5 209.1,150.5 209.1,129.4 209.1,108.1 194.4,108.1 194.4,114.2 194.5,114.2" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1"/>
+<text x="217.1" y="162.2" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#2a3456" pointer-events="none">CR6</text>
+</g>
+<g style="cursor:default"><polygon points="82.5,158.9 135.0,158.9 135.0,159.0 138.4,159.0 138.4,158.9 187.5,158.9 190.9,158.9 190.9,159.0 194.4,159.0 194.4,150.5 154.0,150.5 134.3,150.5 134.3,150.4 103.8,150.4 82.5,150.4" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1"/>
+</g>
+<g style="cursor:default"><polygon points="57.0,165.6 57.0,183.5 57.0,214.2 57.0,235.4 57.0,257.2 57.0,278.0 57.7,278.0 71.8,278.0 75.8,278.0 81.2,278.0 81.2,269.4 79.0,269.4 79.0,269.5 71.7,269.5 71.7,262.3 78.1,262.3 78.1,251.8 71.7,251.8 71.7,214.2 71.7,176.5 78.1,176.5 78.1,166.1 71.7,166.1 71.7,158.9 79.0,158.9 79.0,159.0 81.2,159.0 81.2,150.4 75.9,150.4 71.8,150.4 57.0,150.4 57.0,164.6" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1"/>
+<text x="69.1" y="214.2" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#2a3456" pointer-events="none">CR8</text>
+</g>
+<g style="cursor:default"><polygon points="194.5,217.7 194.5,251.8 188.0,251.8 188.0,262.3 190.9,262.3 190.9,262.4 194.4,262.4 194.4,269.4 190.9,269.4 190.9,269.5 187.5,269.5 138.4,269.5 138.4,269.4 135.0,269.4 135.0,269.5 82.5,269.5 82.5,278.0 87.5,278.0 139.3,278.0 142.0,278.0 194.4,278.0 194.4,288.1 209.3,288.1 209.3,277.9 246.8,277.9 246.8,269.4 242.7,269.4 242.7,262.3 210.0,262.3 210.0,266.7 209.1,266.7 209.1,261.9 209.1,238.1 209.1,237.0 209.3,237.0 209.3,217.7" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1"/>
+<text x="164.7" y="252.9" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#2a3456" pointer-events="none">CR9</text>
+</g>
+<g style="cursor:default"><polygon points="365.1,182.3 366.1,182.6 417.6,201.7 423.9,204.1 437.0,168.8 418.8,162.0 410.8,183.5 392.3,176.7 370.2,168.5" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1"/>
+<text x="401.1" y="183.1" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#2a3456" pointer-events="none">LB1</text>
+</g>
+<g style="cursor:default"><polygon points="521.9,272.5 524.0,266.7 525.5,262.8 532.3,244.3 553.2,252.1 574.2,259.9 579.3,246.1 578.3,245.7 526.8,226.6 519.8,224.0 506.7,259.3 504.2,265.9" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1"/>
+<text x="541.8" y="248.2" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#2a3456" pointer-events="none">LB2</text>
+</g>
+<g style="cursor:default"><polygon points="461.4,150.1 461.4,129.1 471.1,129.1 472.2,129.1 472.2,114.2 470.4,114.2 470.4,107.2 472.2,107.2 472.2,101.4 409.0,101.4 409.0,147.1 420.8,151.5 421.2,151.6 421.8,151.9 441.5,159.2 440.1,163.0 461.4,163.0 461.4,151.1 418.0,107.2 418.0,114.2 414.5,114.2 414.5,107.2" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1"/>
+<text x="440.6" y="132.2" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#2a3456" pointer-events="none">LB3</text>
+</g>
+<g style="cursor:default"><polygon points="808.8,225.4 751.4,225.4 751.4,262.4 753.5,262.4 753.5,262.3 779.4,262.3 779.4,262.7 793.4,262.7 793.4,262.3 805.9,262.3 805.9,262.4 809.4,262.4 812.2,262.4 812.2,253.0 812.2,234.8 812.2,225.4" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1"/>
+<text x="781.8" y="244.1" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#2a3456" pointer-events="none">LB4</text>
+</g>
+<g style="cursor:default"><polygon points="386.3,278.3 386.3,320.2 414.5,320.2 414.5,314.1 416.7,314.1 416.7,269.4 414.5,269.4 414.5,265.6 386.3,265.6 386.3,277.2" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1"/>
+<text x="401.5" y="292.9" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#2a3456" pointer-events="none">LB5</text>
+</g>
+<g style="cursor:default"><polygon points="250.3,114.2 250.4,114.2 250.4,114.3 250.4,129.4 250.4,150.5 246.2,150.5 246.2,159.0 250.3,159.0 250.3,163.6 281.1,163.6 281.1,108.1 250.3,108.1" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1"/>
+<text x="263.6" y="135.8" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#2a3456" pointer-events="none">LB6</text>
+</g>
+<g style="cursor:default"><polygon points="33.8,108.1 33.8,132.5 71.8,132.5 75.9,132.5 81.9,132.5 81.9,132.5 81.9,129.1 92.9,129.1 92.9,131.8 103.8,131.8 114.6,131.8 114.6,129.1 125.6,129.1 125.6,107.5 82.5,107.5 82.5,114.2 79.0,114.2 79.0,108.1" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1"/>
+<text x="79.7" y="120.0" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#2a3456" pointer-events="none">LB7</text>
+</g>
+<g style="cursor:default"><polygon points="471.8,131.4 471.8,149.0 511.8,149.0 511.8,143.4 512.4,143.4 512.4,149.0 522.5,149.0 522.5,133.7 512.4,133.7 512.4,135.6 511.8,135.6 511.8,133.3 511.8,131.9 511.8,131.4" fill="#cce8f4" stroke="#4a8fb0" stroke-width="1"/>
+<text x="497.1" y="140.2" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#143a50" pointer-events="none">WC1</text>
+</g>
+<g style="cursor:default"><polygon points="536.6,149.0 576.6,149.0 576.6,138.8 576.6,131.4 536.6,131.4 536.6,131.9 536.6,133.3 536.6,135.6 536.0,135.6 536.0,133.7 525.9,133.7 525.9,149.0 536.0,149.0 536.0,143.4 536.6,143.4" fill="#cce8f4" stroke="#4a8fb0" stroke-width="1"/>
+<text x="551.2" y="140.2" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#143a50" pointer-events="none">WC2</text>
+</g>
+<g style="cursor:default"><polygon points="743.4,279.3 729.1,279.3 729.1,296.9 743.4,296.9" fill="#cce8f4" stroke="#4a8fb0" stroke-width="1"/>
+</g>
+<g style="cursor:default"><polygon points="727.8,279.3 713.5,279.3 713.5,296.9 727.8,296.9" fill="#cce8f4" stroke="#4a8fb0" stroke-width="1"/>
+</g>
+<g style="cursor:default"><polygon points="711.4,279.3 697.2,279.3 697.2,296.9 711.4,296.9" fill="#cce8f4" stroke="#4a8fb0" stroke-width="1"/>
+</g>
+<g style="cursor:default"><polygon points="114.9,133.2 104.4,133.2 104.4,149.0 133.6,149.0 133.6,142.5 125.0,142.5 125.0,133.2" fill="#cce8f4" stroke="#4a8fb0" stroke-width="1"/>
+<text x="119.0" y="141.1" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#143a50" pointer-events="none">WC6</text>
+</g>
+<g style="cursor:default"><polygon points="82.5,133.2 82.5,149.0 103.1,149.0 103.1,133.2 92.6,133.2" fill="#cce8f4" stroke="#4a8fb0" stroke-width="1"/>
+<text x="92.8" y="141.1" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#143a50" pointer-events="none">WC7</text>
+</g>
+<g style="cursor:default"><polygon points="138.9,279.3 88.2,279.3 88.2,296.9 128.2,296.9 128.2,295.1 128.2,288.1 128.8,288.1 128.8,294.4 138.9,294.4" fill="#cce8f4" stroke="#4a8fb0" stroke-width="1"/>
+<text x="113.6" y="288.1" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#143a50" pointer-events="none">WC8</text>
+</g>
+<g style="cursor:default"><polygon points="142.3,279.3 142.3,294.4 152.4,294.4 152.4,288.1 153.0,288.1 153.0,295.1 153.0,296.9 193.0,296.9 193.0,288.8 193.0,279.3" fill="#cce8f4" stroke="#4a8fb0" stroke-width="1"/>
+<text x="167.7" y="288.1" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#143a50" pointer-events="none">WC9</text>
+</g>
+<g onclick="rC('AD-201')" style="cursor:pointer"><polygon points="472.2,129.1 512.4,129.1 512.4,131.1 512.4,131.6 522.8,131.6 525.6,131.6 536.0,131.6 536.0,131.1 536.0,129.1 577.3,129.1 585.8,129.1 585.8,138.8 585.8,149.7 585.8,150.8 585.8,159.0 585.8,163.0 638.2,163.0 638.2,159.0 641.7,159.0 641.7,163.0 694.1,163.0 694.1,159.0 697.6,159.0 697.6,163.0 750.0,163.0 750.0,159.0 753.5,159.0 753.5,166.0 750.9,166.0 750.9,210.7 753.5,210.7 753.5,217.7 751.4,217.7 751.4,224.0 808.1,224.0 808.1,217.7 805.9,217.7 805.9,210.7 808.1,210.7 808.1,187.2 808.1,166.0 805.9,166.0 805.9,159.0 807.7,159.0 807.7,144.9 805.8,144.9 805.8,114.2 805.9,114.2 805.9,107.2 805.8,107.2 805.8,95.7 805.9,95.7 805.9,92.6 753.5,92.6 753.5,93.5 753.5,95.7 751.4,95.7 751.4,107.2 753.5,107.2 753.5,114.2 750.0,114.2 697.6,114.2 694.1,114.2 688.9,114.2 676.5,114.2 676.5,101.4 472.2,101.4 472.2,107.2 473.9,107.2 473.9,114.2 472.2,114.2 641.7,107.2 641.7,114.2 638.2,114.2 638.2,107.2 585.8,107.2 585.8,114.2 582.3,114.2 582.3,107.2 529.9,107.2 529.9,114.2 526.4,114.2 526.4,107.2" fill="#e6f5ec" stroke="#408060" stroke-width="1.5"/>
+<text x="640.1" y="158.3" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#083a18" pointer-events="none">201</text>
+</g>
+<g onclick="rC('AD-247')" style="cursor:pointer"><polygon points="135.0,159.7 82.5,159.7 82.5,166.0 78.9,166.0 78.9,177.2 72.4,177.2 72.4,214.2 78.2,214.2 78.2,210.7 78.2,184.2 78.9,184.2 78.9,210.7 82.5,210.7 82.5,213.8 135.0,213.8 135.0,210.7 134.8,210.7 134.8,166.0 135.0,166.0" fill="#e6f5ec" stroke="#408060" stroke-width="1.5"/>
+<text x="103.7" y="186.9" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#083a18" pointer-events="none">247</text>
+</g>
+<g onclick="rC('AD-248')" style="cursor:pointer"><polygon points="82.5,268.7 135.0,268.7 135.0,262.4 134.8,262.4 134.8,217.7 135.0,217.7 135.0,214.6 82.5,214.6 82.5,217.7 78.9,217.7 78.9,244.1 78.2,244.1 78.2,217.7 78.2,214.2 72.4,214.2 72.4,251.1 78.9,251.1 78.9,262.4 82.5,262.4" fill="#e6f5ec" stroke="#408060" stroke-width="1.5"/>
+<text x="103.7" y="241.4" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#083a18" pointer-events="none">248</text>
+</g>
+<g onclick="rC('AD-251')" style="cursor:pointer"><polygon points="193.8,251.1 193.8,217.7 190.9,217.7 190.9,210.7 193.8,210.7 193.8,177.2 187.1,177.2 187.1,165.7 187.1,159.7 138.4,159.7 138.4,166.0 135.7,166.0 135.7,210.7 138.4,210.7 138.4,217.7 135.7,217.7 135.7,262.4 138.4,262.4 138.4,268.7 187.1,268.7 187.1,262.7 187.1,251.1 187.1,184.2 187.8,184.2 187.8,244.1 187.1,244.1" fill="#e6f5ec" stroke="#408060" stroke-width="1.5"/>
+<text x="164.8" y="214.2" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#083a18" pointer-events="none">251</text>
+</g>
+<g onclick="rC('AD-204')" style="cursor:pointer"><polygon points="875.8,93.1 809.4,93.1 809.4,95.7 806.7,95.7 806.7,107.2 809.4,107.2 809.4,114.2 806.7,114.2 806.7,144.0 807.7,144.0 809.5,144.0 809.5,144.9 807.7,144.9 807.7,159.0 809.4,159.0 809.4,165.2 836.2,165.2 836.2,163.2 836.2,158.9 837.0,158.9 837.0,162.8 860.8,162.8 860.8,162.9 872.4,162.9 872.4,153.4 875.8,153.4 875.8,114.2 875.8,107.2 878.0,107.2 878.0,95.7 875.8,95.7" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="842.4" y="129.1" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#002554" pointer-events="none">204</text>
+</g>
+<g onclick="rC('AD-205')" style="cursor:pointer"><polygon points="809.4,166.1 809.4,186.7 836.2,186.7 836.2,166.1" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="822.8" y="176.4" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#002554" pointer-events="none">205</text>
+</g>
+<g onclick="rC('AD-206')" style="cursor:pointer"><polygon points="809.4,187.6 809.4,210.7 809.4,217.7 809.4,224.0 812.5,224.0 819.0,224.0 836.2,224.0 836.2,187.6" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="822.8" y="205.8" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#002554" pointer-events="none">206</text>
+</g>
+<g onclick="rC('AD-207')" style="cursor:pointer"><polygon points="836.6,225.4 819.4,225.4 819.4,235.1 813.6,235.1 813.6,252.7 819.4,252.7 819.4,262.4 855.3,262.4 864.5,262.4 864.5,225.4" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="839.0" y="243.9" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="6" font-weight="600" fill="#002554" pointer-events="none">207</text>
+</g>
+<g onclick="rC('AD-211')" style="cursor:pointer"><polygon points="689.9,298.6 695.9,298.6 695.9,297.2 695.9,278.7 695.9,278.6 689.9,278.6 689.9,278.0 675.1,278.0 675.1,282.5 675.1,308.1 689.9,308.1" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="685.5" y="293.1" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#002554" pointer-events="none">211</text>
+</g>
+<g onclick="rC('AD-212')" style="cursor:pointer"><polygon points="639.5,269.5 639.5,282.1 674.3,282.1 674.3,278.0 674.3,266.5 674.3,265.8 641.8,265.8 641.8,269.5" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="656.9" y="274.0" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#002554" pointer-events="none">212</text>
+</g>
+<g onclick="rC('AD-213')" style="cursor:pointer"><polygon points="639.5,282.9 639.5,308.1 674.3,308.1 674.3,282.9" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="656.9" y="295.5" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#002554" pointer-events="none">213</text>
+</g>
+<g onclick="rC('AD-214')" style="cursor:pointer"><polygon points="689.9,310.9 689.9,308.9 674.7,308.9 639.5,308.9 639.5,314.0 641.8,314.0 641.8,321.2 639.5,321.2 639.5,326.4 694.0,326.4 694.0,310.9" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="666.8" y="317.6" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#002554" pointer-events="none">214</text>
+</g>
+<g onclick="rC('AD-216')" style="cursor:pointer"><polygon points="695.4,321.2 695.4,326.4 723.4,326.4 723.4,299.2 713.2,299.2 711.8,299.2 696.5,299.2 690.5,299.2 690.5,308.5 690.5,310.3 694.1,310.3 695.4,310.3 695.4,314.0 697.7,314.0 697.7,321.2" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="707.0" y="312.8" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#002554" pointer-events="none">216</text>
+</g>
+<g onclick="rC('AD-217')" style="cursor:pointer"><polygon points="752.2,326.4 752.2,321.2 749.9,321.2 749.9,314.0 752.2,314.0 752.2,299.2 750.3,299.2 744.0,299.2 724.2,299.2 724.2,326.4" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="738.2" y="312.8" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#002554" pointer-events="none">217</text>
+</g>
+<g onclick="rC('AD-218')" style="cursor:pointer"><polygon points="779.4,262.7 779.4,263.1 753.5,263.1 753.5,269.4 751.8,269.4 751.8,278.0 753.5,278.0 753.5,278.6 752.7,278.6 750.8,278.6 750.7,278.6 750.7,278.7 750.7,298.6 753.5,298.6 753.5,314.1 753.5,321.1 753.5,327.4 805.9,327.4 805.9,326.4 818.3,326.4 818.3,278.3 818.3,277.2 818.3,264.1 818.3,263.7 812.5,263.7 809.4,263.7 809.4,269.4 805.9,269.4 805.9,263.1 793.4,263.1 793.4,262.7 809.4,314.1 809.4,321.1 805.9,321.1 805.9,314.1" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="784.5" y="295.0" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#002554" pointer-events="none">218</text>
+</g>
+<g onclick="rC('AD-219')" style="cursor:pointer"><polygon points="854.7,278.7 819.3,278.7 819.2,278.7 819.2,326.4 854.7,326.4" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="837.0" y="302.5" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="6" font-weight="600" fill="#002554" pointer-events="none">219</text>
+</g>
+<g onclick="rC('AD-220')" style="cursor:pointer"><polygon points="303.5,278.8 303.5,314.0 306.3,314.0 306.3,319.7 358.5,319.7 358.5,314.0 362.2,314.0 362.2,319.7 385.4,319.7 385.4,278.8" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="344.4" y="299.2" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#002554" pointer-events="none">220</text>
+</g>
+<g onclick="rC('AD-224')" style="cursor:pointer"><polygon points="302.5,278.8 257.5,278.8 257.5,319.7 302.5,319.7" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="280.0" y="299.2" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="6" font-weight="600" fill="#002554" pointer-events="none">224</text>
+</g>
+<g onclick="rC('AD-226')" style="cursor:pointer"><polygon points="210.7,319.7 242.6,319.7 242.6,314.0 246.2,314.0 246.8,314.0 250.4,314.0 250.4,319.7 256.4,319.7 256.4,278.8 210.7,278.8" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="233.5" y="299.2" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="6" font-weight="600" fill="#002554" pointer-events="none">226</text>
+</g>
+<g onclick="rC('AD-228')" style="cursor:pointer"><polygon points="210.0,238.5 210.0,261.5 242.7,261.5 246.2,261.5 246.8,261.5 249.0,261.5 249.0,238.5" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="229.5" y="250.0" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="6" font-weight="600" fill="#002554" pointer-events="none">228</text>
+</g>
+<g onclick="rC('AD-229')" style="cursor:pointer"><polygon points="210.7,237.7 249.0,237.7 249.0,217.7 246.8,217.7 246.2,217.7 242.7,217.7 242.7,214.6 210.6,214.6 210.6,217.0 210.6,237.0 210.7,237.0" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="229.8" y="226.1" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="6" font-weight="600" fill="#002554" pointer-events="none">229</text>
+</g>
+<g onclick="rC('AD-230')" style="cursor:pointer"><polygon points="210.6,190.7 210.6,213.8 242.7,213.8 242.7,210.7 246.2,210.7 246.2,217.7 246.8,217.7 246.8,210.7 249.0,210.7 249.0,190.7" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="229.8" y="204.2" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="6" font-weight="600" fill="#002554" pointer-events="none">230</text>
+</g>
+<g onclick="rC('AD-231')" style="cursor:pointer"><polygon points="210.0,189.8 211.0,189.8 249.0,189.8 249.0,166.9 246.8,166.9 246.2,166.9 242.7,166.9 210.0,166.9" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="229.5" y="178.4" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="6" font-weight="600" fill="#002554" pointer-events="none">231</text>
+</g>
+<g onclick="rC('AD-232')" style="cursor:pointer"><polygon points="210.0,129.8 210.0,149.6 246.2,149.6 249.5,149.6 249.5,129.8" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="229.8" y="139.7" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#002554" pointer-events="none">232</text>
+</g>
+<g onclick="rC('AD-234')" style="cursor:pointer"><polygon points="242.6,108.6 210.0,108.6 210.0,128.9 249.5,128.9 249.5,114.3 246.8,114.3 246.2,114.3 242.6,114.3" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="229.8" y="118.8" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#002554" pointer-events="none">234</text>
+</g>
+<g onclick="rC('AD-235')" style="cursor:pointer"><polygon points="190.9,108.6 154.4,108.6 154.4,128.9 193.6,128.9 193.6,114.2 190.9,114.2" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="174.0" y="118.8" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#002554" pointer-events="none">235</text>
+</g>
+<g onclick="rC('AD-236')" style="cursor:pointer"><polygon points="154.4,149.6 193.4,149.6 193.6,149.6 193.6,129.8 154.4,129.8" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="174.0" y="139.7" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#002554" pointer-events="none">236</text>
+</g>
+<g onclick="rC('AD-237')" style="cursor:pointer"><polygon points="135.0,149.6 153.6,149.6 153.6,129.4 153.6,108.6 138.4,108.6 138.4,114.2 135.0,114.2 135.0,108.6 126.5,108.6 126.5,129.4 126.4,129.4 126.4,132.9 126.4,141.2 135.0,141.2" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="140.0" y="129.1" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#002554" pointer-events="none">237</text>
+</g>
+<g onclick="rC('AD-240')" style="cursor:pointer"><polygon points="33.8,132.5 33.8,149.9 33.8,165.2 57.0,165.2 57.0,150.4 71.8,150.4 71.8,149.7 75.5,149.7 75.5,133.2 71.8,133.2 71.8,132.5" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="54.6" y="148.8" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="6" font-weight="600" fill="#002554" pointer-events="none">240</text>
+</g>
+<g onclick="rC('AD-241')" style="cursor:pointer"><polygon points="33.2,166.1 33.2,166.0 22.5,166.0 22.5,183.0 56.2,183.0 56.2,166.1 56.1,166.1" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="39.4" y="174.5" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#002554" pointer-events="none">241</text>
+</g>
+<g onclick="rC('AD-242')" style="cursor:pointer"><polygon points="22.5,183.9 22.5,213.8 56.2,213.8 56.2,183.9" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="39.4" y="198.9" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#002554" pointer-events="none">242</text>
+</g>
+<g onclick="rC('AD-243')" style="cursor:pointer"><polygon points="22.5,214.6 22.5,235.0 56.2,235.0 56.2,214.6" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="39.4" y="224.8" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#002554" pointer-events="none">243</text>
+</g>
+<g onclick="rC('AD-244')" style="cursor:pointer"><polygon points="22.5,235.8 22.5,256.8 56.2,256.8 56.2,235.8" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="39.4" y="246.3" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#002554" pointer-events="none">244</text>
+</g>
+<g onclick="rC('AD-245')" style="cursor:pointer"><polygon points="22.5,257.6 22.5,277.9 23.0,277.9 50.0,277.9 50.0,278.0 56.2,278.0 56.2,257.6" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="39.4" y="267.8" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#002554" pointer-events="none">245</text>
+</g>
+<g onclick="rC('AD-246')" style="cursor:pointer"><polygon points="49.7,278.7 22.0,278.7 22.0,320.2 56.3,320.2 56.3,313.2 55.6,313.2 55.6,299.2 49.6,299.2 49.6,298.5 55.6,298.5 55.6,289.0 49.7,289.0" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="39.1" y="299.4" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="5" font-weight="600" fill="#002554" pointer-events="none">246</text>
+</g>
+<g onclick="rC('AD-249')" style="cursor:pointer"><polygon points="56.9,278.0 56.9,288.7 56.9,298.9 56.9,299.2 71.8,299.2 71.8,298.6 75.5,298.6 75.5,278.7 75.5,278.6 71.8,278.6 71.8,278.0" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+</g>
+</svg>`;
+
+SVGS['bld_ad_f6']=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 900" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;display:block;max-width:700px">
+<rect width="700" height="900" fill="#edf0f8"/>
+<g style="cursor:default"><polygon points="22.0,189.6 22.0,360.0 28.5,362.4 33.4,349.4 50.6,303.0 163.7,345.0 178.0,306.6 126.3,287.4 64.9,264.6 82.2,218.0 84.1,212.7 30.5,247.7 44.1,247.7" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1"/>
+<text x="100.0" y="276.0" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#2a3456" pointer-events="none">CR3</text>
+</g>
+<g style="cursor:default"><polygon points="677.0,587.0 677.0,422.1 671.1,419.9 665.6,434.7 648.4,481.2 501.9,426.8 481.9,419.4 501.4,366.8 335.5,305.2 335.4,305.2 332.9,306.8 278.7,286.7 290.3,255.4 271.7,248.5 264.5,245.8 245.9,238.9 234.3,270.2 196.7,256.3 179.0,303.8 178.0,306.6 163.7,345.0 197.0,357.3 217.1,364.8 210.4,382.8 258.8,400.8 330.5,427.4 391.0,449.8 461.2,475.9 468.1,457.4 517.5,475.8 517.5,475.8 520.1,477.3 575.7,497.9 634.1,519.6 617.3,564.9 342.6,392.1 356.3,392.1 654.8,536.4 668.5,536.4" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1"/>
+<text x="420.4" y="412.9" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#2a3456" pointer-events="none">LB1</text>
+</g>
+<g style="cursor:default"><polygon points="347.1,273.6 346.2,276.3 335.4,305.2 501.4,366.8 505.3,356.4 525.3,363.9 576.0,382.7 588.3,349.5 499.4,316.5 428.6,290.2 351.6,261.6 347.2,273.5" fill="#e4e8f5" stroke="#8a9ab8" stroke-width="1"/>
+<text x="461.8" y="322.1" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#2a3456" pointer-events="none">LB2</text>
+</g>
+<g style="cursor:default"><polygon points="196.7,244.0 200.7,245.5 198.0,252.8 232.1,265.4 243.1,235.9 243.1,235.8 231.7,231.5 232.3,229.9 245.4,234.8 265.0,242.0 293.5,165.4 225.2,140.1 218.2,158.9 219.9,159.5 198.4,217.3 203.8,219.3 209.4,221.4 208.8,223.0 205.0,221.6" fill="#cce8f4" stroke="#4a8fb0" stroke-width="1"/>
+<text x="245.1" y="202.8" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#143a50" pointer-events="none">WC1</text>
+</g>
+<g style="cursor:default"><polygon points="370.8,194.1 302.2,168.7 273.8,245.3 293.4,252.6 306.5,257.5 305.9,259.1 294.5,254.9 294.5,254.9 283.5,284.5 332.4,302.7 343.4,273.0 328.8,267.6 329.4,265.9 342.4,270.8 348.4,254.4 342.6,247.7 353.1,241.9" fill="#cce8f4" stroke="#4a8fb0" stroke-width="1"/>
+<text x="322.3" y="235.7" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#143a50" pointer-events="none">WC2</text>
+</g>
+<g onclick="rC('AD-601')" style="cursor:pointer"><polygon points="22.0,34.5 22.0,187.1 85.0,210.5 86.7,205.7 91.3,193.5 96.5,179.4 96.5,179.3 45.3,160.3 45.9,158.6 98.9,178.3 150.5,197.4 170.3,143.9 182.0,112.4 183.4,108.6 188.1,96.1 30.5,56.5 44.1,56.5" fill="#e6f5ec" stroke="#408060" stroke-width="1.5"/>
+<text x="105.0" y="122.5" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#083a18" pointer-events="none">601</text>
+</g>
+<g onclick="rC('AD-609')" style="cursor:pointer"><polygon points="291.1,722.3 677.0,865.5 677.0,589.5 616.5,567.0 614.9,571.2 610.9,582.1 609.8,584.9 592.1,632.8 493.8,596.3 476.0,589.7 427.0,571.5 408.7,564.7 409.5,562.5 374.8,549.6 373.9,551.8 356.8,545.4 342.6,727.6 356.3,727.6 498.7,727.6 512.4,727.6 654.8,727.6 668.5,727.6 498.7,785.6 512.4,785.6 654.8,843.5 668.5,843.5" fill="#e6f5ec" stroke="#408060" stroke-width="1.5"/>
+<text x="484.1" y="705.5" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#083a18" pointer-events="none">609</text>
+</g>
+<g onclick="rC('AD-614')" style="cursor:pointer"><polygon points="22.0,363.9 22.0,622.4 288.9,721.5 355.0,543.5 355.3,542.5 353.6,541.9 342.7,536.4 356.2,535.1 357.9,535.7 373.1,494.8 358.6,489.4 359.4,487.2 324.7,474.3 323.9,476.5 313.7,472.7 242.0,446.1 230.5,441.8 231.3,439.7 196.5,426.8 195.7,428.9 190.8,427.1 191.0,426.7 173.7,420.2 38.2,370.0 27.3,365.9 30.5,536.4 44.1,536.4 30.5,611.7 44.1,611.7 186.6,669.7 200.2,669.7" fill="#e6f5ec" stroke="#408060" stroke-width="1.5"/>
+<text x="197.6" y="542.7" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#083a18" pointer-events="none">614</text>
+</g>
+<g onclick="rC('AD-604')" style="cursor:pointer"><polygon points="461.7,197.7 385.8,169.5 377.6,191.5 375.9,196.1 358.3,243.7 356.5,243.0 355.7,245.0 356.3,247.7 352.5,253.8 351.7,255.8 353.5,256.5 352.4,259.4 428.3,287.6" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="406.7" y="228.6" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">604</text>
+</g>
+<g onclick="rC('AD-605')" style="cursor:pointer"><polygon points="532.5,224.0 463.9,198.5 430.5,288.4 499.1,313.9 498.7,230.3 512.4,230.3" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="481.5" y="256.2" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">605</text>
+</g>
+<g onclick="rC('AD-608')" style="cursor:pointer"><polygon points="678.0,401.3 677.0,401.6 677.0,277.6 534.7,224.8 501.3,314.7 591.3,348.1 578.2,383.5 660.7,414.2 671.7,418.2 654.8,288.2 668.5,288.2 545.6,247.7 559.2,247.7" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="589.6" y="321.5" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">608</text>
+</g>
+<g onclick="rC('AD-610')" style="cursor:pointer"><polygon points="477.9,587.9 494.6,594.1 493.8,596.3 592.1,632.8 610.6,582.9 495.6,540.3" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="544.2" y="586.5" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">610</text>
+</g>
+<g onclick="rC('AD-611')" style="cursor:pointer"><polygon points="428.9,569.7 475.7,587.1 493.7,538.6 494.2,538.8 497.2,530.7 455.0,515.0 444.4,543.5 439.3,541.6" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="463.0" y="551.0" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#002554" pointer-events="none">611</text>
+</g>
+<g onclick="rC('AD-612')" style="cursor:pointer"><polygon points="460.4,478.1 391.3,452.4 376.1,493.4 375.7,494.5 360.1,536.5 357.6,543.2 374.8,549.6 409.5,562.5 426.7,568.9 437.1,540.8 425.2,536.4 426.1,534.2 439.0,539.0 443.1,540.5 452.8,514.2 448.8,512.7 435.8,507.9 436.6,505.7 448.5,510.1" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="409.0" y="510.6" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" font-weight="600" fill="#002554" pointer-events="none">612</text>
+</g>
+<g onclick="rC('AD-613')" style="cursor:pointer"><polygon points="498.0,528.5 498.2,527.9 516.8,478.0 469.5,460.4 463.0,477.8 450.7,510.9 454.8,512.4" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="483.8" y="494.4" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#002554" pointer-events="none">613</text>
+</g>
+<g onclick="rC('AD-615')" style="cursor:pointer"><polygon points="209.6,385.0 194.7,424.9 194.4,425.9 196.5,426.8 231.3,439.7 241.7,443.5 256.9,402.6" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="225.6" y="414.2" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#002554" pointer-events="none">615</text>
+</g>
+<g onclick="rC('AD-616')" style="cursor:pointer"><polygon points="328.6,429.2 259.1,403.4 243.9,444.3 313.4,470.1" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="286.2" y="436.8" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#002554" pointer-events="none">616</text>
+</g>
+<g onclick="rC('AD-617')" style="cursor:pointer"><polygon points="389.1,451.6 330.8,430.0 315.6,471.0 324.7,474.3 359.4,487.2 373.9,492.6" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1"/>
+<text x="352.4" y="461.3" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="7" font-weight="600" fill="#002554" pointer-events="none">617</text>
+</g>
+</svg>`;
+
+// ── ROOM DETAILS ───────────────────────────────────────────────────────────
 const RDX={
-  'AD-201':{name:'Hội trường chính Tầng 2',owner:'Ban Giám hiệu — VGU',area:900,cap:400,type:'Hội trường',func:'Sự kiện lớn, hội nghị toàn trường, lễ khai giảng và tốt nghiệp',equip:['Sân khấu chuyên nghiệp','Hệ thống âm thanh JBL','4 Màn hình LED lớn','400 ghế khán giả','Điều hòa trung tâm','Hệ thống ánh sáng sân khấu'],status:'Hoạt động'},
-  'AD-247':{name:'Phòng đa năng A',owner:'Phòng Hành chính — VGU',area:170,cap:80,type:'Phòng lớn',func:'Phòng họp đa năng, hội thảo cỡ vừa',equip:['Hệ thống âm thanh','Máy chiếu 4K','80 ghế','Bảng điện tử','Điều hòa'],status:'Hoạt động'},
-  'AD-248':{name:'Phòng đa năng B',owner:'Phòng Hành chính — VGU',area:170,cap:80,type:'Phòng lớn',func:'Phòng họp đa năng, tiếp đoàn đối tác',equip:['Hệ thống âm thanh','Máy chiếu 4K','80 ghế','Bảng điện tử','Điều hòa'],status:'Hoạt động'},
-  'AD-251':{name:'Phòng đa năng C',owner:'Phòng Hành chính — VGU',area:155,cap:60,type:'Phòng lớn',func:'Phòng triển lãm, trưng bày và tiếp khách',equip:['TV 75 inch','Hệ thống ánh sáng','Điều hòa','Hệ thống bảo mật'],status:'Hoạt động'},
-  'AD-2.LB1':{name:'Khu chức năng LB1',owner:'Phòng Quản trị Cơ sở vật chất',area:65,cap:0,type:'Khu chức năng',func:'Khu vực kỹ thuật / thang máy / hộp kỹ thuật',equip:['Hệ thống điều hòa','Tủ kỹ thuật điện'],status:'Hoạt động'},
-  'AD-2.LB2':{name:'Khu chức năng LB2',owner:'Phòng Quản trị Cơ sở vật chất',area:60,cap:0,type:'Khu chức năng',func:'Khu vực thang bộ / tiền sảnh phụ',equip:['Đèn khẩn cấp','Hệ thống PCCC'],status:'Hoạt động'},
-  'AD-2.LB3':{name:'Khu chức năng LB3',owner:'Phòng Quản trị Cơ sở vật chất',area:70,cap:0,type:'Khu chức năng',func:'Khu vực thang máy chính và tiền sảnh',equip:['Thang máy Mitsubishi','Đèn khẩn cấp'],status:'Hoạt động'},
-  'AD-2.LB4':{name:'Khu chức năng LB4',owner:'Phòng Quản trị Cơ sở vật chất',area:95,cap:0,type:'Khu chức năng',func:'Sảnh đón tiếp phía Đông',equip:['Điều hòa','Ghế chờ','Biển chỉ dẫn'],status:'Hoạt động'},
-  'AD-2.LB5':{name:'Khu chức năng LB5',owner:'Phòng Quản trị Cơ sở vật chất',area:50,cap:0,type:'Khu chức năng',func:'Cầu thang thoát hiểm phía Đông',equip:['Đèn khẩn cấp','Hệ thống PCCC'],status:'Hoạt động'},
-  'AD-2.LB6':{name:'Khu chức năng LB6',owner:'Phòng Quản trị Cơ sở vật chất',area:55,cap:0,type:'Khu chức năng',func:'Cầu thang phụ khu trung tâm',equip:['Đèn khẩn cấp'],status:'Hoạt động'},
-  'AD-601':{name:'Phòng đa năng 601',owner:'Admin Building — VGU',area:410,cap:150,type:'Phòng lớn',func:'Sự kiện, hội thảo và tiếp đón quy mô lớn tại tầng 6',equip:['Hệ thống âm thanh chuyên nghiệp','Máy chiếu 4K','150 ghế','Điều hòa trung tâm','Hệ thống ánh sáng'],status:'Hoạt động'},
-  'AD-604':{name:'Phòng 604',owner:'Admin Building — VGU',area:95,cap:30,type:'Văn phòng',func:'Phòng làm việc và hội họp tầng 6',equip:['Máy tính','Bàn họp','Điều hòa','Máy chiếu'],status:'Hoạt động'},
+  // ── Tầng 1 ──
+  'AD-101':{name:'Phòng đa năng 101',owner:'Phòng Hành chính — VGU',area:95,cap:30,type:'Phòng lớn',func:'Phòng làm việc và tiếp khách tầng 1',equip:['Bàn họp','TV 65 inch','Điều hòa','Hệ thống âm thanh'],status:'Hoạt động'},
+  'AD-103':{name:'Phòng 103',owner:'Phòng HC–TC — VGU',area:55,cap:15,type:'Văn phòng',func:'Phòng làm việc tầng 1',equip:['Máy tính','Bàn làm việc','Điều hòa'],status:'Hoạt động'},
+  'AD-104':{name:'Phòng 104',owner:'Phòng HC–TC — VGU',area:65,cap:18,type:'Văn phòng',func:'Phòng làm việc tầng 1',equip:['Máy tính','Bàn làm việc','Điều hòa'],status:'Hoạt động'},
+  // ── Tầng 2 ──
+  'AD-201':{name:'Hội trường chính Tầng 2',owner:'Ban Giám hiệu — VGU',area:900,cap:400,type:'Hội trường',func:'Sự kiện lớn, hội nghị toàn trường, lễ khai giảng và tốt nghiệp',equip:['Sân khấu chuyên nghiệp','Hệ thống âm thanh JBL','4 Màn hình LED','400 ghế','Điều hòa trung tâm','Hệ thống ánh sáng sân khấu'],status:'Hoạt động'},
+  'AD-247':{name:'Phòng đa năng A',owner:'Phòng Hành chính — VGU',area:170,cap:80,type:'Phòng lớn',func:'Hội thảo, họp cỡ vừa',equip:['Hệ thống âm thanh','Máy chiếu 4K','80 ghế','Bảng điện tử','Điều hòa'],status:'Hoạt động'},
+  'AD-248':{name:'Phòng đa năng B',owner:'Phòng Hành chính — VGU',area:170,cap:80,type:'Phòng lớn',func:'Hội thảo, tiếp đoàn đối tác',equip:['Hệ thống âm thanh','Máy chiếu 4K','80 ghế','Bảng điện tử','Điều hòa'],status:'Hoạt động'},
+  'AD-251':{name:'Phòng đa năng C',owner:'Phòng Hành chính — VGU',area:155,cap:60,type:'Phòng lớn',func:'Triển lãm, trưng bày và tiếp khách',equip:['TV 75 inch','Hệ thống ánh sáng','Điều hòa','Hệ thống bảo mật'],status:'Hoạt động'},
+  'AD-2.LB1':{name:'Sảnh / Thang máy khu Tây',owner:'Phòng QTVP — VGU',area:65,cap:0,type:'Sảnh chức năng',func:'Cầu thang, thang máy khu phía Tây tầng 2',equip:['Thang máy','Đèn khẩn cấp','Camera'],status:'Hoạt động'},
+  'AD-2.LB2':{name:'Sảnh cầu thang Trung',owner:'Phòng QTVP — VGU',area:60,cap:0,type:'Sảnh chức năng',func:'Cầu thang bộ khu trung tâm',equip:['Đèn khẩn cấp','PCCC'],status:'Hoạt động'},
+  'AD-2.LB3':{name:'Sảnh thang máy Đông',owner:'Phòng QTVP — VGU',area:70,cap:0,type:'Sảnh chức năng',func:'Thang máy chính và tiền sảnh phía Đông',equip:['Thang máy Mitsubishi','Đèn khẩn cấp'],status:'Hoạt động'},
+  'AD-2.LB4':{name:'Sảnh đón tiếp Đông',owner:'Phòng QTVP — VGU',area:95,cap:0,type:'Sảnh chức năng',func:'Sảnh tiếp đón phía Đông',equip:['Điều hòa','Ghế chờ','Biển chỉ dẫn'],status:'Hoạt động'},
+  'AD-2.LB5':{name:'Cầu thang thoát hiểm Đông',owner:'Phòng QTVP — VGU',area:50,cap:0,type:'Sảnh chức năng',func:'Cầu thang thoát hiểm phía Đông',equip:['Đèn khẩn cấp','PCCC'],status:'Hoạt động'},
+  'AD-2.LB6':{name:'Cầu thang phụ Trung',owner:'Phòng QTVP — VGU',area:55,cap:0,type:'Sảnh chức năng',func:'Cầu thang phụ khu trung tâm',equip:['Đèn khẩn cấp'],status:'Hoạt động'},
+  'AD-2.LB7':{name:'Sảnh đón tiếp Tây',owner:'Phòng QTVP — VGU',area:80,cap:0,type:'Sảnh chức năng',func:'Sảnh và cầu thang chính phía Tây',equip:['Thang máy','Điều hòa'],status:'Hoạt động'},
+  // ── Tầng 6 ──
+  'AD-601':{name:'Hội trường 601',owner:'Admin Building — VGU',area:410,cap:150,type:'Phòng lớn',func:'Sự kiện, hội thảo quy mô lớn tầng 6',equip:['Hệ thống âm thanh','Máy chiếu 4K','150 ghế','Điều hòa trung tâm','Ánh sáng sân khấu'],status:'Hoạt động'},
+  'AD-604':{name:'Phòng 604',owner:'Admin Building — VGU',area:95,cap:30,type:'Văn phòng',func:'Phòng làm việc tầng 6',equip:['Máy tính','Bàn họp','Điều hòa','Máy chiếu'],status:'Hoạt động'},
   'AD-605':{name:'Phòng 605',owner:'Admin Building — VGU',area:90,cap:25,type:'Văn phòng',func:'Phòng làm việc tầng 6',equip:['Máy tính','Bàn làm việc','Điều hòa'],status:'Hoạt động'},
   'AD-608':{name:'Phòng 608',owner:'Admin Building — VGU',area:130,cap:40,type:'Văn phòng',func:'Phòng làm việc và tiếp khách tầng 6',equip:['Máy tính','Bàn họp 10 chỗ','Điều hòa','TV 55 inch'],status:'Hoạt động'},
-  'AD-609':{name:'Hội trường lớn 609',owner:'Admin Building — VGU',area:520,cap:250,type:'Phòng lớn',func:'Hội trường tầng 6 — tổ chức sự kiện, hội nghị quy mô lớn',equip:['Sân khấu','Hệ thống âm thanh JBL','3 Màn hình LED','250 ghế','Điều hòa trung tâm','Ánh sáng sân khấu'],status:'Hoạt động'},
+  'AD-609':{name:'Hội trường lớn 609',owner:'Admin Building — VGU',area:520,cap:250,type:'Phòng lớn',func:'Hội trường tầng 6 — hội nghị quy mô lớn',equip:['Sân khấu','Âm thanh JBL','3 Màn hình LED','250 ghế','Điều hòa','Ánh sáng sân khấu'],status:'Hoạt động'},
   'AD-610':{name:'Phòng 610',owner:'Admin Building — VGU',area:75,cap:20,type:'Văn phòng',func:'Phòng họp nhỏ tầng 6',equip:['Bàn họp','TV 55 inch','Điều hòa','Webcam'],status:'Hoạt động'},
   'AD-611':{name:'Phòng 611',owner:'Admin Building — VGU',area:55,cap:15,type:'Văn phòng',func:'Phòng làm việc tầng 6',equip:['Máy tính','Bàn làm việc','Điều hòa'],status:'Hoạt động'},
   'AD-612':{name:'Phòng 612',owner:'Admin Building — VGU',area:85,cap:25,type:'Văn phòng',func:'Phòng làm việc nhóm tầng 6',equip:['Máy tính','Bảng trắng','Bàn họp','Điều hòa'],status:'Hoạt động'},
   'AD-613':{name:'Phòng 613',owner:'Admin Building — VGU',area:50,cap:15,type:'Văn phòng',func:'Phòng làm việc tầng 6',equip:['Máy tính','Bàn làm việc','Điều hòa'],status:'Hoạt động'},
-  'AD-614':{name:'Khu vực đa năng 614',owner:'Admin Building — VGU',area:450,cap:200,type:'Phòng lớn',func:'Không gian đa năng tầng 6 — hội thảo, triển lãm và tiếp đón',equip:['Hệ thống âm thanh','Máy chiếu','Bàn ghế linh hoạt','Điều hòa trung tâm'],status:'Hoạt động'},
+  'AD-614':{name:'Khu đa năng 614',owner:'Admin Building — VGU',area:450,cap:200,type:'Phòng lớn',func:'Không gian đa năng tầng 6 — hội thảo, triển lãm',equip:['Hệ thống âm thanh','Máy chiếu','Bàn ghế linh hoạt','Điều hòa'],status:'Hoạt động'},
   'AD-615':{name:'Phòng 615',owner:'Admin Building — VGU',area:45,cap:12,type:'Văn phòng',func:'Phòng làm việc tầng 6',equip:['Máy tính','Bàn làm việc','Điều hòa'],status:'Hoạt động'},
   'AD-616':{name:'Phòng 616',owner:'Admin Building — VGU',area:60,cap:18,type:'Văn phòng',func:'Phòng làm việc nhóm tầng 6',equip:['Máy tính','Bàn họp','Điều hòa'],status:'Hoạt động'},
   'AD-617':{name:'Phòng 617',owner:'Admin Building — VGU',area:50,cap:15,type:'Văn phòng',func:'Phòng làm việc tầng 6',equip:['Máy tính','Bàn làm việc','Điều hòa'],status:'Hoạt động'},
-  'AD-2.LB7':{name:'Khu chức năng LB7',owner:'Phòng Quản trị Cơ sở vật chất',area:80,cap:0,type:'Khu chức năng',func:'Sảnh đón tiếp phía Tây và cầu thang chính',equip:['Thang máy','Đèn chiếu sáng','Điều hòa'],status:'Hoạt động'},
 };
 
 function getRD(rid){
   if(RDX[rid])return RDX[rid];
-  return{
-    name:`Phòng ${rid}`,
-    owner:'Admin Building — VGU',
-    area:Math.floor(40+Math.random()*80),
-    cap:Math.floor(10+Math.random()*40),
-    type:'Văn phòng',
-    func:'Phòng chức năng — dữ liệu chi tiết đang được cập nhật vào Google Sheets',
-    equip:['Dữ liệu đang cập nhật'],
-    status:'Hoạt động'
-  };
+  return{name:`Phòng ${rid}`,owner:'Admin Building — VGU',
+    area:Math.floor(40+Math.random()*80),cap:Math.floor(10+Math.random()*40),
+    type:'Văn phòng',func:'Dữ liệu chi tiết đang được cập nhật vào Google Sheets.',
+    equip:['Dữ liệu đang cập nhật'],status:'Hoạt động'};
 }
 
-const BCAT={'AD-201':'hall','AD-247':'large','AD-248':'large','AD-251':'large','AD-601':'large','AD-609':'large','AD-614':'large'};
-const BTXT={
-  office:['#e8eef9','#002554'],
-  hall:['#e8edff','#001060'],
-  large:['#e6f5ec','#083a18'],
-  lb:['#fff3e6','#7a4800']
+const BCAT={
+  'AD-201':'hall','AD-247':'large','AD-248':'large','AD-251':'large',
+  'AD-101':'large','AD-601':'large','AD-609':'large','AD-614':'large'
 };
-let ST={bid:'',fid:'',flN:0,rid:'',rd:null,tab:'2D'};
+const BTXT={
+  office:['#e8eef9','#002554'],hall:['#e8edff','#001060'],
+  large:['#e6f5ec','#083a18'],lb:['#fff3e6','#7a4800']
+};
 
-// Init buildings dropdown
+let ST={bid:'',fid:'',flN:0,fKey:'',rid:'',rd:null,tab:'2D'};
+
+// Init buildings
 (function(){
   const s=document.getElementById('sbl');
-  BLDS.forEach(b=>{
-    const o=document.createElement('option');
-    o.value=b.id;
-    o.textContent=b.act?b.name:b.name+' — Đang cập nhật';
-    s.appendChild(o);
-  });
+  BLDS.forEach(b=>{const o=document.createElement('option');
+    o.value=b.id;o.textContent=b.act?b.name:b.name+' — Đang cập nhật';s.appendChild(o);});
 })();
 
 function show(id){
@@ -485,11 +621,11 @@ function show(id){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function gH(){show('pg-h')}
-function gM(){if(ST.bid&&ST.fid)renderMap(ST.bid,ST.fid,ST.flN)}
+function gM(){if(ST.fKey)renderMap(ST.bid,ST.fid,ST.flN)}
 
 function oBl(){
   const bid=document.getElementById('sbl').value;
-  ST.bid=bid;ST.fid='';ST.flN=0;
+  ST.bid=bid;ST.fid='';ST.flN=0;ST.fKey='';
   const sf=document.getElementById('sfl'),sr=document.getElementById('srm');
   sf.innerHTML='<option value="">— Chọn tầng —</option>';
   sr.innerHTML='<option value="">— Xem toàn bộ bản đồ tầng —</option>';
@@ -511,22 +647,13 @@ function oFl(){
   sr.innerHTML='<option value="">— Xem toàn bộ bản đồ tầng —</option>';
   sr.disabled=!fid;
   if(!fid)return;
-  const n=parseInt(fid.split('_f')[1]);ST.flN=n;
-  if(n===2&&fid.startsWith('bld_ad')){
-    ['AD-201','AD-204','AD-205','AD-206','AD-207','AD-211','AD-212','AD-213',
-     'AD-214','AD-216','AD-217','AD-218','AD-219','AD-220','AD-224','AD-226',
-     'AD-228','AD-229','AD-230','AD-231','AD-232','AD-234','AD-235','AD-236',
-     'AD-237','AD-240','AD-241','AD-242','AD-243','AD-244','AD-245','AD-246',
-     'AD-247','AD-248','AD-249','AD-251',
-     'AD-2.LB1','AD-2.LB2','AD-2.LB3','AD-2.LB4','AD-2.LB5','AD-2.LB6','AD-2.LB7']
-    .forEach(r=>sr.innerHTML+=`<option value="${r}">${r}</option>`);
-  }
-  if(n===6&&fid.startsWith('bld_ad')){
-    ['AD-601','AD-604','AD-605','AD-608','AD-609','AD-610','AD-611','AD-612',
-     'AD-613','AD-614','AD-615','AD-616','AD-617']
-    .forEach(r=>sr.innerHTML+=`<option value="${r}">${r}</option>`);
-  }
-  sr.disabled=false;
+  const n=parseInt(fid.split('_f')[1]);
+  ST.flN=n;
+  const key=`${ST.bid}_f${n}`;
+  ST.fKey=key;
+  const rooms=FLOOR_ROOMS[key]||[];
+  rooms.forEach(r=>sr.innerHTML+=`<option value="${r}">${r}</option>`);
+  sr.disabled=!rooms.length;
 }
 
 function doG(){
@@ -539,26 +666,30 @@ function doG(){
   if(!b.act){document.getElementById('upd').classList.add('show');return}
   if(!fid){document.getElementById('ht').textContent='Vui lòng chọn Tầng.';return}
   const n=parseInt(fid.split('_f')[1]);
-  ST.bid=bid;ST.fid=fid;ST.flN=n;
+  ST.bid=bid;ST.fid=fid;ST.flN=n;ST.fKey=`${bid}_f${n}`;
   if(rid){rC(rid);return}
   renderMap(bid,fid,n);
 }
 
 function renderMap(bid,fid,n){
-  ST.bid=bid;ST.fid=fid;ST.flN=n;
+  ST.bid=bid;ST.fid=fid;ST.flN=n;ST.fKey=`${bid}_f${n}`;
   const b=BLDS.find(x=>x.id===bid);
   const fn=(FLN[bid]||[])[n-1]||`Tầng ${n}`;
   document.getElementById('mpt').textContent=`${b.name} — ${fn}`;
+  document.getElementById('mpbc').innerHTML=`<b>${b.name}</b> › ${fn}`;
   const out=document.getElementById('mout');
-  if(n===2&&bid==='bld_ad'){
-    out.innerHTML=F2_SVG;
-  } else if(n===6&&bid==='bld_ad'){
-    out.innerHTML=F6_SVG;
+  const key=`${bid}_f${n}`;
+  const svg=SVGS[key];
+  // Portrait floors get a centered layout
+  const isPortrait=(n===6&&bid==='bld_ad');
+  out.className='map-wrap'+(isPortrait?' portrait':'');
+  if(svg){
+    out.innerHTML=svg;
   } else {
-    out.innerHTML=`<svg viewBox="0 0 800 300" style="width:800px;height:300px;display:block">
-      <rect width="800" height="300" fill="#edf0f8"/>
-      <rect x="20" y="20" width="760" height="260" fill="none" stroke="#8fa0c0" stroke-width="2" rx="3"/>
-      <text x="400" y="150" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="14" fill="#8896a8">Dữ liệu bản đồ Tầng ${n} đang được cập nhật</text>
+    out.innerHTML=`<svg viewBox="0 0 800 280" style="width:100%;height:auto;display:block">
+      <rect width="800" height="280" fill="#edf0f8"/>
+      <rect x="20" y="20" width="760" height="240" fill="none" stroke="#8fa0c0" stroke-width="1.5" rx="4"/>
+      <text x="400" y="140" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="14" fill="#8896a8">Dữ liệu bản đồ Tầng ${n} đang được cập nhật</text>
     </svg>`;
   }
   show('pg-m');
@@ -569,7 +700,7 @@ function rC(rid){
   const rd=getRD(rid);ST.rd=rd;
   const fn=(FLN['bld_ad']||[])[ST.flN-1]||`Tầng ${ST.flN}`;
   document.getElementById('rbc').innerHTML=`<b>Admin Building</b> › ${fn} › ${rid}`;
-  const isLB=rid.includes('.LB');
+  const isLB=rid.includes('.LB')||rid.includes('1.LB')||rid.includes('6.LB');
   const c=isLB?'lb':(BCAT[rid]||'office');
   const bc=BTXT[c]||BTXT.office;
   const bdg=document.getElementById('rbdg');
@@ -581,65 +712,24 @@ function rC(rid){
   document.getElementById('rar').textContent=rd.area;
   document.getElementById('rcp').textContent=rd.cap||'—';
   const st=document.getElementById('rst');
-  st.textContent=rd.status;
-  st.style.color=rd.status==='Hoạt động'?'#16803a':'#dc2626';
+  st.textContent=rd.status;st.style.color=rd.status==='Hoạt động'?'#16803a':'#dc2626';
   document.getElementById('req').innerHTML=(rd.equip||[]).map(e=>`<div class="ei">${e}</div>`).join('');
-  sT('2D',rd);
-  show('pg-r');
+  sT('2D',rd);show('pg-r');
 }
 
-// Hàm hỗ trợ tự động chuyển link Google Drive thành Direct Link
-function getDirectImageUrl(url) {
-  if (!url) return '';
-  const driveRegex = /\/file\/d\/(.*?)\//;
-  const match = url.match(driveRegex);
-  if (match && match[1]) {
-    return `https://drive.google.com/uc?export=view&id=${match[1]}`;
-  }
-  return url; 
-}
-
-function sT(tab, rd) {
-  rd = rd || ST.rd;
-  if (!rd) return;
-  ST.tab = tab;
-  
-  document.getElementById('t2d').classList.toggle('on', tab === '2D');
-  document.getElementById('t3d').classList.toggle('on', tab === '3D');
-  const f = document.getElementById('ifr');
-
-  // --- BẠN DÁN LINK GOOGLE DRIVE CỦA TỪNG PHÒNG VÀO ĐÂY ---
-  const imageMap2D = {
-    'AD-201': 'https://drive.google.com/file/d/1bQoe1I3csXQAHzKVnTHPsh2fGV8rUTpz/view?usp=drive_link',
-    'AD-204': 'https://drive.google.com/file/d/1-xAD0yDrRK5h5y2TsVCz0n16laB9Qk6K/view?usp=drive_link',
-    'AD-205': 'https://drive.google.com/file/d/1Ecu_loG6Z5liBup9UQkrbqhEv5VdDRnY/view?usp=drive_link',
-    // Cứ enter xuống dòng và thêm các phòng khác theo cấu trúc trên
-  };
-
-  const imageMap3D = {};
-
-  // Tự động chuyển đổi link
-  let rawUrl = tab === '2D' ? imageMap2D[ST.rid] : imageMap3D[ST.rid];
-  let currentImgUrl = getDirectImageUrl(rawUrl);
-
-  // Render giao diện
-  if (currentImgUrl) {
-    f.style.background = '#fff';
-    f.innerHTML = `<img src="${currentImgUrl}" alt="${tab} - ${ST.rid}" style="width:100%; height:100%; object-fit:contain; border-radius:4px; padding:8px;">`;
-  } else {
-    const cfg = {
-      '2D': { bg: '#e8eef9', ic: '📐', l: 'Sơ đồ mặt bằng 2D' },
-      '3D': { bg: '#fff3e6', ic: '🏛', l: 'Phối cảnh 3D nội thất' }
-    }[tab];
-    
-    f.style.background = cfg.bg;
-    f.innerHTML = `<div style="text-align:center;padding:24px 16px">
-      <div style="font-size:44px;margin-bottom:10px">${cfg.ic}</div>
-      <div style="font-size:13px;font-weight:700;color:#002554;margin-bottom:3px">${cfg.l}</div>
-      <div style="font-size:11px;color:#8896a8;margin-bottom:10px">${ST.rid} — ${rd.name}</div>
-      <div style="font-size:10px;color:#8896a8;background:rgba(0,37,84,.06);display:inline-block;padding:3px 12px;border-radius:2px">Đang cập nhật hình ảnh</div>
-    </div>`;
-  }
+function sT(tab,rd){
+  rd=rd||ST.rd;if(!rd)return;ST.tab=tab;
+  document.getElementById('t2d').classList.toggle('on',tab==='2D');
+  document.getElementById('t3d').classList.toggle('on',tab==='3D');
+  const f=document.getElementById('ifr');
+  const cfg={'2D':{bg:'#e8eef9',ic:'📐',l:'Sơ đồ mặt bằng 2D'},'3D':{bg:'#fff3e6',ic:'🏛',l:'Phối cảnh 3D'}}[tab];
+  f.style.background=cfg.bg;
+  f.innerHTML=`<div style="text-align:center;padding:22px 14px">
+    <div style="font-size:42px;margin-bottom:10px">${cfg.ic}</div>
+    <div style="font-size:13px;font-weight:700;color:#002554;margin-bottom:3px">${cfg.l}</div>
+    <div style="font-size:11px;color:#8896a8;margin-bottom:10px">${ST.rid} — ${rd.name}</div>
+    <div style="font-size:10px;color:#8896a8;background:rgba(0,37,84,.06);display:inline-block;padding:3px 12px;border-radius:2px">Google Drive · Wix Gallery</div>
+  </div>`;
 }
 </script>
 </body>
