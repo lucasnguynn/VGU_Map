@@ -890,49 +890,104 @@ V9;23;Line;-7560.11;10092.29;-11694.07;10092.29;4133.97`;
 // ═══════════════════════════════════════════════════════════════
 //  🔧 BỘ PHẬN XỬ LÝ CSV → POLYGON (Tự động tính bounds)
 // ═══════════════════════════════════════════════════════════════
-function parseBuildingCSV(csvText) {
-  const lines = csvText.trim().split('\n').slice(1);
-  const groups = {};
 
+/**
+ * Normalize and scale coordinates to fit within target viewport
+ * Target: 1294px × 474px with 5% padding, maintaining aspect ratio
+ */
+function normalizeCoordinates(csvText, targetWidth = 1294, targetHeight = 474, paddingPercent = 5) {
+  const lines = csvText.trim().split('\n').slice(1);
+  
+  // Step 1: Calculate GLOBAL bounding box from ALL coordinates
+  let globalMinX = Infinity, globalMaxX = -Infinity;
+  let globalMinY = Infinity, globalMaxY = -Infinity;
+  const rawSegments = [];
+  
   lines.forEach(line => {
     const p = line.split(';');
     if (p.length < 7) return;
-    const key = `${p[0]}_${p[1]}`;
+    
+    rawSegments.push({
+      room: p[0],
+      loop: p[1],
+      sx: parseFloat(p[3]) || 0,
+      sy: parseFloat(p[4]) || 0,
+      ex: parseFloat(p[5]) || 0,
+      ey: parseFloat(p[6]) || 0
+    });
+    
+    globalMinX = Math.min(globalMinX, rawSegments[rawSegments.length-1].sx, rawSegments[rawSegments.length-1].ex);
+    globalMaxX = Math.max(globalMaxX, rawSegments[rawSegments.length-1].sx, rawSegments[rawSegments.length-1].ex);
+    globalMinY = Math.min(globalMinY, rawSegments[rawSegments.length-1].sy, rawSegments[rawSegments.length-1].ey);
+    globalMaxY = Math.max(globalMaxY, rawSegments[rawSegments.length-1].sy, rawSegments[rawSegments.length-1].ey);
+  });
+  
+  // Step 2: Calculate dimensions and apply padding
+  const rawWidth = globalMaxX - globalMinX;
+  const rawHeight = globalMaxY - globalMinY;
+  const paddingX = targetWidth * (paddingPercent / 100);
+  const paddingY = targetHeight * (paddingPercent / 100);
+  const availableWidth = targetWidth - (paddingX * 2);
+  const availableHeight = targetHeight - (paddingY * 2);
+  
+  // Step 3: Calculate uniform scale factor (maintain aspect ratio)
+  const scale = Math.min(availableWidth / rawWidth, availableHeight / rawHeight);
+  
+  // Step 4: Calculate centering offset
+  const scaledWidth = rawWidth * scale;
+  const scaledHeight = rawHeight * scale;
+  const offsetX = paddingX + (availableWidth - scaledWidth) / 2;
+  const offsetY = paddingY + (availableHeight - scaledHeight) / 2;
+  
+  // Step 5: Transform coordinates and build polygons
+  const groups = {};
+  rawSegments.forEach(seg => {
+    const key = `${seg.room}_${seg.loop}`;
     if (!groups[key]) groups[key] = [];
+    
     groups[key].push({
-      sx: +p[3], sy: +p[4],
-      ex: +p[5], ey: +p[6]
+      sx: (seg.sx - globalMinX) * scale + offsetX,
+      sy: (seg.sy - globalMinY) * scale + offsetY,
+      ex: (seg.ex - globalMinX) * scale + offsetX,
+      ey: (seg.ey - globalMinY) * scale + offsetY
     });
   });
-
+  
+  // Step 6: Build closed polygons
   const polygons = {};
-  let minX = Infinity, maxX = -Infinity;
-  let minY = Infinity, maxY = -Infinity;
-
+  let finalMinX = Infinity, finalMaxX = -Infinity;
+  let finalMinY = Infinity, finalMaxY = -Infinity;
+  
   for (const key in groups) {
     const [room] = key.split('_');
     if (!polygons[room]) polygons[room] = [];
-
-    // Nối các segment thành vòng kín
-    const coords = groups[key].map(s => [s.sy, s.sx]); // Leaflet CRS.Simple: [lat, lng] = [y, x]
+    
+    const coords = groups[key].map(s => [s.sy, s.sx]);
     const last = groups[key][groups[key].length - 1];
-    coords.push([last.ey, last.ex]); // Đóng vòng lặp
-
-    // Cập nhật bounds
+    coords.push([last.ey, last.ex]);
+    
     coords.forEach(([y, x]) => {
-      if (x < minX) minX = x;
-      if (x > maxX) maxX = x;
-      if (y < minY) minY = y;
-      if (y > maxY) maxY = y;
+      finalMinX = Math.min(finalMinX, x);
+      finalMaxX = Math.max(finalMaxX, x);
+      finalMinY = Math.min(finalMinY, y);
+      finalMaxY = Math.max(finalMaxY, y);
     });
-
+    
     polygons[room].push(coords);
   }
-
+  
   return {
     polygons,
-    bounds: [[minY, minX], [maxY, maxX]] // [[south, west], [north, east]]
+    bounds: [[finalMinY, finalMinX], [finalMaxY, finalMaxX]],
+    rawBounds: [[globalMinY, globalMinX], [globalMaxY, globalMaxX]],
+    scaleFactor: scale,
+    translation: { x: offsetX, y: offsetY }
   };
+}
+
+// Legacy wrapper for backward compatibility
+function parseBuildingCSV(csvText) {
+  return normalizeCoordinates(csvText, 1294, 474, 5);
 }
 
 // ═══════════════════════════════════════════════════════════════
