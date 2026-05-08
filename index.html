@@ -500,46 +500,36 @@ const defaultPolyStyle = { color: 'transparent', fillColor: '#002554', fillOpaci
 const highlightPolyStyle = { color: '#f58220', weight: 3, fillColor: '#f58220', fillOpacity: 0.5 };
 
 function initLeafletMap() {
-    if (lMap) return;
+    if (lMap) return; 
+    lMap = L.map('map', { crs: L.CRS.Simple, minZoom: -1.5, maxZoom: 2, zoomSnap: 0.5 });
     
-    // SỬA LỖI XOAY MAP: Đảo bounds cho khớp ảnh ngang
-    const bounds = [[0, 0], [956, 1645]]; // [height, width] - Khớp với ảnh 1645x956
-    
-    lMap = L.map('map', { 
-        crs: L.CRS.Simple, 
-        minZoom: -1.5, 
-        maxZoom: 2, 
-        zoomSnap: 0.5 
-    });
-    
+    const bounds = [[0, 0], [1200, 2000]]; 
     L.imageOverlay('VGU MAP ALL.png', bounds).addTo(lMap);
     lMap.fitBounds(bounds);
     bldLayerGroup = L.featureGroup().addTo(lMap);
     
-    // Đảo tọa độ polygon: [y, x] -> [x, y] để khớp ảnh ngang
+    // SỬA LỖI 2: Xử lý lại logic nạp toạ độ Polygon
     BUILDINGS.forEach(b => {
-        const coordsArr = b.coordsRaw;
+        // Trực tiếp lấy mảng toạ độ đã được định dạng sẵn trong object
+        const coordsArr = b.coordsRaw; 
+        
         if (coordsArr && coordsArr.length > 0) {
-            // Đảo ngược tọa độ: [lng, lat] thay vì [lat, lng]
-            const flippedCoords = coordsArr.map(([x, y]) => [y, x]);
-            
-            const polygon = L.polygon(flippedCoords, defaultPolyStyle).addTo(bldLayerGroup);
+            const polygon = L.polygon(coordsArr, defaultPolyStyle).addTo(bldLayerGroup);
             polygon.bindTooltip(b.name, { direction: 'top', sticky: true });
             
-            polygon.on('mouseover', e => { 
-                if (selectedPolygon !== e.target) e.target.setStyle({fillOpacity: 0.2, color: '#002554'}); 
-            });
-            polygon.on('mouseout', e => { 
-                if (selectedPolygon !== e.target) e.target.setStyle(defaultPolyStyle); 
-            });
+            // Sự kiện Hover
+            polygon.on('mouseover', e => { if (selectedPolygon !== e.target) e.target.setStyle({fillOpacity: 0.2, color: '#002554'}); });
+            polygon.on('mouseout', e => { if (selectedPolygon !== e.target) e.target.setStyle(defaultPolyStyle); });
+            
+            // Sự kiện Click
             polygon.on('click', e => {
                 selBuilding.value = b.code;
-                onBuildingChange(true);
+                onBuildingChange(true); 
             });
             polygonLayers[b.code] = polygon;
         }
     });
-    
+
     lMap.on('click', e => console.log(`Toạ độ click: [${Math.round(e.latlng.lat)}, ${Math.round(e.latlng.lng)}]`));
 }
 
@@ -1762,5 +1752,4 @@ f.innerHTML=`<div style="text-align:center;padding:22px 14px">
 </script>
 </body>
 </html>
-
 
