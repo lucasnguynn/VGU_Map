@@ -65,11 +65,73 @@ select.c1-select:focus { outline: none; border-color: var(--or); box-shadow: 0 0
 .btn-view { background: var(--bl); color: var(--wh); border: none; padding: 7px 14px; border-radius: 4px; font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: all .2s; box-shadow: 0 2px 6px rgba(0,37,84,.2); display: none;}
 .btn-view:hover { background: var(--or); transform: translateY(-1px); }
 @keyframes slideDown { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
-.map-wrap-c1 { flex: 1; display: flex; position: relative; overflow: hidden; background: #e8ebf2; height: calc(100vh - 56px - 64px); min-height: 400px; z-index: 1;}
-.map-wrap-c1.has-result { height: calc(100vh - 56px - 64px - 42px); }
-#map { width: 100%; height: 100%; background-color: #e8ebf2; outline: none; }
-.leaflet-tooltip { background: var(--bl) !important; color: var(--wh) !important; border: none !important; font-weight: 600; border-radius: 4px; font-family: 'IBM Plex Sans', sans-serif;}
-.leaflet-tooltip::before { border-top-color: var(--bl) !important; }
+/* ── 2. CSS GIỚI HẠN KÍCH THƯỚC CONTAINER ── */
+.map-wrap-c1 { 
+  flex: 1; 
+  display: flex; 
+  align-items: center;        /* Căn giữa theo chiều dọc */
+  justify-content: center;    /* Căn giữa theo chiều ngang */
+  position: relative; 
+  overflow: auto;             /* Cho phép scroll nếu cần */
+  background: #e8ebf2; 
+  min-height: 400px; 
+  z-index: 1;
+  padding: 20px;              /* Padding để không sát mép */
+}
+
+/* Container giới hạn kích thước với aspect ratio */
+#map { 
+  width: 100%;
+  max-width: 1294px;          /* Giới hạn chiều rộng tối đa */
+  aspect-ratio: 1294 / 474;   /* Tỉ lệ 2.73:1 */
+  max-height: calc(100vh - 140px); /* Giới hạn chiều cao */
+  background-color: #e8ebf2; 
+  outline: none;
+  border-radius: 8px;         /* Bo góc đẹp */
+  box-shadow: 0 4px 20px rgba(0,37,84,.08); /* Đổ bóng nhẹ */
+}
+
+/* Khi có kết quả tìm kiếm */
+.map-wrap-c1.has-result #map {
+  max-height: calc(100vh - 182px); /* Trừ thêm chiều cao banner */
+}
+
+/* Responsive cho màn hình nhỏ */
+@media (max-width: 1350px) {
+  #map {
+    max-width: 100%;
+    aspect-ratio: 1294 / 474;
+  }
+}
+
+@media (max-width: 768px) {
+  .map-wrap-c1 {
+    padding: 10px;
+    min-height: 300px;
+  }
+  #map {
+    max-height: calc(100vh - 120px);
+    border-radius: 4px;
+  }
+}
+
+/* Leaflet overrides */
+.leaflet-container {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.leaflet-tooltip { 
+  background: var(--bl) !important; 
+  color: var(--wh) !important; 
+  border: none !important; 
+  font-weight: 600; 
+  border-radius: 4px; 
+  font-family: 'IBM Plex Sans', sans-serif;
+}
+.leaflet-tooltip::before { 
+  border-top-color: var(--bl) !important; 
+}
 .hw{max-width:560px;margin:0 auto;padding:44px 20px 70px}
 .hh{font-size:clamp(21px,3.8vw,27px);font-weight:700;color:var(--bl);line-height:1.25;margin-bottom:8px}
 .hh em{color:var(--or);font-style:normal}
@@ -902,6 +964,7 @@ const CSV_PADDING = 3000;
 const FLIP_Y_AXIS = false;
 
 function initLeafletMap() {
+  if (lMap) setTimeout(() => lMap.invalidateSize(), 100);
   if (lMap) return;
 
   // 1️⃣  Parse CSV → lấy polygons + bounds tự động
