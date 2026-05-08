@@ -44,7 +44,7 @@ transition:all .3s ease}
 .lnote { font-size: 10px; color: var(--ht); text-align: center; margin-top: 10px; line-height: 1.5; }
 .header { background: var(--wh); border-bottom: 1px solid var(--gl); padding: 0 24px; display: flex; align-items: center; gap: 24px; height: 56px; box-shadow: 0 2px 8px rgba(0,37,84,.06); position: relative; z-index: 10;}
 .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; flex-shrink: 0; cursor:pointer; }
-.logo-header { height: 42px; width: auto; }
+.logo-header { height: 42px; width: auto; max-width: 100%; object-fit: contain; -webkit-transform: translateZ(0); transform: translateZ(0); -webkit-backface-visibility: hidden; backface-visibility: hidden; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; shape-rendering: geometricPrecision; }
 .page-title { font-size: 18px; font-weight: 700; color: var(--bl); letter-spacing: .02em; }
 .page-title span { color: var(--or); }
 .control-bar { background: var(--wh); border-bottom: 1px solid var(--gl); padding: 16px 24px; display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: end; position: relative; z-index: 10; }
