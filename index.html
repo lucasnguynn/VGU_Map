@@ -16,16 +16,10 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--bl)
 .page.active{display:block;animation:fu .35s cubic-bezier(.2,.8,.2,1) forwards}
 @keyframes fu{from{opacity:0;transform:translateY(12px) scale(.99)}to{opacity:1;transform:none}}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
-/* ── HEADER ── */
-.vh{background:var(--wh);height:62px;display:flex;align-items:center;padding:0 24px;gap:12px;
-border:2px solid var(--bl);border-radius:10px;box-shadow:0 8px 24px rgba(0,37,84,.12);
-transition:all .3s ease}
-.logo-nav{height:36px;width:auto}
-.logo-hero{max-width:280px;width:100%;height:auto;margin:0 auto 22px;display:block}
+
+/* Header & Login */
+.vh{background:var(--wh);height:62px;display:flex;align-items:center;padding:0 24px;gap:12px;border:2px solid var(--bl);border-radius:10px;box-shadow:0 8px 24px rgba(0,37,84,.12);transition:all .3s ease}
 .logo-login{max-width:200px;width:100%;height:auto;filter:brightness(0) invert(1);margin:0 auto;display:block}
-.vd{width:1.5px;height:20px;background:rgba(0,37,84,.15)}
-.vt{font-size:15px;font-weight:800;color:var(--bl);letter-spacing:.02em}
-/* ── LOGIN ── */
 .lw { min-height: calc(100vh - 62px); display: flex; align-items: center; justify-content: center; padding: 20px 16px; }
 .lc { background: var(--wh); border-radius: 8px; width: 100%; max-width: 320px; border: 1px solid var(--gl); overflow: hidden; box-shadow: 0 8px 24px rgba(0,37,84,.06); }
 .lt { background: var(--bl); padding: 24px 24px 18px; text-align: center; }
@@ -35,7 +29,6 @@ transition:all .3s ease}
 .lf label { display: block; font-size: 12px; font-weight: 600; color: var(--bl); margin-bottom: 4px; }
 .lf input { width: 100%; height: 36px; border: 1.5px solid var(--gl); border-radius: 4px; padding: 0 10px; font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; color: var(--bl); transition: all .2s; }
 .lf input:focus { outline: none; border-color: var(--or); box-shadow: 0 0 0 3px rgba(245,130,32,.15); }
-.lf input::placeholder { color: var(--ht); }
 .lsep { display: flex; align-items: center; gap: 8px; margin: 10px 0; }
 .lsl { flex: 1; height: 1px; background: var(--gl); }
 .lsep span { font-size: 10px; color: var(--ht); }
@@ -44,8 +37,8 @@ transition:all .3s ease}
 .bls.solid:hover { background: #c9661a; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(245,130,32,.25); }
 .bls.out { background: var(--wh); border: 2px solid var(--bl); color: var(--bl); margin-top: 8px; }
 .bls.out:hover { background: var(--bl); color: var(--wh); transform: translateY(-1px); }
-.lnote { font-size: 10px; color: var(--ht); text-align: center; margin-top: 10px; line-height: 1.5; }
-/* ── HOME (Code 1 styles) ── */
+
+/* Home Control Bar */
 .header { background: var(--wh); border-bottom: 1px solid var(--gl); padding: 0 24px; display: flex; align-items: center; gap: 24px; height: 56px; box-shadow: 0 2px 8px rgba(0,37,84,.06); position: relative; z-index: 10;}
 .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; flex-shrink: 0; cursor:pointer; }
 .logo-box { background: var(--bl); color: var(--or); font-weight: 900; font-size: 14px; padding: 4px 7px; border-radius: 3px; letter-spacing: .5px; line-height: 1.2; text-align: center; }
@@ -55,15 +48,14 @@ transition:all .3s ease}
 .control-bar { background: var(--wh); border-bottom: 1px solid var(--gl); padding: 10px 24px; display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; position: relative; z-index: 10;}
 .ctrl-group { display: flex; flex-direction: column; gap: 3px; min-width: 160px; }
 .ctrl-group label { font-size: 11px; font-weight: 700; color: var(--bl); text-transform: uppercase; letter-spacing: .06em; }
-.ctrl-group small { font-size: 11px; font-weight: 400; color: var(--ht); text-transform: none; letter-spacing: 0; }
 select.c1-select { height: 40px; border: 1.5px solid var(--gl); border-radius: 4px; padding: 0 28px 0 10px; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; color: var(--bl); background: var(--wh) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' fill='%23002554' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E") no-repeat right 9px center; appearance: none; cursor: pointer; transition: all .18s; min-width: 150px; }
 select.c1-select:disabled { opacity: .38; cursor: not-allowed; background-color: #f4f5f9; }
 select.c1-select:focus { outline: none; border-color: var(--or); box-shadow: 0 0 0 3px rgba(245,130,32,.15); }
 .btn-search { width: 44px; height: 44px; border: none; border-radius: 50%; background: var(--or); color: var(--wh); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .2s; box-shadow: 0 3px 10px rgba(245,130,32,.35); margin-bottom: 1px; }
-.btn-search:hover { background: #e06a00; transform: scale(1.06); box-shadow: 0 5px 16px rgba(245,130,32,.4); }
+.btn-search:hover { background: #e06a00; transform: scale(1.06); }
 .btn-search svg { width: 18px; height: 18px; }
 
-/* 2. CẬP NHẬT CSS RESULT BANNER & NÚT BẤM */
+/* Result Banner */
 .result-banner { display: none; background: #fffbf0; border-bottom: 2px solid var(--or); padding: 10px 24px; font-size: 13px; color: var(--bl); animation: slideDown .25s ease; justify-content: space-between; align-items: center;}
 .result-banner.show { display: flex; }
 .result-banner-left { display: flex; align-items: center; gap: 10px;}
@@ -72,32 +64,14 @@ select.c1-select:focus { outline: none; border-color: var(--or); box-shadow: 0 0
 .btn-view:hover { background: var(--or); transform: translateY(-1px); }
 @keyframes slideDown { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
 
-/* 3. CẬP NHẬT CSS MAP CONTAINER CHO LEAFLET */
+/* Leaflet Map Area */
 .map-wrap-c1 { flex: 1; display: flex; position: relative; overflow: hidden; background: #e8ebf2; height: calc(100vh - 56px - 64px); min-height: 400px; z-index: 1;}
 .map-wrap-c1.has-result { height: calc(100vh - 56px - 64px - 42px); }
 #map { width: 100%; height: 100%; background-color: #e8ebf2; outline: none; }
 .leaflet-tooltip { background: var(--bl) !important; color: var(--wh) !important; border: none !important; font-weight: 600; border-radius: 4px; font-family: 'IBM Plex Sans', sans-serif;}
 .leaflet-tooltip::before { border-top-color: var(--bl) !important; }
 
-/* ── Original Home ── */
-.hw{max-width:560px;margin:0 auto;padding:44px 20px 70px}
-.hh{font-size:clamp(21px,3.8vw,27px);font-weight:700;color:var(--bl);line-height:1.25;margin-bottom:8px}
-.hh em{color:var(--or);font-style:normal}
-.hsub{font-size:14px;color:var(--mt);line-height:1.6}
-.sc{background:var(--wh);border:1px solid var(--gl);border-radius:8px;padding:24px 22px 20px;box-shadow:0 4px 20px rgba(0,37,84,.04);margin-top:28px}
-.sc-t{font-size:11px;font-weight:700;color:var(--bl);text-transform:uppercase;letter-spacing:.06em;margin-bottom:18px;padding-bottom:8px;border-bottom:2px solid var(--or);display:inline-block}
-.fg{margin-bottom:13px}
-.fg label{display:block;font-size:14px;font-weight:600;color:var(--bl);margin-bottom:5px}
-.fg label small{font-weight:400;color:var(--ht);font-size:12px;text-transform:none;letter-spacing:0}
-.req{color:var(--or)}
-.bgo{width:100%;height:46px;border:none;border-radius:4px;background:var(--bl);font-family:'IBM Plex Sans',sans-serif;font-size:15px;font-weight:600;color:var(--wh);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;margin-top:4px}
-.bgo:hover{background:#0a3d82;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,37,84,.2)}
-.ht2{font-size:12px;color:#c0392b;margin-top:5px;font-weight:500}
-.upd{background:#fffbf0;border:1.5px solid var(--or);border-radius:4px;padding:13px 15px;margin-top:10px;display:none;animation:fu .3s ease}
-.upd.show{display:block}
-.upd h4{font-size:13px;font-weight:700;color:var(--or);margin-bottom:2px}
-.upd p{font-size:12px;color:var(--mt)}
-/* ── PAGE HEADER ── */
+/* Floor Map & Room Info UI */
 .ph{background:var(--bl)}
 .phi{max-width:1100px;margin:0 auto;padding:0 20px;height:52px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .pb{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:4px;color:rgba(255,255,255,.85);padding:6px 14px;font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}
@@ -107,7 +81,6 @@ select.c1-select:focus { outline: none; border-color: var(--or); box-shadow: 0 0
 .pbc{margin-left:auto;font-size:15px;color:rgba(255,255,255,.4)}
 .pbc b{color:rgba(255,255,255,.78)}
 .pc{max-width:1100px;margin:0 auto;padding:20px 20px 60px}
-/* ── FLOOR MAP ── */
 .map-wrap{ width:100%; background:#edf0f8; border:1.5px solid var(--gl); border-radius:8px; overflow:hidden; display:flex; align-items:center; justify-content:center; padding:12px; }
 .map-wrap svg{width:100%;height:auto;display:block}
 .map-wrap.portrait svg{max-width:560px;margin:0 auto}
@@ -115,7 +88,6 @@ select.c1-select:focus { outline: none; border-color: var(--or); box-shadow: 0 0
 .lgi{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--mt)}
 .lgd{width:10px;height:10px;border-radius:2px;border:1px solid rgba(0,0,0,.1);flex-shrink:0}
 .mtip{margin-top:10px;background:var(--wh);border:1px solid var(--gl);border-radius:6px;padding:9px 14px;font-size:12px;color:var(--mt);display:flex;align-items:center;gap:7px}
-/* ── ROOM INFO ── */
 .rg{display:grid;grid-template-columns:1fr 1fr;gap:24px}
 @media(max-width:600px){.rg{grid-template-columns:1fr}}
 .itab{display:flex;gap:6px;margin-bottom:10px}
@@ -142,144 +114,141 @@ select.c1-select:focus { outline: none; border-color: var(--or); box-shadow: 0 0
 .bno:hover{background:var(--bl);color:var(--wh);transform:translateY(-1px)}
 .bnp{padding:8px 16px;border:none;border-radius:4px;background:var(--or);font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:600;color:var(--wh);cursor:pointer;transition:all .2s}
 .bnp:hover{background:#c9661a;transform:translateY(-1px)}
-/* SVG hover */
 g[onclick]{cursor:pointer}
 g[onclick]:hover polygon,g[onclick]:hover polyline{ filter:brightness(.88) contrast(1.1); stroke:#002554!important;stroke-width:2px!important }
 polygon,polyline{transition:all .18s cubic-bezier(.4,0,.2,1)}
-@media(max-width:680px){.phi{height:auto;padding:10px 16px;gap:8px}}
 </style>
 </head>
 <body>
-<h2 class="sr-only">VGUMap — Hệ thống tra cứu Kiến trúc & Phòng ốc VGU</h2>
+
 <div class="page active" id="pg-l">
-<div class="lw"><div class="lc">
-<div class="lt">
-<img src="VGU-Full-Color-logo-05-_1_.svg" alt="VGU Logo" class="logo-login">
-<p class="lp">VGUMap — Tra cứu Phòng ốc</p>
-</div>
-<div class="lb">
-<div class="lf"><label>Email</label><input type="email" placeholder="example@vgu.edu.vn"></div>
-<div class="lf"><label>Mật khẩu</label><input type="password" placeholder="Nhập mật khẩu"></div>
-<button class="bls solid" onclick="gH()">Đăng nhập</button>
-<div class="lsep"><div class="lsl"></div><span>hoặc</span><div class="lsl"></div></div>
-<button class="bls out" onclick="gH()">Đăng nhập dưới dạng khách</button>
-</div>
-</div></div>
+  <div class="lw">
+    <div class="lc">
+      <div class="lt">
+        <img src="VGU-Full-Color-logo-05-_1_.svg" alt="VGU Logo" class="logo-login">
+        <p class="lp">VGUMap — Tra cứu Phòng ốc</p>
+      </div>
+      <div class="lb">
+        <div class="lf"><label>Email</label><input type="email" placeholder="example@vgu.edu.vn"></div>
+        <div class="lf"><label>Mật khẩu</label><input type="password" placeholder="Nhập mật khẩu"></div>
+        <button class="bls solid" onclick="gH()">Đăng nhập</button>
+        <div class="lsep"><div class="lsl"></div><span>hoặc</span><div class="lsl"></div></div>
+        <button class="bls out" onclick="gH()">Đăng nhập dưới dạng khách</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="page" id="pg-h">
-<div class="header">
-  <div class="logo" onclick="gH()">
-    <div class="logo-box">VGU</div>
-    <div class="logo-sub">Vietnamese-German<br>University</div>
-  </div>
-  <div class="page-title">VGU Map &mdash; <span>TRA CỨU PHÒNG ỐC</span></div>
-</div>
-
-<div class="control-bar">
-  <div class="ctrl-group">
-    <label>Tòa nhà <small>/ Building</small></label>
-    <select id="selBuilding" class="c1-select" onchange="onBuildingChange()">
-      <option value="">— Chọn Mã Tòa —</option>
-    </select>
+  <div class="header">
+    <div class="logo" onclick="gH()">
+      <div class="logo-box">VGU</div>
+      <div class="logo-sub">Vietnamese-German<br>University</div>
+    </div>
+    <div class="page-title">VGU Map &mdash; <span>TRA CỨU PHÒNG ỐC</span></div>
   </div>
 
-  <div class="ctrl-group">
-    <label>Tầng <small>/ Floor</small></label>
-    <select id="selFloor" class="c1-select" disabled onchange="onFloorChange()">
-      <option value="">— Chọn Tầng —</option>
-    </select>
+  <div class="control-bar">
+    <div class="ctrl-group">
+      <label>Tòa nhà <small>/ Building</small></label>
+      <select id="selBuilding" class="c1-select" onchange="onBuildingChange()">
+        <option value="">— Chọn Mã Tòa —</option>
+      </select>
+    </div>
+    <div class="ctrl-group">
+      <label>Tầng <small>/ Floor</small></label>
+      <select id="selFloor" class="c1-select" disabled onchange="onFloorChange()">
+        <option value="">— Chọn Tầng —</option>
+      </select>
+    </div>
+    <div class="ctrl-group">
+      <label>Số Phòng <small>/ Room</small></label>
+      <select id="selRoom" class="c1-select" disabled>
+        <option value="">— Chọn số phòng —</option>
+      </select>
+    </div>
+    <button class="btn-search" onclick="doSearch()" title="Tìm phòng">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7"/>
+        <line x1="16.5" y1="16.5" x2="22" y2="22"/>
+      </svg>
+    </button>
   </div>
 
-  <div class="ctrl-group">
-    <label>Số Phòng <small>/ Room</small></label>
-    <select id="selRoom" class="c1-select" disabled>
-      <option value="">— Chọn số phòng —</option>
-    </select>
+  <div class="result-banner" id="resultBanner">
+    <div class="result-banner-left">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F58220" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span id="resultText">Nhấp vào bản đồ để chọn tòa nhà.</span>
+    </div>
+    <button class="btn-view" id="btnViewFloor" onclick="goToFloorMap()">Xem mặt bằng tầng</button>
   </div>
 
-  <button class="btn-search" onclick="doSearch()" title="Tìm phòng">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="11" cy="11" r="7"/>
-      <line x1="16.5" y1="16.5" x2="22" y2="22"/>
-    </svg>
-  </button>
-</div>
-
-<div class="result-banner" id="resultBanner">
-  <div class="result-banner-left">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F58220" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-    <span id="resultText">Nhấp vào bản đồ để chọn tòa nhà.</span>
+  <div class="map-wrap-c1" id="mapWrap">
+    <div id="map"></div>
   </div>
-  <button class="btn-view" id="btnViewFloor" onclick="goToFloorMap()">Xem mặt bằng tầng</button>
-</div>
-
-<div class="map-wrap-c1" id="mapWrap">
-  <div id="map"></div>
-</div>
 </div>
 
 <div class="page" id="pg-m">
-<div class="ph"><div class="phi">
-<button class="pb" onclick="gH()">← Trang chủ</button>
-<div><div class="pt" id="mpt">Bản đồ tầng</div><div class="ps">Nhấn vào phòng để xem chi tiết</div></div>
-<div class="pbc" id="mpbc"></div>
-</div></div>
-<div class="pc">
-<div class="mleg" id="mleg">
-<div class="lgi"><div class="lgd" style="background:#eef2fc;border-color:#8fa0c0"></div>Văn phòng / Phòng làm việc</div>
-<div class="lgi"><div class="lgd" style="background:#e6f5ec;border-color:#408060"></div>Phòng lớn / Hội trường</div>
-<div class="lgi"><div class="lgd" style="background:#cce8f4;border-color:#4a8fb0"></div>Nhà vệ sinh (WC)</div>
-<div class="lgi"><div class="lgd" style="background:#e4e8f5;border-color:#8a9ab8"></div>Hành lang / Sảnh (LB/CR)</div>
+  <div class="ph"><div class="phi">
+    <button class="pb" onclick="gH()">← Trang chủ</button>
+    <div><div class="pt" id="mpt">Bản đồ tầng</div><div class="ps">Nhấn vào phòng để xem chi tiết</div></div>
+    <div class="pbc" id="mpbc"></div>
+  </div></div>
+  <div class="pc">
+    <div class="mleg" id="mleg">
+      <div class="lgi"><div class="lgd" style="background:#eef2fc;border-color:#8fa0c0"></div>Văn phòng / Phòng làm việc</div>
+      <div class="lgi"><div class="lgd" style="background:#e6f5ec;border-color:#408060"></div>Phòng lớn / Hội trường</div>
+      <div class="lgi"><div class="lgd" style="background:#cce8f4;border-color:#4a8fb0"></div>Nhà vệ sinh (WC)</div>
+      <div class="lgi"><div class="lgd" style="background:#e4e8f5;border-color:#8a9ab8"></div>Hành lang / Sảnh (LB/CR)</div>
+    </div>
+    <div class="map-wrap" id="mout"></div>
+    <div class="mtip">
+      <svg width="13" height="13" fill="none" stroke="#F58220" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Bản đồ tự động điều chỉnh theo màn hình. Nhấn vào phòng để xem thông tin chi tiết.
+    </div>
+  </div>
 </div>
-<div class="map-wrap" id="mout"></div>
-<div class="mtip">
-<svg width="13" height="13" fill="none" stroke="#F58220" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-Bản đồ tự động điều chỉnh theo màn hình. Nhấn vào phòng để xem thông tin chi tiết.
-</div>
-</div>
-</div>
+
 <div class="page" id="pg-r">
-<div class="ph"><div class="phi">
-<button class="pb" onclick="gH()">← Trang chủ</button>
-<button class="pb" onclick="gM()">Bản đồ tầng</button>
-<div class="pbc" id="rbc"></div>
-</div></div>
-<div class="pc">
-<div class="rg">
-<div>
-<div class="itab">
-<button class="it on" id="t2d" onclick="sT('2D')">Sơ đồ 2D</button>
-<button class="it" id="t3d" onclick="sT('3D')">Phối cảnh 3D</button>
-</div>
-<div class="ifrm" id="ifr"></div>
-<div class="mrow">
-<div class="mv"><div class="mvn" id="rar">—</div><div class="mvl">Diện tích (m²)</div></div>
-<div class="mv"><div class="mvn" id="rcp">—</div><div class="mvl">Sức chứa</div></div>
-<div class="mv"><div class="mvn" id="rst" style="font-size:12px">—</div><div class="mvl">Trạng thái</div></div>
-</div>
-</div>
-<div>
-<div id="rbdg" class="rbdg"></div>
-<div class="rnum" id="rnum"></div>
-<div class="rnm" id="rnm"></div>
-<div class="ib"><div class="il">Đơn vị quản lý</div><div class="iv" id="row2"></div></div>
-<div class="ib"><div class="il">Công năng sử dụng</div><div class="iv" id="rfn"></div></div>
-<div class="ib"><div class="il">Trang thiết bị</div><div class="eq" id="req"></div></div>
-<div class="nb">
-<button class="bno" onclick="gH()">Trang chủ</button>
-<button class="bnp" onclick="gM()">Bản đồ tầng</button>
-</div>
-</div>
-</div>
-</div>
+  <div class="ph"><div class="phi">
+    <button class="pb" onclick="gH()">← Trang chủ</button>
+    <button class="pb" onclick="gM()">Bản đồ tầng</button>
+    <div class="pbc" id="rbc"></div>
+  </div></div>
+  <div class="pc">
+    <div class="rg">
+      <div>
+        <div class="itab">
+          <button class="it on" id="t2d" onclick="sT('2D')">Sơ đồ 2D</button>
+          <button class="it" id="t3d" onclick="sT('3D')">Phối cảnh 3D</button>
+        </div>
+        <div class="ifrm" id="ifr"></div>
+        <div class="mrow">
+          <div class="mv"><div class="mvn" id="rar">—</div><div class="mvl">Diện tích (m²)</div></div>
+          <div class="mv"><div class="mvn" id="rcp">—</div><div class="mvl">Sức chứa</div></div>
+          <div class="mv"><div class="mvn" id="rst" style="font-size:12px">—</div><div class="mvl">Trạng thái</div></div>
+        </div>
+      </div>
+      <div>
+        <div id="rbdg" class="rbdg"></div>
+        <div class="rnum" id="rnum"></div>
+        <div class="rnm" id="rnm"></div>
+        <div class="ib"><div class="il">Đơn vị quản lý</div><div class="iv" id="row2"></div></div>
+        <div class="ib"><div class="il">Công năng sử dụng</div><div class="iv" id="rfn"></div></div>
+        <div class="ib"><div class="il">Trang thiết bị</div><div class="eq" id="req"></div></div>
+        <div class="nb">
+          <button class="bno" onclick="gH()">Trang chủ</button>
+          <button class="bnp" onclick="gM()">Bản đồ tầng</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-// ── BUILDING DATA (Cập nhật có thêm tọa độ polygon giả định) ──
-// Ghi chú: Để vẽ hình dạng chính xác, bạn đo lại trên ảnh và thay vào chuỗi `coords` 
+// 1. DATA KHỞI TẠO TÒA NHÀ
 const BUILDINGS = [
   { code:'D1',  name:'Ký túc xá D1',        cx:9.0,   cy:47.5,  floors:7, rooms:['101','102','103','104','105','106'] },
   { code:'D2',  name:'Ký túc xá D2',        cx:9.0,   cy:91.7,  floors:7, rooms:['101','102','103','104','105','106'] },
@@ -304,208 +273,30 @@ const BUILDINGS = [
   { code:'V5',  name:'Biệt thự V5',         cx:204.0, cy:43.0,  floors:2, rooms:['101','102','201','202'] },
   { code:'V6',  name:'Biệt thự V6',         cx:216.0, cy:43.0,  floors:2, rooms:['101','102','201','202'] },
   { code:'V7',  name:'Biệt thự V7',         cx:228.2, cy:46.9,  floors:2, rooms:['101','102','201','202'] },
-  { code:'V8',  name:'Biệt thự V8',         cx:229.3, cy:58.4,  floors:2, rooms:['101','102','201','202'] },
+  { code:'V8',  name:'Biệt thự V8',         cx:229.3, cy:58.4,  floors:2, rooms:['101','102','201','202'] }
 ];
 
-const selBuilding = document.getElementById('selBuilding');
-const selFloor    = document.getElementById('selFloor');
-const selRoom     = document.getElementById('selRoom');
-const banner      = document.getElementById('resultBanner');
-const bannerText  = document.getElementById('resultText');
-const btnViewFloor = document.getElementById('btnViewFloor');
-const mapWrap     = document.getElementById('mapWrap');
-
-// ── KHỞI TẠO BẢN ĐỒ LEAFLET ──
-let lMap, bldLayerGroup;
-let polygonLayers = {}; // Lưu polygon theo ID
-let selectedPolygon = null;
-
-const defaultPolyStyle = { color: 'transparent', fillColor: '#002554', fillOpacity: 0.0 };
-const highlightPolyStyle = { color: '#f58220', weight: 3, fillColor: '#f58220', fillOpacity: 0.5 };
-
-function initLeafletMap() {
-    lMap = L.map('map', { crs: L.CRS.Simple, minZoom: -1.5, maxZoom: 2, zoomSnap: 0.5 });
-    
-    // Thay đổi số 2000, 1200 này cho bằng kích thước thật (px) của file ảnh "VGU MAP ALL.png"
-    const bounds = [[0, 0], [1200, 2000]]; // [Chiều cao, Chiều rộng]
-    L.imageOverlay('VGU MAP ALL.png', bounds).addTo(lMap);
-    lMap.fitBounds(bounds);
-
-    bldLayerGroup = L.featureGroup().addTo(lMap);
-
-    // Vẽ Polygon cho các tòa nhà
-    BUILDINGS.forEach(b => {
-        let coordsArr = [];
-        if (b.coords) {
-            coordsArr = b.coords.split('|').map(c => c.split(',').map(Number));
-        } else {
-            // TẠO HÌNH VUÔNG TẠM TỪ TỌA ĐỘ CX/CY CŨ (Để test click được hết các tòa)
-            // CX cũ tính theo tỷ lệ 232.98, CY cũ tính theo tỷ lệ 144.85
-            const x = (b.cx / 232.98) * 2000;
-            const y = 1200 - (b.cy / 144.85) * 1200; // Nghịch đảo trục Y
-            coordsArr = [[y-40, x-40], [y-40, x+40], [y+40, x+40], [y+40, x-40]];
-        }
-
-        const polygon = L.polygon(coordsArr, defaultPolyStyle).addTo(bldLayerGroup);
-        polygon.bindTooltip(b.name, { direction: 'top', sticky: true });
-
-        // Sự kiện Hover
-        polygon.on('mouseover', e => { if (selectedPolygon !== e.target) e.target.setStyle({fillOpacity: 0.2, color: '#002554'}); });
-        polygon.on('mouseout', e => { if (selectedPolygon !== e.target) e.target.setStyle(defaultPolyStyle); });
-        
-        // Sự kiện Click
-        polygon.on('click', e => {
-            selBuilding.value = b.code;
-            onBuildingChange(true); // Tham số true để khỏi loop flyToBounds
-        });
-
-        polygonLayers[b.code] = polygon;
-    });
-
-    // Code hỗ trợ lấy tọa độ mới (Bật F12 lên xem)
-    lMap.on('click', e => console.log(`Toạ độ click: ${Math.round(e.latlng.lat)},${Math.round(e.latlng.lng)}`));
-}
-
-// Khởi tạo các Option cho Dropdown
-BUILDINGS.forEach(b => {
-  const opt = document.createElement('option');
-  opt.value = b.code;
-  opt.textContent = `${b.code} – ${b.name}`;
-  selBuilding.appendChild(opt);
-});
-
-// Logic thay đổi Tòa nhà
-function onBuildingChange(fromMapClick = false) {
-  const code = selBuilding.value;
-  
-  // Xử lý đồ họa Leaflet
-  if (selectedPolygon) selectedPolygon.setStyle(defaultPolyStyle);
-  if (code && polygonLayers[code]) {
-      selectedPolygon = polygonLayers[code];
-      selectedPolygon.setStyle(highlightPolyStyle);
-      
-      // Zoom đến tòa nhà nếu người dùng chọn từ Dropdown (chứ ko phải tự click map)
-      if(!fromMapClick) {
-          lMap.flyToBounds(selectedPolygon.getBounds(), {padding: [50, 50], duration: 0.5});
-      }
-  }
-
-  // Xử lý Form
-  banner.classList.remove('show');
-  selFloor.innerHTML = '<option value="">— Chọn Tầng —</option>';
-  selRoom.innerHTML  = '<option value="">— Chọn số phòng —</option>';
-  selFloor.disabled = true;
-  selRoom.disabled  = true;
-  btnViewFloor.style.display = 'none';
-
-  if (!code) return;
-  const bld = BUILDINGS.find(b => b.code === code);
-  if (!bld) return;
-
-  for (let f = 1; f <= bld.floors; f++) {
-    const opt = document.createElement('option');
-    opt.value = f;
-    opt.textContent = `Tầng ${f}`;
-    selFloor.appendChild(opt);
-  }
-  selFloor.disabled = false;
-
-  // Hiển thị Banner nếu click từ map
-  if(fromMapClick) {
-      bannerText.innerHTML = `📍 Vị trí: <strong>${bld.name}</strong>`;
-      banner.classList.add('show');
-      if (code === 'AD') btnViewFloor.style.display = 'block';
-  }
-}
-
-function onFloorChange() {
-  const code  = selBuilding.value;
-  const floor = parseInt(selFloor.value);
-  selRoom.innerHTML = '<option value="">— Chọn số phòng —</option>';
-  selRoom.disabled  = true;
-  banner.classList.remove('show');
-  btnViewFloor.style.display = 'none';
-
-  if (!code || !floor) return;
-  const bld = BUILDINGS.find(b => b.code === code);
-  if (!bld) return;
-  
-  const prefix = String(floor);
-  let hasRooms = false;
-  bld.rooms.forEach(r => {
-    if (r.startsWith(prefix)) {
-      const opt = document.createElement('option');
-      opt.value = r;
-      opt.textContent = `Phòng ${r}`;
-      selRoom.appendChild(opt);
-      hasRooms = true;
-    }
-  });
-
-  selRoom.disabled = false;
-}
-
-function doSearch() {
-  const code  = selBuilding.value;
-  const floor = selFloor.value;
-  const room  = selRoom.value;
-  if (!code) {
-    selBuilding.focus();
-    selBuilding.style.borderColor = 'var(--or)';
-    setTimeout(() => selBuilding.style.borderColor = '', 1500);
-    return;
-  }
-  
-  const bld = BUILDINGS.find(b => b.code === code);
-  const parts = [bld.name];
-  if (floor) parts.push(`Tầng ${floor}`);
-  if (room)  parts.push(`Phòng ${room}`);
-  
-  bannerText.innerHTML = `📍 Vị trí: <strong>${parts.join(' › ')}</strong>`;
-  banner.classList.add('show');
-  mapWrap.classList.add('has-result');
-  
-  if (code === 'AD') {
-      btnViewFloor.style.display = 'block';
-      if (floor) {
-          goToFloorMap();
-          if(room) setTimeout(() => rC(room.startsWith('AD-') ? room : `AD-${room}`), 100);
-      }
-  }
-}
-
-// Logic Nút "Xem Mặt Bằng"
-function goToFloorMap() {
-    const code = selBuilding.value;
-    const floor = selFloor.value || 1; // Mặc định hiển thị tầng 1 nếu chưa chọn
-    if (code === 'AD') {
-        renderMap('bld_ad', `bld_ad_f${floor}`, parseInt(floor));
-    } else {
-        alert("Sơ đồ mặt bằng chi tiết cho tòa nhà này đang được cập nhật!");
-    }
-}
-
-
-// ── BUILDINGS (Original) ──────────────────────────────────────────────────────────────
-const BLDS=[
-{id:'bld_ad',name:'Admin Building',act:true,fl:6},
-{id:'bld_lh',name:'Lecture Hall',act:false,fl:4},
-{id:'bld_c1',name:'Cluster 1',act:false,fl:4},
-{id:'bld_c2',name:'Cluster 2',act:false,fl:4},
-{id:'bld_c3',name:'Cluster 3',act:false,fl:4},
-{id:'bld_c5',name:'Cluster 5',act:false,fl:4},
-{id:'bld_c6',name:'Cluster 6',act:false,fl:4},
-{id:'bld_lb',name:'Library',act:false,fl:3},
-{id:'bld_d1',name:'Dorm 1',act:false,fl:8},
-{id:'bld_d2',name:'Dorm 2',act:false,fl:8},
-{id:'bld_ct',name:'Canteen',act:false,fl:2},
-{id:'bld_gh',name:'Guest House',act:false,fl:3},
-{id:'bld_ch',name:'Ceremony Hall',act:false,fl:2},
-{id:'bld_eh',name:'Exhibition Hall',act:false,fl:2},
-{id:'bld_sh',name:'Sport Hall',act:false,fl:2}
+const BLDS = [
+  {id:'bld_ad',name:'Admin Building',act:true,fl:6},
+  {id:'bld_lh',name:'Lecture Hall',act:false,fl:4},
+  {id:'bld_c1',name:'Cluster 1',act:false,fl:4},
+  {id:'bld_c2',name:'Cluster 2',act:false,fl:4},
+  {id:'bld_c3',name:'Cluster 3',act:false,fl:4},
+  {id:'bld_c5',name:'Cluster 5',act:false,fl:4},
+  {id:'bld_c6',name:'Cluster 6',act:false,fl:4},
+  {id:'bld_lb',name:'Library',act:false,fl:3},
+  {id:'bld_d1',name:'Dorm 1',act:false,fl:8},
+  {id:'bld_d2',name:'Dorm 2',act:false,fl:8},
+  {id:'bld_ct',name:'Canteen',act:false,fl:2},
+  {id:'bld_gh',name:'Guest House',act:false,fl:3},
+  {id:'bld_ch',name:'Ceremony Hall',act:false,fl:2},
+  {id:'bld_eh',name:'Exhibition Hall',act:false,fl:2},
+  {id:'bld_sh',name:'Sport Hall',act:false,fl:2}
 ];
-const FLN={bld_ad:['Tầng 1 — Bãi giữ xe','Tầng 2','Tầng 3','Tầng 4','Tầng 5','Tầng 6']};
-// ── FLOOR ROOMS FOR DROPDOWNS ──────────────────────────────────────────────
+
+const FLN = {bld_ad:['Tầng 1 — Bãi giữ xe','Tầng 2','Tầng 3','Tầng 4','Tầng 5','Tầng 6']};
+
+// --- DÁN CỤC CONST FLOOR_ROOMS CŨ VÀO ĐÂY ---
 const FLOOR_ROOMS={
 'bld_ad_f1':['AD-101','AD-103','AD-104'],
 'bld_ad_f2':['AD-201','AD-204','AD-205','AD-206','AD-207','AD-211','AD-212',
@@ -520,7 +311,8 @@ const FLOOR_ROOMS={
 'bld_ad_f6':['AD-601','AD-604','AD-605','AD-608','AD-609','AD-610',
 'AD-611','AD-612','AD-613','AD-614','AD-615','AD-616','AD-617']
 };
-// ── SVG MAPS ────────────────────────────────────────────────────────────
+
+// --- DÁN CỤC CONST SVGS DÀI DẰNG DẶC VÀO ĐÂY ---
 const SVGS={};
 SVGS['bld_ad_f1']=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 260" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;display:block;max-width:900px">
 <rect width="900" height="260" fill="#edf0f8"/>
@@ -1461,7 +1253,8 @@ SVGS['bld_ad_f6']=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 900"
 </g>
 </svg>`;
 
-// ── ROOM DETAILS ───────────────────────────────────────────────────────────
+
+// 2. DATA CHI TIẾT PHÒNG
 const RDX={
   // ── Tầng 1 ──
   'AD-101':{name:'Phòng đa năng 101',owner:'Phòng Hành chính — VGU',area:95,cap:30,type:'Phòng lớn',func:'Phòng làm việc và tiếp khách tầng 1',equip:['Bàn họp','TV 65 inch','Điều hòa','Hệ thống âm thanh'],status:'Hoạt động'},
@@ -1496,85 +1289,207 @@ const RDX={
 };
 
 function getRD(rid){
-  if(RDX[rid])return RDX[rid];
-  return{name:`Phòng ${rid}`,owner:'Admin Building — VGU',
-    area:Math.floor(40+Math.random()*80),cap:Math.floor(10+Math.random()*40),
-    type:'Văn phòng',func:'Dữ liệu chi tiết đang được cập nhật vào Google Sheets.',
-    equip:['Dữ liệu đang cập nhật'],status:'Hoạt động'};
+  if(RDX[rid]) return RDX[rid];
+  return {name:`Phòng ${rid}`,owner:'Admin Building — VGU',area:Math.floor(40+Math.random()*80),cap:Math.floor(10+Math.random()*40),type:'Văn phòng',func:'Dữ liệu đang được cập nhật.',equip:['Đang cập nhật'],status:'Hoạt động'};
 }
 
-const BCAT={'AD-501':'large','AD-507':'large',
-  'AD-201':'hall','AD-247':'large','AD-248':'large','AD-251':'large',
-  'AD-101':'large','AD-601':'large','AD-609':'large','AD-614':'large'
-};
-const BTXT={
-  office:['#e8eef9','#002554'],hall:['#e8edff','#001060'],
-  large:['#e6f5ec','#083a18'],lb:['#fff3e6','#7a4800']
-};
+const BCAT={'AD-501':'large','AD-507':'large','AD-201':'hall','AD-247':'large','AD-248':'large','AD-251':'large','AD-101':'large','AD-601':'large','AD-609':'large','AD-614':'large'};
+const BTXT={ office:['#e8eef9','#002554'], hall:['#e8edff','#001060'], large:['#e6f5ec','#083a18'], lb:['#fff3e6','#7a4800'] };
 
 let ST={bid:'',fid:'',flN:0,fKey:'',rid:'',rd:null,tab:'2D'};
 
-// Init buildings
-(function(){
-  const s=document.getElementById('sbl');
-  BLDS.forEach(b=>{const o=document.createElement('option');
-    o.value=b.id;o.textContent=b.act?b.name:b.name+' — Đang cập nhật';s.appendChild(o);});
-})();
+// 3. LOGIC UI CONTROL BAR
+const selBuilding = document.getElementById('selBuilding');
+const selFloor    = document.getElementById('selFloor');
+const selRoom     = document.getElementById('selRoom');
+const banner      = document.getElementById('resultBanner');
+const bannerText  = document.getElementById('resultText');
+const btnViewFloor = document.getElementById('btnViewFloor');
+const mapWrap     = document.getElementById('mapWrap');
+
+// Khởi tạo các Option cho Dropdown Tòa Nhà
+BUILDINGS.forEach(b => {
+  const opt = document.createElement('option');
+  opt.value = b.code;
+  opt.textContent = `${b.code} – ${b.name}`;
+  selBuilding.appendChild(opt);
+});
+
+// Vô hiệu hóa Tầng và Phòng ban đầu
+selFloor.innerHTML = '<option value="">— Chọn Tầng —</option>';
+selRoom.innerHTML  = '<option value="">— Chọn số phòng —</option>';
+selFloor.disabled = true;
+selRoom.disabled  = true;
+
+function onBuildingChange(fromMapClick = false) {
+  const code = selBuilding.value;
+  
+  if (selectedPolygon) selectedPolygon.setStyle(defaultPolyStyle);
+  if (code && polygonLayers[code]) {
+      selectedPolygon = polygonLayers[code];
+      selectedPolygon.setStyle(highlightPolyStyle);
+      if(!fromMapClick) {
+          lMap.flyToBounds(selectedPolygon.getBounds(), {padding: [50, 50], duration: 0.5});
+      }
+  }
+
+  banner.classList.remove('show');
+  selFloor.innerHTML = '<option value="">— Chọn Tầng —</option>';
+  selRoom.innerHTML  = '<option value="">— Chọn số phòng —</option>';
+  selFloor.disabled = true;
+  selRoom.disabled  = true;
+  btnViewFloor.style.display = 'none';
+
+  if (!code) return;
+  const bld = BUILDINGS.find(b => b.code === code);
+  if (!bld) return;
+
+  for (let f = 1; f <= bld.floors; f++) {
+    const opt = document.createElement('option');
+    opt.value = f;
+    opt.textContent = `Tầng ${f}`;
+    selFloor.appendChild(opt);
+  }
+  selFloor.disabled = false;
+
+  if(fromMapClick) {
+      bannerText.innerHTML = `📍 Vị trí: <strong>${bld.name}</strong>`;
+      banner.classList.add('show');
+      if (code === 'AD') btnViewFloor.style.display = 'block';
+  }
+}
+
+function onFloorChange() {
+  const code  = selBuilding.value;
+  const floor = parseInt(selFloor.value);
+  selRoom.innerHTML = '<option value="">— Chọn số phòng —</option>';
+  selRoom.disabled  = true;
+  banner.classList.remove('show');
+  btnViewFloor.style.display = 'none';
+
+  if (!code || !floor) return;
+  const bld = BUILDINGS.find(b => b.code === code);
+  if (!bld) return;
+  
+  const prefix = String(floor);
+  let hasRooms = false;
+  bld.rooms.forEach(r => {
+    if (r.startsWith(prefix)) {
+      const opt = document.createElement('option');
+      opt.value = r;
+      opt.textContent = `Phòng ${r}`;
+      selRoom.appendChild(opt);
+      hasRooms = true;
+    }
+  });
+  selRoom.disabled = false;
+}
+
+function doSearch() {
+  const code  = selBuilding.value;
+  const floor = selFloor.value;
+  const room  = selRoom.value;
+  
+  if (!code) {
+    selBuilding.focus();
+    selBuilding.style.borderColor = 'var(--or)';
+    setTimeout(() => selBuilding.style.borderColor = '', 1500);
+    return;
+  }
+  
+  const bld = BUILDINGS.find(b => b.code === code);
+  const parts = [bld.name];
+  if (floor) parts.push(`Tầng ${floor}`);
+  if (room)  parts.push(`Phòng ${room}`);
+  
+  bannerText.innerHTML = `<span style="display:flex;align-items:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F58220" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Vị trí: <strong>${parts.join(' › ')}</strong></span>`;
+  banner.classList.add('show');
+  mapWrap.classList.add('has-result');
+  
+  if (code === 'AD') {
+      btnViewFloor.style.display = 'block';
+      if (floor) {
+          goToFloorMap();
+          if(room) setTimeout(() => rC(room.startsWith('AD-') ? room : `AD-${room}`), 100);
+      }
+  }
+}
+
+function goToFloorMap() {
+    const code = selBuilding.value;
+    const floor = selFloor.value || 1; 
+    if (code === 'AD') {
+        renderMap('bld_ad', `bld_ad_f${floor}`, parseInt(floor));
+    } else {
+        alert("Sơ đồ mặt bằng chi tiết cho tòa nhà này đang được cập nhật!");
+    }
+}
+
+// 4. LOGIC BẢN ĐỒ LEAFLET
+let lMap, bldLayerGroup;
+let polygonLayers = {}; 
+let selectedPolygon = null;
+
+const defaultPolyStyle = { color: 'transparent', fillColor: '#002554', fillOpacity: 0.0 };
+const highlightPolyStyle = { color: '#f58220', weight: 3, fillColor: '#f58220', fillOpacity: 0.5 };
+
+function initLeafletMap() {
+    lMap = L.map('map', { crs: L.CRS.Simple, minZoom: -1.5, maxZoom: 2, zoomSnap: 0.5 });
+    const bounds = [[0, 0], [1200, 2000]]; 
+    L.imageOverlay('VGU MAP ALL.png', bounds).addTo(lMap);
+    lMap.fitBounds(bounds);
+
+    bldLayerGroup = L.featureGroup().addTo(lMap);
+
+    BUILDINGS.forEach(b => {
+        let coordsArr = [];
+        if (b.coords) {
+            coordsArr = b.coords.split('|').map(c => c.split(',').map(Number));
+        } else {
+            const x = (b.cx / 232.98) * 2000;
+            const y = 1200 - (b.cy / 144.85) * 1200; 
+            coordsArr = [[y-40, x-40], [y-40, x+40], [y+40, x+40], [y+40, x-40]];
+        }
+
+        const polygon = L.polygon(coordsArr, defaultPolyStyle).addTo(bldLayerGroup);
+        polygon.bindTooltip(b.name, { direction: 'top', sticky: true });
+
+        polygon.on('mouseover', e => { if (selectedPolygon !== e.target) e.target.setStyle({fillOpacity: 0.2, color: '#002554'}); });
+        polygon.on('mouseout', e => { if (selectedPolygon !== e.target) e.target.setStyle(defaultPolyStyle); });
+        polygon.on('click', e => {
+            selBuilding.value = b.code;
+            onBuildingChange(true); 
+        });
+
+        polygonLayers[b.code] = polygon;
+    });
+
+    lMap.on('click', e => console.log(`Toạ độ click: ${Math.round(e.latlng.lat)},${Math.round(e.latlng.lng)}`));
+}
+
+// 5. LOGIC ĐIỀU HƯỚNG TRANG & RENDER MẶT BẰNG
+let isMapInitialized = false; 
 
 function show(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
 }
-function gH(){show('pg-h')}
-function gM(){if(ST.fKey)renderMap(ST.bid,ST.fid,ST.flN)}
 
-function oBl(){
-  const bid=document.getElementById('sbl').value;
-  ST.bid=bid;ST.fid='';ST.flN=0;ST.fKey='';
-  const sf=document.getElementById('sfl'),sr=document.getElementById('srm');
-  sf.innerHTML='<option value="">— Chọn tầng —</option>';
-  sr.innerHTML='<option value="">— Xem toàn bộ bản đồ tầng —</option>';
-  sf.disabled=sr.disabled=true;
-  document.getElementById('ht').textContent='';
-  document.getElementById('upd').classList.remove('show');
-  if(!bid)return;
-  const b=BLDS.find(x=>x.id===bid);
-  if(!b.act){document.getElementById('upd').classList.add('show');return}
-  const fns=FLN[bid]||[];
-  for(let i=0;i<b.fl;i++){sf.innerHTML+=`<option value="${bid}_f${i+1}">${fns[i]||'Tầng '+(i+1)}</option>`}
-  sf.disabled=false;
+function gH(){
+  show('pg-h'); 
+  setTimeout(function() {
+      if (!isMapInitialized) {
+          initLeafletMap(); 
+          isMapInitialized = true;
+      } else {
+          if (lMap) lMap.invalidateSize(); 
+      }
+  }, 50); 
 }
 
-function oFl(){
-  const fid=document.getElementById('sfl').value;
-  ST.fid=fid;ST.rid='';
-  const sr=document.getElementById('srm');
-  sr.innerHTML='<option value="">— Xem toàn bộ bản đồ tầng —</option>';
-  sr.disabled=!fid;
-  if(!fid)return;
-  const n=parseInt(fid.split('_f')[1]);
-  ST.flN=n;
-  const key=`${ST.bid}_f${n}`;
-  ST.fKey=key;
-  const rooms=FLOOR_ROOMS[key]||[];
-  rooms.forEach(r=>sr.innerHTML+=`<option value="${r}">${r}</option>`);
-  sr.disabled=!rooms.length;
-}
-
-function doG(){
-  const bid=document.getElementById('sbl').value;
-  const fid=document.getElementById('sfl').value;
-  const rid=document.getElementById('srm').value;
-  document.getElementById('ht').textContent='';
-  if(!bid){document.getElementById('ht').textContent='Vui lòng chọn Khu vực / Tòa nhà.';return}
-  const b=BLDS.find(x=>x.id===bid);
-  if(!b.act){document.getElementById('upd').classList.add('show');return}
-  if(!fid){document.getElementById('ht').textContent='Vui lòng chọn Tầng.';return}
-  const n=parseInt(fid.split('_f')[1]);
-  ST.bid=bid;ST.fid=fid;ST.flN=n;ST.fKey=`${bid}_f${n}`;
-    if(rid){rC(rid);return}
-  renderMap(bid,fid,n);
+function gM(){
+  if(ST.fKey) renderMap(ST.bid,ST.fid,ST.flN);
 }
 
 function renderMap(bid,fid,n){
@@ -1586,7 +1501,6 @@ function renderMap(bid,fid,n){
   const out=document.getElementById('mout');
   const key=`${bid}_f${n}`;
   const svg=SVGS[key];
-  // Portrait floors get a centered layout
   const isPortrait=(n===5||n===6)&&bid==='bld_ad';
   out.className='map-wrap'+(isPortrait?' portrait':'');
   if(svg){
@@ -1637,10 +1551,6 @@ function sT(tab,rd){
     <div style="font-size:10px;color:#8896a8;background:rgba(0,37,84,.06);display:inline-block;padding:3px 12px;border-radius:2px">Google Drive · Wix Gallery</div>
   </div>`;
 }
-// ── KÍCH HOẠT LEAFLET KHI TRANG ĐÃ TẢI XONG ──
-document.addEventListener('DOMContentLoaded', function() {
-    initLeafletMap();
-});
 </script>
 </body>
 </html>
