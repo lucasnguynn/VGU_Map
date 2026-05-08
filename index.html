@@ -895,7 +895,7 @@ V9;23;Line;-7560.11;10092.29;-11694.07;10092.29;4133.97`;
  * Normalize and scale coordinates to fit within target viewport
  * Target: 1294px × 474px with 5% padding, maintaining aspect ratio
  */
-function normalizeCoordinates(csvText, targetWidth = 1294, targetHeight = 474, paddingPercent = 5) {
+function normalizeCoordinates(csvText, targetWidth = 1294, targetHeight = 474) {
   const lines = csvText.trim().split('\n').slice(1);
   
   // Step 1: Calculate GLOBAL bounding box from ALL coordinates
@@ -922,22 +922,24 @@ function normalizeCoordinates(csvText, targetWidth = 1294, targetHeight = 474, p
     globalMaxY = Math.max(globalMaxY, rawSegments[rawSegments.length-1].sy, rawSegments[rawSegments.length-1].ey);
   });
   
-  // Step 2: Calculate dimensions and apply padding
+  // Step 2: Calculate dimensions (NO PADDING)
   const rawWidth = globalMaxX - globalMinX;
   const rawHeight = globalMaxY - globalMinY;
-  const paddingX = targetWidth * (paddingPercent / 100);
-  const paddingY = targetHeight * (paddingPercent / 100);
-  const availableWidth = targetWidth - (paddingX * 2);
-  const availableHeight = targetHeight - (paddingY * 2);
   
-  // Step 3: Calculate uniform scale factor (maintain aspect ratio)
-  const scale = Math.min(availableWidth / rawWidth, availableHeight / rawHeight);
+  if (rawWidth === 0 || rawHeight === 0) {
+    return { polygons: {}, bounds: [[0, 0], [targetHeight, targetWidth]], rawBounds: [[0, 0], [0, 0]], scaleFactor: 1, translation: { x: 0, y: 0 } };
+  }
+  
+  // Step 3: Calculate uniform scale factor (maintain aspect ratio, fit to bounds)
+  const scaleX = targetWidth / rawWidth;
+  const scaleY = targetHeight / rawHeight;
+  const scale = Math.min(scaleX, scaleY);
   
   // Step 4: Calculate centering offset
   const scaledWidth = rawWidth * scale;
   const scaledHeight = rawHeight * scale;
-  const offsetX = paddingX + (availableWidth - scaledWidth) / 2;
-  const offsetY = paddingY + (availableHeight - scaledHeight) / 2;
+  const offsetX = (targetWidth - scaledWidth) / 2;
+  const offsetY = (targetHeight - scaledHeight) / 2;
   
   // Step 5: Transform coordinates and build polygons
   const groups = {};
@@ -945,11 +947,28 @@ function normalizeCoordinates(csvText, targetWidth = 1294, targetHeight = 474, p
     const key = `${seg.room}_${seg.loop}`;
     if (!groups[key]) groups[key] = [];
     
+    // Apply scaling and centering
+    const normSX = (seg.sx - globalMinX) * scale;
+    const normSY = (seg.sy - globalMinY) * scale;
+    const normEX = (seg.ex - globalMinX) * scale;
+    const normEY = (seg.ey - globalMinY) * scale;
+    
+    // Apply centering offset
+    const centSX = normSX + offsetX;
+    const centSY = normSY + offsetY;
+    const centEX = normEX + offsetX;
+    const centEY = normEY + offsetY;
+    
+    // CRITICAL: Invert Y-Axis for Image Coordinate System (Top-Left Origin)
+    // Image Y = Total Height - Scaled Y
+    const finalSY = targetHeight - centSY;
+    const finalEY = targetHeight - centEY;
+    
     groups[key].push({
-      sx: (seg.sx - globalMinX) * scale + offsetX,
-      sy: (seg.sy - globalMinY) * scale + offsetY,
-      ex: (seg.ex - globalMinX) * scale + offsetX,
-      ey: (seg.ey - globalMinY) * scale + offsetY
+      sx: centSX,
+      sy: finalSY,
+      ex: centEX,
+      ey: finalEY
     });
   });
   
@@ -978,7 +997,7 @@ function normalizeCoordinates(csvText, targetWidth = 1294, targetHeight = 474, p
   
   return {
     polygons,
-    bounds: [[finalMinY, finalMinX], [finalMaxY, finalMaxX]],
+    bounds: [[0, 0], [targetHeight, targetWidth]], // Hardcoded bounds matching image exactly
     rawBounds: [[globalMinY, globalMinX], [globalMaxY, globalMaxX]],
     scaleFactor: scale,
     translation: { x: offsetX, y: offsetY }
@@ -987,7 +1006,7 @@ function normalizeCoordinates(csvText, targetWidth = 1294, targetHeight = 474, p
 
 // Legacy wrapper for backward compatibility
 function parseBuildingCSV(csvText) {
-  return normalizeCoordinates(csvText, 1294, 474, 5);
+  return normalizeCoordinates(csvText, 1294, 474);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1032,42 +1051,19 @@ let globalBounds = null; // Lưu trữ bounds toàn cục để dùng cho fitBou
 const defaultPolyStyle   = { color:'#002554', fillColor:'#002554', fillOpacity:0.05, weight:2 };
 const highlightPolyStyle = { color:'#f58220', weight:4, fillColor:'#f58220', fillOpacity:0.3 };
 
-// ⚙️  Tuỳ chỉnh: nếu polygon bị lật ngược trục Y so với ảnh PNG → đổi thành true
-const FLIP_Y_AXIS = false;
-
-/**
- * Tính toán padded bounds dựa trên % của kích thước bounds
- * Đảm bảo responsive trên mọi thiết bị
- */
-function calculatePaddedBounds(rawBounds) {
-  const minY = rawBounds[0][0], minX = rawBounds[0][1];
-  const maxY = rawBounds[1][0], maxX = rawBounds[1][1];
-  
-  const width = maxX - minX;
-  const height = maxY - minY;
-  
-  // Padding 8% mỗi bên để buildings không sát mép
-  const paddingX = width * 0.08;
-  const paddingY = height * 0.08;
-  
-  return [
-    [minY - paddingY, minX - paddingX],
-    [maxY + paddingY, maxX + paddingX]
-  ];
-}
+// Hardcoded viewport bounds matching the 1294x474 background image exactly
+const VIEWPORT_WIDTH = 1294;
+const VIEWPORT_HEIGHT = 474;
 
 function initLeafletMap() {
   if (lMap) setTimeout(() => lMap.invalidateSize(), 100);
   if (lMap) return;
 
-  // 1️⃣  Parse CSV → lấy polygons + bounds tự động
-  const csvData = parseBuildingCSV(BUILDING_BOUNDARY_CSV);
-  const rawBounds = csvData.bounds; // [[minY, minX], [maxY, maxX]]
+  // 1️⃣  Set Hardcoded Global Bounds (No dynamic calculation)
+  // Bounds format: [[South, West], [North, East]] => [[0, 0], [Height, Width]]
+  globalBounds = [[0, 0], [VIEWPORT_HEIGHT, VIEWPORT_WIDTH]];
 
-  // 2️⃣  Tính toán padded bounds dựa trên % để responsive
-  globalBounds = calculatePaddedBounds(rawBounds);
-
-  // 3️⃣  Khởi tạo Leaflet map với CRS.Simple (hệ trục chữ nhật pixel)
+  // 2️⃣  Khởi tạo Leaflet map với CRS.Simple (hệ trục chữ nhật pixel)
   lMap = L.map('map', {
     crs: L.CRS.Simple,
     minZoom: -3,
@@ -1077,13 +1073,14 @@ function initLeafletMap() {
     wheelPxPerZoomLevel: 120
   });
 
-  // 4️⃣  ️ THAY TÊN FILE PNG MỚI TẠI ĐÂY
-  //      Ảnh PNG phải có cùng aspect-ratio với paddedBounds
-  //      Nếu ảnh bị méo → điều chỉnh lại kích thước ảnh hoặc padding ở trên
+  // 3️⃣  Add Background Image Overlay with exact bounds
   L.imageOverlay('VGU ALL MAP.png', globalBounds).addTo(lMap);
   
   // Fit bounds ngay lập tức để tất cả buildings hiển thị trong viewport
   lMap.fitBounds(globalBounds, { animate: false });
+
+  // 4️⃣  Parse CSV → lấy polygons + bounds (with Y-axis inversion already applied)
+  const csvData = parseBuildingCSV(BUILDING_BOUNDARY_CSV);
 
   // 5️⃣  Vẽ polygons từ CSV lên cùng hệ tọa độ
   bldLayerGroup = L.featureGroup().addTo(lMap);
@@ -1091,10 +1088,8 @@ function initLeafletMap() {
   for (const code in csvData.polygons) {
     const loops = csvData.polygons[code];
 
-    // Nếu bật FLIP_Y → đảo ngược tọa độ Y (dùng khi gốc tọa độ PNG ở góc trái-trên)
-    const finalLoops = FLIP_Y_AXIS
-      ? loops.map(loop => loop.map(([y, x]) => [-y, x]))
-      : loops;
+    // Y-axis inversion is now handled in normalizeCoordinates, so no need to flip here
+    const finalLoops = loops;
 
     const polygon = L.polygon(finalLoops, defaultPolyStyle).addTo(bldLayerGroup);
 
