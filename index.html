@@ -895,7 +895,7 @@ V9;23;Line;-7560.11;10092.29;-11694.07;10092.29;4133.97`;
  * Normalize and scale coordinates to fit within target viewport
  * Target: 1294px × 474px with 5% padding, maintaining aspect ratio
  */
-function normalizeCoordinates(csvText, targetWidth = 1294, targetHeight = 474) {
+function normalizeCoordinates(csvText, targetWidth = 1294, targetHeight = 474, flipX = false, flipY = false) {
   const lines = csvText.trim().split('\n').slice(1);
   
   // Step 1: Calculate GLOBAL bounding box from ALL coordinates
@@ -959,15 +959,16 @@ function normalizeCoordinates(csvText, targetWidth = 1294, targetHeight = 474) {
     const centEX = normEX + offsetX;
     const centEY = normEY + offsetY;
     
-    // CRITICAL: Invert Y-Axis for Image Coordinate System (Top-Left Origin)
-    // Image Y = Total Height - Scaled Y
-    const finalSY = targetHeight - centSY;
-    const finalEY = targetHeight - centEY;
+    // Apply optional axis flipping for orientation correction
+    const finalSX = flipX ? targetWidth - centSX : centSX;
+    const finalSY = flipY ? targetHeight - centSY : centSY;
+    const finalEX = flipX ? targetWidth - centEX : centEX;
+    const finalEY = flipY ? targetHeight - centEY : centEY;
     
     groups[key].push({
-      sx: centSX,
+      sx: finalSX,
       sy: finalSY,
-      ex: centEX,
+      ex: finalEX,
       ey: finalEY
     });
   });
