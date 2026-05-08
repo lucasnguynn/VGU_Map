@@ -398,7 +398,6 @@ function doG(){
 }
 
 // === DÁN ĐOẠN CODE KẾT NỐI GOOGLE SHEETS VÀO ĐÂY ===
-// === DÁN ĐOẠN CODE KẾT NỐI GOOGLE SHEETS VÀO ĐÂY ===
 const SHEET_API_URL = "https://script.google.com/macros/library/d/1SfkSrdF0QcEnEpb2NrFjdlKiXNlsrxhxCBWTh1aMYYTdktB93MqtV8kO/1"; 
 
 async function loadMapFromSheets(fid) {
@@ -474,28 +473,6 @@ async function renderMap(bid, fid, n) {
     </svg>`;
   }
 }
-  ST.rid=rid;ST.tab='2D';
-  const rd=getRD(rid);ST.rd=rd;
-  const fn=(FLN['bld_ad']||[])[ST.flN-1]||`Tầng ${ST.flN}`;
-  document.getElementById('rbc').innerHTML=`<b>Admin Building</b> › ${fn} › ${rid}`;
-  const isLB=rid.includes('.LB')||rid.includes('1.LB')||rid.includes('6.LB');
-  const c=isLB?'lb':(BCAT[rid]||'office');
-  const bc=BTXT[c]||BTXT.office;
-  const bdg=document.getElementById('rbdg');
-  bdg.textContent=rd.type;bdg.style.background=bc[0];bdg.style.color=bc[1];
-  document.getElementById('rnum').textContent=rid;
-  document.getElementById('rnm').textContent=rd.name;
-  document.getElementById('row2').textContent=rd.owner;
-  document.getElementById('rfn').textContent=rd.func;
-  document.getElementById('rar').textContent=rd.area;
-  document.getElementById('rcp').textContent=rd.cap||'—';
-  const st=document.getElementById('rst');
-  st.textContent=rd.status;st.style.color=rd.status==='Hoạt động'?'#16803a':'#dc2626';
-  document.getElementById('req').innerHTML=(rd.equip||[]).map(e=>`<div class="ei">${e}</div>`).join('');
-  sT('2D',rd);show('pg-r');
-}
-
-function sT(tab,rd){
   rd=rd||ST.rd;if(!rd)return;ST.tab=tab;
   document.getElementById('t2d').classList.toggle('on',tab==='2D');
   document.getElementById('t3d').classList.toggle('on',tab==='3D');
