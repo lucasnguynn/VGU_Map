@@ -1037,8 +1037,7 @@ const BUILDINGS = [
   {code:'V5',name:'Biệt thự V5',floors:2,rooms:['101','102','201','202']},
   {code:'V6',name:'Biệt thự V6',floors:2,rooms:['101','102','201','202']},
   {code:'V7',name:'Biệt thự V7',floors:2,rooms:['101','102','201','202']},
-  {code:'V8',name:'Biệt thự V8',floors:2,rooms:['101','102','201','202']},
-  {code:'V9',name:'Khuôn viên tổng (V9)',floors:1,rooms:['OUTER']}
+  {code:'V8',name:'Biệt thự V8',floors:2,rooms:['101','102','201','202']}
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -1087,6 +1086,9 @@ function initLeafletMap() {
   bldLayerGroup = L.featureGroup().addTo(lMap);
 
   for (const code in csvData.polygons) {
+    // Skip rendering V9 (outermost boundary) - it's only used for scaling calculations
+    if (code === 'V9') continue;
+    
     const loops = csvData.polygons[code];
 
     // Y-axis inversion is now handled in normalizeCoordinates, so no need to flip here
