@@ -1538,11 +1538,11 @@ const FLOOR_ROOMS = {
 };
 
 // ═══════════════════════════════════════════════════════════════
-//  🔗 GOOGLE SHEETS API ENDPOINTS
+//  🔗 DATA ENDPOINTS (Local JSON files - cached via Cron Job)
 // ═══════════════════════════════════════════════════════════════
-const API_MAP = "https://script.google.com/macros/s/AKfycbxFmunolmZ5LSC6exu6OnGE0dZi9VYrf6gWBqMJQOrFUe8MdRQAiz0XT825JwkGd-O0/exec";
-const API_INFO = "https://script.google.com/macros/s/AKfycbwezEzR7ALpcj0g2wDX3nt4S_UtBQH_i4_gaiZjApSo4xromfHXB4H_DDzhyQnxpsf77Q/exec";
-const API_DRIVE_LIST = "https://script.google.com/macros/s/AKfycbw4PtDoCILXSiIn1AAYzJhUhSvmJ6ufKD-5R-QKZGzbBy-yQTfC_bPTKJEErwt1d_iS/exec";
+const API_MAP = "./map_data.json";
+const API_INFO = "./info_data.json";
+const API_DRIVE_LIST = "./drive_data.json";
 
 let sheetRoomData = {};
 let driveImages = {};
@@ -1550,8 +1550,8 @@ let isInfoLoaded = false;
 
 async function loadDriveImages() {
   try {
-    if (!API_DRIVE_LIST.startsWith("http")) return;
     const response = await fetch(API_DRIVE_LIST);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
     driveImages = await response.json();
     console.log("✅ Đã tải danh sách ảnh từ Drive:", driveImages);
   } catch (e) { 
