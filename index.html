@@ -47,25 +47,72 @@ transition:all .3s ease}
 .logo-header { height: 42px; width: auto; }
 .page-title { font-size: 18px; font-weight: 700; color: var(--bl); letter-spacing: .02em; }
 .page-title span { color: var(--or); }
-.control-bar { background: var(--wh); border-bottom: 1px solid var(--gl); padding: 10px 24px; display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; position: relative; z-index: 10;}
-.ctrl-group { display: flex; flex-direction: column; gap: 3px; min-width: 160px; }
-.ctrl-group label { font-size: 11px; font-weight: 700; color: var(--bl); text-transform: uppercase; letter-spacing: .06em; }
-.ctrl-group small { font-size: 11px; font-weight: 400; color: var(--ht); text-transform: none; letter-spacing: 0; }
-select.c1-select { height: 40px; border: 1.5px solid var(--gl); border-radius: 4px; padding: 0 28px 0 10px; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; color: var(--bl); background: var(--wh) url("image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' fill='%23002554' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E") no-repeat right 9px center; appearance: none; cursor: pointer; transition: all .18s; min-width: 150px; }
-select.c1-select:disabled { opacity: .38; cursor: not-allowed; background-color: #f4f5f9; }
-select.c1-select:focus { outline: none; border-color: var(--or); box-shadow: 0 0 0 3px rgba(245,130,32,.15); }
+.control-bar { background: var(--wh); border-bottom: 1px solid var(--gl); padding: 16px 24px; display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: end; position: relative; z-index: 10; }
+.ctrl-group { display: flex; flex-direction: column; gap: 6px; min-width: 140px; }
+.ctrl-group label { font-size: 11px; font-weight: 700; color: var(--bl); text-transform: uppercase; letter-spacing: .06em; line-height: 1.2; }
+.ctrl-group small { font-size: 11px; font-weight: 400; color: var(--ht); text-transform: none; letter-spacing: 0; opacity: 0.8; }
+.ctrl-group.search-group { grid-column: 1 / -1; min-width: auto; }
+select.c1-select { height: 44px; border: 1.5px solid var(--gl); border-radius: 6px; padding: 0 32px 0 12px; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; color: var(--bl); background: var(--wh) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' fill='%23002554' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E") no-repeat right 10px center; appearance: none; cursor: pointer; transition: all .2s ease; min-width: 140px; box-shadow: 0 1px 3px rgba(0,37,84,.04); }
+select.c1-select:disabled { opacity: .45; cursor: not-allowed; background-color: #f4f5f9; }
+select.c1-select:hover:not(:disabled) { border-color: #c5d0e0; }
+select.c1-select:focus { outline: none; border-color: var(--or); box-shadow: 0 0 0 3px rgba(245,130,32,.18), 0 2px 8px rgba(245,130,32,.1); }
 input.c1-select { background: var(--wh); appearance: textfield; }
 input.c1-select::-webkit-search-cancel-button { display: none; }
-.btn-search { width: 44px; height: 44px; border: none; border-radius: 50%; background: var(--or); color: var(--wh); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .2s; box-shadow: 0 3px 10px rgba(245,130,32,.35); margin-bottom: 1px; }
-.btn-search:hover { background: #e06a00; transform: scale(1.06); box-shadow: 0 5px 16px rgba(245,130,32,.4); }
-.btn-search svg { width: 18px; height: 18px; }
-.result-banner { display: none; background: #fffbf0; border-bottom: 2px solid var(--or); padding: 10px 24px; font-size: 13px; color: var(--bl); animation: slideDown .25s ease; justify-content: space-between; align-items: center;}
+.input-wrapper { position: relative; display: flex; align-items: center; }
+.input-wrapper input.c1-select { width: 100%; height: 44px; padding: 0 40px 0 14px; border: 1.5px solid var(--gl); border-radius: 6px; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; color: var(--bl); box-shadow: 0 1px 3px rgba(0,37,84,.04); transition: all .2s ease; }
+.input-wrapper input.c1-select:hover { border-color: #c5d0e0; }
+.input-wrapper input.c1-select:focus { outline: none; border-color: var(--or); box-shadow: 0 0 0 3px rgba(245,130,32,.18), 0 2px 8px rgba(245,130,32,.1); }
+.btn-clear { position: absolute; right: 6px; width: 32px; height: 32px; border: none; background: transparent; cursor: pointer; color: var(--ht); display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all .2s; }
+.btn-clear:hover { background: #f0f2f7; color: var(--bl); }
+.action-group { display: flex; gap: 10px; align-items: flex-end; margin-bottom: 1px; }
+.btn-search { width: 48px; height: 44px; border: none; border-radius: 6px; background: var(--or); color: var(--wh); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .25s cubic-bezier(.4,0,.2,1); box-shadow: 0 3px 10px rgba(245,130,32,.3); }
+.btn-search:hover { background: #e06a00; transform: translateY(-2px); box-shadow: 0 6px 18px rgba(245,130,32,.4); }
+.btn-search:active { transform: translateY(0); }
+.btn-search svg { width: 20px; height: 20px; }
+.btn-search.reset-btn { background: var(--bl); box-shadow: 0 3px 10px rgba(0,37,84,.25); }
+.btn-search.reset-btn:hover { background: #0a3d82; box-shadow: 0 6px 18px rgba(0,37,84,.35); }
+.search-hint { font-size: 11px; color: var(--ht); margin-top: 2px; display: none; }
+.result-banner { display: none; background: #fffbf0; border-bottom: 2px solid var(--or); padding: 14px 24px; font-size: 13px; color: var(--bl); animation: slideDown .3s cubic-bezier(.4,0,.2,1); justify-content: space-between; align-items: center; }
 .result-banner.show { display: flex; }
-.result-banner-left { display: flex; align-items: center; gap: 10px;}
-.result-banner strong { color: var(--or); font-size: 14px;}
-.btn-view { background: var(--bl); color: var(--wh); border: none; padding: 7px 14px; border-radius: 4px; font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: all .2s; box-shadow: 0 2px 6px rgba(0,37,84,.2); display: none;}
+.result-banner-left { display: flex; align-items: center; gap: 10px; }
+.result-banner strong { color: var(--or); font-size: 14px; }
+.btn-view { background: var(--bl); color: var(--wh); border: none; padding: 8px 16px; border-radius: 6px; font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: all .2s; box-shadow: 0 2px 6px rgba(0,37,84,.2); display: none; }
 .btn-view:hover { background: var(--or); transform: translateY(-1px); }
-@keyframes slideDown { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Desktop Layout (Width > 768px) */
+@media (min-width: 769px) {
+  .control-bar { 
+    grid-template-columns: 1fr auto auto auto auto; 
+    gap: 16px;
+    padding: 16px 24px;
+  }
+  .ctrl-group.search-group { grid-column: auto; min-width: 200px; flex-grow: 1; }
+  .input-wrapper input.c1-select { min-width: 180px; }
+}
+
+/* Mobile Layout (Width <= 768px) */
+@media (max-width: 768px) {
+  .control-bar { 
+    grid-template-columns: 1fr 1fr; 
+    gap: 14px;
+    padding: 14px 16px;
+  }
+  .ctrl-group.search-group { 
+    grid-column: 1 / -1; 
+    min-width: auto;
+  }
+  .input-wrapper input.c1-select { height: 48px; font-size: 15px; }
+  .ctrl-group { min-width: auto; }
+  select.c1-select { height: 48px; font-size: 14px; }
+  .ctrl-group:nth-child(2) { grid-column: 1 / -1; } /* Building full width */
+  .ctrl-group:nth-child(3) { grid-column: 1 / 2; } /* Floor left */
+  .ctrl-group:nth-child(4) { grid-column: 2 / 3; } /* Room right */
+  .action-group { grid-column: 1 / -1; justify-content: stretch; }
+  .btn-search { flex: 1; max-width: 140px; height: 48px; border-radius: 6px; }
+  .btn-search svg { width: 22px; height: 22px; }
+  .search-hint { font-size: 12px; }
+}
 /* ── 2. CSS GIỚI HẠN KÍCH THƯỚC CONTAINER ── */
 .map-wrap-c1 { 
   flex: 1; 
@@ -223,15 +270,15 @@ polygon,polyline{transition:all .18s cubic-bezier(.4,0,.2,1)}
 <div class="page-title">VGU Map &mdash; <span>TRA CỨU PHÒNG ỐC</span></div>
 </div>
 <div class="control-bar">
-<div class="ctrl-group" style="min-width:220px;flex:1;">
+<div class="ctrl-group search-group">
 <label>Tìm kiếm <small>/ Search</small></label>
-<div style="position:relative;display:flex;align-items:center;">
-<input type="text" id="searchInput" class="c1-select" style="height:40px;padding-right:40px;appearance:textfield;background-image:none;" placeholder="Nhập tên tòa, phòng..." oninput="onSearchInput()" onkeydown="handleSearchKey(event)">
-<button type="button" onclick="clearSearch()" style="position:absolute;right:6px;width:32px;height:32px;border:none;background:transparent;cursor:pointer;color:var(--ht);display:flex;align-items:center;justify-content:center;border-radius:50%;transition:all .2s;" title="Xóa tìm kiếm">
+<div class="input-wrapper">
+<input type="text" id="searchInput" class="c1-select" placeholder="Nhập tên tòa, phòng..." oninput="onSearchInput()" onkeydown="handleSearchKey(event)">
+<button type="button" onclick="clearSearch()" class="btn-clear" title="Xóa tìm kiếm">
 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
 </button>
 </div>
-<small id="searchHint" style="font-size:10px;color:var(--ht);margin-top:4px;display:none;">Gõ để tìm kiếm...</small>
+<small id="searchHint" class="search-hint">Gõ để tìm kiếm...</small>
 </div>
 <div class="ctrl-group">
 <label>Tòa nhà <small>/ Building</small></label>
@@ -251,18 +298,20 @@ polygon,polyline{transition:all .18s cubic-bezier(.4,0,.2,1)}
 <option value="">— Chọn số phòng —</option>
 </select>
 </div>
+<div class="action-group">
 <button class="btn-search" onclick="doSearch()" title="Tìm phòng">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
 <circle cx="11" cy="11" r="7"/>
 <line x1="16.5" y1="16.5" x2="22" y2="22"/>
 </svg>
 </button>
-<button class="btn-search" onclick="resetMap()" title="Đặt lại bản đồ" style="background:var(--bl);margin-left:8px;box-shadow:0 3px 10px rgba(0,37,84,.35);">
+<button class="btn-search reset-btn" onclick="resetMap()" title="Đặt lại bản đồ">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
 <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
 <path d="M3 3v5h5"/>
 </svg>
 </button>
+</div>
 </div>
 <div class="result-banner" id="resultBanner">
 <div class="result-banner-left">
