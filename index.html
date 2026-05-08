@@ -478,7 +478,7 @@ async function loadMapFromSheets(fid) {
       let textY = mapY((rData.minY + rData.maxY) / 2);
       
       // Cỡ chữ và độ dày nét điều chỉnh dựa vào tỷ lệ bản đồ
-      let fontSize = Math.max(vbW * 0.012, 5); 
+      let fontSize = Math.max(vbW * 0.012, 3); 
       let strokeW = Math.max(vbW * 0.0015, 1);
 
       svgContent += `
