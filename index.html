@@ -1234,14 +1234,6 @@ function initLeafletMap() {
       selBuilding.value = code;
       onBuildingChange(true);
       
-      // Bridge: When clicking a building, offer to view indoor floor map
-      const bldInfo = BUILDINGS.find(b => b.code === code);
-      if (bldInfo && bldInfo.code === 'AD') {
-        setTimeout(() => {
-          transitionToIndoorMap('bld_ad', 1);
-        }, 300);
-      }
-      
       L.DomEvent.stopPropagation(e);
     });
 
