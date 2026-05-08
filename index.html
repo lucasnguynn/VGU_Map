@@ -97,10 +97,14 @@ input.c1-select::-webkit-search-cancel-button { display: none; }
     grid-template-columns: 1fr 1fr; 
     gap: 14px;
     padding: 14px 16px;
+    justify-items: center;
   }
   .ctrl-group.search-group { 
     grid-column: 1 / -1; 
     min-width: auto;
+    display: flex;
+    justify-content: center;
+    width: 100%;
   }
   .input-wrapper input.c1-select { height: 48px; font-size: 15px; }
   .ctrl-group { min-width: auto; }
@@ -108,7 +112,7 @@ input.c1-select::-webkit-search-cancel-button { display: none; }
   .ctrl-group:nth-child(2) { grid-column: 1 / -1; } /* Building full width */
   .ctrl-group:nth-child(3) { grid-column: 1 / 2; } /* Floor left */
   .ctrl-group:nth-child(4) { grid-column: 2 / 3; } /* Room right */
-  .action-group { grid-column: 1 / -1; justify-content: stretch; }
+  .action-group { grid-column: 1 / -1; justify-content: center; }
   .btn-search { flex: 1; max-width: 140px; height: 48px; border-radius: 6px; }
   .btn-search svg { width: 22px; height: 22px; }
   .search-hint { font-size: 12px; }
@@ -1189,7 +1193,8 @@ function initLeafletMap() {
     maxZoom: 2,
     zoomSnap: 0.25,
     zoomDelta: 0.5,
-    wheelPxPerZoomLevel: 120
+    wheelPxPerZoomLevel: 120,
+    attributionControl: false
   });
 
   // 3️⃣  Add Background Image Overlay with exact bounds
