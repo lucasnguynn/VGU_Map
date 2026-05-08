@@ -127,11 +127,11 @@ select:focus{outline:none;border-color:var(--or);box-shadow:0 0 0 3px rgba(245,1
 
 /* SVG hover */
 g[onclick]{cursor:pointer}
-g[onclick]:hover polygon,g[onclick]:hover polyline{
+g[onclick]:hover path,g[onclick]:hover polyline{
   filter:brightness(.88) contrast(1.1);
-  stroke:#002554!important;stroke-width:2px!important
+  stroke:#002554!important;stroke-width:3px!important
 }
-polygon,polyline{transition:all .18s cubic-bezier(.4,0,.2,1)}
+path,polyline{transition:all .18s cubic-bezier(.4,0,.2,1)}
 
 @media(max-width:680px){.phi{height:auto;padding:10px 16px;gap:8px}}
 </style>
@@ -139,7 +139,6 @@ polygon,polyline{transition:all .18s cubic-bezier(.4,0,.2,1)}
 <body>
 <h2 class="sr-only">VGUMap — Hệ thống tra cứu Kiến trúc & Phòng ốc VGU</h2>
 
-<!-- ═══ LOGIN ═══ -->
 <div class="page active" id="pg-l">
   <div class="lw"><div class="lc">
     <div class="lt">
@@ -156,7 +155,6 @@ polygon,polyline{transition:all .18s cubic-bezier(.4,0,.2,1)}
   </div></div>
 </div>
 
-<!-- ═══ HOME ═══ -->
 <div class="page" id="pg-h">
   <div class="hw">
     <div style="text-align:center;margin-bottom:6px">
@@ -182,7 +180,6 @@ polygon,polyline{transition:all .18s cubic-bezier(.4,0,.2,1)}
   </div>
 </div>
 
-<!-- ═══ FLOOR MAP ═══ -->
 <div class="page" id="pg-m">
   <div class="ph"><div class="phi">
     <button class="pb" onclick="gH()">← Trang chủ</button>
@@ -204,7 +201,6 @@ polygon,polyline{transition:all .18s cubic-bezier(.4,0,.2,1)}
   </div>
 </div>
 
-<!-- ═══ ROOM INFO ═══ -->
 <div class="page" id="pg-r">
   <div class="ph"><div class="phi">
     <button class="pb" onclick="gH()">← Trang chủ</button>
@@ -278,10 +274,6 @@ const FLOOR_ROOMS={
     'AD-611','AD-612','AD-613','AD-614','AD-615','AD-616','AD-617']
 };
 
-// ── SVG MAPS — viewBox responsive, no horizontal scroll ────────────────────
-const SVGS = {};
-
-// ── ROOM DETAILS ───────────────────────────────────────────────────────────
 const RDX={
   // ── Tầng 1 ──
   'AD-101':{name:'Phòng đa năng 101',owner:'Phòng Hành chính — VGU',area:95,cap:30,type:'Phòng lớn',func:'Phòng làm việc và tiếp khách tầng 1',equip:['Bàn họp','TV 65 inch','Điều hòa','Hệ thống âm thanh'],status:'Hoạt động'},
@@ -334,7 +326,6 @@ const BTXT={
 
 let ST={bid:'',fid:'',flN:0,fKey:'',rid:'',rd:null,tab:'2D'};
 
-// Init buildings
 (function(){
   const s=document.getElementById('sbl');
   BLDS.forEach(b=>{const o=document.createElement('option');
@@ -397,47 +388,112 @@ function doG(){
   renderMap(bid,fid,n);
 }
 
-// === KẾT NỐI GOOGLE SHEETS ===
+// === HÀM LOAD BẢN ĐỒ MỚI (FIX TỌA ĐỘ CAD, TỶ LỆ, CHIỀU Y) ===
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxFmunolmZ5LSC6exu6OnGE0dZi9VYrf6gWBqMJQOrFUe8MdRQAiz0XT825JwkGd-O0/exec"; 
 
 async function loadMapFromSheets(fid) {
   try {
     const response = await fetch(SHEET_API_URL);
-    const rawData = await response.json();
+    let rawData = await response.json();
     
-    // Logic lọc: lấy 'f1' biến thành 'AD-1' để tìm đúng phòng
+    // Kiểm tra và lấy data array
+    let dataArray = Array.isArray(rawData) ? rawData : (rawData.data || rawData.items || []);
+    if (!dataArray || dataArray.length === 0) return null;
+
+    // Lọc theo ký tự bắt đầu của tầng (VD: bld_ad_f1 -> AD-1)
     const floorPrefix = fid.split('_').pop().replace('f', 'AD-'); 
-    const floorData = rawData.filter(item => item.Room_Number && item.Room_Number.startsWith(floorPrefix));
+    const floorData = dataArray.filter(item => item.Room_Number && item.Room_Number.startsWith(floorPrefix));
     
     if (floorData.length === 0) return null;
 
     const rooms = {};
+    let minMapX = Infinity, minMapY = Infinity, maxMapX = -Infinity, maxMapY = -Infinity;
+
+    // Bước 1: Quét toàn bộ để lấy tọa độ min/max của cả tầng
     floorData.forEach(d => {
-      if (!rooms[d.Room_Number]) rooms[d.Room_Number] = [];
-      rooms[d.Room_Number].push(`${d.StartX},${d.StartY}`);
-      rooms[d.Room_Number].push(`${d.EndX},${d.EndY}`);
+      let rNum = d.Room_Number;
+      if (!rooms[rNum]) {
+        rooms[rNum] = { paths: [], minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
+      }
+      
+      let sx = parseFloat(d.StartX) || 0;
+      let sy = parseFloat(d.StartY) || 0;
+      let ex = parseFloat(d.EndX) || 0;
+      let ey = parseFloat(d.EndY) || 0;
+
+      // Lưu lại từng đoạn nối để vẽ chính xác
+      rooms[rNum].paths.push({sx, sy, ex, ey});
+
+      // Bounding box riêng của từng phòng (để đặt chữ)
+      rooms[rNum].minX = Math.min(rooms[rNum].minX, sx, ex);
+      rooms[rNum].maxX = Math.max(rooms[rNum].maxX, sx, ex);
+      rooms[rNum].minY = Math.min(rooms[rNum].minY, sy, ey);
+      rooms[rNum].maxY = Math.max(rooms[rNum].maxY, sy, ey);
+
+      // Bounding box chung của cả tầng (để tính ViewBox)
+      minMapX = Math.min(minMapX, sx, ex);
+      maxMapX = Math.max(maxMapX, sx, ex);
+      minMapY = Math.min(minMapY, sy, ey);
+      maxMapY = Math.max(maxMapY, sy, ey);
     });
 
-    // Tạo SVG
-    let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 1000" style="width:100%;height:auto;display:block">
-      <rect width="10000" height="10000" fill="#edf0f8"/>`;
+    // Bước 2: Khởi tạo ViewBox tự động ôm vừa mọi tọa độ
+    let mapWidth = maxMapX - minMapX;
+    let mapHeight = maxMapY - minMapY;
+    let padX = mapWidth * 0.05; // 5% lề trái phải
+    let padY = mapHeight * 0.05; // 5% lề trên dưới
     
-    for (const [roomNum, points] of Object.entries(rooms)) {
-      const uniquePoints = [...new Set(points)].join(' ');
+    // Thu gọn hệ tọa độ CAD xuống mức 0-1000 cho thân thiện với Web
+    let vbW = 1000;
+    let scale = vbW / (mapWidth + padX * 2);
+    let vbH = (mapHeight + padY * 2) * scale;
+
+    // Hàm chuyển đổi Tọa độ CAD -> SVG
+    function mapX(x) { return (x - minMapX + padX) * scale; }
+    // TRỤC Y: Lấy max trừ đi Y hiện tại để đảo ngược lại chiều dọc cho đúng phương hướng
+    function mapY(y) { return (maxMapY - y + padY) * scale; }
+
+    // Dựng SVG
+    let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${vbW} ${vbH}" style="width:100%;height:auto;display:block">
+      <rect x="0" y="0" width="${vbW}" height="${vbH}" fill="#edf0f8"/>`;
+    
+    for (const [roomNum, rData] of Object.entries(rooms)) {
+      let dString = "";
+      let lastX = null, lastY = null;
       
+      // Nối đường <path>
+      rData.paths.forEach(p => {
+        // Nếu nét vẽ bị đứt đoạn, nhảy đến điểm bắt đầu mới thay vì kéo ngang qua
+        if (lastX === null || Math.abs(p.sx - lastX) > 0.1 || Math.abs(p.sy - lastY) > 0.1) {
+          dString += `M ${mapX(p.sx).toFixed(2)} ${mapY(p.sy).toFixed(2)} `;
+        }
+        dString += `L ${mapX(p.ex).toFixed(2)} ${mapY(p.ey).toFixed(2)} `;
+        lastX = p.ex;
+        lastY = p.ey;
+      });
+      dString += "Z"; // Ký tự Z giúp đóng kín phòng
+      
+      // Đặt chữ ở trung tâm căn chỉnh của phòng
+      let textX = mapX((rData.minX + rData.maxX) / 2);
+      let textY = mapY((rData.minY + rData.maxY) / 2);
+      
+      // Cỡ chữ và độ dày nét điều chỉnh dựa vào tỷ lệ bản đồ
+      let fontSize = Math.max(vbW * 0.012, 5); 
+      let strokeW = Math.max(vbW * 0.0015, 1);
+
       svgContent += `
         <g onclick="rC('${roomNum}')" style="cursor:pointer">
-          <polygon points="${uniquePoints}" fill="#eef2fc" stroke="#8fa0c0" stroke-width="1.5">
+          <path d="${dString}" fill="#eef2fc" stroke="#8fa0c0" stroke-width="${strokeW}">
             <title>${roomNum}</title>
-          </polygon>
-          <text x="${parseFloat(points[0])}" y="${parseFloat(points[1])}" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="20" font-weight="600" fill="#002554" pointer-events="none">${roomNum}</text>
+          </path>
+          <text x="${textX.toFixed(2)}" y="${textY.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="${fontSize}" font-weight="600" fill="#002554" pointer-events="none">${roomNum}</text>
         </g>`;
     }
     
     svgContent += `</svg>`;
     return svgContent;
   } catch (e) {
-    console.error("Lỗi tải dữ liệu: ", e);
+    console.error("Lỗi tải hoặc xử lý dữ liệu: ", e);
     return null;
   }
 }
@@ -452,15 +508,12 @@ async function renderMap(bid, fid, n) {
   document.getElementById('mpbc').innerHTML = `<b>${b.name}</b> › ${fn}`;
   const out = document.getElementById('mout');
   
-  // Xử lý layout cho màn hình dọc (giữ lại logic cũ của bạn)
   const isPortrait = (n === 5 || n === 6) && bid === 'bld_ad';
   out.className = 'map-wrap' + (isPortrait ? ' portrait' : '');
   
-  // Hiển thị trạng thái đang tải
-  out.innerHTML = `<div style="padding:40px;text-align:center;color:var(--mt);font-size:14px;">Loading...</div>`;
-  show('pg-m'); // Mở trang bản đồ ra trước
+  out.innerHTML = `<div style="padding:40px;text-align:center;color:var(--mt);font-size:14px;">Đang tải dữ liệu và dựng bản đồ...</div>`;
+  show('pg-m');
 
-  // Gọi dữ liệu từ Sheets
   const sheetSvg = await loadMapFromSheets(fid);
   
   if (sheetSvg) {
@@ -469,12 +522,11 @@ async function renderMap(bid, fid, n) {
     out.innerHTML = `<svg viewBox="0 0 800 280" style="width:100%;height:auto;display:block">
       <rect width="800" height="280" fill="#edf0f8"/>
       <rect x="20" y="20" width="760" height="240" fill="none" stroke="#8fa0c0" stroke-width="1.5" rx="4"/>
-      <text x="400" y="140" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="14" fill="#8896a8">Chưa có dữ liệu tọa độ cho ${fn} trên Sheets</text>
+      <text x="400" y="140" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="14" fill="#8896a8">Dữ liệu trên sheet trống hoặc sai cấu trúc cho ${fn}</text>
     </svg>`;
   }
 }
 
-// === HÀM ĐỔI TAB BỊ MẤT TÊN ĐÃ ĐƯỢC BỌC LẠI ===
 function sT(tab, rd) {
   rd=rd||ST.rd;if(!rd)return;ST.tab=tab;
   document.getElementById('t2d').classList.toggle('on',tab==='2D');
@@ -490,7 +542,6 @@ function sT(tab, rd) {
   </div>`;
 }
 
-// === HÀM XEM CHI TIẾT PHÒNG BỊ XÓA NHẦM ĐÃ ĐƯỢC KHÔI PHỤC ===
 function rC(rid) {
   ST.rid = rid;
   const rd = getRD(rid);
