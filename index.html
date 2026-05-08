@@ -500,37 +500,72 @@ const defaultPolyStyle = { color: 'transparent', fillColor: '#002554', fillOpaci
 const highlightPolyStyle = { color: '#f58220', weight: 3, fillColor: '#f58220', fillOpacity: 0.5 };
 
 function initLeafletMap() {
-    if (lMap) return; 
-    lMap = L.map('map', { crs: L.CRS.Simple, minZoom: -1.5, maxZoom: 2, zoomSnap: 0.5 });
+    if (lMap) return;
     
-    const bounds = [[0, 0], [1200, 2000]]; 
+    // TÌM BOUNDS THỰC TẾ TỪ DỮ LIỆU TÒA NHÀ
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    
+    BUILDINGS.forEach(b => {
+        if (b.coordsRaw && b.coordsRaw.length > 0) {
+            b.coordsRaw.forEach(coord => {
+                // coord[0] là X, coord[1] là Y
+                minX = Math.min(minX, coord[0]);
+                maxX = Math.max(maxX, coord[0]);
+                minY = Math.min(minY, coord[1]);
+                maxY = Math.max(maxY, coord[1]);
+            });
+        }
+    });
+    
+    // Thêm padding 10%
+    const paddingX = (maxX - minX) * 0.1;
+    const paddingY = (maxY - minY) * 0.1;
+    
+    // Leaflet CRS.Simple dùng [y, x] - ĐẢO NGƯỢC TỌA ĐỘ
+    const bounds = [
+        [maxY + paddingY, minX - paddingX],  // Southwest (bottom-left)
+        [minY - paddingY, maxX + paddingX]   // Northeast (top-right)
+    ];
+    
+    lMap = L.map('map', { 
+        crs: L.CRS.Simple, 
+        minZoom: -3, 
+        maxZoom: 2, 
+        zoomSnap: 0.5,
+        maxBounds: bounds
+    });
+    
     L.imageOverlay('VGU MAP ALL.png', bounds).addTo(lMap);
     lMap.fitBounds(bounds);
+    
     bldLayerGroup = L.featureGroup().addTo(lMap);
     
-    // SỬA LỖI 2: Xử lý lại logic nạp toạ độ Polygon
+    // VẼ POLYGON - CHUYỂN ĐỔI TỌA ĐỘ TỪ [x,y] SANG [y,x]
     BUILDINGS.forEach(b => {
-        // Trực tiếp lấy mảng toạ độ đã được định dạng sẵn trong object
-        const coordsArr = b.coordsRaw; 
-        
-        if (coordsArr && coordsArr.length > 0) {
-            const polygon = L.polygon(coordsArr, defaultPolyStyle).addTo(bldLayerGroup);
+        if (b.coordsRaw && b.coordsRaw.length > 0) {
+            // Chuyển từ [x, y] sang [y, x] cho Leaflet
+            const latlngs = b.coordsRaw.map(coord => [coord[1], coord[0]]);
+            
+            const polygon = L.polygon(latlngs, defaultPolyStyle).addTo(bldLayerGroup);
             polygon.bindTooltip(b.name, { direction: 'top', sticky: true });
             
-            // Sự kiện Hover
-            polygon.on('mouseover', e => { if (selectedPolygon !== e.target) e.target.setStyle({fillOpacity: 0.2, color: '#002554'}); });
-            polygon.on('mouseout', e => { if (selectedPolygon !== e.target) e.target.setStyle(defaultPolyStyle); });
-            
-            // Sự kiện Click
+            polygon.on('mouseover', e => { 
+                if (selectedPolygon !== e.target) 
+                    e.target.setStyle({fillOpacity: 0.2, color: '#002554'}); 
+            });
+            polygon.on('mouseout', e => { 
+                if (selectedPolygon !== e.target) 
+                    e.target.setStyle(defaultPolyStyle); 
+            });
             polygon.on('click', e => {
                 selBuilding.value = b.code;
-                onBuildingChange(true); 
+                onBuildingChange(true);
             });
             polygonLayers[b.code] = polygon;
         }
     });
-
-    lMap.on('click', e => console.log(`Toạ độ click: [${Math.round(e.latlng.lat)}, ${Math.round(e.latlng.lng)}]`));
+    
+    lMap.on('click', e => console.log(`Toạ độ click: [${e.latlng.lat.toFixed(2)}, ${e.latlng.lng.toFixed(2)}]`));
 }
 
 // Khởi tạo các Option cho Dropdown
