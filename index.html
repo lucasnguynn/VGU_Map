@@ -1353,21 +1353,15 @@ function clearSearch() {
 }
 
 function performSearch(query) {
-  // Tìm theo code tòa nhà
-  let foundBuilding = BUILDINGS.find(b => 
-    b.code.toLowerCase().includes(query) || 
-    b.name.toLowerCase().includes(query)
-  );
+  const normalizedQuery = query.trim().toLowerCase();
   
-  // Tìm theo số phòng
-  if (!foundBuilding) {
-    for (const b of BUILDINGS) {
-      if (b.rooms.some(r => r.toLowerCase().includes(query))) {
-        foundBuilding = b;
-        break;
-      }
-    }
-  }
+  // ═══════════════════════════════════════════════════════════════
+  //  STEP 1: Building Search (Keep existing)
+  // ═══════════════════════════════════════════════════════════════
+  let foundBuilding = BUILDINGS.find(b => 
+    b.code.toLowerCase().includes(normalizedQuery) || 
+    b.name.toLowerCase().includes(normalizedQuery)
+  );
   
   if (foundBuilding) {
     // Select building
@@ -1383,7 +1377,7 @@ function performSearch(query) {
     }
     
     // Check if room number
-    const roomMatch = foundBuilding.rooms.find(r => r.toLowerCase().includes(query));
+    const roomMatch = foundBuilding.rooms.find(r => r.toLowerCase().includes(normalizedQuery));
     if (roomMatch) {
       // Auto-select floor if room starts with floor number
       const floorNum = roomMatch.charAt(0);
@@ -1405,17 +1399,108 @@ function performSearch(query) {
       banner.classList.add('show');
       if (foundBuilding.code === 'AD') btnViewFloor.style.display = 'block';
     }
-  } else {
-    // Not found
-    bannerText.innerHTML = `❌ Không tìm thấy kết quả cho "<strong>${searchInput.value}</strong>"`;
-    banner.classList.add('show');
-    banner.style.background = '#fff5f5';
-    banner.style.borderColor = '#c0392b';
-    setTimeout(() => {
-      banner.style.background = '';
-      banner.style.borderColor = '';
-    }, 2000);
+    return;
   }
+  
+  // ═══════════════════════════════════════════════════════════════
+  //  STEP 2: Comprehensive Room Search across FLOOR_ROOMS & sheetRoomData
+  // ═══════════════════════════════════════════════════════════════
+  let matchedRoom = null;
+  let matchedFloorKey = null;
+  
+  // 2a. Search in FLOOR_ROOMS arrays
+  for (const [floorKey, rooms] of Object.entries(FLOOR_ROOMS)) {
+    const found = rooms.find(r => r.toLowerCase() === normalizedQuery || r.toLowerCase().includes(normalizedQuery));
+    if (found) {
+      matchedRoom = found;
+      matchedFloorKey = floorKey;
+      break;
+    }
+  }
+  
+  // 2b. If not found in FLOOR_ROOMS, search in sheetRoomData keys
+  if (!matchedRoom && sheetRoomData) {
+    for (const roomId of Object.keys(sheetRoomData)) {
+      if (roomId.toLowerCase() === normalizedQuery || roomId.toLowerCase().includes(normalizedQuery)) {
+        matchedRoom = roomId;
+        break;
+      }
+    }
+  }
+  
+  // ═══════════════════════════════════════════════════════════════
+  //  STEP 3: Reverse-Engineering Location from matched room
+  // ═══════════════════════════════════════════════════════════════
+  if (matchedRoom) {
+    let buildingId = null;
+    let floorNumber = null;
+    
+    // If we found it via FLOOR_ROOMS, extract from floorKey (e.g., 'bld_ad_f3')
+    if (matchedFloorKey) {
+      const parts = matchedFloorKey.split('_f');
+      if (parts.length === 2) {
+        buildingId = parts[0].replace('bld_', '').toUpperCase(); // 'bld_ad' -> 'AD'
+        floorNumber = parts[1]; // '3'
+      }
+    } else {
+      // Extract from room code itself (e.g., 'AD-301' -> AD, 3)
+      const roomUpper = matchedRoom.toUpperCase();
+      const bldMatch = roomUpper.match(/^([A-Z]+)-/);
+      if (bldMatch) {
+        buildingId = bldMatch[1];
+        // Extract floor from room number (e.g., AD-301 -> 3, AD-2.LB1 -> 2)
+        const numPart = roomUpper.replace(/^[A-Z]+-/, '');
+        const floorMatch = numPart.match(/^(\d+)/);
+        if (floorMatch) {
+          floorNumber = floorMatch[1];
+        }
+      }
+    }
+    
+    // Find the corresponding BUILDINGS entry
+    const targetBuilding = BUILDINGS.find(b => b.code === buildingId);
+    
+    if (targetBuilding) {
+      // Step 4: Update UI - Auto-select building
+      selBuilding.value = targetBuilding.code;
+      onBuildingChange(false);
+      
+      // Auto-select floor
+      if (floorNumber) {
+        const floorOpt = Array.from(selFloor.options).find(o => o.value === floorNumber);
+        if (floorOpt) {
+          selFloor.value = floorNumber;
+          onFloorChange();
+          
+          // Auto-select room
+          const roomOpt = Array.from(selRoom.options).find(o => o.value === matchedRoom);
+          if (roomOpt) {
+            selRoom.value = matchedRoom;
+            doSearch();
+            return;
+          }
+        }
+      }
+      
+      // If floor mapping isn't explicitly defined, still show the room result
+      bannerText.innerHTML = `🔍 Tìm thấy phòng: <strong>${matchedRoom}</strong> tại <strong>${targetBuilding.name}</strong>`;
+      banner.classList.add('show');
+      if (targetBuilding.code === 'AD') btnViewFloor.style.display = 'block';
+      return;
+    }
+  }
+  
+  // ═══════════════════════════════════════════════════════════════
+  //  STEP 5: Not Found
+  // ═══════════════════════════════════════════════════════════════
+  bannerText.innerHTML = `❌ Không tìm thấy kết quả cho "<strong>${searchInput.value}</strong>"`;
+  banner.classList.add('show');
+  banner.style.background = '#fff5f5';
+  banner.style.borderColor = '#c0392b';
+  setTimeout(() => {
+    banner.style.background = '';
+    banner.style.borderColor = '';
+  }, 2000);
 }
 
 function resetMap() {
