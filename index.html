@@ -397,7 +397,7 @@ function doG(){
   renderMap(bid,fid,n);
 }
 
-// === DÁN ĐOẠN CODE KẾT NỐI GOOGLE SHEETS VÀO ĐÂY ===
+// === KẾT NỐI GOOGLE SHEETS ===
 const SHEET_API_URL = "https://script.google.com/macros/library/d/1SfkSrdF0QcEnEpb2NrFjdlKiXNlsrxhxCBWTh1aMYYTdktB93MqtV8kO/1"; 
 
 async function loadMapFromSheets(fid) {
@@ -442,7 +442,7 @@ async function loadMapFromSheets(fid) {
   }
 }
 
-// === THAY THẾ HÀM RENDERMAP CŨ THÀNH HÀM NÀY ===
+// === HÀM RENDERMAP ===
 async function renderMap(bid, fid, n) {
   ST.bid = bid; ST.fid = fid; ST.flN = n; ST.fKey = `${bid}_f${n}`;
   const b = BLDS.find(x => x.id === bid);
@@ -473,6 +473,9 @@ async function renderMap(bid, fid, n) {
     </svg>`;
   }
 }
+
+// === HÀM ĐỔI TAB BỊ MẤT TÊN ĐÃ ĐƯỢC BỌC LẠI ===
+function sT(tab, rd) {
   rd=rd||ST.rd;if(!rd)return;ST.tab=tab;
   document.getElementById('t2d').classList.toggle('on',tab==='2D');
   document.getElementById('t3d').classList.toggle('on',tab==='3D');
@@ -485,6 +488,35 @@ async function renderMap(bid, fid, n) {
     <div style="font-size:11px;color:#8896a8;margin-bottom:10px">${ST.rid} — ${rd.name}</div>
     <div style="font-size:10px;color:#8896a8;background:rgba(0,37,84,.06);display:inline-block;padding:3px 12px;border-radius:2px">Google Drive · Wix Gallery</div>
   </div>`;
+}
+
+// === HÀM XEM CHI TIẾT PHÒNG BỊ XÓA NHẦM ĐÃ ĐƯỢC KHÔI PHỤC ===
+function rC(rid) {
+  ST.rid = rid;
+  const rd = getRD(rid);
+  ST.rd = rd;
+  const b = BLDS.find(x => x.id === ST.bid) || { name: 'Admin Building' };
+  const fn = ST.flN ? `Tầng ${ST.flN}` : '';
+  
+  document.getElementById('rbc').innerHTML = `<b>${b.name}</b> › ${fn} › ${rid}`;
+  document.getElementById('rar').textContent = rd.area;
+  document.getElementById('rcp').textContent = rd.cap;
+  document.getElementById('rst').textContent = rd.status;
+  
+  document.getElementById('rbdg').textContent = rd.type;
+  const tc = rd.type === 'Văn phòng' ? 'office' : rd.type === 'Hội trường' ? 'hall' : 'large';
+  document.getElementById('rbdg').style.background = BTXT[tc] ? BTXT[tc][0] : '#e8eef9';
+  document.getElementById('rbdg').style.color = BTXT[tc] ? BTXT[tc][1] : '#002554';
+  
+  document.getElementById('rnum').textContent = rid;
+  document.getElementById('rnm').textContent = rd.name;
+  document.getElementById('row2').textContent = rd.owner;
+  document.getElementById('rfn').textContent = rd.func;
+  
+  document.getElementById('req').innerHTML = rd.equip.map(e => `<div class="ei">${e}</div>`).join('');
+  
+  sT('2D', rd);
+  show('pg-r');
 }
 </script>
 </body>
