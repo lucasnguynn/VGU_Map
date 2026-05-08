@@ -55,6 +55,8 @@ transition:all .3s ease}
 select.c1-select { height: 40px; border: 1.5px solid var(--gl); border-radius: 4px; padding: 0 28px 0 10px; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; color: var(--bl); background: var(--wh) url("image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' fill='%23002554' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E") no-repeat right 9px center; appearance: none; cursor: pointer; transition: all .18s; min-width: 150px; }
 select.c1-select:disabled { opacity: .38; cursor: not-allowed; background-color: #f4f5f9; }
 select.c1-select:focus { outline: none; border-color: var(--or); box-shadow: 0 0 0 3px rgba(245,130,32,.15); }
+input.c1-select { background: var(--wh); appearance: textfield; }
+input.c1-select::-webkit-search-cancel-button { display: none; }
 .btn-search { width: 44px; height: 44px; border: none; border-radius: 50%; background: var(--or); color: var(--wh); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .2s; box-shadow: 0 3px 10px rgba(245,130,32,.35); margin-bottom: 1px; }
 .btn-search:hover { background: #e06a00; transform: scale(1.06); box-shadow: 0 5px 16px rgba(245,130,32,.4); }
 .btn-search svg { width: 18px; height: 18px; }
@@ -223,6 +225,16 @@ polygon,polyline{transition:all .18s cubic-bezier(.4,0,.2,1)}
 <div class="page-title">VGU Map &mdash; <span>TRA CỨU PHÒNG ỐC</span></div>
 </div>
 <div class="control-bar">
+<div class="ctrl-group" style="min-width:220px;flex:1;">
+<label>Tìm kiếm <small>/ Search</small></label>
+<div style="position:relative;display:flex;align-items:center;">
+<input type="text" id="searchInput" class="c1-select" style="height:40px;padding-right:40px;appearance:textfield;background-image:none;" placeholder="Nhập tên tòa, phòng..." oninput="onSearchInput()" onkeydown="handleSearchKey(event)">
+<button type="button" onclick="clearSearch()" style="position:absolute;right:6px;width:32px;height:32px;border:none;background:transparent;cursor:pointer;color:var(--ht);display:flex;align-items:center;justify-content:center;border-radius:50%;transition:all .2s;" title="Xóa tìm kiếm">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+</button>
+</div>
+<small id="searchHint" style="font-size:10px;color:var(--ht);margin-top:4px;display:none;">Gõ để tìm kiếm...</small>
+</div>
 <div class="ctrl-group">
 <label>Tòa nhà <small>/ Building</small></label>
 <select id="selBuilding" class="c1-select" onchange="onBuildingChange()">
@@ -245,6 +257,12 @@ polygon,polyline{transition:all .18s cubic-bezier(.4,0,.2,1)}
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
 <circle cx="11" cy="11" r="7"/>
 <line x1="16.5" y1="16.5" x2="22" y2="22"/>
+</svg>
+</button>
+<button class="btn-search" onclick="resetMap()" title="Đặt lại bản đồ" style="background:var(--bl);margin-left:8px;box-shadow:0 3px 10px rgba(0,37,84,.35);">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+<path d="M3 3v5h5"/>
 </svg>
 </button>
 </div>
@@ -1044,6 +1062,8 @@ const banner       = document.getElementById('resultBanner');
 const bannerText   = document.getElementById('resultText');
 const btnViewFloor = document.getElementById('btnViewFloor');
 const mapWrap      = document.getElementById('mapWrap');
+const searchInput  = document.getElementById('searchInput');
+const searchHint   = document.getElementById('searchHint');
 
 // Khởi tạo dropdown tòa nhà
 BUILDINGS.forEach(b => {
@@ -1056,6 +1076,145 @@ selFloor.innerHTML = '<option value="">— Chọn Tầng —</option>';
 selRoom.innerHTML  = '<option value="">— Chọn số phòng —</option>';
 selFloor.disabled = true;
 selRoom.disabled  = true;
+
+// ═══════════════════════════════════════════════════════════════
+//  🔍 TÌM KIẾM & RESET MAP
+// ═══════════════════════════════════════════════════════════════
+let searchDebounceTimer = null;
+
+function onSearchInput() {
+  const query = searchInput.value.trim().toLowerCase();
+  
+  // Show/hide hint
+  searchHint.style.display = query.length > 0 ? 'block' : 'none';
+  
+  // Clear previous timer
+  clearTimeout(searchDebounceTimer);
+  
+  if (query.length === 0) {
+    resetMap();
+    return;
+  }
+  
+  // Debounce search
+  searchDebounceTimer = setTimeout(() => {
+    performSearch(query);
+  }, 300);
+}
+
+function handleSearchKey(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    const query = searchInput.value.trim().toLowerCase();
+    if (query.length > 0) {
+      performSearch(query);
+    }
+  }
+}
+
+function clearSearch() {
+  searchInput.value = '';
+  searchHint.style.display = 'none';
+  resetMap();
+  searchInput.focus();
+}
+
+function performSearch(query) {
+  // Tìm theo code tòa nhà
+  let foundBuilding = BUILDINGS.find(b => 
+    b.code.toLowerCase().includes(query) || 
+    b.name.toLowerCase().includes(query)
+  );
+  
+  // Tìm theo số phòng
+  if (!foundBuilding) {
+    for (const b of BUILDINGS) {
+      if (b.rooms.some(r => r.toLowerCase().includes(query))) {
+        foundBuilding = b;
+        break;
+      }
+    }
+  }
+  
+  if (foundBuilding) {
+    // Select building
+    selBuilding.value = foundBuilding.code;
+    onBuildingChange(false);
+    
+    // Highlight polygon
+    if (polygonLayers[foundBuilding.code]) {
+      if (selectedPolygon) selectedPolygon.setStyle(defaultPolyStyle);
+      selectedPolygon = polygonLayers[foundBuilding.code];
+      selectedPolygon.setStyle(highlightPolyStyle);
+      lMap.flyToBounds(selectedPolygon.getBounds(), { padding:[50,50], duration:0.5 });
+    }
+    
+    // Check if room number
+    const roomMatch = foundBuilding.rooms.find(r => r.toLowerCase().includes(query));
+    if (roomMatch) {
+      // Auto-select floor if room starts with floor number
+      const floorNum = roomMatch.charAt(0);
+      const floorOpt = Array.from(selFloor.options).find(o => o.value === floorNum);
+      if (floorOpt) {
+        selFloor.value = floorNum;
+        onFloorChange();
+        
+        // Auto-select room
+        const roomOpt = Array.from(selRoom.options).find(o => o.value === roomMatch);
+        if (roomOpt) {
+          selRoom.value = roomMatch;
+          doSearch();
+        }
+      }
+    } else {
+      // Show building result
+      bannerText.innerHTML = `📍 Đã tìm thấy: <strong>${foundBuilding.name}</strong>`;
+      banner.classList.add('show');
+      if (foundBuilding.code === 'AD') btnViewFloor.style.display = 'block';
+    }
+  } else {
+    // Not found
+    bannerText.innerHTML = `❌ Không tìm thấy kết quả cho "<strong>${searchInput.value}</strong>"`;
+    banner.classList.add('show');
+    banner.style.background = '#fff5f5';
+    banner.style.borderColor = '#c0392b';
+    setTimeout(() => {
+      banner.style.background = '';
+      banner.style.borderColor = '';
+    }, 2000);
+  }
+}
+
+function resetMap() {
+  // Reset dropdowns
+  selBuilding.value = '';
+  selFloor.innerHTML = '<option value="">— Chọn Tầng —</option>';
+  selRoom.innerHTML  = '<option value="">— Chọn số phòng —</option>';
+  selFloor.disabled = true;
+  selRoom.disabled  = true;
+  
+  // Reset polygon highlight
+  if (selectedPolygon) {
+    selectedPolygon.setStyle(defaultPolyStyle);
+    selectedPolygon = null;
+  }
+  
+  // Hide banner
+  banner.classList.remove('show');
+  btnViewFloor.style.display = 'none';
+  mapWrap.classList.remove('has-result');
+  
+  // Reset map view
+  if (lMap) {
+    const csvData = parseBuildingCSV(BUILDING_BOUNDARY_CSV);
+    const rawBounds = csvData.bounds;
+    const paddedBounds = [
+      [rawBounds[0][0] - CSV_PADDING, rawBounds[0][1] - CSV_PADDING],
+      [rawBounds[1][0] + CSV_PADDING, rawBounds[1][1] + CSV_PADDING]
+    ];
+    lMap.fitBounds(paddedBounds);
+  }
+}
 
 function onBuildingChange(fromMapClick = false) {
   const code = selBuilding.value;
