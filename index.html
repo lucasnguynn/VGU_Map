@@ -267,7 +267,7 @@ Bản đồ tự động điều chỉnh theo màn hình. Nhấn vào phòng đ�
 // ── BUILDING DATA (Cập nhật có thêm tọa độ polygon giả định) ──
 // Ghi chú: Để vẽ hình dạng chính xác, bạn đo lại trên ảnh và thay vào chuỗi `coords`
 // ── BUILDING DATA ──
-const BUILDINGS_RAW = [
+const BUILDINGS = [
   { 
     code: 'D1', name: 'Ký túc xá D1', floors: 7, 
     rooms: ['101','102','103','104','105','106'], 
@@ -491,56 +491,57 @@ const banner      = document.getElementById('resultBanner');
 const bannerText  = document.getElementById('resultText');
 const btnViewFloor = document.getElementById('btnViewFloor');
 const mapWrap     = document.getElementById('mapWrap');
-// ── KHỞI TẠO BẢN ĐỒ LEAFLET ──
+
+  // ── KHỞI TẠO BẢN ĐỒ LEAFLET ──
 let lMap, bldLayerGroup;
-let polygonLayers = {}; // Lưu polygon theo ID
+let polygonLayers = {}; 
 let selectedPolygon = null;
 const defaultPolyStyle = { color: 'transparent', fillColor: '#002554', fillOpacity: 0.0 };
 const highlightPolyStyle = { color: '#f58220', weight: 3, fillColor: '#f58220', fillOpacity: 0.5 };
+
 function initLeafletMap() {
-if (lMap) return; // Tránh khởi tạo nhiều lần
-lMap = L.map('map', { crs: L.CRS.Simple, minZoom: -1.5, maxZoom: 2, zoomSnap: 0.5 });
-// Thay đổi số 2000, 1200 này cho bằng kích thước thật (px) của file ảnh "VGU MAP ALL.png"
-const bounds = [[0, 0], [1200, 2000]]; // [Chiều cao, Chiều rộng]
-L.imageOverlay('VGU MAP ALL.png', bounds).addTo(lMap);
-lMap.fitBounds(bounds);
-bldLayerGroup = L.featureGroup().addTo(lMap);
-// Vẽ Polygon cho các tòa nhà
-BUILDINGS.forEach(b => {
-let coordsArr = [];
-if (b.coords) {
-coordsArr = b.coords.split('|').map(c => c.split(',').map(Number));
-} else {
-// TẠO HÌNH VUÔNG TẠM TỪ TỌA ĐỘ CX/CY CŨ (Để test click được hết các tòa)
-// CX cũ tính theo tỷ lệ 232.98, CY cũ tính theo tỷ lệ 144.85
-const x = (b.cx / 232.98) * 2000;
-const y = 1200 - (b.cy / 144.85) * 1200; // Nghịch đảo trục Y
-coordsArr = [[y-40, x-40], [y-40, x+40], [y+40, x+40], [y+40, x-40]];
+    if (lMap) return; 
+    lMap = L.map('map', { crs: L.CRS.Simple, minZoom: -1.5, maxZoom: 2, zoomSnap: 0.5 });
+    
+    const bounds = [[0, 0], [1200, 2000]]; 
+    L.imageOverlay('VGU MAP ALL.png', bounds).addTo(lMap);
+    lMap.fitBounds(bounds);
+    bldLayerGroup = L.featureGroup().addTo(lMap);
+    
+    // SỬA LỖI 2: Xử lý lại logic nạp toạ độ Polygon
+    BUILDINGS.forEach(b => {
+        // Trực tiếp lấy mảng toạ độ đã được định dạng sẵn trong object
+        const coordsArr = b.coordsRaw; 
+        
+        if (coordsArr && coordsArr.length > 0) {
+            const polygon = L.polygon(coordsArr, defaultPolyStyle).addTo(bldLayerGroup);
+            polygon.bindTooltip(b.name, { direction: 'top', sticky: true });
+            
+            // Sự kiện Hover
+            polygon.on('mouseover', e => { if (selectedPolygon !== e.target) e.target.setStyle({fillOpacity: 0.2, color: '#002554'}); });
+            polygon.on('mouseout', e => { if (selectedPolygon !== e.target) e.target.setStyle(defaultPolyStyle); });
+            
+            // Sự kiện Click
+            polygon.on('click', e => {
+                selBuilding.value = b.code;
+                onBuildingChange(true); 
+            });
+            polygonLayers[b.code] = polygon;
+        }
+    });
+
+    lMap.on('click', e => console.log(`Toạ độ click: [${Math.round(e.latlng.lat)}, ${Math.round(e.latlng.lng)}]`));
 }
-const polygon = L.polygon(coordsArr, defaultPolyStyle).addTo(bldLayerGroup);
-polygon.bindTooltip(b.name, { direction: 'top', sticky: true });
-// Sự kiện Hover
-polygon.on('mouseover', e => { if (selectedPolygon !== e.target) e.target.setStyle({fillOpacity: 0.2, color: '#002554'}); });
-polygon.on('mouseout', e => { if (selectedPolygon !== e.target) e.target.setStyle(defaultPolyStyle); });
-// Sự kiện Click
-polygon.on('click', e => {
-selBuilding.value = b.code;
-onBuildingChange(true); // Tham số true để khỏi loop flyToBounds
-});
-polygonLayers[b.code] = polygon;
-});
-// Code hỗ trợ lấy tọa độ mới (Bật F12 lên xem)
-lMap.on('click', e => console.log(`Toạ độ click: ${Math.round(e.latlng.lat)},${Math.round(e.latlng.lng)}`));
-}
+
 // Khởi tạo các Option cho Dropdown
 BUILDINGS.forEach(b => {
-const opt = document.createElement('option');
-opt.value = b.code;
-opt.textContent = `${b.code} – ${b.name}`;
-selBuilding.appendChild(opt);
+    const opt = document.createElement('option');
+    opt.value = b.code;
+    opt.textContent = `${b.code} – ${b.name}`;
+    selBuilding.appendChild(opt);
 });
-// KHÔI PHỤC LẠI KHỞI TẠO DROPDOWNS: Gọi hàm oBl() cũ (hoặc chỉ cần reset thanh chọn)
-// Lệnh này đảm bảo khi vừa vô trang, các thanh chọn Tầng và Phòng đều bị vô hiệu hóa cho đến khi người dùng chọn Tòa nhà.
+
+// KHÔI PHỤC LẠI KHỞI TẠO DROPDOWNS
 selFloor.innerHTML = '<option value="">— Chọn Tầng —</option>';
 selRoom.innerHTML  = '<option value="">— Chọn số phòng —</option>';
 selFloor.disabled = true;
