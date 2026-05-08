@@ -206,9 +206,81 @@ input.c1-select::-webkit-search-cancel-button { display: none; }
 .pbc{margin-left:auto;font-size:15px;color:rgba(255,255,255,.4)}
 .pbc b{color:rgba(255,255,255,.78)}
 .pc{max-width:1100px;margin:0 auto;padding:20px 20px 60px}
-.map-wrap{ width:100%; background:#edf0f8; border:1.5px solid var(--gl); border-radius:8px; overflow:hidden; display:flex; align-items:center; justify-content:center; padding:12px; }
-.map-wrap svg{width:100%;height:auto;display:block}
-.map-wrap.portrait svg{max-width:560px;margin:0 auto}
+
+/* ═══════════════════════════════════════════════════════════════
+   PREMIUM MAP CONTAINER — Interactive Viewport with Blueprint Grid
+   ═══════════════════════════════════════════════════════════════ */
+.map-wrap {
+  width: 100%;
+  height: calc(100vh - 250px);
+  min-height: 400px;
+  background-color: #eef2f9;
+  /* Premium blueprint grid pattern */
+  background-image: 
+    linear-gradient(rgba(0, 37, 84, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 37, 84, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+  border: 1.5px solid var(--gl);
+  border-radius: 10px;
+  overflow: auto;
+  touch-action: pan-x pan-y;
+  position: relative;
+  z-index: 1;
+  box-shadow: inset 0 2px 8px rgba(0, 37, 84, 0.06);
+}
+
+/* SVG container inside map-wrap — maintains minimum readable size */
+.map-wrap svg {
+  min-width: 800px;
+  min-height: 400px;
+  width: auto;
+  height: auto;
+  display: block;
+  margin: 20px auto;
+}
+
+/* Portrait mode override for specific floors */
+.map-wrap.portrait svg {
+  min-width: 500px;
+  max-width: 700px;
+}
+
+/* Room path styling with modern aesthetics */
+.map-wrap path {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  filter: drop-shadow(0 1px 2px rgba(0, 37, 84, 0.1));
+}
+
+/* Hover effect for interactive rooms */
+.map-wrap g[onclick]:hover path {
+  filter: brightness(0.95) contrast(1.05) drop-shadow(0 3px 6px rgba(0, 37, 84, 0.15));
+  stroke: #002554 !important;
+  stroke-width: 2.5px !important;
+}
+
+/* Text labels with enhanced readability */
+.map-wrap text {
+  font-family: 'IBM Plex Sans', sans-serif;
+  paint-order: stroke fill;
+  /* White stroke/shadow for contrast over lines */
+  text-shadow: 
+    0 0 3px rgba(255, 255, 255, 0.9),
+    0 0 6px rgba(255, 255, 255, 0.7);
+  transition: all 0.15s ease;
+}
+
+/* Enhanced hover state for room groups */
+.map-wrap g[onclick] {
+  cursor: pointer;
+}
+
+.map-wrap g[onclick]:hover text {
+  font-weight: 700;
+  fill: #002554 !important;
+}
+
 .mleg{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}
 .lgi{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--mt)}
 .lgd{width:10px;height:10px;border-radius:2px;border:1px solid rgba(0,0,0,.1);flex-shrink:0}
@@ -1645,18 +1717,34 @@ async function loadMapFromSheets(fid) {
       maxMapY = Math.max(maxMapY, sy, ey);
     });
 
+    // ═══════════════════════════════════════════════════════════════
+    // TRUE-TO-SCALE PROPORTIONS — Uniform scale for X and Y axes
+    // ═══════════════════════════════════════════════════════════════
     let mapWidth = maxMapX - minMapX;
     let mapHeight = maxMapY - minMapY;
-    let padX = mapWidth * 0.05, padY = mapHeight * 0.05; 
+    
+    // Add uniform padding (5% on each side)
+    let padX = mapWidth * 0.05;
+    let padY = mapHeight * 0.05;
+    
+    // Calculate padded dimensions
+    let paddedWidth = mapWidth + padX * 2;
+    let paddedHeight = mapHeight + padY * 2;
+    
+    // Use a base viewBox width and calculate height using the SAME scale
     let vbW = 1000;
-    let scale = vbW / (mapWidth + padX * 2);
-    let vbH = (mapHeight + padY * 2) * scale;
+    // CRITICAL: Uniform scale multiplier for both X and Y axes
+    let uniformScale = vbW / paddedWidth;
+    // Height is derived from the same scale — preserves true proportions
+    let vbH = paddedHeight * uniformScale;
 
-    function mapX(x) { return (x - minMapX + padX) * scale; }
-    function mapY(y) { return (maxMapY - y + padY) * scale; }
+    // Mapping functions with Y-axis inversion (SVG Y grows downward, map Y grows upward)
+    function mapX(x) { return (x - minMapX + padX) * uniformScale; }
+    function mapY(y) { return (maxMapY - y + padY) * uniformScale; }
 
+    // Modern color palette
     let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${vbW} ${vbH}" style="width:100%;height:auto;display:block">
-      <rect x="0" y="0" width="${vbW}" height="${vbH}" fill="#edf0f8"/>`;
+      <rect x="0" y="0" width="${vbW}" height="${vbH}" fill="#eef2f9"/>`;
       
     for (const [roomNum, rData] of Object.entries(rooms)) {
       let dString = "", lastX = null, lastY = null;
@@ -1669,30 +1757,43 @@ async function loadMapFromSheets(fid) {
       });
       dString += "Z"; 
       
+      // Calculate room center for text placement
       let textX = mapX((rData.minX + rData.maxX) / 2);
       let textY = mapY((rData.minY + rData.maxY) / 2);
       let roomWidth = Math.abs(mapX(rData.maxX) - mapX(rData.minX));
       let roomHeight = Math.abs(mapY(rData.minY) - mapY(rData.maxY)); 
       
-      let baseFontSize = vbW * 0.009; 
-      let maxFontByWidth = roomWidth / Math.max(roomNum.length * 0.55, 1);
-      let maxFontByHeight = roomHeight * 0.5;
-      let fontSize = Math.max(Math.min(baseFontSize, maxFontByWidth, maxFontByHeight), 1.5); 
-      let strokeW = Math.max(vbW * 0.001, 0.5);
+      // Dynamic font-size calculation — ensures text fits within room boundaries
+      let baseFontSize = vbW * 0.008; 
+      // More conservative sizing to prevent bleed
+      let maxFontByWidth = roomWidth / Math.max(roomNum.length * 0.65, 1);
+      let maxFontByHeight = roomHeight * 0.45;
+      let fontSize = Math.max(Math.min(baseFontSize, maxFontByWidth, maxFontByHeight), 2); 
+      
+      // Stroke width proportional to viewBox
+      let strokeW = Math.max(vbW * 0.0008, 0.4);
 
       const BCAT={'AD-501':'large','AD-507':'large','AD-201':'hall','AD-247':'large','AD-248':'large','AD-251':'large','AD-101':'large','AD-601':'large','AD-609':'large','AD-614':'large'};
 
-      let fillColor = "#eef2fc", strokeColor = "#8fa0c0";
-      if (/^WC/i.test(roomNum)) { fillColor = "#cce8f4"; strokeColor = "#4a8fb0"; } 
-      else if (/^(LB|CR)/i.test(roomNum)) { fillColor = "#e4e8f5"; strokeColor = "#8a9ab8"; } 
-      else if (BCAT[roomNum] || roomNum.includes("Hội trường")) { fillColor = "#e6f5ec"; strokeColor = "#408060"; }
+      // Modern, premium color palette
+      let fillColor = "#e8edf8", strokeColor = "#7a8fb8";
+      if (/^WC/i.test(roomNum)) { 
+        fillColor = "#c5e3f0"; 
+        strokeColor = "#3d7a99"; 
+      } else if (/^(LB|CR)/i.test(roomNum)) { 
+        fillColor = "#dce1f2"; 
+        strokeColor = "#6b7aa8"; 
+      } else if (BCAT[roomNum] || roomNum.includes("Hội trường")) { 
+        fillColor = "#dff0e6"; 
+        strokeColor = "#3a7a5a"; 
+      }
 
       svgContent += `
         <g onclick="rC('${roomNum}')" style="cursor:pointer">
           <path d="${dString}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="${strokeW}">
             <title>${roomNum}</title>
           </path>
-          <text x="${textX.toFixed(2)}" y="${textY.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="${fontSize.toFixed(2)}" font-weight="600" fill="#002554" pointer-events="none">${roomNum}</text>
+          <text x="${textX.toFixed(2)}" y="${textY.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="${fontSize.toFixed(2)}" font-weight="600" fill="#002554" pointer-events="none" style="paint-order:stroke;stroke:#ffffff;stroke-width:${fontSize * 0.25}px">${roomNum}</text>
         </g>`;
     }
     return svgContent + `</svg>`;
