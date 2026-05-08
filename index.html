@@ -971,15 +971,34 @@ const BUILDINGS = [
 let lMap, bldLayerGroup;
 let polygonLayers = {};
 let selectedPolygon = null;
+let globalBounds = null; // Lưu trữ bounds toàn cục để dùng cho fitBounds khi resize
 
 const defaultPolyStyle   = { color:'#002554', fillColor:'#002554', fillOpacity:0.05, weight:2 };
 const highlightPolyStyle = { color:'#f58220', weight:4, fillColor:'#f58220', fillOpacity:0.3 };
 
-// ⚙️  Tuỳ chỉnh: thêm padding (đơn vị: cùng đơn vị với CSV)
-const CSV_PADDING = 3000;
-
 // ⚙️  Tuỳ chỉnh: nếu polygon bị lật ngược trục Y so với ảnh PNG → đổi thành true
 const FLIP_Y_AXIS = false;
+
+/**
+ * Tính toán padded bounds dựa trên % của kích thước bounds
+ * Đảm bảo responsive trên mọi thiết bị
+ */
+function calculatePaddedBounds(rawBounds) {
+  const minY = rawBounds[0][0], minX = rawBounds[0][1];
+  const maxY = rawBounds[1][0], maxX = rawBounds[1][1];
+  
+  const width = maxX - minX;
+  const height = maxY - minY;
+  
+  // Padding 8% mỗi bên để buildings không sát mép
+  const paddingX = width * 0.08;
+  const paddingY = height * 0.08;
+  
+  return [
+    [minY - paddingY, minX - paddingX],
+    [maxY + paddingY, maxX + paddingX]
+  ];
+}
 
 function initLeafletMap() {
   if (lMap) setTimeout(() => lMap.invalidateSize(), 100);
@@ -989,25 +1008,26 @@ function initLeafletMap() {
   const csvData = parseBuildingCSV(BUILDING_BOUNDARY_CSV);
   const rawBounds = csvData.bounds; // [[minY, minX], [maxY, maxX]]
 
-  // 2️⃣  Thêm padding để polygon không sát mép ảnh
-  const paddedBounds = [
-    [rawBounds[0][0] - CSV_PADDING, rawBounds[0][1] - CSV_PADDING],
-    [rawBounds[1][0] + CSV_PADDING, rawBounds[1][1] + CSV_PADDING]
-  ];
+  // 2️⃣  Tính toán padded bounds dựa trên % để responsive
+  globalBounds = calculatePaddedBounds(rawBounds);
 
   // 3️⃣  Khởi tạo Leaflet map với CRS.Simple (hệ trục chữ nhật pixel)
   lMap = L.map('map', {
     crs: L.CRS.Simple,
-    minZoom: -2,
+    minZoom: -3,
     maxZoom: 2,
-    zoomSnap: 0.5
+    zoomSnap: 0.25,
+    zoomDelta: 0.5,
+    wheelPxPerZoomLevel: 120
   });
 
   // 4️⃣  ️ THAY TÊN FILE PNG MỚI TẠI ĐÂY
   //      Ảnh PNG phải có cùng aspect-ratio với paddedBounds
   //      Nếu ảnh bị méo → điều chỉnh lại kích thước ảnh hoặc padding ở trên
-  L.imageOverlay('VGU ALL MAP.png', paddedBounds).addTo(lMap);
-  lMap.fitBounds(paddedBounds);
+  L.imageOverlay('VGU ALL MAP.png', globalBounds).addTo(lMap);
+  
+  // Fit bounds ngay lập tức để tất cả buildings hiển thị trong viewport
+  lMap.fitBounds(globalBounds, { animate: false });
 
   // 5️⃣  Vẽ polygons từ CSV lên cùng hệ tọa độ
   bldLayerGroup = L.featureGroup().addTo(lMap);
@@ -1050,6 +1070,37 @@ function initLeafletMap() {
   lMap.on('click', e => {
     console.log(`Clicked: [${Math.round(e.latlng.lat)}, ${Math.round(e.latlng.lng)}]`);
   });
+  
+  // 6️⃣  Thêm event listener cho window resize để tự động fit bounds
+  setupMapResizeHandler();
+}
+
+/**
+ * Thiết lập handler cho sự kiện resize window và orientation change
+ * Đảm bảo map luôn fit bounds khi kích thước màn hình thay đổi
+ */
+function setupMapResizeHandler() {
+  let resizeTimeout;
+  
+  function handleResize() {
+    if (!lMap || !globalBounds) return;
+    
+    // Clear timeout cũ để tránh gọi quá nhiều lần
+    clearTimeout(resizeTimeout);
+    
+    // Debounce resize event (chờ 250ms sau khi resize xong mới thực hiện)
+    resizeTimeout = setTimeout(() => {
+      // Invalidate size để map nhận diện kích thước container mới
+      lMap.invalidateSize(false);
+      
+      // Fit bounds để đảm bảo tất cả buildings vẫn hiển thị trong viewport
+      lMap.fitBounds(globalBounds, { animate: true, duration: 0.3 });
+    }, 250);
+  }
+  
+  // Listen cho cả resize và orientationchange (cho mobile)
+  window.addEventListener('resize', handleResize, { passive: true });
+  window.addEventListener('orientationchange', handleResize, { passive: true });
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1204,15 +1255,9 @@ function resetMap() {
   btnViewFloor.style.display = 'none';
   mapWrap.classList.remove('has-result');
   
-  // Reset map view
-  if (lMap) {
-    const csvData = parseBuildingCSV(BUILDING_BOUNDARY_CSV);
-    const rawBounds = csvData.bounds;
-    const paddedBounds = [
-      [rawBounds[0][0] - CSV_PADDING, rawBounds[0][1] - CSV_PADDING],
-      [rawBounds[1][0] + CSV_PADDING, rawBounds[1][1] + CSV_PADDING]
-    ];
-    lMap.fitBounds(paddedBounds);
+  // Reset map view to global bounds
+  if (lMap && globalBounds) {
+    lMap.fitBounds(globalBounds, { animate: true, duration: 0.5 });
   }
 }
 
