@@ -1,50 +1,190 @@
 /**
  * VGUMap Data Service
- * Handles data fetching from Google Sheets APIs and local JSON files
+ * Handles data fetching from Google Sheets APIs with caching support
  */
 
-import { DATA_FILES } from './config.js';
+import { DATA_FILES, CACHE_CONFIG, EXCLUDED_ROOM_CODES } from './config.js';
 
 /**
- * Fetch data from a URL with proper error handling
+ * Cache utility for storing and retrieving API responses
+ */
+export const cacheService = {
+    /**
+     * Get cached data if it exists and is not expired
+     * @param {string} key - Cache key
+     * @returns {any|null} - Cached data or null if expired/not found
+     */
+    get(key) {
+        try {
+            const cached = localStorage.getItem(key);
+            if (!cached) return null;
+            
+            const { data, timestamp } = JSON.parse(cached);
+            const now = Date.now();
+            
+            // Check if cache is expired
+            if (now - timestamp > CACHE_CONFIG.TTL) {
+                localStorage.removeItem(key);
+                return null;
+            }
+            
+            return data;
+        } catch (error) {
+            console.warn(`Cache read error for key ${key}:`, error);
+            return null;
+        }
+    },
+    
+    /**
+     * Store data in cache with timestamp
+     * @param {string} key - Cache key
+     * @param {any} data - Data to cache
+     */
+    set(key, data) {
+        try {
+            const cacheEntry = {
+                data,
+                timestamp: Date.now()
+            };
+            localStorage.setItem(key, JSON.stringify(cacheEntry));
+        } catch (error) {
+            console.warn(`Cache write error for key ${key}:`, error);
+            // Storage might be full, clear old entries
+            if (error.name === 'QuotaExceededError') {
+                localStorage.clear();
+            }
+        }
+    },
+    
+    /**
+     * Clear all cached data
+     */
+    clear() {
+        Object.values(CACHE_CONFIG.KEYS).forEach(key => {
+            localStorage.removeItem(key);
+        });
+    }
+};
+
+/**
+ * Parse room number string to extract building code, floor, and room number
+ * Format: [BuildingCode]-[Floor][RoomNumber] (e.g., "AD-301" -> building: "AD", floor: 3, room: "01")
+ * @param {string} roomNumber - Room number string (e.g., "AD-301", "FC-202")
+ * @returns {Object|null} - Parsed room info or null if invalid format
+ */
+export function parseRoomNumber(roomNumber) {
+    if (!roomNumber || typeof roomNumber !== 'string') {
+        return null;
+    }
+    
+    // Match pattern: 2 chars before hyphen, then digits
+    const match = roomNumber.match(/^([A-Z]{2})-(\d+)(.*)$/i);
+    if (!match) {
+        return null;
+    }
+    
+    const [, buildingCode, floorAndRoom, suffix] = match;
+    const floorNumber = parseInt(floorAndRoom.charAt(0), 10);
+    const roomDigits = floorAndRoom.slice(1, 4); // First 3 digits after floor
+    
+    return {
+        buildingCode: buildingCode.toUpperCase(),
+        floorNumber,
+        roomNumber: roomDigits,
+        fullRoomSuffix: suffix,
+        originalCode: roomNumber
+    };
+}
+
+/**
+ * Check if a room code should be excluded from search dropdown
+ * Excludes rooms containing CR (Corridor), LB (Lobby), WC (Restroom)
+ * @param {string} roomCode - Room code to check
+ * @returns {boolean} - True if room should be excluded
+ */
+export function isExcludedRoom(roomCode) {
+    if (!roomCode) return true;
+    
+    const upperCode = roomCode.toUpperCase();
+    
+    // Check if any exclusion code is present in the room code
+    return EXCLUDED_ROOM_CODES.some(code => 
+        upperCode.includes(`-${code}`) || 
+        upperCode.includes(`.${code}`) ||
+        upperCode.startsWith(`${code}-`) ||
+        upperCode.startsWith(`${code}.`)
+    );
+}
+
+/**
+ * Fetch data from a URL with proper error handling and caching
  * @param {string} url - The URL to fetch
+ * @param {string} cacheKey - Cache storage key
+ * @param {boolean} useCache - Whether to use cache (default: true)
  * @returns {Promise<any>} - The parsed JSON response
  */
-export async function fetchData(url) {
+export async function fetchData(url, cacheKey, useCache = true) {
+    // Try to get from cache first
+    if (useCache) {
+        const cachedData = cacheService.get(cacheKey);
+        if (cachedData) {
+            console.log(`✅ Cache hit for ${cacheKey}`);
+            return cachedData;
+        }
+    }
+    
     try {
         const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-        return await response.json();
+        const data = await response.json();
+        
+        // Cache the response
+        if (useCache && cacheKey) {
+            cacheService.set(cacheKey, data);
+            console.log(`✅ Cached data for ${cacheKey}`);
+        }
+        
+        return data;
     } catch (error) {
         console.error(`❌ Fetch error from ${url}:`, error.message);
+        
+        // If fetch fails, try to return stale cache data if available
+        if (useCache) {
+            const staleCache = cacheService.get(cacheKey);
+            if (staleCache) {
+                console.log(`⚠️ Returning stale cache for ${cacheKey}`);
+                return staleCache;
+            }
+        }
+        
         throw error;
     }
 }
 
 /**
- * Load room map data from local JSON file
+ * Load room map data from local JSON file with caching
  * @returns {Promise<Array>} - Array of room boundary data
  */
 export async function loadMapData() {
-    return await fetchData(DATA_FILES.MAP);
+    return await fetchData(DATA_FILES.MAP_COORDINATES, CACHE_CONFIG.KEYS.MAP);
 }
 
 /**
- * Load room information data from local JSON file
+ * Load room information data from local JSON file with caching
  * @returns {Promise<Object>} - Room information object
  */
 export async function loadRoomInfo() {
-    return await fetchData(DATA_FILES.INFO);
+    return await fetchData(DATA_FILES.ROOM_SCHEDULE, CACHE_CONFIG.KEYS.ROOMS);
 }
 
 /**
- * Load drive images mapping from local JSON file
+ * Load drive images mapping from local JSON file with caching
  * @returns {Promise<Object>} - Drive images mapping object
  */
 export async function loadDriveImages() {
-    return await fetchData(DATA_FILES.DRIVE_LIST);
+    return await fetchData(DATA_FILES.DRIVE_LIST, CACHE_CONFIG.KEYS.DRIVE);
 }
 
 /**
@@ -57,9 +197,14 @@ export function processRoomInfo(rawData) {
     const roomData = {};
 
     dataArray.forEach(row => {
-        const roomId = row['Room: Number'] || row.Room_Number || row.Number;
+        const roomId = row['room_number'] || row['Room: Number'] || row.Room_Number || row.Number;
         
         if (!roomId) return;
+
+        // Skip excluded rooms (CR, LB, WC)
+        if (isExcludedRoom(roomId)) {
+            return;
+        }
 
         if (!roomData[roomId]) {
             roomData[roomId] = {
@@ -69,15 +214,21 @@ export function processRoomInfo(rawData) {
         }
 
         // Aggregate staff names
-        const staffName = row['FM_Staff_Name'];
+        const staffName = row['FM_Staff_Name'] || row['occupant_display'];
         if (staffName && staffName.trim() !== '' && !roomData[roomId].staffList.includes(staffName)) {
             roomData[roomId].staffList.push(staffName);
         }
 
         // Update fields if available
-        roomData[roomId]['Room: Area'] = row['Room: Area'] || roomData[roomId]['Room: Area'];
-        roomData[roomId]['FM_Room_Type'] = row['FM_Room_Type'] || roomData[roomId]['FM_Room_Type'];
-        roomData[roomId]['Room: Name'] = row['Room: Name'] || roomData[roomId]['Room: Name'];
+        roomData[roomId]['Room: Area'] = row['Room: Area'] || row['area'] || roomData[roomId]['Room: Area'];
+        roomData[roomId]['FM_Room_Type'] = row['FM_Room_Type'] || row['fm_room_type'] || roomData[roomId]['FM_Room_Type'];
+        roomData[roomId]['Room: Name'] = row['Room: Name'] || row['heading_1'] || roomData[roomId]['Room: Name'];
+        roomData[roomId]['Department'] = row['Department'] || row['department'] || roomData[roomId]['Department'];
+        roomData[roomId]['Capacity'] = row['Capacity'] || roomData[roomId]['Capacity'];
+        roomData[roomId]['Function'] = row['Function'] || row['fm_room_function'] || roomData[roomId]['Function'];
+        roomData[roomId]['Abound height'] = row['Abound height'] || row['unbounded_height'] || roomData[roomId]['Abound height'];
+        roomData[roomId]['Equipment'] = row['Equipment'] || roomData[roomId]['Equipment'];
+        roomData[roomId]['Status'] = row['Status'] || (row['is_active'] ? 'Hoạt động' : 'Không hoạt động');
     });
 
     return roomData;
@@ -126,7 +277,7 @@ export function buildRoomPaths(floorData) {
             rooms[roomNum] = { 
                 paths: [], 
                 minX: Infinity, minY: Infinity, 
-                maxX: -Infinity, maxY: Infinity 
+                maxX: -Infinity, maxY: -Infinity 
             };
         }
 
@@ -148,4 +299,13 @@ export function buildRoomPaths(floorData) {
     });
 
     return { rooms, bounds: { minMapX, minMapY, maxMapX, maxMapY } };
+}
+
+/**
+ * Get list of active rooms for a floor (excluding CR, LB, WC)
+ * @param {Array} floorRooms - Array of room codes for a floor
+ * @returns {Array} - Filtered array of active room codes
+ */
+export function getActiveRooms(floorRooms) {
+    return floorRooms.filter(roomCode => !isExcludedRoom(roomCode));
 }

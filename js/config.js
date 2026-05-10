@@ -5,17 +5,30 @@
 
 // API Endpoints - Google Sheets Apps Script URLs
 export const API_ENDPOINTS = {
-    MAP: 'https://script.google.com/macros/s/AKfycbxFmunolmZ5LSC6exu6OnGE0dZi9VYrf6gWBqMJQOrFUe8MdRQAiz0XT825JwkGd-O0/exec',
-    INFO: 'https://script.google.com/macros/s/AKfycbzhMONbzVtaRnlIe3hiumaNXBPbQN6qybuANtguLcWMO1ZM0Nmu0NtWZ2yfGsJWORM5dA/exec',
+    MAP_COORDINATES: 'https://script.google.com/macros/s/AKfycbxFmunolmZ5LSC6exu6OnGE0dZi9VYrf6gWBqMJQOrFUe8MdRQAiz0XT825JwkGd-O0/exec',
+    ROOM_SCHEDULE: 'https://script.google.com/macros/s/AKfycbzhMONbzVtaRnlIe3hiumaNXBPbQN6qybuANtguLcWMO1ZM0Nmu0NtWZ2yfGsJWORM5dA/exec',
     DRIVE_LIST: 'https://script.google.com/macros/s/AKfycbw4PtDoCILXSiIn1AAYzJhUhSvmJ6ufKD-5R-QKZGzbBy-yQTfC_bPTKJEErwt1d_iS/exec'
 };
 
 // Local JSON file paths (for cached data)
 export const DATA_FILES = {
-    MAP: './map_data.json',
-    INFO: './info_data.json',
+    MAP_COORDINATES: './map_data.json',
+    ROOM_SCHEDULE: './info_data.json',
     DRIVE_LIST: './drive_data.json'
 };
+
+// Cache configuration
+export const CACHE_CONFIG = {
+    TTL: 5 * 60 * 1000, // 5 minutes in milliseconds
+    KEYS: {
+        MAP: 'vgu_map_coordinates_cache',
+        ROOMS: 'vgu_room_schedule_cache',
+        DRIVE: 'vgu_drive_images_cache'
+    }
+};
+
+// Exclusion filter codes - rooms with these codes will NOT appear in search dropdown
+export const EXCLUDED_ROOM_CODES = ['CR', 'LB', 'WC'];
 
 // Building definitions
 export const BUILDINGS = [
