@@ -13,7 +13,7 @@ const path = require('path');
 
 // Configuration - Google Sheets Apps Script API URLs
 const CONFIG = {
-    API_MAP: 'https://script.google.com/macros/s/AKfycbxFmunolmZ5LSC6exu6OnGE0dZi9VYrf6gWBqMJQOrFUe8MdRQAiz0XT825JwkGd-O0/exec',
+    API_MAP: 'https://script.google.com/macros/s/AKfycbwCh31O5FN49QkB2xF8WwXEawZSiFpcTPr1iAvFgfOEJdK6i5DObJ16ACqc65D9fC3H/exec',
     // Đã cập nhật API_INFO với link mới chứa dữ liệu phòng chuẩn hóa (heading, department, is_active...)
     API_INFO: 'https://script.google.com/macros/s/AKfycbzhMONbzVtaRnlIe3hiumaNXBPbQN6qybuANtguLcWMO1ZM0Nmu0NtWZ2yfGsJWORM5dA/exec',
     API_DRIVE_LIST: 'https://script.google.com/macros/s/AKfycbw4PtDoCILXSiIn1AAYzJhUhSvmJ6ufKD-5R-QKZGzbBy-yQTfC_bPTKJEErwt1d_iS/exec'
