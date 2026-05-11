@@ -1729,6 +1729,9 @@ const FLOOR_ROOMS = {
 // ═══════════════════════════════════════════════════════════════
 //  🔗 DATA ENDPOINTS (Local JSON files - cached via Cron Job)
 // ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+//  🔗 DATA ENDPOINTS (Local JSON files - cached via Cron Job)
+// ═══════════════════════════════════════════════════════════════
 const API_MAP = "./map_data.json";
 const API_INFO = "./info_data.json";
 const API_DRIVE_LIST = "./drive_data.json";
@@ -2124,23 +2127,7 @@ function getRD(rid) {
     status: 'Đang chờ đồng bộ'
   };
 }
-  
-  const RDX = {
-    'AD-101':{name:'Phòng đa năng 101',owner:'Phòng Hành chính — VGU',area:95,cap:30,type:'Phòng lớn',func:'Phòng làm việc và tiếp khách tầng 1',equip:['Bàn họp','TV 65 inch','Điều hòa','Hệ thống âm thanh'],status:'Hoạt động'},
-    'AD-103':{name:'Phòng 103',owner:'Phòng HC–TC — VGU',area:55,cap:15,type:'Văn phòng',func:'Phòng làm việc tầng 1',equip:['Máy tính','Bàn làm việc','Điều hòa'],status:'Hoạt động'},
-    'AD-104':{name:'Phòng 104',owner:'Phòng HC–TC — VGU',area:65,cap:18,type:'Văn phòng',func:'Phòng làm việc tầng 1',equip:['Máy tính','Bàn làm việc','Điều hòa'],status:'Hoạt động'},
-    'AD-201':{name:'Hội trường chính Tầng 2',owner:'Ban Giám hiệu — VGU',area:900,cap:400,type:'Hội trường',func:'Sự kiện lớn, hội nghị toàn trường',equip:['Sân khấu','Âm thanh JBL','4 Màn hình LED','400 ghế'],status:'Hoạt động'},
-    'AD-601':{name:'Hội trường 601',owner:'Admin Building — VGU',area:410,cap:150,type:'Phòng lớn',func:'Hội thảo quy mô lớn tầng 6',equip:['Âm thanh','Máy chiếu 4K','150 ghế'],status:'Hoạt động'},
-    'AD-609':{name:'Hội trường lớn 609',owner:'Admin Building — VGU',area:520,cap:250,type:'Phòng lớn',func:'Hội nghị quy mô lớn',equip:['Sân khấu','Âm thanh JBL','3 Màn hình LED','250 ghế'],status:'Hoạt động'},
-    'AD-614':{name:'Khu đa năng 614',owner:'Admin Building — VGU',area:450,cap:200,type:'Phòng lớn',func:'Không gian đa năng tầng 6',equip:['Âm thanh','Máy chiếu','Bàn ghế linh hoạt'],status:'Hoạt động'}
-  };
-  if (RDX[trimmedRid]) return RDX[trimmedRid];
-  
-  return {
-    name: `Phòng ${trimmedRid}`, owner: '__', occupancy: '__', area: '--', height: '--',
-    type: 'Chưa phân loại', cap: '--', func: '__', equip: [], status: 'Trống'
-  };
-}
+
 const BCAT = {'AD-501':'large','AD-507':'large','AD-201':'hall','AD-247':'large','AD-248':'large','AD-251':'large','AD-101':'large','AD-601':'large','AD-609':'large','AD-614':'large'};
 const BTXT = { office:['#e8eef9','#002554'], hall:['#e8edff','#001060'], large:['#e6f5ec','#083a18'], lb:['#fff3e6','#7a4800'] };
 
