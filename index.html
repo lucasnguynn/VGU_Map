@@ -2066,6 +2066,7 @@ function getRD(rid) {
   const trimmedRid = String(rid).trim();
   let roomInfo = null;
   
+  // Tìm kiếm thông tin phòng trong bộ nhớ đệm (API)
   if (sheetRoomData[trimmedRid]) {
     roomInfo = sheetRoomData[trimmedRid];
   } else {
@@ -2078,12 +2079,19 @@ function getRD(rid) {
     }
   }
   
-  if(roomInfo) {
-    let occupancy = roomInfo.occupants && Array.isArray(roomInfo.occupants) && roomInfo.occupants.length > 0 
-      ? roomInfo.occupants.join(', ') 
-      : (roomInfo.staffList && roomInfo.staffList.length > 0 
-          ? roomInfo.staffList.join(', ') 
-          : '__');
+  // NẾU TÌM THẤY TRONG API: Hiển thị đầy đủ thông tin
+  if (roomInfo) {
+    let occupancy = '__';
+    
+    if (roomInfo.occupants_list && Array.isArray(roomInfo.occupants_list) && roomInfo.occupants_list.length > 0) {
+      occupancy = roomInfo.occupants_list.join(', ');
+    } else if (roomInfo.occupant_display && roomInfo.occupant_display.trim() !== "") {
+      occupancy = roomInfo.occupant_display;
+    } else if (roomInfo.occupants && Array.isArray(roomInfo.occupants) && roomInfo.occupants.length > 0) {
+      occupancy = roomInfo.occupants.join(', ');
+    } else if (roomInfo.staffList && roomInfo.staffList.length > 0) {
+      occupancy = roomInfo.staffList.join(', ');
+    }
 
     let rawEquip = roomInfo.equipment || roomInfo['Equipment'] || roomInfo['Thiết bị'] || '';
     let equipArray = rawEquip ? String(rawEquip).split(',').map(e => e.trim()) : [];
@@ -2093,14 +2101,29 @@ function getRD(rid) {
       owner: roomInfo.department || roomInfo.Department || '__', 
       occupancy: occupancy, 
       area: roomInfo.area || roomInfo['Room: Area'] || '--', 
-      height: roomInfo.height || roomInfo.unbounded_height || roomInfo['Abound height'] || '--',
-      type: roomInfo.type || roomInfo.fm_room_type || roomInfo.FM_Room_Type || roomInfo['FM_Room_Type'] || 'Chưa phân loại',
+      height: roomInfo.unbounded_height || roomInfo.height || roomInfo['Abound height'] || '--',
+      type: roomInfo.fm_room_type || roomInfo.type || roomInfo.FM_Room_Type || roomInfo['FM_Room_Type'] || 'Chưa phân loại',
       cap: roomInfo.capacity || roomInfo.Capacity || '--', 
-      func: roomInfo.function || roomInfo.fm_room_function || roomInfo.Function || '__',
+      func: roomInfo.fm_room_function || roomInfo.function || roomInfo.Function || '__',
       equip: equipArray,
       status: roomInfo.is_active !== false ? 'Hoạt động' : 'Không hoạt động'
     };
   }
+  
+  // NẾU KHÔNG TÌM THẤY TRONG API: Hiển thị trạng thái "Đang cập nhật"
+  return {
+    name: `Phòng ${trimmedRid}`, 
+    owner: 'Thông tin đang cập nhật...', 
+    occupancy: 'Thông tin đang cập nhật...', 
+    area: '--', 
+    height: '--',
+    type: 'Đang cập nhật', 
+    cap: '--', 
+    func: 'Hệ thống đang đồng bộ dữ liệu từ Google Sheets...', 
+    equip: ['Dữ liệu thiết bị đang được cập nhật'], 
+    status: 'Đang chờ đồng bộ'
+  };
+}
   
   const RDX = {
     'AD-101':{name:'Phòng đa năng 101',owner:'Phòng Hành chính — VGU',area:95,cap:30,type:'Phòng lớn',func:'Phòng làm việc và tiếp khách tầng 1',equip:['Bàn họp','TV 65 inch','Điều hòa','Hệ thống âm thanh'],status:'Hoạt động'},
