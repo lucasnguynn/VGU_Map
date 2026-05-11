@@ -2180,12 +2180,24 @@ function sT(tab, rd) {
   document.getElementById('t3d').classList.toggle('on', tab === '3D');
   const f = document.getElementById('ifr');
 
-  const imageId = driveImages[ST.rid];
+  // Robust Image ID Lookup with sanitization
+  const sanitizedRid = ST.rid.trim().toUpperCase();
+  let imageId = driveImages[sanitizedRid];
+
+  // Fallback: iterate through entries to handle hidden whitespace/characters
+  if (imageId === undefined) {
+    for (const [key, value] of Object.entries(driveImages)) {
+      if (key.trim().toUpperCase() === sanitizedRid) {
+        imageId = value;
+        break;
+      }
+    }
+  }
 
   if (tab === '2D') {
     if (imageId) {
       f.style.background = '#fff';
-      f.innerHTML = `<img src="https://drive.google.com/uc?export=view&id=${imageId}" 
+      f.innerHTML = `<img src="https://drive.google.com/thumbnail?id=${imageId}&sz=w1000" 
                           style="width:100%; height:100%; object-fit:contain; display:block; padding: 4px;" 
                           alt="Sơ đồ ${ST.rid}"
                           onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\\'text-align:center;padding:22px 14px\\'><div style=\\'font-size:42px;margin-bottom:10px\\'>🖼️</div><div style=\\'font-size:13px;font-weight:700;color:#002554;margin-bottom:3px\\'>Ảnh không khả dụng</div><div style=\\'font-size:11px;color:#8896a8\\'>${ST.rid} — Quyền truy cập Google Drive bị hạn chế</div></div>';">`;

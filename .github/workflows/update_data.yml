@@ -1,0 +1,40 @@
+name: Update Data
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch map_data.json
+        run: |
+          curl -s -L "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/gviz/tq?tqx=out:json" \
+            | sed '1d' | sed '$d' | sed 's/}/*\/)};/' > map_data.json
+
+      - name: Fetch info_data.json
+        run: |
+          curl -s -L "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/gviz/tq?tqx=out:json" \
+            | sed '1d' | sed '$d' | sed 's/}/*\/)};/' > info_data.json
+
+      - name: Fetch drive_data.json
+        run: |
+          curl -s -L "https://script.google.com/macros/s/AKfycbw4PtDoCILXSiIn1AAYzJhUhSvmJ6ufKD-5R-QKZGzbBy-yQTfC_bPTKJEErwt1d_iS/exec" \
+            -o drive_data.json
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add map_data.json info_data.json drive_data.json
+          if ! git diff --staged --quiet; then
+            git commit -m "chore: auto-update data files [skip ci]"
+            git push
+          else
+            echo "No changes to commit"
+          fi
