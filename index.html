@@ -1822,28 +1822,36 @@ async function fetchRoomInfo() {
         
         // Dynamically populate BUILDINGS array from API data
         // Exclude rooms containing LB, CR, or WC
+        // Dynamically populate BUILDINGS array from API data
+        // Tự động bỏ qua các khu vực CR, LB, WC không cho vào Search Bar
         if (!/(LB|CR|WC)/i.test(roomId)) {
-          const match = roomId.match(roomPattern);
-          if (match) {
-            const bldCode = match[1].toUpperCase();
-            const roomNum = match[2] + match[3]; // e.g., "301"
+          // Tách chuỗi dựa theo dấu gạch ngang "-"
+          const parts = roomId.split('-');
+          
+          if (parts.length >= 2) {
+            const bldCode = parts[0].toUpperCase().trim();
+            const afterHyphen = parts[1].trim(); // Ví dụ: "601" hoặc "328A"
             
-            // Find or create building entry in BUILDINGS
-            let bldEntry = BUILDINGS.find(b => b.code === bldCode);
-            if (!bldEntry) {
-              // Create new building entry if not exists
-              bldEntry = { code: bldCode, name: `${bldCode} Building`, floors: 6, rooms: [] };
-              BUILDINGS.push(bldEntry);
-            }
-            
-            // Add room to building's rooms array if not already present
-            if (!bldEntry.rooms.includes(roomNum)) {
-              bldEntry.rooms.push(roomNum);
-              bldEntry.rooms.sort(); // Keep rooms sorted
+            // Kiểm tra xem sau dấu "-" có bắt đầu bằng đúng 3 chữ số hay không
+            // Số đầu tiên sẽ tự động là số tầng (ví dụ: 6), toàn bộ chuỗi là số phòng
+            if (/^\d{3}/.test(afterHyphen)) {
+              const roomNum = afterHyphen; 
+              
+              // Tìm tòa nhà trong mảng BUILDINGS, nếu chưa có thì tự động tạo mới
+              let bldEntry = BUILDINGS.find(b => b.code === bldCode);
+              if (!bldEntry) {
+                bldEntry = { code: bldCode, name: `${bldCode} Building`, floors: 6, rooms: [] };
+                BUILDINGS.push(bldEntry);
+              }
+              
+              // Đẩy số phòng vào danh sách và sắp xếp
+              if (!bldEntry.rooms.includes(roomNum)) {
+                bldEntry.rooms.push(roomNum);
+                bldEntry.rooms.sort(new Intl.Collator('en', { numeric: true, sensitivity: 'base' }).compare);
+              }
             }
           }
         }
-      }
     });
     
     // Refresh UI dropdowns after populating BUILDINGS
