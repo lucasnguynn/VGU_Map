@@ -1730,6 +1730,10 @@ const API_MAP = "./map_data.json";
 const API_INFO = "./info_data.json";
 const API_DRIVE_LIST = "./drive_data.json";
 
+const API_MAP = "./map_data.json";
+const API_INFO = "./info_data.json";
+const API_DRIVE_LIST = "./drive_data.json";
+
 let sheetRoomData = {};
 let driveImages = {};
 let isInfoLoaded = false;
@@ -1743,18 +1747,15 @@ async function loadDriveImages() {
     console.log("✅ Đã tải danh sách ảnh từ Drive:", driveImages);
   } catch (e) { 
     console.error("❌ Lỗi kết nối Drive Images:", e.message);
-    if (e.name === 'TypeError' && e.message.includes('fetch')) {
-      console.error("🔴 CORS Policy Error hoặc Network Disconnect khi tải Drive images");
-    }
   }
 }
 
-// Pre-load both drive images and room info on page load with error handling
+// Tự động nạp dữ liệu ngay khi mở trang
 (async function initializeData() {
   try {
     await Promise.all([loadDriveImages(), fetchRoomInfo()]);
     isDataInitializationComplete = true;
-    console.log("✅ Hoàn tất khởi tạo dữ liệu ban đầu");
+    console.log("✅ Hoàn tất đồng bộ dữ liệu API lên giao diện");
   } catch (e) {
     console.error("❌ Lỗi khởi tạo dữ liệu:", e);
     isDataInitializationComplete = false;
@@ -1775,19 +1776,14 @@ async function fetchRoomInfo() {
       return;
     }
     
-    // Regex pattern to parse valid room IDs (e.g., AD-301 -> Building AD, Room 301)
-    const roomPattern = /^([A-Z]{2})-(\d)(\d{3})$/i;
-    
     dataArray.forEach(row => {
-      // NEW API KEY MAPPING: Use standardized keys from updated backend
-      // Primary key: room_number (e.g., "AD-101")
+      // Quét linh hoạt các định dạng key API trả về
       let roomId = row.room_number || row.Room_Number || row['Room: Number'] || row['room_number'] || row['Number'] || row['Room_Number'];
       
       if (roomId) {
         roomId = String(roomId).trim();
         
         if (!sheetRoomData[roomId]) {
-          // Store data using NEW standardized schema
           sheetRoomData[roomId] = { 
             room_id: roomId,
             name_en: row.heading_1 || row.name_en || row['Room: Name'] || '',
@@ -1799,19 +1795,17 @@ async function fetchRoomInfo() {
             type: row.fm_room_type || row.FM_Room_Type || row['FM_Room_Type'] || 'Chưa phân loại',
             function: row.fm_room_function || row.function || row.Function || '__',
             is_active: row.is_active !== undefined ? row.is_active : true,
-            // Legacy support
             ...row,
             staffList: []
           };
         }
         
-        // Handle staff/occupants from both old and new API formats
+        // Xử lý gộp danh sách nhân viên
         let staffName = row.FM_Staff_Name || row.staff_name;
         if (staffName && staffName.trim() !== "" && !sheetRoomData[roomId].staffList.includes(staffName)) {
           sheetRoomData[roomId].staffList.push(staffName);
         }
         
-        // Also add occupants_list to staffList for compatibility
         if (row.occupants_list && Array.isArray(row.occupants_list)) {
           row.occupants_list.forEach(occ => {
             if (occ && occ.trim() !== "" && !sheetRoomData[roomId].staffList.includes(occ)) {
@@ -1820,52 +1814,49 @@ async function fetchRoomInfo() {
           });
         }
         
-        // Dynamically populate BUILDINGS array from API data
-        // Exclude rooms containing LB, CR, or WC
-        // Dynamically populate BUILDINGS array from API data
-        // Tự động bỏ qua các khu vực CR, LB, WC không cho vào Search Bar
+        // --- LOGIC PHÂN TÍCH VÀ BỔ SUNG PHÒNG VÀO SEARCH BAR ---
+        // Bỏ qua hoàn toàn các khu vực công cộng (LB, CR, WC)
         if (!/(LB|CR|WC)/i.test(roomId)) {
-          // Tách chuỗi dựa theo dấu gạch ngang "-"
           const parts = roomId.split('-');
           
           if (parts.length >= 2) {
             const bldCode = parts[0].toUpperCase().trim();
-            const afterHyphen = parts[1].trim(); // Ví dụ: "601" hoặc "328A"
+            const afterHyphen = parts.slice(1).join('-').trim(); // Lấy toàn bộ phần sau dấu '-' đầu tiên
             
-            // Kiểm tra xem sau dấu "-" có bắt đầu bằng đúng 3 chữ số hay không
-            // Số đầu tiên sẽ tự động là số tầng (ví dụ: 6), toàn bộ chuỗi là số phòng
-            if (/^\d{3}/.test(afterHyphen)) {
+            // Xác nhận chuỗi bắt đầu bằng chữ số (ký tự đầu là tầng, toàn bộ chuỗi sau là số phòng)
+            if (/^\d/.test(afterHyphen)) {
               const roomNum = afterHyphen; 
               
-              // Tìm tòa nhà trong mảng BUILDINGS, nếu chưa có thì tự động tạo mới
               let bldEntry = BUILDINGS.find(b => b.code === bldCode);
               if (!bldEntry) {
                 bldEntry = { code: bldCode, name: `${bldCode} Building`, floors: 6, rooms: [] };
                 BUILDINGS.push(bldEntry);
               }
               
-              // Đẩy số phòng vào danh sách và sắp xếp
               if (!bldEntry.rooms.includes(roomNum)) {
                 bldEntry.rooms.push(roomNum);
+                // Sắp xếp mảng phòng theo thứ tự tự nhiên (101, 102... 614)
                 bldEntry.rooms.sort(new Intl.Collator('en', { numeric: true, sensitivity: 'base' }).compare);
               }
             }
           }
         }
+      }
     });
-    
-    // Refresh UI dropdowns after populating BUILDINGS
-    refreshBuildingDropdowns();
     
     isInfoLoaded = true;
     console.log(`✅ Đã tải thông tin ${Object.keys(sheetRoomData).length} phòng từ API`);
+
+    // LÀM MỚI GIAO DIỆN: Bắt buộc gọi sau khi dữ liệu đã nạp xong
+    refreshBuildingDropdowns();
+    
+    // Nếu người dùng đã chọn sẵn Tòa nhà/Tầng trước đó, tự động kích hoạt lại dropdown số phòng
+    if (selBuilding.value && selFloor.value) {
+      onFloorChange();
+    }
+    
   } catch (e) {
     console.error("❌ Lỗi tải API thông tin phòng:", e);
-    if (e.name === 'TypeError' && e.message.includes('fetch')) {
-      console.error("🔴 CORS Policy Error hoặc Network Disconnect khi tải Room Info API");
-    } else if (e instanceof SyntaxError) {
-      console.error("🔴 JSON Parsing Error - Dữ liệu trả về không hợp lệ");
-    }
   }
 }
 
@@ -1937,20 +1928,15 @@ async function loadMapFromSheets(fid) {
     
     // Use a base viewBox width and calculate height using the SAME scale
     let vbW = 1000;
-    // CRITICAL: Uniform scale multiplier for both X and Y axes
     let uniformScale = vbW / paddedWidth;
-    // Height is derived from the same scale — preserves true proportions
     let vbH = paddedHeight * uniformScale;
 
-    // Mapping functions with Y-axis inversion (SVG Y grows downward, map Y grows upward)
     function mapX(x) { return (x - minMapX + padX) * uniformScale; }
     function mapY(y) { return (maxMapY - y + padY) * uniformScale; }
 
-    // Modern color palette
     let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${vbW} ${vbH}" style="width:100%;height:auto;display:block">
       <rect x="0" y="0" width="${vbW}" height="${vbH}" fill="#eef2f9"/>`;
       
-    // Separate rooms into background and interactive layers
     const backgroundLayer = [];
     const interactiveLayer = [];
     
@@ -1965,50 +1951,37 @@ async function loadMapFromSheets(fid) {
       });
       dString += "Z"; 
       
-      // Calculate room center for text placement
       let textX = mapX((rData.minX + rData.maxX) / 2);
       let textY = mapY((rData.minY + rData.maxY) / 2);
       let roomWidth = Math.abs(mapX(rData.maxX) - mapX(rData.minX));
       let roomHeight = Math.abs(mapY(rData.minY) - mapY(rData.maxY)); 
       
-      // Dynamic font-size calculation — ensures text fits within room boundaries
       let baseFontSize = vbW * 0.008; 
-      // More conservative sizing to prevent bleed
       let maxFontByWidth = roomWidth / Math.max(roomNum.length * 0.65, 1);
       let maxFontByHeight = roomHeight * 0.45;
       let fontSize = Math.max(Math.min(baseFontSize, maxFontByWidth, maxFontByHeight), 2); 
-      
-      // Stroke width proportional to viewBox
       let strokeW = Math.max(vbW * 0.0008, 0.4);
 
       const BCAT={'AD-501':'large','AD-507':'large','AD-201':'hall','AD-247':'large','AD-248':'large','AD-251':'large','AD-101':'large','AD-601':'large','AD-609':'large','AD-614':'large'};
 
-      // Check if room is a background element (LB, CR, WC)
       const isBackground = /^(LB|CR|WC)/i.test(roomNum);
       
-      // Modern, premium color palette
       let fillColor = "#e8edf8", strokeColor = "#7a8fb8";
       if (/^WC/i.test(roomNum)) { 
-        fillColor = "#c5e3f0"; 
-        strokeColor = "#3d7a99"; 
+        fillColor = "#c5e3f0"; strokeColor = "#3d7a99"; 
       } else if (/^(LB|CR)/i.test(roomNum)) { 
-        fillColor = "#dce1f2"; 
-        strokeColor = "#6b7aa8"; 
+        fillColor = "#dce1f2"; strokeColor = "#6b7aa8"; 
       } else if (BCAT[roomNum] || roomNum.includes("Hội trường")) { 
-        fillColor = "#dff0e6"; 
-        strokeColor = "#3a7a5a"; 
+        fillColor = "#dff0e6"; strokeColor = "#3a7a5a"; 
       }
 
       if (isBackground) {
-        // Background layer: muted colors, no pointer events
         backgroundLayer.push(`\n        <g style="cursor:default">\n          <path d="${dString}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="${strokeW}" pointer-events="none">\n            <title>${roomNum}</title>\n          </path>\n          <text x="${textX.toFixed(2)}" y="${textY.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="${fontSize.toFixed(2)}" font-weight="600" fill="#8896a8" pointer-events="none" style="paint-order:stroke;stroke:#ffffff;stroke-width:${fontSize * 0.25}px">${roomNum}</text>\n        </g>`);
       } else {
-        // Interactive layer: full interactivity
         interactiveLayer.push(`\n        <g onclick="rC('${roomNum}')" style="cursor:pointer">\n          <path d="${dString}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="${strokeW}">\n            <title>${roomNum}</title>\n          </path>\n          <text x="${textX.toFixed(2)}" y="${textY.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="${fontSize.toFixed(2)}" font-weight="600" fill="#002554" pointer-events="none" style="paint-order:stroke;stroke:#ffffff;stroke-width:${fontSize * 0.25}px">${roomNum}</text>\n        </g>`);
       }
     }
     
-    // Concatenate markup: background layer FIRST, then interactive layer on top
     svgContent += backgroundLayer.join('') + interactiveLayer.join('');
     return svgContent + `</svg>`;
   } catch (e) {
@@ -2090,19 +2063,13 @@ async function renderMap(bid, fid, n) {
   }
 }
 
-// Room detail logic - Tích hợp với sheetRoomData từ API (NEW STANDARDIZED SCHEMA)
 function getRD(rid) {
-  // Apply .trim() aggressively to input rid and support flexible key lookups
   const trimmedRid = String(rid).trim();
-  
-  // Support multiple flexible key lookups - try various key formats
   let roomInfo = null;
   
-  // First try direct lookup with trimmed ID
   if (sheetRoomData[trimmedRid]) {
     roomInfo = sheetRoomData[trimmedRid];
   } else {
-    // Try alternative key formats in sheetRoomData
     for (const key of Object.keys(sheetRoomData)) {
       const trimmedKey = String(key).trim();
       if (trimmedKey === trimmedRid) {
@@ -2113,20 +2080,16 @@ function getRD(rid) {
   }
   
   if(roomInfo) {
-    // NEW API KEY MAPPING: Use standardized keys from updated backend
-    // occupants is now an array, use join directly
     let occupancy = roomInfo.occupants && Array.isArray(roomInfo.occupants) && roomInfo.occupants.length > 0 
       ? roomInfo.occupants.join(', ') 
       : (roomInfo.staffList && roomInfo.staffList.length > 0 
           ? roomInfo.staffList.join(', ') 
           : '__');
 
-    // Equipment handling - fallback to legacy keys if needed
     let rawEquip = roomInfo.equipment || roomInfo['Equipment'] || roomInfo['Thiết bị'] || '';
     let equipArray = rawEquip ? String(rawEquip).split(',').map(e => e.trim()) : [];
 
     return {
-      // Use new standardized keys with fallbacks to legacy keys
       name: roomInfo.name_vn || roomInfo.heading_2 || roomInfo['Room: Name'] || roomInfo.name_en || roomInfo.heading_1 || `Phòng ${trimmedRid}`,
       owner: roomInfo.department || roomInfo.Department || '__', 
       occupancy: occupancy, 
@@ -2140,7 +2103,6 @@ function getRD(rid) {
     };
   }
   
-  // Fallback to hardcoded data if API data not available
   const RDX = {
     'AD-101':{name:'Phòng đa năng 101',owner:'Phòng Hành chính — VGU',area:95,cap:30,type:'Phòng lớn',func:'Phòng làm việc và tiếp khách tầng 1',equip:['Bàn họp','TV 65 inch','Điều hòa','Hệ thống âm thanh'],status:'Hoạt động'},
     'AD-103':{name:'Phòng 103',owner:'Phòng HC–TC — VGU',area:55,cap:15,type:'Văn phòng',func:'Phòng làm việc tầng 1',equip:['Máy tính','Bàn làm việc','Điều hòa'],status:'Hoạt động'},
@@ -2153,16 +2115,8 @@ function getRD(rid) {
   if (RDX[trimmedRid]) return RDX[trimmedRid];
   
   return {
-    name: `Phòng ${trimmedRid}`, 
-    owner: '__',
-    occupancy: '__',
-    area: '--', 
-    height: '--',
-    type: 'Chưa phân loại', 
-    cap: '--',
-    func: '__',
-    equip: [], 
-    status: 'Trống'
+    name: `Phòng ${trimmedRid}`, owner: '__', occupancy: '__', area: '--', height: '--',
+    type: 'Chưa phân loại', cap: '--', func: '__', equip: [], status: 'Trống'
   };
 }
 const BCAT = {'AD-501':'large','AD-507':'large','AD-201':'hall','AD-247':'large','AD-248':'large','AD-251':'large','AD-101':'large','AD-601':'large','AD-609':'large','AD-614':'large'};
@@ -2217,13 +2171,11 @@ function sT(tab, rd) {
   document.getElementById('t3d').classList.toggle('on', tab === '3D');
   const f = document.getElementById('ifr');
 
-  // Logic tìm ảnh tự động từ Google Drive
   const imageId = driveImages[ST.rid];
 
   if (tab === '2D') {
     if (imageId) {
       f.style.background = '#fff';
-      // Sử dụng export endpoint trực tiếp để tránh lỗi CORS và xử lý chuỗi ký tự gãy
       f.innerHTML = `<img src="https://drive.google.com/uc?export=view&id=${imageId}" 
                           style="width:100%; height:100%; object-fit:contain; display:block; padding: 4px;" 
                           alt="Sơ đồ ${ST.rid}"
