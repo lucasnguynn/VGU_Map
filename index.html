@@ -1733,6 +1733,7 @@ const API_DRIVE_LIST = "./drive_data.json";
 let sheetRoomData = {};
 let driveImages = {};
 let isInfoLoaded = false;
+let isDataInitializationComplete = false;
 
 async function loadDriveImages() {
   try {
@@ -1741,45 +1742,83 @@ async function loadDriveImages() {
     driveImages = await response.json();
     console.log("✅ Đã tải danh sách ảnh từ Drive:", driveImages);
   } catch (e) { 
-    console.error("❌ Lỗi kết nối Drive", e); 
+    console.error("❌ Lỗi kết nối Drive Images:", e.message);
+    if (e.name === 'TypeError' && e.message.includes('fetch')) {
+      console.error("🔴 CORS Policy Error hoặc Network Disconnect khi tải Drive images");
+    }
   }
 }
 
-// Pre-load both drive images and room info on page load
-Promise.all([loadDriveImages(), fetchRoomInfo()]);
+// Pre-load both drive images and room info on page load with error handling
+(async function initializeData() {
+  try {
+    await Promise.all([loadDriveImages(), fetchRoomInfo()]);
+    isDataInitializationComplete = true;
+    console.log("✅ Hoàn tất khởi tạo dữ liệu ban đầu");
+  } catch (e) {
+    console.error("❌ Lỗi khởi tạo dữ liệu:", e);
+    isDataInitializationComplete = false;
+  }
+})();
 
 async function fetchRoomInfo() {
   if (isInfoLoaded) return; 
   try {
     const response = await fetch(API_INFO);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    
     let rawData = await response.json();
     let dataArray = Array.isArray(rawData) ? rawData : (rawData.data || rawData.items || []);
+    
+    if (!dataArray || dataArray.length === 0) {
+      console.warn("⚠️ API trả về dữ liệu trống");
+      return;
+    }
     
     // Regex pattern to parse valid room IDs (e.g., AD-301 -> Building AD, Room 301)
     const roomPattern = /^([A-Z]{2})-(\d)(\d{3})$/i;
     
     dataArray.forEach(row => {
-      // Support multiple flexible key lookups for room number
-      let roomId = row['Room: Number'] || row.Room_Number || row['room_number'] || row['Number'] || row['Room_Number'];
+      // NEW API KEY MAPPING: Use standardized keys from updated backend
+      // Primary key: room_number (e.g., "AD-101")
+      let roomId = row.room_number || row.Room_Number || row['Room: Number'] || row['room_number'] || row['Number'] || row['Room_Number'];
       
       if (roomId) {
         roomId = String(roomId).trim();
         
         if (!sheetRoomData[roomId]) {
+          // Store data using NEW standardized schema
           sheetRoomData[roomId] = { 
-            ...row, 
+            room_id: roomId,
+            name_en: row.heading_1 || row.name_en || row['Room: Name'] || '',
+            name_vn: row.heading_2 || row.name_vn || row['Room: Name'] || '',
+            department: row.department || row.Department || '__',
+            occupants: row.occupants_list || row.occupants || [],
+            area: row.area || row['Room: Area'] || '--',
+            height: row.unbounded_height || row.height || row['Abound height'] || '--',
+            type: row.fm_room_type || row.FM_Room_Type || row['FM_Room_Type'] || 'Chưa phân loại',
+            function: row.fm_room_function || row.function || row.Function || '__',
+            is_active: row.is_active !== undefined ? row.is_active : true,
+            // Legacy support
+            ...row,
             staffList: []
           };
         }
         
-        let staffName = row['FM_Staff_Name'];
+        // Handle staff/occupants from both old and new API formats
+        let staffName = row.FM_Staff_Name || row.staff_name;
         if (staffName && staffName.trim() !== "" && !sheetRoomData[roomId].staffList.includes(staffName)) {
           sheetRoomData[roomId].staffList.push(staffName);
         }
-
-        sheetRoomData[roomId]['Room: Area'] = row['Room: Area'] || sheetRoomData[roomId]['Room: Area'];
-        sheetRoomData[roomId]['FM_Room_Type'] = row['FM_Room_Type'] || sheetRoomData[roomId]['FM_Room_Type'];
-        sheetRoomData[roomId]['Room: Name'] = row['Room: Name'] || sheetRoomData[roomId]['Room: Name'];
+        
+        // Also add occupants_list to staffList for compatibility
+        if (row.occupants_list && Array.isArray(row.occupants_list)) {
+          row.occupants_list.forEach(occ => {
+            if (occ && occ.trim() !== "" && !sheetRoomData[roomId].staffList.includes(occ)) {
+              sheetRoomData[roomId].staffList.push(occ);
+            }
+          });
+        }
         
         // Dynamically populate BUILDINGS array from API data
         // Exclude rooms containing LB, CR, or WC
@@ -1811,9 +1850,14 @@ async function fetchRoomInfo() {
     refreshBuildingDropdowns();
     
     isInfoLoaded = true;
-    console.log("✅ Đã tải thông tin phòng từ API");
+    console.log(`✅ Đã tải thông tin ${Object.keys(sheetRoomData).length} phòng từ API`);
   } catch (e) {
-    console.error("❌ Lỗi tải API thông tin phòng: ", e);
+    console.error("❌ Lỗi tải API thông tin phòng:", e);
+    if (e.name === 'TypeError' && e.message.includes('fetch')) {
+      console.error("🔴 CORS Policy Error hoặc Network Disconnect khi tải Room Info API");
+    } else if (e instanceof SyntaxError) {
+      console.error("🔴 JSON Parsing Error - Dữ liệu trả về không hợp lệ");
+    }
   }
 }
 
@@ -1824,6 +1868,8 @@ async function loadMapFromSheets(fid) {
       fetchRoomInfo() 
     ]);
 
+    if (!mapResponse.ok) throw new Error(`HTTP ${mapResponse.status}`);
+    
     let rawMapData = await mapResponse.json();
     let dataArray = Array.isArray(rawMapData) ? rawMapData : (rawMapData.data || rawMapData.items || []);
     if (!dataArray || dataArray.length === 0) return null;
@@ -1976,15 +2022,20 @@ function show(id) {
 }
 
 function gH() {
-  show('pg-h');
-  setTimeout(() => {
-    if (!isMapInitialized) {
-      initLeafletMap();
-      isMapInitialized = true;
-    } else {
-      if (lMap) lMap.invalidateSize();
-    }
-  }, 50);
+  console.log("Navigating to Home View...");
+  try {
+    show('pg-h');
+    setTimeout(() => {
+      if (!isMapInitialized) {
+        initLeafletMap();
+        isMapInitialized = true;
+      } else {
+        if (lMap) lMap.invalidateSize();
+      }
+    }, 50);
+  } catch (e) {
+    console.error("❌ Lỗi khi chuyển sang Home View:", e);
+  }
 }
 
 function gM() {
@@ -1992,33 +2043,46 @@ function gM() {
 }
 
 async function renderMap(bid, fid, n) {
-  ST.bid = bid; ST.fid = fid; ST.flN = n; ST.fKey = `${bid}_f${n}`;
-  const b = BLDS.find(x => x.id === bid);
-  const fn = (FLN[bid] || [])[n - 1] || `Tầng ${n}`;
-  
-  document.getElementById('mpt').textContent = `${b.name} — ${fn}`;
-  document.getElementById('mpbc').innerHTML = `<b>${b.name}</b> › ${fn}`;
-  const out = document.getElementById('mout');
-  
-  const isPortrait = (n === 5 || n === 6) && bid === 'bld_ad';
-  out.className = 'map-wrap' + (isPortrait ? ' portrait' : '');
-  out.innerHTML = `<div style="padding:40px;text-align:center;color:var(--mt);font-size:14px;">Đang tải dữ liệu và dựng bản đồ...</div>`;
-  show('pg-m');
+  try {
+    ST.bid = bid; ST.fid = fid; ST.flN = n; ST.fKey = `${bid}_f${n}`;
+    const b = BLDS.find(x => x.id === bid);
+    const fn = (FLN[bid] || [])[n - 1] || `Tầng ${n}`;
+    
+    document.getElementById('mpt').textContent = `${b.name} — ${fn}`;
+    document.getElementById('mpbc').innerHTML = `<b>${b.name}</b> › ${fn}`;
+    const out = document.getElementById('mout');
+    
+    const isPortrait = (n === 5 || n === 6) && bid === 'bld_ad';
+    out.className = 'map-wrap' + (isPortrait ? ' portrait' : '');
+    out.innerHTML = `<div style="padding:40px;text-align:center;color:var(--mt);font-size:14px;">Đang tải dữ liệu và dựng bản đồ...</div>`;
+    show('pg-m');
 
-  const sheetSvg = await loadMapFromSheets(fid);
-  
-  if (sheetSvg) {
-    out.innerHTML = sheetSvg;
-  } else {
-    out.innerHTML = `<svg viewBox="0 0 800 280" style="width:100%;height:auto;display:block">
-      <rect width="800" height="280" fill="#edf0f8"/>
-      <rect x="20" y="20" width="760" height="240" fill="none" stroke="#8fa0c0" stroke-width="1.5" rx="4"/>
-      <text x="400" y="140" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="14" fill="#8896a8">Dữ liệu trên sheet trống hoặc sai cấu trúc cho ${fn}</text>
-    </svg>`;
+    const sheetSvg = await loadMapFromSheets(fid);
+    
+    if (sheetSvg) {
+      out.innerHTML = sheetSvg;
+    } else {
+      out.innerHTML = `<svg viewBox="0 0 800 280" style="width:100%;height:auto;display:block">
+        <rect width="800" height="280" fill="#edf0f8"/>
+        <rect x="20" y="20" width="760" height="240" fill="none" stroke="#8fa0c0" stroke-width="1.5" rx="4"/>
+        <text x="400" y="140" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="14" fill="#8896a8">Dữ liệu trên sheet trống hoặc sai cấu trúc cho ${fn}</text>
+      </svg>`;
+    }
+  } catch (e) {
+    console.error("❌ Lỗi khi render bản đồ:", e);
+    const out = document.getElementById('mout');
+    if (out) {
+      out.innerHTML = `<svg viewBox="0 0 800 280" style="width:100%;height:auto;display:block">
+        <rect width="800" height="280" fill="#fff5f5"/>
+        <rect x="20" y="20" width="760" height="240" fill="none" stroke="#e53e3e" stroke-width="1.5" rx="4"/>
+        <text x="400" y="130" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="14" fill="#e53e3e" font-weight="600">Không thể tải bản đồ</text>
+        <text x="400" y="155" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="11" fill="#718096">Vui lòng thử lại sau</text>
+      </svg>`;
+    }
   }
 }
 
-// Room detail logic - Tích hợp với sheetRoomData từ API
+// Room detail logic - Tích hợp với sheetRoomData từ API (NEW STANDARDIZED SCHEMA)
 function getRD(rid) {
   // Apply .trim() aggressively to input rid and support flexible key lookups
   const trimmedRid = String(rid).trim();
@@ -2041,24 +2105,30 @@ function getRD(rid) {
   }
   
   if(roomInfo) {
-    let occupancy = roomInfo.staffList && roomInfo.staffList.length > 0 
-      ? roomInfo.staffList.join(', ') 
-      : '__';
+    // NEW API KEY MAPPING: Use standardized keys from updated backend
+    // occupants is now an array, use join directly
+    let occupancy = roomInfo.occupants && Array.isArray(roomInfo.occupants) && roomInfo.occupants.length > 0 
+      ? roomInfo.occupants.join(', ') 
+      : (roomInfo.staffList && roomInfo.staffList.length > 0 
+          ? roomInfo.staffList.join(', ') 
+          : '__');
 
-    let rawEquip = roomInfo['Equipment'] || roomInfo['Thiết bị'] || '';
+    // Equipment handling - fallback to legacy keys if needed
+    let rawEquip = roomInfo.equipment || roomInfo['Equipment'] || roomInfo['Thiết bị'] || '';
     let equipArray = rawEquip ? String(rawEquip).split(',').map(e => e.trim()) : [];
 
     return {
-      name: roomInfo['Room: Name'] || roomInfo['Name'] || `Phòng ${trimmedRid}`,
-      owner: roomInfo['Department'] || '__', 
+      // Use new standardized keys with fallbacks to legacy keys
+      name: roomInfo.name_vn || roomInfo.heading_2 || roomInfo['Room: Name'] || roomInfo.name_en || roomInfo.heading_1 || `Phòng ${trimmedRid}`,
+      owner: roomInfo.department || roomInfo.Department || '__', 
       occupancy: occupancy, 
-      area: roomInfo['Room: Area'] || roomInfo['Area'] || '--', 
-      height: roomInfo['Abound height'] || roomInfo['Height'] || '--',
-      type: roomInfo['FM_Room_Type'] || roomInfo['Type'] || 'Chưa phân loại',
-      cap: roomInfo['Capacity'] || '--', 
-      func: roomInfo['Function'] || '__',
+      area: roomInfo.area || roomInfo['Room: Area'] || '--', 
+      height: roomInfo.height || roomInfo.unbounded_height || roomInfo['Abound height'] || '--',
+      type: roomInfo.type || roomInfo.fm_room_type || roomInfo.FM_Room_Type || roomInfo['FM_Room_Type'] || 'Chưa phân loại',
+      cap: roomInfo.capacity || roomInfo.Capacity || '--', 
+      func: roomInfo.function || roomInfo.fm_room_function || roomInfo.Function || '__',
       equip: equipArray,
-      status: roomInfo['Status'] || 'Hoạt động'
+      status: roomInfo.is_active !== false ? 'Hoạt động' : 'Không hoạt động'
     };
   }
   
