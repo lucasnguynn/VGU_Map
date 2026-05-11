@@ -1296,12 +1296,47 @@ const searchInput  = document.getElementById('searchInput');
 const searchHint   = document.getElementById('searchHint');
 
 // Khởi tạo dropdown tòa nhà
-BUILDINGS.forEach(b => {
-  const opt = document.createElement('option');
-  opt.value = b.code;
-  opt.textContent = `${b.code} – ${b.name}`;
-  selBuilding.appendChild(opt);
-});
+function initBuildingDropdown() {
+  selBuilding.innerHTML = '<option value="">— Chọn Tòa nhà —</option>';
+  BUILDINGS.forEach(b => {
+    const opt = document.createElement('option');
+    opt.value = b.code;
+    opt.textContent = `${b.code} – ${b.name}`;
+    selBuilding.appendChild(opt);
+  });
+}
+
+// Refresh building dropdown after dynamic data loading
+function refreshBuildingDropdowns() {
+  // Save current selection
+  const currentBld = selBuilding.value;
+  const currentFloor = selFloor.value;
+  const currentRoom = selRoom.value;
+  
+  // Re-populate building dropdown
+  initBuildingDropdown();
+  
+  // Restore selection if still valid
+  if (currentBld && BUILDINGS.find(b => b.code === currentBld)) {
+    selBuilding.value = currentBld;
+  }
+  
+  // Re-populate floor dropdown if building is selected
+  if (selBuilding.value) {
+    onBuildingChange(false);
+    // Restore floor selection if valid
+    if (currentFloor && Array.from(selFloor.options).find(o => o.value === currentFloor)) {
+      selFloor.value = currentFloor;
+      onFloorChange();
+      // Restore room selection if valid
+      if (currentRoom && Array.from(selRoom.options).find(o => o.value === currentRoom)) {
+        selRoom.value = currentRoom;
+      }
+    }
+  }
+}
+
+initBuildingDropdown();
 selFloor.innerHTML = '<option value="">— Chọn Tầng —</option>';
 selRoom.innerHTML  = '<option value="">— Chọn số phòng —</option>';
 selFloor.disabled = true;
@@ -1720,10 +1755,16 @@ async function fetchRoomInfo() {
     let rawData = await response.json();
     let dataArray = Array.isArray(rawData) ? rawData : (rawData.data || rawData.items || []);
     
+    // Regex pattern to parse valid room IDs (e.g., AD-301 -> Building AD, Room 301)
+    const roomPattern = /^([A-Z]{2})-(\d)(\d{3})$/i;
+    
     dataArray.forEach(row => {
-      let roomId = row['Room: Number'] || row.Room_Number || row.Number;
+      // Support multiple flexible key lookups for room number
+      let roomId = row['Room: Number'] || row.Room_Number || row['room_number'] || row['Number'] || row['Room_Number'];
       
       if (roomId) {
+        roomId = String(roomId).trim();
+        
         if (!sheetRoomData[roomId]) {
           sheetRoomData[roomId] = { 
             ...row, 
@@ -1739,8 +1780,36 @@ async function fetchRoomInfo() {
         sheetRoomData[roomId]['Room: Area'] = row['Room: Area'] || sheetRoomData[roomId]['Room: Area'];
         sheetRoomData[roomId]['FM_Room_Type'] = row['FM_Room_Type'] || sheetRoomData[roomId]['FM_Room_Type'];
         sheetRoomData[roomId]['Room: Name'] = row['Room: Name'] || sheetRoomData[roomId]['Room: Name'];
+        
+        // Dynamically populate BUILDINGS array from API data
+        // Exclude rooms containing LB, CR, or WC
+        if (!/(LB|CR|WC)/i.test(roomId)) {
+          const match = roomId.match(roomPattern);
+          if (match) {
+            const bldCode = match[1].toUpperCase();
+            const roomNum = match[2] + match[3]; // e.g., "301"
+            
+            // Find or create building entry in BUILDINGS
+            let bldEntry = BUILDINGS.find(b => b.code === bldCode);
+            if (!bldEntry) {
+              // Create new building entry if not exists
+              bldEntry = { code: bldCode, name: `${bldCode} Building`, floors: 6, rooms: [] };
+              BUILDINGS.push(bldEntry);
+            }
+            
+            // Add room to building's rooms array if not already present
+            if (!bldEntry.rooms.includes(roomNum)) {
+              bldEntry.rooms.push(roomNum);
+              bldEntry.rooms.sort(); // Keep rooms sorted
+            }
+          }
+        }
       }
     });
+    
+    // Refresh UI dropdowns after populating BUILDINGS
+    refreshBuildingDropdowns();
+    
     isInfoLoaded = true;
     console.log("✅ Đã tải thông tin phòng từ API");
   } catch (e) {
@@ -1827,6 +1896,10 @@ async function loadMapFromSheets(fid) {
     let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${vbW} ${vbH}" style="width:100%;height:auto;display:block">
       <rect x="0" y="0" width="${vbW}" height="${vbH}" fill="#eef2f9"/>`;
       
+    // Separate rooms into background and interactive layers
+    const backgroundLayer = [];
+    const interactiveLayer = [];
+    
     for (const [roomNum, rData] of Object.entries(rooms)) {
       let dString = "", lastX = null, lastY = null;
       rData.paths.forEach(p => {
@@ -1856,6 +1929,9 @@ async function loadMapFromSheets(fid) {
 
       const BCAT={'AD-501':'large','AD-507':'large','AD-201':'hall','AD-247':'large','AD-248':'large','AD-251':'large','AD-101':'large','AD-601':'large','AD-609':'large','AD-614':'large'};
 
+      // Check if room is a background element (LB, CR, WC)
+      const isBackground = /^(LB|CR|WC)/i.test(roomNum);
+      
       // Modern, premium color palette
       let fillColor = "#e8edf8", strokeColor = "#7a8fb8";
       if (/^WC/i.test(roomNum)) { 
@@ -1869,14 +1945,17 @@ async function loadMapFromSheets(fid) {
         strokeColor = "#3a7a5a"; 
       }
 
-      svgContent += `
-        <g onclick="rC('${roomNum}')" style="cursor:pointer">
-          <path d="${dString}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="${strokeW}">
-            <title>${roomNum}</title>
-          </path>
-          <text x="${textX.toFixed(2)}" y="${textY.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="${fontSize.toFixed(2)}" font-weight="600" fill="#002554" pointer-events="none" style="paint-order:stroke;stroke:#ffffff;stroke-width:${fontSize * 0.25}px">${roomNum}</text>
-        </g>`;
+      if (isBackground) {
+        // Background layer: muted colors, no pointer events
+        backgroundLayer.push(`\n        <g style="cursor:default">\n          <path d="${dString}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="${strokeW}" pointer-events="none">\n            <title>${roomNum}</title>\n          </path>\n          <text x="${textX.toFixed(2)}" y="${textY.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="${fontSize.toFixed(2)}" font-weight="600" fill="#8896a8" pointer-events="none" style="paint-order:stroke;stroke:#ffffff;stroke-width:${fontSize * 0.25}px">${roomNum}</text>\n        </g>`);
+      } else {
+        // Interactive layer: full interactivity
+        interactiveLayer.push(`\n        <g onclick="rC('${roomNum}')" style="cursor:pointer">\n          <path d="${dString}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="${strokeW}">\n            <title>${roomNum}</title>\n          </path>\n          <text x="${textX.toFixed(2)}" y="${textY.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="${fontSize.toFixed(2)}" font-weight="600" fill="#002554" pointer-events="none" style="paint-order:stroke;stroke:#ffffff;stroke-width:${fontSize * 0.25}px">${roomNum}</text>\n        </g>`);
+      }
     }
+    
+    // Concatenate markup: background layer FIRST, then interactive layer on top
+    svgContent += backgroundLayer.join('') + interactiveLayer.join('');
     return svgContent + `</svg>`;
   } catch (e) {
     console.error("❌ Lỗi vẽ bản đồ: ", e);
@@ -1941,8 +2020,26 @@ async function renderMap(bid, fid, n) {
 
 // Room detail logic - Tích hợp với sheetRoomData từ API
 function getRD(rid) {
-  const roomInfo = sheetRoomData[rid];
-
+  // Apply .trim() aggressively to input rid and support flexible key lookups
+  const trimmedRid = String(rid).trim();
+  
+  // Support multiple flexible key lookups - try various key formats
+  let roomInfo = null;
+  
+  // First try direct lookup with trimmed ID
+  if (sheetRoomData[trimmedRid]) {
+    roomInfo = sheetRoomData[trimmedRid];
+  } else {
+    // Try alternative key formats in sheetRoomData
+    for (const key of Object.keys(sheetRoomData)) {
+      const trimmedKey = String(key).trim();
+      if (trimmedKey === trimmedRid) {
+        roomInfo = sheetRoomData[key];
+        break;
+      }
+    }
+  }
+  
   if(roomInfo) {
     let occupancy = roomInfo.staffList && roomInfo.staffList.length > 0 
       ? roomInfo.staffList.join(', ') 
@@ -1952,7 +2049,7 @@ function getRD(rid) {
     let equipArray = rawEquip ? String(rawEquip).split(',').map(e => e.trim()) : [];
 
     return {
-      name: roomInfo['Room: Name'] || roomInfo['Name'] || `Phòng ${rid}`,
+      name: roomInfo['Room: Name'] || roomInfo['Name'] || `Phòng ${trimmedRid}`,
       owner: roomInfo['Department'] || '__', 
       occupancy: occupancy, 
       area: roomInfo['Room: Area'] || roomInfo['Area'] || '--', 
@@ -1975,10 +2072,10 @@ function getRD(rid) {
     'AD-609':{name:'Hội trường lớn 609',owner:'Admin Building — VGU',area:520,cap:250,type:'Phòng lớn',func:'Hội nghị quy mô lớn',equip:['Sân khấu','Âm thanh JBL','3 Màn hình LED','250 ghế'],status:'Hoạt động'},
     'AD-614':{name:'Khu đa năng 614',owner:'Admin Building — VGU',area:450,cap:200,type:'Phòng lớn',func:'Không gian đa năng tầng 6',equip:['Âm thanh','Máy chiếu','Bàn ghế linh hoạt'],status:'Hoạt động'}
   };
-  if (RDX[rid]) return RDX[rid];
+  if (RDX[trimmedRid]) return RDX[trimmedRid];
   
   return {
-    name: `Phòng ${rid}`, 
+    name: `Phòng ${trimmedRid}`, 
     owner: '__',
     occupancy: '__',
     area: '--', 
@@ -2046,11 +2143,15 @@ function sT(tab, rd) {
   const imageId = driveImages[ST.rid];
 
   if (tab === '2D') {
+  if (tab === '2D') {
     if (imageId) {
       f.style.background = '#fff';
-      f.innerHTML = `<img src="https://drive.google.com/thumbnail?id=${imageId}&sz=w1000" 
+      // Use direct export endpoint instead of thumbnail URL to avoid CORS issues
+      // Add onerror handler for graceful fallback when Drive permissions are restricted
+      f.innerHTML = `<img src="https://drive.google.com/uc?export=view&id=${imageId}" 
                           style="width:100%; height:100%; object-fit:contain; display:block; padding: 4px;" 
-                          alt="Sơ đồ ${ST.rid}">`;
+                          alt="Sơ đồ ${ST.rid}"
+                          onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\'text-align:center;padding:22px 14px\'><div style=\'font-size:42px;margin-bottom:10px\'>🖼️</div><div style=\'font-size:13px;font-weight:700;color:#002554;margin-bottom:3px\'>Ảnh không khả dụng</div><div style=\'font-size:11px;color:#8896a8\'>${ST.rid} — Quyền truy cập Google Drive bị hạn chế</div></div>';">`;
     } else {
       f.style.background = '#e8eef9';
       f.innerHTML = `<div style="text-align:center;padding:22px 14px">
