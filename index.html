@@ -1632,7 +1632,7 @@ function goToFloorMap() {
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  RENDER BẢN ĐỒ TẦNG & GIAO DIỆN CHI TIẾT (TRUE-TO-SCALE BLUEPRINT)
+//  RENDER BẢN ĐỒ TẦNG & GIAO DIỆN CHI TIẾT (CHUẨN TỶ LỆ BLUEPRINT)
 // ═══════════════════════════════════════════════════════════════
 async function loadMapFromSheets(fid) {
   try {
@@ -1647,11 +1647,10 @@ async function loadMapFromSheets(fid) {
     let dataArray = Array.isArray(rawMapData) ? rawMapData : (rawMapData.data || rawMapData.items || []);
     if (!dataArray || dataArray.length === 0) return null;
 
-    // Bóc tách thông tin Tòa và Tầng từ fid (Ví dụ: 'bld_ad_f3' -> Tòa AD, Tầng 3)
+    // Bóc tách thông tin Tòa và Tầng từ fid (Ví dụ: 'bld_ad_f6' -> Tòa AD, Tầng 6)
     const bldInternalId = fid.split('_f')[0]; 
     const fNum = fid.split('_f')[1]; 
     
-    // Đối chiếu ID nội bộ ra mã Tòa thực tế (bld_ad -> AD)
     const bldObj = BLDS.find(b => b.id === bldInternalId);
     let targetBldCode = "AD"; 
     if (bldObj) {
@@ -1659,17 +1658,16 @@ async function loadMapFromSheets(fid) {
     }
     const floorPrefix = `${targetBldCode}-${fNum}`; 
 
-    // ── VÒNG 1: QUÉT TÌM BIÊN TỔNG THỂ CỦA TOÀN BỘ TÒA NHÀ (GLOBAL BOUNDS) ──
-    // Giúp cố định mốc tọa độ (Origin) và tỷ lệ (Scale) chung cho tất cả các tầng
+    // ── BƯỚC 1: QUÉT TÌM BIÊN TOÀN TÒA (LÀM MỐC X, Y CHUNG) ──
     let globalMinX = Infinity, globalMinY = Infinity;
     let globalMaxX = -Infinity, globalMaxY = -Infinity;
     let hasBuildingData = false;
 
+    // Quét toàn bộ file để lấy biên độ chuẩn của tất cả các tầng gộp lại
     dataArray.forEach(d => {
       const rnStr = d.Room_Number || d.room_number || d['Room_Number'] || d['room_number'] || "";
       const rn = String(rnStr).trim();
       
-      // Quét tất cả các phòng thuộc Tòa nhà này (bất kể tầng nào)
       if (rn.startsWith(`${targetBldCode}-`) || rn.includes(`-${targetBldCode}-`) || rn.startsWith(targetBldCode)) {
         let sx = parseFloat(d.StartX) || 0, sy = parseFloat(d.StartY) || 0;
         let ex = parseFloat(d.EndX) || 0, ey = parseFloat(d.EndY) || 0;
@@ -1684,15 +1682,37 @@ async function loadMapFromSheets(fid) {
 
     if (!hasBuildingData) return null;
 
-    // ── VÒNG 2: LỌC DỮ LIỆU ĐỂ VẼ RIÊNG CÁC PHÒNG THUỘC TẦNG ĐƯỢC CHỌN ──
+    // ── BƯỚC 2: TÍNH TOÁN WIDTH, HEIGHT VÀ PADDING CỐ ĐỊNH ──
+    let bldWidth = globalMaxX - globalMinX;
+    let bldHeight = globalMaxY - globalMinY;
+    
+    // Padding 5% viền ngoài
+    let padX = bldWidth * 0.05;
+    let padY = bldHeight * 0.05;
+    
+    let paddedWidth = bldWidth + padX * 2;
+    let paddedHeight = bldHeight + padY * 2;
+    
+    // ── BƯỚC 3: KHÓA SCALE CHUNG CHO VIEWBOX 1000px ──
+    let vbW = 1000;
+    let uniformScale = vbW / paddedWidth;
+    let vbH = paddedHeight * uniformScale; // Chiều cao tự động dãn theo đúng tỷ lệ thực
+
+    // ── BƯỚC 4: HÀM CHUYỂN ĐỔI MỐC TỌA ĐỘ VĨNH VIỄN BÁM THEO GLOBAL MIN ──
+    function mapX(realX) { 
+      return (realX - globalMinX + padX) * uniformScale; 
+    }
+    function mapY(realY) { 
+      return (globalMaxY - realY + padY) * uniformScale; 
+    }
+
+    // ── BƯỚC 5: LỌC DỮ LIỆU ĐỂ VẼ RIÊNG TẦNG ĐƯỢC CHỌN ──
     const floorData = dataArray.filter(item => {
       const rnStr = item.Room_Number || item.room_number || item['Room_Number'] || item['room_number'] || "";
       let rn = String(rnStr).trim();
       if (!rn) return false;
       
-      // Lấy phòng chính của tầng (Ví dụ: AD-301)
       if (rn.startsWith(floorPrefix)) return true;
-      // Lấy các khu vực sảnh/hành lang/WC dùng chung của tầng này
       if (/^(LB|CR|WC)/i.test(rn)) {
         if (rn.includes(floorPrefix)) return true;
         if (rn.includes(`-${targetBldCode}-${fNum}`) || rn.endsWith(fNum)) return true; 
@@ -1702,6 +1722,7 @@ async function loadMapFromSheets(fid) {
     
     if (floorData.length === 0) return null;
 
+    // Lắp ghép đường dẫn (paths) của các phòng thuộc tầng hiện tại
     const rooms = {};
     floorData.forEach(d => {
       const rNumStr = d.Room_Number || d.room_number || d['Room_Number'] || d['room_number'] || "";
@@ -1719,25 +1740,7 @@ async function loadMapFromSheets(fid) {
       rooms[rNum].maxY = Math.max(rooms[rNum].maxY, sy, ey);
     });
 
-    // ── ÁP DỤNG TỶ LỆ CHUNG TỪ GLOBAL BOUNDS (KHÓA CỨNG KHUNG HÌNH) ──
-    let bldWidth = globalMaxX - globalMinX;
-    let bldHeight = globalMaxY - globalMinY;
-    
-    // Đệm 5% viền ngoài để bản đồ không chạm sát mép
-    let padX = bldWidth * 0.05;
-    let padY = bldHeight * 0.05;
-    
-    let paddedWidth = bldWidth + padX * 2;
-    let paddedHeight = bldHeight + padY * 2;
-    
-    let vbW = 1000;
-    let uniformScale = vbW / paddedWidth;
-    let vbH = paddedHeight * uniformScale;
-
-    // Chuyển đổi hệ tọa độ thực tế sang pixel màn hình dựa trên mốc Toàn Tòa
-    function mapX(x) { return (x - globalMinX + padX) * uniformScale; }
-    function mapY(y) { return (globalMaxY - y + padY) * uniformScale; }
-
+    // Xuất chuỗi đồ họa SVG
     let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${vbW} ${vbH}" style="width:100%;height:auto;display:block">
       <rect x="0" y="0" width="${vbW}" height="${vbH}" fill="#eef2f9"/>`;
       
@@ -1748,6 +1751,7 @@ async function loadMapFromSheets(fid) {
       let dString = "", lastX = null, lastY = null;
       rData.paths.forEach(p => {
         if (lastX === null || Math.abs(p.sx - lastX) > 0.1 || Math.abs(p.sy - lastY) > 0.1) {
+          // 👉 Sử dụng mapX và mapY đã khóa mốc Toàn Tòa
           dString += `M ${mapX(p.sx).toFixed(2)} ${mapY(p.sy).toFixed(2)} `;
         }
         dString += `L ${mapX(p.ex).toFixed(2)} ${mapY(p.ey).toFixed(2)} `;
