@@ -1134,34 +1134,9 @@ function parseBuildingCSV(csvText) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  🏢 DỮ LIỆU TÒA NHÀ (Metadata — không chứa coords hardcode)
+//  🏢 DỮ LIỆU TÒA NHÀ (Khởi tạo rỗng - sẽ được nạp từ API)
 // ═══════════════════════════════════════════════════════════════
-const BUILDINGS = [
-  {code:'D1',name:'Ký túc xá D1',floors:7,rooms:['101','102','103','104','105','106']},
-  {code:'D2',name:'Ký túc xá D2',floors:7,rooms:['101','102','103','104','105','106']},
-  {code:'FC',name:'Canteen',floors:3,rooms:['101','102','201','202','301']},
-  {code:'CH',name:'Ceremony Hall',floors:2,rooms:['101','102','103','201','202']},
-  {code:'LI',name:'Thư viện',floors:4,rooms:['101','102','103','104','201','202','203']},
-  {code:'LH',name:'Giảng đường',floors:5,rooms:['101','102','201','202','203','301','302','401','501']},
-  {code:'B1',name:'Tòa học thuật B1',floors:6,rooms:['101','102','103','201','202']},
-  {code:'B2',name:'Tòa học thuật B2',floors:6,rooms:['101','102','103','201','202']},
-  {code:'B3',name:'Tòa học thuật B3',floors:6,rooms:['101','102','103','201','202']},
-  {code:'B5',name:'Tòa học thuật B5',floors:6,rooms:['101','102','103','201','202']},
-  {code:'B6',name:'Tòa học thuật B6',floors:6,rooms:['101','102','103','201','202']},
-  {code:'AD',name:'Tòa Hành chính',floors:6,rooms:['101','102','103','201','202','203','301','302','401','402']},
-  {code:'GH',name:'Căn hộ Guest House',floors:2,rooms:['101','102','201','202']},
-  {code:'25',name:'Công viên khu Guest House',floors:3,rooms:['101','102','201','202','301']},
-  {code:'SH',name:'Nhà thi đấu Thể thao',floors:1,rooms:['101','102','103','104']},
-  {code:'CP',name:'Nhà máy năng lượng',floors:1,rooms:['A1','A2','B1','B2']},
-  {code:'V1',name:'Biệt thự V1',floors:2,rooms:['101','102','201','202']},
-  {code:'V2',name:'Biệt thự V2',floors:2,rooms:['101','102','201','202']},
-  {code:'V3',name:'Biệt thự V3',floors:2,rooms:['101','102','201','202']},
-  {code:'V4',name:'Biệt thự V4',floors:2,rooms:['101','102','201','202']},
-  {code:'V5',name:'Biệt thự V5',floors:2,rooms:['101','102','201','202']},
-  {code:'V6',name:'Biệt thự V6',floors:2,rooms:['101','102','201','202']},
-  {code:'V7',name:'Biệt thự V7',floors:2,rooms:['101','102','201','202']},
-  {code:'V8',name:'Biệt thự V8',floors:2,rooms:['101','102','201','202']}
-];
+let BUILDINGS = [];
 
 // ═══════════════════════════════════════════════════════════════
 //  🗺️ KHỞI TẠO BẢN ĐỒ LEAFLET
@@ -1336,6 +1311,7 @@ function refreshBuildingDropdowns() {
   }
 }
 
+// Chỉ khởi tạo dropdown ban đầu, dữ liệu sẽ được nạp sau từ API
 initBuildingDropdown();
 selFloor.innerHTML = '<option value="">— Chọn Tầng —</option>';
 selRoom.innerHTML  = '<option value="">— Chọn số phòng —</option>';
@@ -1607,18 +1583,17 @@ function onFloorChange() {
   btnViewFloor.style.display = 'none';
 
   if (!code || !floor) return;
-  const bld = BUILDINGS.find(b => b.code === code);
-  if (!bld) return;
-
-  const prefix = String(floor);
-  bld.rooms.forEach(r => {
-    if (r.startsWith(prefix)) {
-      const opt = document.createElement('option');
-      opt.value = r;
-      opt.textContent = `Phòng ${r}`;
-      selRoom.appendChild(opt);
-    }
+  
+  // Sử dụng hàm getRoomsForFloor để lọc phòng trực tiếp từ sheetRoomData
+  const rooms = getRoomsForFloor(code, floor);
+  
+  rooms.forEach(r => {
+    const opt = document.createElement('option');
+    opt.value = r;
+    opt.textContent = `Phòng ${r}`;
+    selRoom.appendChild(opt);
   });
+  
   selRoom.disabled = false;
 }
 
@@ -1687,7 +1662,7 @@ function transitionToIndoorMap(bid, defaultFloor = 1) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  📋 DỮ LIỆU TẦNG & PHÒNG (FLOOR_ROOMS mapping)
+//  📋 DỮ LIỆU TẦNG & PHÒNG (Dynamic from API)
 // ═══════════════════════════════════════════════════════════════
 const BLDS = [
   {id:'bld_ad',name:'Admin Building',act:true,fl:6},
@@ -1708,20 +1683,30 @@ const BLDS = [
 ];
 const FLN = {bld_ad:['Tầng 1 — Bãi giữ xe','Tầng 2','Tầng 3','Tầng 4','Tầng 5','Tầng 6']};
 
-const FLOOR_ROOMS = {
-  'bld_ad_f1':['AD-101','AD-103','AD-104'],
-  'bld_ad_f2':['AD-201','AD-204','AD-205','AD-206','AD-207','AD-211','AD-212',
-    'AD-213','AD-214','AD-216','AD-217','AD-218','AD-219','AD-220','AD-224',
-    'AD-226','AD-228','AD-229','AD-230','AD-231','AD-232','AD-234','AD-235',
-    'AD-236','AD-237','AD-240','AD-241','AD-242','AD-243','AD-244','AD-245',
-    'AD-246','AD-247','AD-248','AD-249','AD-251',
-    'AD-2.LB1','AD-2.LB2','AD-2.LB3','AD-2.LB4','AD-2.LB5','AD-2.LB6','AD-2.LB7'],
-  'bld_ad_f3':["AD-301", "AD-304", "AD-305", "AD-306", "AD-307", "AD-308", "AD-309", "AD-310", "AD-311", "AD-312", "AD-313", "AD-314", "AD-315", "AD-316", "AD-317", "AD-318", "AD-319", "AD-320", "AD-321", "AD-322", "AD-323", "AD-324", "AD-325", "AD-326", "AD-327", "AD-328A", "AD-328B", "AD-329", "AD-330", "AD-331", "AD-332", "AD-335", "AD-336", "AD-337", "AD-338", "AD-339", "AD-340", "AD-341", "AD-342A", "AD-342B", "AD-343", "AD-344", "AD-345", "AD-346", "AD-347", "AD-348", "AD-349", "AD-350", "AD-351", "AD-353", "AD-355", "AD-356", "AD-357", "AD-358", "AD-359", "AD-362", "AD-363", "AD-364", "AD-365", "AD-366", "AD-367", "AD-368", "AD-369", "AD-370", "AD-371", "AD-372", "AD-373", "AD-376", "AD-377", "AD-378", "AD-379", "AD-380", "AD-381", "AD-382", "AD-383", "AD-384", "AD-385", "AD-386", "AD-387", "AD-388", "AD-389", "AD-390", "AD-391"],
-  'bld_ad_f4':["AD-401", "AD-403", "AD-404", "AD-405", "AD-407", "AD-410", "AD-411", "AD-412", "AD-414", "AD-416", "AD-417", "AD-418", "AD-419", "AD-420", "AD-422", "AD-423", "AD-424", "AD-425", "AD-426", "AD-427", "AD-428", "AD-429", "AD-430", "AD-431", "AD-432", "AD-435", "AD-436", "AD-437", "AD-438", "AD-439", "AD-440", "AD-441", "AD-442", "AD-443", "AD-444", "AD-446", "AD-447", "AD-448", "AD-449", "AD-450", "AD-451", "AD-453", "AD-454", "AD-455", "AD-456", "AD-459", "AD-460", "AD-462", "AD-463", "AD-464", "AD-465", "AD-466", "AD-467", "AD-468", "AD-469", "AD-470", "AD-471", "AD-472", "AD-473", "AD-474", "AD-475", "AD-478", "AD-479", "AD-480", "AD-481", "AD-482", "AD-483", "AD-484", "AD-485", "AD-486", "AD-487", "AD-488", "AD-489", "AD-490", "AD-491", "AD-492", "AD-493", "AD-495"],
-  'bld_ad_f5':["AD-501", "AD-504", "AD-505", "AD-507", "AD-508", "AD-510", "AD-511", "AD-512", "AD-513", "AD-514", "AD-515", "AD-516", "AD-517", "AD-518", "AD-519", "AD-520", "AD-522", "AD-523", "AD-524"],
-  'bld_ad_f6':['AD-601','AD-604','AD-605','AD-608','AD-609','AD-610',
-    'AD-611','AD-612','AD-613','AD-614','AD-615','AD-616','AD-617']
-};
+// Hàm bổ trợ: Lọc danh sách phòng theo Tòa/Tầng trực tiếp từ sheetRoomData
+function getRoomsForFloor(buildingCode, floorNum) {
+  const floorStr = String(floorNum);
+  const rooms = [];
+  
+  for (const roomId of Object.keys(sheetRoomData)) {
+    // Bỏ qua các khu vực công cộng (LB, CR, WC)
+    if (/(LB|CR|WC)/i.test(roomId)) continue;
+    
+    const parts = roomId.split('-');
+    if (parts.length >= 2) {
+      const bldCode = parts[0].toUpperCase().trim();
+      const afterHyphen = parts.slice(1).join('-').trim();
+      
+      // Kiểm tra đúng tòa nhà và số phòng bắt đầu bằng số tầng
+      if (bldCode === buildingCode && afterHyphen.startsWith(floorStr)) {
+        rooms.push(roomId);
+      }
+    }
+  }
+  
+  // Sắp xếp theo thứ tự tự nhiên
+  return rooms.sort(new Intl.Collator('en', { numeric: true, sensitivity: 'base' }).compare);
+}
 
 // ═══════════════════════════════════════════════════════════════
 //  🔗 DATA ENDPOINTS (Local JSON files - cached via Cron Job)
@@ -1778,6 +1763,9 @@ async function fetchRoomInfo() {
       return;
     }
     
+    // Reset BUILDINGS array để xây dựng lại hoàn toàn từ API
+    BUILDINGS = [];
+    
     dataArray.forEach(row => {
       // Quét linh hoạt các định dạng key API trả về
       let roomId = row.room_number || row.Room_Number || row['Room: Number'] || row['room_number'] || row['Number'] || row['Room_Number'];
@@ -1828,10 +1816,12 @@ async function fetchRoomInfo() {
             // Xác nhận chuỗi bắt đầu bằng chữ số (ký tự đầu là tầng, toàn bộ chuỗi sau là số phòng)
             if (/^\d/.test(afterHyphen)) {
               const roomNum = afterHyphen; 
+              const floorNum = parseInt(afterHyphen.charAt(0)); // Lấy số tầng từ ký tự đầu của số phòng
               
               let bldEntry = BUILDINGS.find(b => b.code === bldCode);
               if (!bldEntry) {
-                bldEntry = { code: bldCode, name: `${bldCode} Building`, floors: 6, rooms: [] };
+                // Tạo mới tòa nhà với floors = 0, sẽ cập nhật sau
+                bldEntry = { code: bldCode, name: `${bldCode} Building`, floors: 0, rooms: [] };
                 BUILDINGS.push(bldEntry);
               }
               
@@ -1840,6 +1830,11 @@ async function fetchRoomInfo() {
                 // Sắp xếp mảng phòng theo thứ tự tự nhiên (101, 102... 614)
                 bldEntry.rooms.sort(new Intl.Collator('en', { numeric: true, sensitivity: 'base' }).compare);
               }
+              
+              // Cập nhật số tầng cao nhất nếu phòng này ở tầng cao hơn
+              if (floorNum > bldEntry.floors) {
+                bldEntry.floors = floorNum;
+              }
             }
           }
         }
@@ -1847,7 +1842,8 @@ async function fetchRoomInfo() {
     });
     
     isInfoLoaded = true;
-    console.log(`✅ Đã tải thông tin ${Object.keys(sheetRoomData).length} phòng từ API`);
+    console.log(`✅ Đã tải thông tin ${Object.keys(sheetRoomData).length} phòng từ API, ${BUILDINGS.length} tòa nhà`);
+    console.log("🏢 BUILDINGS:", BUILDINGS);
 
     // LÀM MỚI GIAO DIỆN: Bắt buộc gọi sau khi dữ liệu đã nạp xong
     refreshBuildingDropdowns();
