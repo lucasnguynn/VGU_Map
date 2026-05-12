@@ -420,40 +420,42 @@ Bản đồ tự động điều chỉnh theo màn hình. Nhấn vào phòng đ�
 </div>
 </div>
 <div class="page" id="pg-r">
-<div class="ph"><div class="phi">
-<button class="pb" onclick="gH()">← Trang chủ</button>
-<button class="pb" onclick="gM()">Bản đồ tầng</button>
-<div class="pbc" id="rbc"></div>
-</div></div>
-<div class="pc">
-<div class="rg">
-<div>
-<div class="itab">
-<button class="it on" id="t2d" onclick="sT('2D')">Sơ đồ 2D</button>
-<button class="it" id="t3d" onclick="sT('3D')">Phối cảnh 3D</button>
-</div>
-<div class="ifrm" id="ifr"></div>
-<div class="mrow">
-<div class="mv"><div class="mvn" id="rar">—</div><div class="mvl">Diện tích (m²)</div></div>
-<div class="mv"><div class="mvn" id="rcp">—</div><div class="mvl">Sức chứa</div></div>
-<div class="mv"><div class="mvn" id="rst" style="font-size:12px">—</div><div class="mvl">Trạng thái</div></div>
-</div>
-</div>
-<div>
-<div id="rbdg" class="rbdg"></div>
-<div class="rnum" id="rnum"></div>
-<div class="rnm" id="rnm"></div>
-<div class="ib"><div class="il">Đơn vị quản lý (Department)</div><div class="iv" id="row2"></div></div>
-<div class="ib"><div class="il">Người sử dụng (Occupancy)</div><div class="iv" id="rocc"></div></div>
-<div class="ib"><div class="il">Chiều cao trần (Abound Height)</div><div class="iv" id="rhgt"></div></div>
-<div class="ib"><div class="il">Trang thiết bị</div><div class="eq" id="req"></div></div>
-<div class="nb">
-<button class="bno" onclick="gH()">Trang chủ</button>
-<button class="bnp" onclick="gM()">Bản đồ tầng</button>
-</div>
-</div>
-</div>
-</div>
+  <div class="ph">
+    <div class="phi">
+      <button class="pb" onclick="gH()">← Trang chủ</button>
+      <button class="pb" onclick="gM()">Bản đồ tầng</button>
+      <div class="pbc" id="rbc"></div>
+    </div>
+  </div>
+  <div class="pc">
+    <div class="rg">
+      <div>
+        <div class="itab">
+          <button class="it on" id="t2d" onclick="sT('2D')">Sơ đồ 2D</button>
+          <button class="it" id="t3d" onclick="sT('3D')">Phối cảnh 3D</button>
+        </div>
+        <div class="ifrm" id="ifr"></div>
+        <div class="mrow">
+          <div class="mv"><div class="mvn" id="rar">—</div><div class="mvl">Area (m²)</div></div>
+          <div class="mv"><div class="mvn" id="rhgt">—</div><div class="mvl">Abound Height (m)</div></div>
+          <div class="mv"><div class="mvn" id="rcp">—</div><div class="mvl">Sức chứa</div></div>
+        </div>
+      </div>
+      <div>
+        <div id="rbdg" class="rbdg"></div>
+        <div class="rnum" id="rnum"></div>
+        <div class="rnm" id="rnm"></div>
+        <div class="ib"><div class="il">Occupancy</div><div class="iv" id="rocc"></div></div>
+        <div class="ib"><div class="il">Department</div><div class="iv" id="rdep"></div></div>
+        <div class="ib"><div class="il">Room Type</div><div class="iv" id="rtype"></div></div>
+        <div class="ib"><div class="il">Room Function</div><div class="iv" id="rfunc"></div></div>
+        <div class="nb">
+          <button class="bno" onclick="gH()">Trang chủ</button>
+          <button class="bnp" onclick="gM()">Bản đồ tầng</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
@@ -1896,34 +1898,28 @@ function getRD(rid) {
   }
   
   if (roomInfo) {
+    // Mảng occupants đã được gộp gọn gàng từ backend
     let occupancy = '__';
-    // Đã gộp mảng mượt mà từ fetchRoomInfo, bung trực tiếp ra chuỗi
     if (roomInfo.occupants && Array.isArray(roomInfo.occupants) && roomInfo.occupants.length > 0) {
       occupancy = roomInfo.occupants.join(', ');
     }
 
-    // Quét linh hoạt cột thiết bị
-    let rawEquip = roomInfo.equipment || roomInfo['Equipment'] || roomInfo['Thiết bị'] || '';
-    let equipArray = rawEquip ? String(rawEquip).split(',').map(e => e.trim()) : [];
-
     return {
       name: roomInfo.name_vn || roomInfo.name_en || `Phòng ${trimmedRid}`,
-      owner: roomInfo.department || '__', 
+      department: roomInfo.department || '__', 
       occupancy: occupancy, 
       area: roomInfo.area || '--', 
       height: roomInfo.height || '--',
-      type: roomInfo.type || 'Chưa phân loại',
-      cap: roomInfo.capacity || roomInfo.Capacity || '--', 
-      func: roomInfo.function || '__',
-      equip: equipArray,
-      status: roomInfo.is_active !== false ? 'Hoạt động' : 'Không hoạt động'
+      type: roomInfo.type || '--',
+      cap: roomInfo.capacity || '--', 
+      func: roomInfo.function || '--',
+      status: roomInfo.status || 'Hoạt động'
     };
   }
   
   return {
-    name: `Phòng ${trimmedRid}`, owner: 'Đang cập nhật...', occupancy: 'Đang cập nhật...', 
-    area: '--', height: '--', type: 'Đang cập nhật', cap: '--', func: 'Đang đồng bộ Sheets...', 
-    equip: [], status: 'Đang chờ đồng bộ'
+    name: `Phòng ${trimmedRid}`, department: '--', occupancy: '--', 
+    area: '--', height: '--', type: '--', cap: '--', func: '--', status: 'Hoạt động'
   };
 }
 
@@ -1934,28 +1930,37 @@ function rC(rid) {
   const fn = ST.flN ? `Tầng ${ST.flN}` : '';
   
   document.getElementById('rbc').innerHTML = `<b>${b.name}</b> › ${fn} › ${rid}`;
+  
+  // Đổ 3 thông số nhanh
   document.getElementById('rar').textContent = rd.area;
+  document.getElementById('rhgt').textContent = rd.height;
   document.getElementById('rcp').textContent = rd.cap;
-  document.getElementById('rst').textContent = rd.status;
   
-  document.getElementById('row2').textContent = rd.owner; 
+  // Đổ danh sách chi tiết
   document.getElementById('rocc').textContent = rd.occupancy; 
-  document.getElementById('rhgt').textContent = rd.height; 
-  document.getElementById('rbdg').textContent = rd.type;
-  
-  const BTXT={ office:['#e8eef9','#002554'], hall:['#e8edff','#001060'], large:['#e6f5ec','#083a18'], lb:['#fff3e6','#7a4800'] };
-  const tc = String(rd.type).toLowerCase().includes('office') ? 'office' : String(rd.type).toLowerCase().includes('hội trường') ? 'hall' : 'large';
-  
-  document.getElementById('rbdg').style.background = BTXT[tc] ? BTXT[tc][0] : '#e8eef9';
-  document.getElementById('rbdg').style.color = BTXT[tc] ? BTXT[tc][1] : '#002554';
+  document.getElementById('rdep').textContent = rd.department; 
+  document.getElementById('rtype').textContent = rd.type; 
+  document.getElementById('rfunc').textContent = rd.func;
   
   document.getElementById('rnum').textContent = rid;
   document.getElementById('rnm').textContent = rd.name;
   
-  if (rd.equip.length > 0) {
-    document.getElementById('req').innerHTML = rd.equip.map(e => `<div class="ei">${e}</div>`).join('');
+  // LOGIC ĐỔI MÀU TRẠNG THÁI CHUẨN XANH - VÀNG - ĐỎ
+  const badge = document.getElementById('rbdg');
+  badge.textContent = rd.status.toUpperCase();
+  
+  if (rd.status === 'Hoạt động') {
+    badge.style.background = '#e6f5ec';
+    badge.style.color = '#083a18';
+    badge.style.border = '1px solid #408060';
+  } else if (rd.status === 'Bảo trì' || rd.status === 'Sửa chữa') {
+    badge.style.background = '#fffbf0';
+    badge.style.color = '#c9661a';
+    badge.style.border = '1px solid #f58220';
   } else {
-    document.getElementById('req').innerHTML = '<div style="font-size:12px;color:var(--ht)">Chưa có dữ liệu thiết bị</div>';
+    badge.style.background = '#fdeded';
+    badge.style.color = '#5f2120';
+    badge.style.border = '1px solid #ef5350';
   }
   
   sT('2D', rd);
