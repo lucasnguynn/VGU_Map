@@ -1296,13 +1296,19 @@ async function loadDriveImages() {
 async function fetchRoomInfo() {
   if (isInfoLoaded) return; 
   try {
+    // TẠO CHUỖI RANDOM HOẶC TIMESTAMP ĐỂ PHÁ CACHE
+    const noCacheParam = '?t=' + new Date().getTime();
+
+    // Thêm noCacheParam vào sau đuôi link API_INFO
     const [mapRes, infoRes] = await Promise.all([
       fetch(API_MAP),
-      fetch(API_INFO)
+      fetch(API_INFO + noCacheParam) // <--- SỬA DÒNG NÀY
     ]);
 
     if (!mapRes.ok) throw new Error(`HTTP Map ${mapRes.status}`);
     if (!infoRes.ok) throw new Error(`HTTP Info ${infoRes.status}`);
+
+    // ... (Giữ nguyên phần code xử lý bên dưới của bạn) ...
 
     const rawMapData = await mapRes.json();
     const rawInfoData = await infoRes.json();
