@@ -233,11 +233,10 @@ input.c1-select::-webkit-search-cancel-button { display: none; }
   box-shadow: inset 0 2px 8px rgba(0, 37, 84, 0.06);
 }
 
-/* SVG container inside map-wrap — maintains minimum readable size */
+/* Kích hoạt kích thước hiển thị lớn cho bản đồ SVG bên trong container */
 .map-wrap svg {
-  min-width: 800px;
-  min-height: 400px;
-  width: auto;
+  width: 100%;
+  min-width: 1300px; /* Ép sơ đồ rộng tối thiểu 1300px để cụm phòng ở giữa to và rõ chữ */
   height: auto;
   display: block;
   margin: 20px auto;
