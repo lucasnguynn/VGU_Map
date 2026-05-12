@@ -648,7 +648,7 @@ B1;0;Line;23180.07;14898.64;23180.07;16328.51;1429.86
 B1;0;Line;23180.07;16328.51;18090.47;16328.51;5089.60
 B1;0;Line;18090.47;16328.51;18090.47;11339.58;4988.93
 B1;0;Line;18090.47;11339.58;20516.34;11339.58;2425.88
-B1;0;Line;20516.34;11339.58;20516.34;11364.06;24.48
+B1;0;Line;18090.47;11339.58;20516.34;11364.06;24.48
 B1;0;Line;20516.34;11364.06;23054.38;11364.06;2538.04
 B1;1;Line;22066.19;12352.82;21928.42;12352.82;137.77
 B1;1;Line;21928.42;12352.82;20516.60;12352.82;1411.83
@@ -1014,14 +1014,8 @@ V9;23;Line;-7560.11;10092.29;-11694.07;10092.29;4133.97`;
 //  🔧 BỘ PHẬN XỬ LÝ CSV → POLYGON (Tự động tính bounds)
 // ═══════════════════════════════════════════════════════════════
 
-/**
- * Normalize and scale coordinates to fit within target viewport
- * Target: 1294px × 474px with 5% padding, maintaining aspect ratio
- */
 function normalizeCoordinates(csvText, targetWidth = 1294, targetHeight = 474, flipX = false, flipY = false) {
   const lines = csvText.trim().split('\n').slice(1);
-  
-  // Step 1: Calculate GLOBAL bounding box from ALL coordinates
   let globalMinX = Infinity, globalMaxX = -Infinity;
   let globalMinY = Infinity, globalMaxY = -Infinity;
   const rawSegments = [];
@@ -1031,12 +1025,9 @@ function normalizeCoordinates(csvText, targetWidth = 1294, targetHeight = 474, f
     if (p.length < 7) return;
     
     rawSegments.push({
-      room: p[0],
-      loop: p[1],
-      sx: parseFloat(p[3]) || 0,
-      sy: parseFloat(p[4]) || 0,
-      ex: parseFloat(p[5]) || 0,
-      ey: parseFloat(p[6]) || 0
+      room: p[0], loop: p[1],
+      sx: parseFloat(p[3]) || 0, sy: parseFloat(p[4]) || 0,
+      ex: parseFloat(p[5]) || 0, ey: parseFloat(p[6]) || 0
     });
     
     globalMinX = Math.min(globalMinX, rawSegments[rawSegments.length-1].sx, rawSegments[rawSegments.length-1].ex);
@@ -1045,7 +1036,6 @@ function normalizeCoordinates(csvText, targetWidth = 1294, targetHeight = 474, f
     globalMaxY = Math.max(globalMaxY, rawSegments[rawSegments.length-1].sy, rawSegments[rawSegments.length-1].ey);
   });
   
-  // Step 2: Calculate dimensions (NO PADDING)
   const rawWidth = globalMaxX - globalMinX;
   const rawHeight = globalMaxY - globalMinY;
   
@@ -1053,54 +1043,39 @@ function normalizeCoordinates(csvText, targetWidth = 1294, targetHeight = 474, f
     return { polygons: {}, bounds: [[0, 0], [targetHeight, targetWidth]], rawBounds: [[0, 0], [0, 0]], scaleFactor: 1, translation: { x: 0, y: 0 } };
   }
   
-  // Step 3: Calculate uniform scale factor (maintain aspect ratio, fit to bounds)
   const scaleX = targetWidth / rawWidth;
   const scaleY = targetHeight / rawHeight;
   const scale = Math.min(scaleX, scaleY);
   
-  // Step 4: Calculate centering offset
   const scaledWidth = rawWidth * scale;
   const scaledHeight = rawHeight * scale;
   const offsetX = (targetWidth - scaledWidth) / 2;
   const offsetY = (targetHeight - scaledHeight) / 2;
   
-  // Step 5: Transform coordinates and build polygons
   const groups = {};
   rawSegments.forEach(seg => {
     const key = `${seg.room}_${seg.loop}`;
     if (!groups[key]) groups[key] = [];
     
-    // Apply scaling and centering
     const normSX = (seg.sx - globalMinX) * scale;
     const normSY = (seg.sy - globalMinY) * scale;
     const normEX = (seg.ex - globalMinX) * scale;
     const normEY = (seg.ey - globalMinY) * scale;
     
-    // Apply centering offset
     const centSX = normSX + offsetX;
     const centSY = normSY + offsetY;
     const centEX = normEX + offsetX;
     const centEY = normEY + offsetY;
     
-    // Apply optional axis flipping for orientation correction
-    const finalSX = flipX ? targetWidth - centSX : centSX;
-    const finalSY = flipY ? targetHeight - centSY : centSY;
-    const finalEX = flipX ? targetWidth - centEX : centEX;
-    const finalEY = flipY ? targetHeight - centEY : centEY;
-    
     groups[key].push({
-      sx: finalSX,
-      sy: finalSY,
-      ex: finalEX,
-      ey: finalEY
+      sx: flipX ? targetWidth - centSX : centSX,
+      sy: flipY ? targetHeight - centSY : centSY,
+      ex: flipX ? targetWidth - centEX : centEX,
+      ey: flipY ? targetHeight - centEY : centEY
     });
   });
   
-  // Step 6: Build closed polygons
   const polygons = {};
-  let finalMinX = Infinity, finalMaxX = -Infinity;
-  let finalMinY = Infinity, finalMaxY = -Infinity;
-  
   for (const key in groups) {
     const [room] = key.split('_');
     if (!polygons[room]) polygons[room] = [];
@@ -1108,33 +1083,24 @@ function normalizeCoordinates(csvText, targetWidth = 1294, targetHeight = 474, f
     const coords = groups[key].map(s => [s.sy, s.sx]);
     const last = groups[key][groups[key].length - 1];
     coords.push([last.ey, last.ex]);
-    
-    coords.forEach(([y, x]) => {
-      finalMinX = Math.min(finalMinX, x);
-      finalMaxX = Math.max(finalMaxX, x);
-      finalMinY = Math.min(finalMinY, y);
-      finalMaxY = Math.max(finalMaxY, y);
-    });
-    
     polygons[room].push(coords);
   }
   
   return {
     polygons,
-    bounds: [[0, 0], [targetHeight, targetWidth]], // Hardcoded bounds matching image exactly
+    bounds: [[0, 0], [targetHeight, targetWidth]],
     rawBounds: [[globalMinY, globalMinX], [globalMaxY, globalMaxX]],
     scaleFactor: scale,
     translation: { x: offsetX, y: offsetY }
   };
 }
 
-// Legacy wrapper for backward compatibility
 function parseBuildingCSV(csvText) {
   return normalizeCoordinates(csvText, 1294, 474);
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  🏢 DỮ LIỆU TÒA NHÀ (Metadata — không chứa coords hardcode)
+//  🏢 DỮ LIỆU TÒA NHÀ MẶC ĐỊNH (Rỗng mảng phòng để API tự điền)
 // ═══════════════════════════════════════════════════════════════
 const BUILDINGS = [
   {code:'D1', name:'Ký túc xá D1', floors:7, rooms:[]},
@@ -1169,12 +1135,11 @@ const BUILDINGS = [
 let lMap, bldLayerGroup;
 let polygonLayers = {};
 let selectedPolygon = null;
-let globalBounds = null; // Lưu trữ bounds toàn cục để dùng cho fitBounds khi resize
+let globalBounds = null; 
 
 const defaultPolyStyle   = { color:'#002554', fillColor:'#002554', fillOpacity:0.05, weight:2 };
 const highlightPolyStyle = { color:'#f58220', weight:4, fillColor:'#f58220', fillOpacity:0.3 };
 
-// Hardcoded viewport bounds matching the 1294x474 background image exactly
 const VIEWPORT_WIDTH = 1294;
 const VIEWPORT_HEIGHT = 474;
 
@@ -1182,102 +1147,64 @@ function initLeafletMap() {
   if (lMap) setTimeout(() => lMap.invalidateSize(), 100);
   if (lMap) return;
 
-  // 1️⃣  Set Hardcoded Global Bounds (No dynamic calculation)
-  // Bounds format: [[South, West], [North, East]] => [[0, 0], [Height, Width]]
   globalBounds = [[0, 0], [VIEWPORT_HEIGHT, VIEWPORT_WIDTH]];
 
-  // 2️⃣  Khởi tạo Leaflet map với CRS.Simple (hệ trục chữ nhật pixel)
   lMap = L.map('map', {
     crs: L.CRS.Simple,
-    minZoom: -3,
-    maxZoom: 2,
-    zoomSnap: 0.25,
-    zoomDelta: 0.5,
+    minZoom: -3, maxZoom: 2,
+    zoomSnap: 0.25, zoomDelta: 0.5,
     wheelPxPerZoomLevel: 120,
     attributionControl: false
   });
 
-  // 3️⃣  Add Background Image Overlay with exact bounds
   L.imageOverlay('VGU MAP ALL.png', globalBounds).addTo(lMap);
-  
-  // Fit bounds ngay lập tức để tất cả buildings hiển thị trong viewport
   lMap.fitBounds(globalBounds, { animate: false });
 
-  // 4️⃣  Parse CSV → lấy polygons + bounds (with Y-axis inversion already applied)
   const csvData = parseBuildingCSV(BUILDING_BOUNDARY_CSV);
-
-  // 5️⃣  Vẽ polygons từ CSV lên cùng hệ tọa độ
   bldLayerGroup = L.featureGroup().addTo(lMap);
 
   for (const code in csvData.polygons) {
-    // Skip rendering V9 (outermost boundary) - it's only used for scaling calculations
     if (code === 'V9') continue;
     
-    const loops = csvData.polygons[code];
-
-    // Y-axis inversion is now handled in normalizeCoordinates, so no need to flip here
-    const finalLoops = loops;
-
+    const finalLoops = csvData.polygons[code];
     const polygon = L.polygon(finalLoops, defaultPolyStyle).addTo(bldLayerGroup);
-
     const bldInfo = BUILDINGS.find(b => b.code === code);
     const label = bldInfo ? bldInfo.name : code;
 
     polygon.bindTooltip(label, { direction:'top', sticky:true });
 
     polygon.on('mouseover', e => {
-      if (selectedPolygon !== e.target) {
-        e.target.setStyle({ fillOpacity:0.15, weight:3 });
-      }
+      if (selectedPolygon !== e.target) e.target.setStyle({ fillOpacity:0.15, weight:3 });
     });
     polygon.on('mouseout', e => {
-      if (selectedPolygon !== e.target) {
-        e.target.setStyle(defaultPolyStyle);
-      }
+      if (selectedPolygon !== e.target) e.target.setStyle(defaultPolyStyle);
     });
     polygon.on('click', e => {
       selBuilding.value = code;
       onBuildingChange(true);
-      
       L.DomEvent.stopPropagation(e);
     });
 
     polygonLayers[code] = polygon;
   }
 
-  // Debug: click map → log tọa độ để căn chỉnh
   lMap.on('click', e => {
     console.log(`Clicked: [${Math.round(e.latlng.lat)}, ${Math.round(e.latlng.lng)}]`);
   });
   
-  // 6️⃣  Thêm event listener cho window resize để tự động fit bounds
   setupMapResizeHandler();
 }
 
-/**
- * Thiết lập handler cho sự kiện resize window và orientation change
- * Đảm bảo map luôn fit bounds khi kích thước màn hình thay đổi
- */
 function setupMapResizeHandler() {
   let resizeTimeout;
-  
   function handleResize() {
     if (!lMap || !globalBounds) return;
-    
-    // Clear timeout cũ để tránh gọi quá nhiều lần
     clearTimeout(resizeTimeout);
-    
-    // Debounce resize event (chờ 250ms sau khi resize xong mới thực hiện)
     resizeTimeout = setTimeout(() => {
-      // Invalidate size để map nhận diện kích thước container mới
       lMap.invalidateSize(false);
-      
-      // Fit bounds để đảm bảo tất cả buildings vẫn hiển thị trong viewport
       lMap.fitBounds(globalBounds, { animate: true, duration: 0.3 });
     }, 250);
   }
-  
-  // Listen cho cả resize và orientationchange (cho mobile)
   window.addEventListener('resize', handleResize, { passive: true });
   window.addEventListener('orientationchange', handleResize, { passive: true });
 }
@@ -1295,7 +1222,6 @@ const mapWrap      = document.getElementById('mapWrap');
 const searchInput  = document.getElementById('searchInput');
 const searchHint   = document.getElementById('searchHint');
 
-// Khởi tạo dropdown tòa nhà
 function initBuildingDropdown() {
   selBuilding.innerHTML = '<option value="">— Chọn Tòa nhà —</option>';
   BUILDINGS.forEach(b => {
@@ -1306,29 +1232,22 @@ function initBuildingDropdown() {
   });
 }
 
-// Refresh building dropdown after dynamic data loading
 function refreshBuildingDropdowns() {
-  // Save current selection
   const currentBld = selBuilding.value;
   const currentFloor = selFloor.value;
   const currentRoom = selRoom.value;
   
-  // Re-populate building dropdown
   initBuildingDropdown();
   
-  // Restore selection if still valid
   if (currentBld && BUILDINGS.find(b => b.code === currentBld)) {
     selBuilding.value = currentBld;
   }
   
-  // Re-populate floor dropdown if building is selected
   if (selBuilding.value) {
     onBuildingChange(false);
-    // Restore floor selection if valid
     if (currentFloor && Array.from(selFloor.options).find(o => o.value === currentFloor)) {
       selFloor.value = currentFloor;
       onFloorChange();
-      // Restore room selection if valid
       if (currentRoom && Array.from(selRoom.options).find(o => o.value === currentRoom)) {
         selRoom.value = currentRoom;
       }
@@ -1343,37 +1262,142 @@ selFloor.disabled = true;
 selRoom.disabled  = true;
 
 // ═══════════════════════════════════════════════════════════════
-//  🔍 TÌM KIẾM & RESET MAP
+//  🔗 ĐỒNG BỘ DỮ LIỆU TỪ CÁC API
+// ═══════════════════════════════════════════════════════════════
+const API_MAP = "./map_data.json";
+const API_INFO = "./info_data.json";
+const API_DRIVE_LIST = "./drive_data.json";
+
+let sheetRoomData = {};
+let driveImages = {};
+let isInfoLoaded = false;
+
+async function loadDriveImages() {
+  try {
+    const response = await fetch(API_DRIVE_LIST);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    driveImages = await response.json();
+  } catch (e) { 
+    console.error("❌ Lỗi tải ảnh Drive:", e.message);
+  }
+}
+
+(async function initializeData() {
+  try {
+    await Promise.all([loadDriveImages(), fetchRoomInfo()]);
+    console.log("✅ Hệ thống tải dữ liệu API hoàn tất!");
+  } catch (e) {
+    console.error("❌ Lỗi khởi tạo hệ thống:", e);
+  }
+})();
+
+async function fetchRoomInfo() {
+  if (isInfoLoaded) return; 
+  try {
+    // Gọi song song API vẽ tọa độ (lấy số phòng thực tế) và API Info
+    const [mapRes, infoRes] = await Promise.all([
+      fetch(API_MAP),
+      fetch(API_INFO)
+    ]);
+
+    if (!mapRes.ok) throw new Error(`HTTP Map ${mapRes.status}`);
+    if (!infoRes.ok) throw new Error(`HTTP Info ${infoRes.status}`);
+
+    const rawMapData = await mapRes.json();
+    const rawInfoData = await infoRes.json();
+
+    const mapArray = Array.isArray(rawMapData) ? rawMapData : (rawMapData.data || rawMapData.items || []);
+    const infoArray = Array.isArray(rawInfoData) ? rawInfoData : (rawInfoData.data || rawInfoData.items || []);
+
+    // ── BƯỚC 1: QUÉT API TỌA ĐỘ ĐỂ LẤY PHÒNG ĐƯA VÀO HARDCODE GỐC ──
+    mapArray.forEach(item => {
+      // Hỗ trợ cả 2 dạng viết hoa và viết thường từ API trả về
+      const roomNumStr = item.Room_Number || item.room_number || item['Room_Number'] || item['room_number'] || "";
+      const roomNum = String(roomNumStr).trim();
+
+      // Bỏ qua phòng rỗng hoặc khu vực vệ sinh/hành lang
+      if (!roomNum || /LB|CR|WC/i.test(roomNum)) return;
+
+      // Phân tách (Ví dụ: "AD-206" -> Tòa: "AD", Phòng: "206")
+      const parts = roomNum.split('-');
+      if (parts.length >= 2) {
+        const bldCode = parts[0].toUpperCase().trim();
+        const roomCode = parts.slice(1).join('-').trim();
+
+        // CHỈ thêm phòng nếu Tòa nhà đó ĐÃ TỒN TẠI trong mảng BUILDINGS (Khóa chặt)
+        const targetBld = BUILDINGS.find(b => b.code === bldCode);
+        if (targetBld) {
+          if (!targetBld.rooms.includes(roomCode)) {
+            targetBld.rooms.push(roomCode);
+          }
+          // Tự động tính số tầng cao nhất
+          const floorNum = parseInt(roomCode.charAt(0));
+          if (!isNaN(floorNum) && floorNum > targetBld.floors) {
+            targetBld.floors = floorNum;
+          }
+        }
+      }
+    });
+
+    // Sắp xếp số phòng theo thứ tự tăng dần
+    BUILDINGS.forEach(bld => {
+      bld.rooms.sort(new Intl.Collator('en', { numeric: true, sensitivity: 'base' }).compare);
+    });
+
+    // ── BƯỚC 2: QUÉT API INFO ĐỂ LƯU THÔNG TIN CHI TIẾT ──
+    infoArray.forEach(row => {
+      let roomId = row.room_id || row.room_number || row.Room_Number || row['Number'];
+      if (roomId) {
+        roomId = String(roomId).trim();
+        sheetRoomData[roomId] = { 
+          room_id: roomId,
+          name_en: row.name_en || row.heading_1 || '',
+          name_vn: row.name_vn || row.heading_2 || '',
+          department: row.department || '__',
+          occupants: row.occupants || row.occupants_list || [],
+          area: row.area || '--',
+          height: row.height || row.unbounded_height || '--',
+          type: row.type || row.fm_room_type || 'Chưa phân loại',
+          function: row.function || row.fm_room_function || '__',
+          is_active: row.is_active !== undefined ? row.is_active : true,
+          ...row
+        };
+      }
+    });
+
+    isInfoLoaded = true;
+    console.log("✅ Đã trích xuất số phòng từ API Tọa độ vào các Tòa nhà!");
+
+    // Cập nhật ngay các thanh Dropdown trên giao diện
+    refreshBuildingDropdowns();
+
+  } catch (e) {
+    console.error("❌ Lỗi xử lý đồng bộ dữ liệu API:", e);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  🔍 TÌM KIẾM & HỆ THỐNG XỬ LÝ SỰ KIẾN
 // ═══════════════════════════════════════════════════════════════
 let searchDebounceTimer = null;
 
 function onSearchInput() {
   const query = searchInput.value.trim().toLowerCase();
-  
-  // Show/hide hint
   searchHint.style.display = query.length > 0 ? 'block' : 'none';
-  
-  // Clear previous timer
   clearTimeout(searchDebounceTimer);
   
   if (query.length === 0) {
     resetMap();
     return;
   }
-  
-  // Debounce search
-  searchDebounceTimer = setTimeout(() => {
-    performSearch(query);
-  }, 300);
+  searchDebounceTimer = setTimeout(() => performSearch(query), 300);
 }
 
 function handleSearchKey(e) {
   if (e.key === 'Enter') {
     e.preventDefault();
     const query = searchInput.value.trim().toLowerCase();
-    if (query.length > 0) {
-      performSearch(query);
-    }
+    if (query.length > 0) performSearch(query);
   }
 }
 
@@ -1386,26 +1410,18 @@ function clearSearch() {
 
 async function performSearch(query) {
   const normalizedQuery = query.trim().toLowerCase();
-  // Ensure room data is loaded before searching
-  if (!isInfoLoaded) {
-    await fetchRoomInfo();
-  }
+  if (!isInfoLoaded) await fetchRoomInfo();
 
-  
-  // ═══════════════════════════════════════════════════════════════
-  //  STEP 1: Building Search (Keep existing)
-  // ═══════════════════════════════════════════════════════════════
+  // BƯỚC 1: TÌM THEO TÊN TÒA NHÀ
   let foundBuilding = BUILDINGS.find(b => 
     b.code.toLowerCase().includes(normalizedQuery) || 
     b.name.toLowerCase().includes(normalizedQuery)
   );
   
   if (foundBuilding) {
-    // Select building
     selBuilding.value = foundBuilding.code;
     onBuildingChange(false);
     
-    // Highlight polygon
     if (polygonLayers[foundBuilding.code]) {
       if (selectedPolygon) selectedPolygon.setStyle(defaultPolyStyle);
       selectedPolygon = polygonLayers[foundBuilding.code];
@@ -1413,17 +1429,13 @@ async function performSearch(query) {
       lMap.flyToBounds(selectedPolygon.getBounds(), { padding:[50,50], duration:0.5 });
     }
     
-    // Check if room number
     const roomMatch = foundBuilding.rooms.find(r => r.toLowerCase().includes(normalizedQuery));
     if (roomMatch) {
-      // Auto-select floor if room starts with floor number
       const floorNum = roomMatch.charAt(0);
       const floorOpt = Array.from(selFloor.options).find(o => o.value === floorNum);
       if (floorOpt) {
         selFloor.value = floorNum;
         onFloorChange();
-        
-        // Auto-select room
         const roomOpt = Array.from(selRoom.options).find(o => o.value === roomMatch);
         if (roomOpt) {
           selRoom.value = roomMatch;
@@ -1431,7 +1443,6 @@ async function performSearch(query) {
         }
       }
     } else {
-      // Show building result
       bannerText.innerHTML = `📍 Đã tìm thấy: <strong>${foundBuilding.name}</strong>`;
       banner.classList.add('show');
       if (foundBuilding.code === 'AD') btnViewFloor.style.display = 'block';
@@ -1439,12 +1450,8 @@ async function performSearch(query) {
     return;
   }
   
-  // ═══════════════════════════════════════════════════════════════
-  //  STEP 2: Comprehensive Room Search across sheetRoomData (COMPLETE dataset)
-  // ═══════════════════════════════════════════════════════════════
+  // BƯỚC 2: TÌM CHI TIẾT THEO SỐ PHÒNG TRONG API
   let matchedRoom = null;
-  
-  // Search in sheetRoomData keys (the complete room list from API/CSV)
   if (sheetRoomData && Object.keys(sheetRoomData).length > 0) {
     for (const roomId of Object.keys(sheetRoomData)) {
       if (roomId.toLowerCase() === normalizedQuery || roomId.toLowerCase().includes(normalizedQuery)) {
@@ -1454,42 +1461,27 @@ async function performSearch(query) {
     }
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  //  STEP 3: Reverse-Engineering Location from matched room
-  // ═══════════════════════════════════════════════════════════════
   if (matchedRoom) {
-    let buildingCode = null;
-    let floorNumber = null;
-    
-    // Extract from room code itself (e.g., 'AD-301' -> AD, 3 or 'FC-202' -> FC, 2)
+    let buildingCode = null, floorNumber = null;
     const roomUpper = matchedRoom.toUpperCase();
     const bldMatch = roomUpper.match(/^([A-Z]+)-/);
     if (bldMatch) {
       buildingCode = bldMatch[1];
-      // Extract floor from room number (e.g., AD-301 -> 3, AD-2.LB1 -> 2, FC-202 -> 2)
       const numPart = roomUpper.replace(/^[A-Z]+-/, '');
       const floorMatch = numPart.match(/^(\d+)/);
-      if (floorMatch) {
-        floorNumber = floorMatch[1];
-      }
+      if (floorMatch) floorNumber = floorMatch[1];
     }
     
-    // Find the corresponding BUILDINGS entry
     const targetBuilding = BUILDINGS.find(b => b.code === buildingCode);
-    
     if (targetBuilding) {
-      // Step 4: Update UI - Auto-select building
       selBuilding.value = targetBuilding.code;
       onBuildingChange(false);
       
-      // Auto-select floor
       if (floorNumber) {
         const floorOpt = Array.from(selFloor.options).find(o => o.value === floorNumber);
         if (floorOpt) {
           selFloor.value = floorNumber;
           onFloorChange();
-          
-          // Auto-select room and render map
           const roomOpt = Array.from(selRoom.options).find(o => o.value === matchedRoom);
           if (roomOpt) {
             selRoom.value = matchedRoom;
@@ -1498,30 +1490,13 @@ async function performSearch(query) {
           }
         }
       }
-      
-      // Floor deduction failed or floor doesn't exist in dropdown
-      // Show banner with room info but no map navigation
-      bannerText.innerHTML = `🔍 Tìm thấy phòng: <strong>${matchedRoom}</strong> tại <strong>${targetBuilding.name}</strong> (Tầng ${floorNumber || 'không xác định'})`;
+      bannerText.innerHTML = `🔍 Tìm thấy phòng: <strong>${matchedRoom}</strong> tại <strong>${targetBuilding.name}</strong>`;
       banner.classList.add('show');
       if (targetBuilding.code === 'AD') btnViewFloor.style.display = 'block';
       return;
     }
-    
-    // Building code not found in BUILDINGS constant
-    bannerText.innerHTML = `⚠️ Tìm thấy phòng <strong>${matchedRoom}</strong> nhưng không tìm thấy bản đồ tương ứng`;
-    banner.classList.add('show');
-    banner.style.background = '#fff8e1';
-    banner.style.borderColor = '#ffa000';
-    setTimeout(() => {
-      banner.style.background = '';
-      banner.style.borderColor = '';
-    }, 3000);
-    return;
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  //  STEP 5: Not Found
-  // ═══════════════════════════════════════════════════════════════
   bannerText.innerHTML = `❌ Không tìm thấy kết quả cho "<strong>${searchInput.value}</strong>"`;
   banner.classList.add('show');
   banner.style.background = '#fff5f5';
@@ -1533,44 +1508,33 @@ async function performSearch(query) {
 }
 
 function resetMap() {
-  // Reset dropdowns
   selBuilding.value = '';
   selFloor.innerHTML = '<option value="">— Chọn Tầng —</option>';
   selRoom.innerHTML  = '<option value="">— Chọn số phòng —</option>';
   selFloor.disabled = true;
   selRoom.disabled  = true;
   
-  // Reset polygon highlight
   if (selectedPolygon) {
     selectedPolygon.setStyle(defaultPolyStyle);
     selectedPolygon = null;
   }
   
-  // Hide banner
   banner.classList.remove('show');
   btnViewFloor.style.display = 'none';
   mapWrap.classList.remove('has-result');
   
-  // Reset map view to global bounds
-  if (lMap && globalBounds) {
-    lMap.fitBounds(globalBounds, { animate: true, duration: 0.5 });
-  }
+  if (lMap && globalBounds) lMap.fitBounds(globalBounds, { animate: true, duration: 0.5 });
 }
 
 function onBuildingChange(fromMapClick = false) {
   const code = selBuilding.value;
-
-  // Highlight polygon trên map
   if (selectedPolygon) selectedPolygon.setStyle(defaultPolyStyle);
   if (code && polygonLayers[code]) {
     selectedPolygon = polygonLayers[code];
     selectedPolygon.setStyle(highlightPolyStyle);
-    if (!fromMapClick) {
-      lMap.flyToBounds(selectedPolygon.getBounds(), { padding:[50,50], duration:0.5 });
-    }
+    if (!fromMapClick) lMap.flyToBounds(selectedPolygon.getBounds(), { padding:[50,50], duration:0.5 });
   }
 
-  // Reset UI
   banner.classList.remove('show');
   selFloor.innerHTML = '<option value="">— Chọn Tầng —</option>';
   selRoom.innerHTML  = '<option value="">— Chọn số phòng —</option>';
@@ -1582,7 +1546,6 @@ function onBuildingChange(fromMapClick = false) {
   const bld = BUILDINGS.find(b => b.code === code);
   if (!bld) return;
 
-  // Điền dropdown tầng
   for (let f = 1; f <= bld.floors; f++) {
     const opt = document.createElement('option');
     opt.value = f;
@@ -1611,6 +1574,7 @@ function onFloorChange() {
   if (!bld) return;
 
   const prefix = String(floor);
+  // Hiển thị mảng phòng đã được đồng bộ từ API Tọa độ phía trên
   bld.rooms.forEach(r => {
     if (r.startsWith(prefix)) {
       const opt = document.createElement('option');
@@ -1651,11 +1615,8 @@ function doSearch() {
   if (code === 'AD') {
     btnViewFloor.style.display = 'block';
     if (floor) {
-      // Use the new async renderMap with Google Sheets integration
       renderMap('bld_ad', `bld_ad_f${floor}`, parseInt(floor));
-      if (room) {
-        setTimeout(() => rC(room.startsWith('AD-') ? room : `AD-${room}`), 500);
-      }
+      if (room) setTimeout(() => rC(room.startsWith('AD-') ? room : `AD-${room}`), 500);
     }
   }
 }
@@ -1670,192 +1631,9 @@ function goToFloorMap() {
   }
 }
 
-// Bridge function: Transition from Leaflet building map to indoor floor map
-function transitionToIndoorMap(bid, defaultFloor = 1) {
-  ST.bid = bid;
-  ST.flN = defaultFloor;
-  ST.fid = `${bid}_f${defaultFloor}`;
-  ST.fKey = `${bid}_f${defaultFloor}`;
-  
-  const b = BLDS.find(x => x.id === bid);
-  if (!b || !b.act) {
-    alert("Bản đồ chi tiết cho tòa nhà này đang được cập nhật!");
-    return;
-  }
-  
-  renderMap(bid, ST.fid, defaultFloor);
-}
-
 // ═══════════════════════════════════════════════════════════════
-//  📋 DỮ LIỆU TẦNG & PHÒNG (FLOOR_ROOMS mapping)
+//  RENDER BẢN ĐỒ TẦNG & GIAO DIỆN CHI TIẾT
 // ═══════════════════════════════════════════════════════════════
-const BLDS = [
-  {id:'bld_ad',name:'Admin Building',act:true,fl:6},
-  {id:'bld_lh',name:'Lecture Hall',act:false,fl:4},
-  {id:'bld_c1',name:'Cluster 1',act:false,fl:4},
-  {id:'bld_c2',name:'Cluster 2',act:false,fl:4},
-  {id:'bld_c3',name:'Cluster 3',act:false,fl:4},
-  {id:'bld_c5',name:'Cluster 5',act:false,fl:4},
-  {id:'bld_c6',name:'Cluster 6',act:false,fl:4},
-  {id:'bld_lb',name:'Library',act:false,fl:3},
-  {id:'bld_d1',name:'Dorm 1',act:false,fl:8},
-  {id:'bld_d2',name:'Dorm 2',act:false,fl:8},
-  {id:'bld_ct',name:'Canteen',act:false,fl:2},
-  {id:'bld_gh',name:'Guest House',act:false,fl:3},
-  {id:'bld_ch',name:'Ceremony Hall',act:false,fl:2},
-  {id:'bld_eh',name:'Exhibition Hall',act:false,fl:2},
-  {id:'bld_sh',name:'Sport Hall',act:false,fl:2}
-];
-const FLN = {bld_ad:['Tầng 1 — Bãi giữ xe','Tầng 2','Tầng 3','Tầng 4','Tầng 5','Tầng 6']};
-
-const FLOOR_ROOMS = {
-  'bld_ad_f1':['AD-101','AD-103','AD-104'],
-  'bld_ad_f2':['AD-201','AD-204','AD-205','AD-206','AD-207','AD-211','AD-212',
-    'AD-213','AD-214','AD-216','AD-217','AD-218','AD-219','AD-220','AD-224',
-    'AD-226','AD-228','AD-229','AD-230','AD-231','AD-232','AD-234','AD-235',
-    'AD-236','AD-237','AD-240','AD-241','AD-242','AD-243','AD-244','AD-245',
-    'AD-246','AD-247','AD-248','AD-249','AD-251',
-    'AD-2.LB1','AD-2.LB2','AD-2.LB3','AD-2.LB4','AD-2.LB5','AD-2.LB6','AD-2.LB7'],
-  'bld_ad_f3':["AD-301", "AD-304", "AD-305", "AD-306", "AD-307", "AD-308", "AD-309", "AD-310", "AD-311", "AD-312", "AD-313", "AD-314", "AD-315", "AD-316", "AD-317", "AD-318", "AD-319", "AD-320", "AD-321", "AD-322", "AD-323", "AD-324", "AD-325", "AD-326", "AD-327", "AD-328A", "AD-328B", "AD-329", "AD-330", "AD-331", "AD-332", "AD-335", "AD-336", "AD-337", "AD-338", "AD-339", "AD-340", "AD-341", "AD-342A", "AD-342B", "AD-343", "AD-344", "AD-345", "AD-346", "AD-347", "AD-348", "AD-349", "AD-350", "AD-351", "AD-353", "AD-355", "AD-356", "AD-357", "AD-358", "AD-359", "AD-362", "AD-363", "AD-364", "AD-365", "AD-366", "AD-367", "AD-368", "AD-369", "AD-370", "AD-371", "AD-372", "AD-373", "AD-376", "AD-377", "AD-378", "AD-379", "AD-380", "AD-381", "AD-382", "AD-383", "AD-384", "AD-385", "AD-386", "AD-387", "AD-388", "AD-389", "AD-390", "AD-391"],
-  'bld_ad_f4':["AD-401", "AD-403", "AD-404", "AD-405", "AD-407", "AD-410", "AD-411", "AD-412", "AD-414", "AD-416", "AD-417", "AD-418", "AD-419", "AD-420", "AD-422", "AD-423", "AD-424", "AD-425", "AD-426", "AD-427", "AD-428", "AD-429", "AD-430", "AD-431", "AD-432", "AD-435", "AD-436", "AD-437", "AD-438", "AD-439", "AD-440", "AD-441", "AD-442", "AD-443", "AD-444", "AD-446", "AD-447", "AD-448", "AD-449", "AD-450", "AD-451", "AD-453", "AD-454", "AD-455", "AD-456", "AD-459", "AD-460", "AD-462", "AD-463", "AD-464", "AD-465", "AD-466", "AD-467", "AD-468", "AD-469", "AD-470", "AD-471", "AD-472", "AD-473", "AD-474", "AD-475", "AD-478", "AD-479", "AD-480", "AD-481", "AD-482", "AD-483", "AD-484", "AD-485", "AD-486", "AD-487", "AD-488", "AD-489", "AD-490", "AD-491", "AD-492", "AD-493", "AD-495"],
-  'bld_ad_f5':["AD-501", "AD-504", "AD-505", "AD-507", "AD-508", "AD-510", "AD-511", "AD-512", "AD-513", "AD-514", "AD-515", "AD-516", "AD-517", "AD-518", "AD-519", "AD-520", "AD-522", "AD-523", "AD-524"],
-  'bld_ad_f6':['AD-601','AD-604','AD-605','AD-608','AD-609','AD-610',
-    'AD-611','AD-612','AD-613','AD-614','AD-615','AD-616','AD-617']
-};
-
-// ═══════════════════════════════════════════════════════════════
-//  🔗 DATA ENDPOINTS (Local JSON files - cached via Cron Job)
-// ═══════════════════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════════════════
-//  🔗 DATA ENDPOINTS (Local JSON files - cached via Cron Job)
-// ═══════════════════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════════════════
-//  🔗 DATA ENDPOINTS (Local JSON files - cached via Cron Job)
-// ═══════════════════════════════════════════════════════════════
-const API_MAP = "./map_data.json";
-const API_INFO = "./info_data.json";
-const API_DRIVE_LIST = "./drive_data.json";
-
-let sheetRoomData = {};
-let driveImages = {};
-let isInfoLoaded = false;
-let isDataInitializationComplete = false;
-
-async function loadDriveImages() {
-  try {
-    const response = await fetch(API_DRIVE_LIST);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    driveImages = await response.json();
-    console.log("✅ Đã tải danh sách ảnh từ Drive:", driveImages);
-  } catch (e) { 
-    console.error("❌ Lỗi kết nối Drive Images:", e.message);
-  }
-}
-
-// Tự động nạp dữ liệu ngay khi mở trang
-(async function initializeData() {
-  try {
-    await Promise.all([loadDriveImages(), fetchRoomInfo()]);
-    isDataInitializationComplete = true;
-    console.log("✅ Hoàn tất đồng bộ dữ liệu API lên giao diện");
-  } catch (e) {
-    console.error("❌ Lỗi khởi tạo dữ liệu:", e);
-    isDataInitializationComplete = false;
-  }
-})();
-
-// Biến lưu trữ API Tọa độ (Bạn thay bằng URL API thực tế của bạn)
-const API_COORDS = "./map_data.json"; 
-
-async function fetchRoomInfo() {
-  if (isInfoLoaded) return; 
-  try {
-    // 1. TẢI CẢ 2 API SONG SONG: API Tọa độ (để lấy danh sách phòng thực) và API Info
-    const [coordsRes, infoRes] = await Promise.all([
-      fetch(API_COORDS),
-      fetch(API_INFO)
-    ]);
-
-    if (!coordsRes.ok) throw new Error(`HTTP Coords ${coordsRes.status}`);
-    if (!infoRes.ok) throw new Error(`HTTP Info ${infoRes.status}`);
-
-    const rawCoords = await coordsRes.json();
-    const rawInfo = await infoRes.json();
-
-    const coordsArray = Array.isArray(rawCoords) ? rawCoords : (rawCoords.data || rawCoords.items || []);
-    const infoArray = Array.isArray(rawInfo) ? rawInfo : (rawInfo.data || rawInfo.items || []);
-
-    // ═══════════════════════════════════════════════════════════════
-    //  LOGIC 1: ĐỒNG BỘ DANH SÁCH PHÒNG TỪ API TỌA ĐỘ VÀO HARDCODE
-    // ═══════════════════════════════════════════════════════════════
-    coordsArray.forEach(item => {
-      const roomNumStr = item.Room_Number || item.room_number || "";
-      const roomNum = String(roomNumStr).trim();
-      
-      // Bỏ qua các phòng trống hoặc khu công cộng (LB, CR, WC) không cần hiện ở search bar
-      if (!roomNum || /LB|CR|WC/i.test(roomNum)) return;
-
-      // Phân tách mã phòng (Ví dụ: "AD-206" -> Tòa: "AD", Phòng: "206")
-      const parts = roomNum.split('-');
-      if (parts.length >= 2) {
-        const bldCode = parts[0].toUpperCase().trim();
-        const roomCode = parts.slice(1).join('-').trim();
-
-        // CHỈ ĐỐI CHIẾU VỚI DANH SÁCH TÒA HARDCODE GỐC
-        const targetBld = BUILDINGS.find(b => b.code === bldCode);
-        
-        // Nếu Tòa nhà có trong hardcode và phòng đó chưa được thêm vào mảng -> Thêm vào
-        if (targetBld && !targetBld.rooms.includes(roomCode)) {
-          targetBld.rooms.push(roomCode);
-          
-          // Tự động cập nhật số tầng (floors) nếu phát hiện đầu số phòng lớn hơn floors hiện tại
-          const detectedFloor = parseInt(roomCode.charAt(0));
-          if (!isNaN(detectedFloor) && detectedFloor > targetBld.floors) {
-            targetBld.floors = detectedFloor;
-          }
-        }
-      }
-    });
-
-    // Sắp xếp lại danh sách phòng của từng tòa theo thứ tự tự nhiên (101 -> 102 -> 201)
-    BUILDINGS.forEach(bld => {
-      bld.rooms.sort(new Intl.Collator('en', { numeric: true, sensitivity: 'base' }).compare);
-    });
-
-    // ═══════════════════════════════════════════════════════════════
-    //  LOGIC 2: LƯU TRỮ THÔNG TIN CHI TIẾT PHÒNG TỪ API INFO (Giữ nguyên)
-    // ═══════════════════════════════════════════════════════════════
-    infoArray.forEach(row => {
-      let roomId = row.room_id || row.room_number || row.Room_Number || row['Number'];
-      if (roomId) {
-        roomId = String(roomId).trim();
-        sheetRoomData[roomId] = { 
-          room_id: roomId,
-          name_en: row.name_en || row.heading_1 || '',
-          name_vn: row.name_vn || row.heading_2 || '',
-          department: row.department || '__',
-          occupants: row.occupants || row.occupants_list || [],
-          area: row.area || '--',
-          height: row.height || row.unbounded_height || '--',
-          type: row.type || row.fm_room_type || 'Chưa phân loại',
-          function: row.function || row.fm_room_function || '__',
-          is_active: row.is_active !== undefined ? row.is_active : true,
-          ...row
-        };
-      }
-    });
-
-    isInfoLoaded = true;
-    console.log("✅ Đã cập nhật mảng Hardcode gốc thành công từ API Tọa độ!");
-
-    // Cập nhật lại giao diện Dropdown để hiển thị ngay số phòng mới
-    refreshBuildingDropdowns();
-
-  } catch (e) {
-    console.error("❌ Lỗi nạp dữ liệu đồng bộ:", e);
-  }
-}
-
 async function loadMapFromSheets(fid) {
   try {
     const [mapResponse] = await Promise.all([
@@ -1873,8 +1651,11 @@ async function loadMapFromSheets(fid) {
     const floorPrefix = `AD-${fNum}`; 
 
     const floorData = dataArray.filter(item => {
-      if (!item.Room_Number) return false;
-      let rn = item.Room_Number;
+      // Hỗ trợ tương thích đa định dạng từ Google Sheets API
+      const rnStr = item.Room_Number || item.room_number || item['Room_Number'] || item['room_number'] || "";
+      let rn = String(rnStr).trim();
+      if (!rn) return false;
+      
       if (rn.startsWith(floorPrefix)) return true;
       if (/^(LB|CR|WC)/i.test(rn)) {
         if (rn.includes(floorPrefix)) return true;
@@ -1889,7 +1670,8 @@ async function loadMapFromSheets(fid) {
     let minMapX = Infinity, minMapY = Infinity, maxMapX = -Infinity, maxMapY = -Infinity;
 
     floorData.forEach(d => {
-      let rNum = d.Room_Number;
+      const rNumStr = d.Room_Number || d.room_number || d['Room_Number'] || d['room_number'] || "";
+      let rNum = String(rNumStr).trim();
       if (!rooms[rNum]) {
         rooms[rNum] = { paths: [], minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
       }
@@ -1908,21 +1690,15 @@ async function loadMapFromSheets(fid) {
       maxMapY = Math.max(maxMapY, sy, ey);
     });
 
-    // ═══════════════════════════════════════════════════════════════
-    // TRUE-TO-SCALE PROPORTIONS — Uniform scale for X and Y axes
-    // ═══════════════════════════════════════════════════════════════
     let mapWidth = maxMapX - minMapX;
     let mapHeight = maxMapY - minMapY;
     
-    // Add uniform padding (5% on each side)
     let padX = mapWidth * 0.05;
     let padY = mapHeight * 0.05;
     
-    // Calculate padded dimensions
     let paddedWidth = mapWidth + padX * 2;
     let paddedHeight = mapHeight + padY * 2;
     
-    // Use a base viewBox width and calculate height using the SAME scale
     let vbW = 1000;
     let uniformScale = vbW / paddedWidth;
     let vbH = paddedHeight * uniformScale;
@@ -1959,7 +1735,6 @@ async function loadMapFromSheets(fid) {
       let strokeW = Math.max(vbW * 0.0008, 0.4);
 
       const BCAT={'AD-501':'large','AD-507':'large','AD-201':'hall','AD-247':'large','AD-248':'large','AD-251':'large','AD-101':'large','AD-601':'large','AD-609':'large','AD-614':'large'};
-
       const isBackground = /^(LB|CR|WC)/i.test(roomNum);
       
       let fillColor = "#e8edf8", strokeColor = "#7a8fb8";
@@ -1981,14 +1756,30 @@ async function loadMapFromSheets(fid) {
     svgContent += backgroundLayer.join('') + interactiveLayer.join('');
     return svgContent + `</svg>`;
   } catch (e) {
-    console.error("❌ Lỗi vẽ bản đồ: ", e);
+    console.error("❌ Lỗi dựng bản đồ SVG:", e);
     return null;
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  🚪 ĐIỀU HƯỚNG TRANG & HIỂN THỊ
-// ═══════════════════════════════════════════════════════════════
+const BLDS = [
+  {id:'bld_ad',name:'Admin Building',act:true,fl:6},
+  {id:'bld_lh',name:'Lecture Hall',act:false,fl:4},
+  {id:'bld_c1',name:'Cluster 1',act:false,fl:4},
+  {id:'bld_c2',name:'Cluster 2',act:false,fl:4},
+  {id:'bld_c3',name:'Cluster 3',act:false,fl:4},
+  {id:'bld_c5',name:'Cluster 5',act:false,fl:4},
+  {id:'bld_c6',name:'Cluster 6',act:false,fl:4},
+  {id:'bld_lb',name:'Library',act:false,fl:3},
+  {id:'bld_d1',name:'Dorm 1',act:false,fl:8},
+  {id:'bld_d2',name:'Dorm 2',act:false,fl:8},
+  {id:'bld_ct',name:'Canteen',act:false,fl:2},
+  {id:'bld_gh',name:'Guest House',act:false,fl:3},
+  {id:'bld_ch',name:'Ceremony Hall',act:false,fl:2},
+  {id:'bld_eh',name:'Exhibition Hall',act:false,fl:2},
+  {id:'bld_sh',name:'Sport Hall',act:false,fl:2}
+];
+const FLN = {bld_ad:['Tầng 1 — Bãi giữ xe','Tầng 2','Tầng 3','Tầng 4','Tầng 5','Tầng 6']};
+
 let ST = {bid:'',fid:'',flN:0,fKey:'',rid:'',rd:null,tab:'2D'};
 let isMapInitialized = false;
 
@@ -1999,20 +1790,15 @@ function show(id) {
 }
 
 function gH() {
-  console.log("Navigating to Home View...");
-  try {
-    show('pg-h');
-    setTimeout(() => {
-      if (!isMapInitialized) {
-        initLeafletMap();
-        isMapInitialized = true;
-      } else {
-        if (lMap) lMap.invalidateSize();
-      }
-    }, 50);
-  } catch (e) {
-    console.error("❌ Lỗi khi chuyển sang Home View:", e);
-  }
+  show('pg-h');
+  setTimeout(() => {
+    if (!isMapInitialized) {
+      initLeafletMap();
+      isMapInitialized = true;
+    } else {
+      if (lMap) lMap.invalidateSize();
+    }
+  }, 50);
 }
 
 function gM() {
@@ -2035,95 +1821,59 @@ async function renderMap(bid, fid, n) {
     show('pg-m');
 
     const sheetSvg = await loadMapFromSheets(fid);
-    
     if (sheetSvg) {
       out.innerHTML = sheetSvg;
     } else {
       out.innerHTML = `<svg viewBox="0 0 800 280" style="width:100%;height:auto;display:block">
         <rect width="800" height="280" fill="#edf0f8"/>
-        <rect x="20" y="20" width="760" height="240" fill="none" stroke="#8fa0c0" stroke-width="1.5" rx="4"/>
-        <text x="400" y="140" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="14" fill="#8896a8">Dữ liệu trên sheet trống hoặc sai cấu trúc cho ${fn}</text>
+        <text x="400" y="140" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="14" fill="#8896a8">Dữ liệu bản đồ đang được cập nhật cho ${fn}</text>
       </svg>`;
     }
   } catch (e) {
-    console.error("❌ Lỗi khi render bản đồ:", e);
-    const out = document.getElementById('mout');
-    if (out) {
-      out.innerHTML = `<svg viewBox="0 0 800 280" style="width:100%;height:auto;display:block">
-        <rect width="800" height="280" fill="#fff5f5"/>
-        <rect x="20" y="20" width="760" height="240" fill="none" stroke="#e53e3e" stroke-width="1.5" rx="4"/>
-        <text x="400" y="130" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="14" fill="#e53e3e" font-weight="600">Không thể tải bản đồ</text>
-        <text x="400" y="155" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif" font-size="11" fill="#718096">Vui lòng thử lại sau</text>
-      </svg>`;
-    }
+    console.error("❌ Lỗi khi render bản đồ tầng:", e);
   }
 }
 
 function getRD(rid) {
   const trimmedRid = String(rid).trim();
-  let roomInfo = null;
-  
-  // Tìm kiếm thông tin phòng trong bộ nhớ đệm (API)
-  if (sheetRoomData[trimmedRid]) {
-    roomInfo = sheetRoomData[trimmedRid];
-  } else {
+  let roomInfo = sheetRoomData[trimmedRid];
+  if (!roomInfo) {
     for (const key of Object.keys(sheetRoomData)) {
-      const trimmedKey = String(key).trim();
-      if (trimmedKey === trimmedRid) {
-        roomInfo = sheetRoomData[key];
-        break;
-      }
+      if (String(key).trim() === trimmedRid) { roomInfo = sheetRoomData[key]; break; }
     }
   }
   
-  // NẾU TÌM THẤY TRONG API: Hiển thị đầy đủ thông tin
   if (roomInfo) {
     let occupancy = '__';
-    
-    if (roomInfo.occupants_list && Array.isArray(roomInfo.occupants_list) && roomInfo.occupants_list.length > 0) {
-      occupancy = roomInfo.occupants_list.join(', ');
-    } else if (roomInfo.occupant_display && roomInfo.occupant_display.trim() !== "") {
-      occupancy = roomInfo.occupant_display;
-    } else if (roomInfo.occupants && Array.isArray(roomInfo.occupants) && roomInfo.occupants.length > 0) {
+    if (roomInfo.occupants && Array.isArray(roomInfo.occupants) && roomInfo.occupants.length > 0) {
       occupancy = roomInfo.occupants.join(', ');
-    } else if (roomInfo.staffList && roomInfo.staffList.length > 0) {
-      occupancy = roomInfo.staffList.join(', ');
+    } else if (roomInfo.occupants_list && Array.isArray(roomInfo.occupants_list) && roomInfo.occupants_list.length > 0) {
+      occupancy = roomInfo.occupants_list.join(', ');
     }
 
-    let rawEquip = roomInfo.equipment || roomInfo['Equipment'] || roomInfo['Thiết bị'] || '';
+    let rawEquip = roomInfo.equipment || roomInfo['Equipment'] || '';
     let equipArray = rawEquip ? String(rawEquip).split(',').map(e => e.trim()) : [];
 
     return {
-      name: roomInfo.name_vn || roomInfo.heading_2 || roomInfo['Room: Name'] || roomInfo.name_en || roomInfo.heading_1 || `Phòng ${trimmedRid}`,
-      owner: roomInfo.department || roomInfo.Department || '__', 
+      name: roomInfo.name_vn || roomInfo.heading_2 || roomInfo.name_en || roomInfo.heading_1 || `Phòng ${trimmedRid}`,
+      owner: roomInfo.department || '__', 
       occupancy: occupancy, 
-      area: roomInfo.area || roomInfo['Room: Area'] || '--', 
-      height: roomInfo.unbounded_height || roomInfo.height || roomInfo['Abound height'] || '--',
-      type: roomInfo.fm_room_type || roomInfo.type || roomInfo.FM_Room_Type || roomInfo['FM_Room_Type'] || 'Chưa phân loại',
-      cap: roomInfo.capacity || roomInfo.Capacity || '--', 
-      func: roomInfo.fm_room_function || roomInfo.function || roomInfo.Function || '__',
+      area: roomInfo.area || '--', 
+      height: roomInfo.height || '--',
+      type: roomInfo.type || 'Chưa phân loại',
+      cap: roomInfo.capacity || '--', 
+      func: roomInfo.function || '__',
       equip: equipArray,
       status: roomInfo.is_active !== false ? 'Hoạt động' : 'Không hoạt động'
     };
   }
   
-  // NẾU KHÔNG TÌM THẤY TRONG API: Hiển thị trạng thái "Đang cập nhật"
   return {
-    name: `Phòng ${trimmedRid}`, 
-    owner: 'Thông tin đang cập nhật...', 
-    occupancy: 'Thông tin đang cập nhật...', 
-    area: '--', 
-    height: '--',
-    type: 'Đang cập nhật', 
-    cap: '--', 
-    func: 'Hệ thống đang đồng bộ dữ liệu từ Google Sheets...', 
-    equip: ['Dữ liệu thiết bị đang được cập nhật'], 
-    status: 'Đang chờ đồng bộ'
+    name: `Phòng ${trimmedRid}`, owner: 'Đang cập nhật...', occupancy: 'Đang cập nhật...', 
+    area: '--', height: '--', type: 'Đang cập nhật', cap: '--', func: 'Đang đồng bộ Sheets...', 
+    equip: [], status: 'Đang chờ đồng bộ'
   };
 }
-
-const BCAT = {'AD-501':'large','AD-507':'large','AD-201':'hall','AD-247':'large','AD-248':'large','AD-251':'large','AD-101':'large','AD-601':'large','AD-609':'large','AD-614':'large'};
-const BTXT = { office:['#e8eef9','#002554'], hall:['#e8edff','#001060'], large:['#e6f5ec','#083a18'], lb:['#fff3e6','#7a4800'] };
 
 function rC(rid) {
   ST.rid = rid; ST.tab = '2D';
@@ -2139,15 +1889,10 @@ function rC(rid) {
   document.getElementById('row2').textContent = rd.owner; 
   document.getElementById('rocc').textContent = rd.occupancy; 
   document.getElementById('rhgt').textContent = rd.height; 
-  
   document.getElementById('rbdg').textContent = rd.type;
   
-  const BTXT={
-    office:['#e8eef9','#002554'],hall:['#e8edff','#001060'],
-    large:['#e6f5ec','#083a18'],lb:['#fff3e6','#7a4800']
-  };
-  const tc = String(rd.type).toLowerCase().includes('office') ? 'office' : 
-             String(rd.type).toLowerCase().includes('hội trường') ? 'hall' : 'large';
+  const BTXT={ office:['#e8eef9','#002554'], hall:['#e8edff','#001060'], large:['#e6f5ec','#083a18'], lb:['#fff3e6','#7a4800'] };
+  const tc = String(rd.type).toLowerCase().includes('office') ? 'office' : String(rd.type).toLowerCase().includes('hội trường') ? 'hall' : 'large';
   
   document.getElementById('rbdg').style.background = BTXT[tc] ? BTXT[tc][0] : '#e8eef9';
   document.getElementById('rbdg').style.color = BTXT[tc] ? BTXT[tc][1] : '#002554';
@@ -2174,42 +1919,25 @@ function sT(tab, rd) {
   document.getElementById('t3d').classList.toggle('on', tab === '3D');
   const f = document.getElementById('ifr');
 
-  // Robust Image ID Lookup with sanitization
   const sanitizedRid = ST.rid.trim().toUpperCase();
   let imageId = driveImages[sanitizedRid];
-
-  // Fallback: iterate through entries to handle hidden whitespace/characters
-  if (imageId === undefined) {
+  if (!imageId) {
     for (const [key, value] of Object.entries(driveImages)) {
-      if (key.trim().toUpperCase() === sanitizedRid) {
-        imageId = value;
-        break;
-      }
+      if (key.trim().toUpperCase() === sanitizedRid) { imageId = value; break; }
     }
   }
 
   if (tab === '2D') {
     if (imageId) {
       f.style.background = '#fff';
-      f.innerHTML = `<img src="https://drive.google.com/thumbnail?id=${imageId}&sz=w1000" 
-                          style="width:100%; height:100%; object-fit:contain; display:block; padding: 4px;" 
-                          alt="Sơ đồ ${ST.rid}"
-                          onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\\'text-align:center;padding:22px 14px\\'><div style=\\'font-size:42px;margin-bottom:10px\\'>🖼️</div><div style=\\'font-size:13px;font-weight:700;color:#002554;margin-bottom:3px\\'>Ảnh không khả dụng</div><div style=\\'font-size:11px;color:#8896a8\\'>${ST.rid} — Quyền truy cập Google Drive bị hạn chế</div></div>';">`;
+      f.innerHTML = `<img src="https://drive.google.com/thumbnail?id=${imageId}&sz=w1000" style="width:100%; height:100%; object-fit:contain; display:block; padding: 4px;" alt="Sơ đồ ${ST.rid}">`;
     } else {
       f.style.background = '#e8eef9';
-      f.innerHTML = `<div style="text-align:center;padding:22px 14px">
-        <div style="font-size:42px;margin-bottom:10px">📐</div>
-        <div style="font-size:13px;font-weight:700;color:#002554;margin-bottom:3px">Sơ đồ mặt bằng 2D</div>
-        <div style="font-size:11px;color:#8896a8;margin-bottom:10px">Đang chờ cập nhật ảnh cho ${ST.rid}</div>
-      </div>`;
+      f.innerHTML = `<div style="text-align:center;padding:22px 14px"><div style="font-size:42px;margin-bottom:10px">📐</div><div style="font-size:13px;font-weight:700;color:#002554;margin-bottom:3px">Sơ đồ mặt bằng 2D</div><div style="font-size:11px;color:#8896a8">Đang chờ cập nhật ảnh cho ${ST.rid}</div></div>`;
     }
   } else {
     f.style.background = '#fff3e6';
-    f.innerHTML = `<div style="text-align:center;padding:22px 14px">
-      <div style="font-size:42px;margin-bottom:10px">🏛</div>
-      <div style="font-size:13px;font-weight:700;color:#002554;margin-bottom:3px">Phối cảnh 3D</div>
-      <div style="font-size:11px;color:#8896a8;margin-bottom:10px">${ST.rid} — ${rd.name}</div>
-    </div>`;
+    f.innerHTML = `<div style="text-align:center;padding:22px 14px"><div style="font-size:42px;margin-bottom:10px">🏛</div><div style="font-size:13px;font-weight:700;color:#002554;margin-bottom:3px">Phối cảnh 3D</div><div style="font-size:11px;color:#8896a8">${ST.rid} — ${rd.name}</div></div>`;
   }
 }
 </script>
