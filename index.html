@@ -1347,41 +1347,11 @@ async function fetchRoomInfo() {
 
     // ── BƯỚC 2: QUÉT API INFO ĐỂ LƯU THÔNG TIN CHI TIẾT (ĐÃ CHUẨN HÓA) ──
     infoArray.forEach(row => {
-      // Quét linh hoạt mọi định dạng ID phòng mà API có thể nhả về
-      let roomId = row.room_id || row.room_number || row.Room_Number || row['Number'];
-      if (roomId) {
-        roomId = String(roomId).trim();
-        
-        // Trích xuất dải người sử dụng (Hỗ trợ cả chuỗi Flat và mảng Array)
-        let occupancyData = [];
-        if (Array.isArray(row.occupants)) {
-          occupancyData = row.occupants;
-        } else if (Array.isArray(row.occupants_list)) {
-          occupancyData = row.occupants_list;
-        } else if (row.occupant || row.FM_Staff_Name) {
-          // Cắt chuỗi nếu API trả về dạng Flat Text
-          const rawOcc = String(row.occupant || row.FM_Staff_Name || "");
-          occupancyData = rawOcc.split(/,|\n/).map(s => s.trim()).filter(s => s !== "");
-        }
-
-        // Áp dụng gán giá trị với bộ quét bao quát toàn bộ Header cũ và mới
-        sheetRoomData[roomId] = { 
-          room_id: roomId,
-          name_en: row.name_en || row.Name || row['Room: Name'] || '',
-          name_vn: row.name_vn || row['Tên phòng'] || row.heading_2 || '',
-          department: row.department || row.Department || '__',
-          occupants: occupancyData,
-          area: row.area || row.Area || row['Room: Area'] || '--',
-          height: row.height || row.Height || row['Abound height'] || '--',
-          type: row.type || row.FM_Room_Type || 'Chưa phân loại',
-          function: row.function || row.FM_Room_Function || row.Function || '__',
-          is_active: row.is_active !== undefined ? row.is_active : true,
-          // Bổ sung luồng thiết bị nếu có
-          equipment: row.equipment || row.Equipment || row['Thiết bị'] || '',
-          ...row
-        };
-      }
-    });
+  let roomId = row.room_number || row.room_id; // Đã chuẩn hóa thành room_number
+  if (roomId) {
+    sheetRoomData[String(roomId).trim()] = row; 
+  }
+});
 
     isInfoLoaded = true;
     console.log("✅ Đã trích xuất số phòng từ API Tọa độ vào các Tòa nhà!");
@@ -1891,6 +1861,8 @@ async function renderMap(bid, fid, n) {
 function getRD(rid) {
   const trimmedRid = String(rid).trim();
   let roomInfo = sheetRoomData[trimmedRid];
+  
+  // Quét linh hoạt theo đối tượng trả về
   if (!roomInfo) {
     for (const key of Object.keys(sheetRoomData)) {
       if (String(key).trim() === trimmedRid) { roomInfo = sheetRoomData[key]; break; }
@@ -1898,21 +1870,20 @@ function getRD(rid) {
   }
   
   if (roomInfo) {
-    // Mảng occupants đã được gộp gọn gàng từ backend
-    let occupancy = '__';
-    if (roomInfo.occupants && Array.isArray(roomInfo.occupants) && roomInfo.occupants.length > 0) {
-      occupancy = roomInfo.occupants.join(', ');
-    }
+    // Ưu tiên hiển thị Tiên Tiếng Việt (heading_2) trước, nếu không có nhả Tiếng Anh (heading_1)
+    const roomName = roomInfo.heading_2 && roomInfo.heading_2 !== "___" ? roomInfo.heading_2 : 
+                    (roomInfo.heading_1 && roomInfo.heading_1 !== "___" ? roomInfo.heading_1 : `Phòng ${trimmedRid}`);
 
     return {
-      name: roomInfo.name_vn || roomInfo.name_en || `Phòng ${trimmedRid}`,
+      name: roomName,
       department: roomInfo.department || '__', 
-      occupancy: occupancy, 
+      // Chuỗi hiển thị nhân viên đã gộp sẵn sạch sẽ từ Backend
+      occupancy: roomInfo.occupant_display || '__', 
       area: roomInfo.area || '--', 
-      height: roomInfo.height || '--',
-      type: roomInfo.type || '--',
+      height: roomInfo.height || roomInfo.unbounded_height || '--',
+      type: roomInfo.fm_room_type || '--',
       cap: roomInfo.capacity || '--', 
-      func: roomInfo.function || '--',
+      func: roomInfo.fm_room_function || '--',
       status: roomInfo.status || 'Hoạt động'
     };
   }
