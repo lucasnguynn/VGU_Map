@@ -306,7 +306,8 @@ input.c1-select::-webkit-search-cancel-button { display: none; }
 .ib{margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--gl)}
 .ib:last-child{border-bottom:none;margin-bottom:0}
 .il{font-size:10px;font-weight:700;color:var(--or);letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px}
-.iv{font-size:13px;color:var(--bl);line-height:1.5}
+/* ── THÊM THUỘC TÍNH NÀY CHO LỚP .iv ĐỂ TỰ ĐỘNG XUỐNG DÒNG ── */
+.iv{font-size:13px;color:var(--bl);line-height:1.6;white-space:pre-line}
 .eq{display:flex;flex-direction:column;gap:4px}
 .ei{font-size:12px;color:var(--bl);padding:6px 10px;background:#f5f7fb;border-radius:3px;border-left:3px solid var(--or)}
 .nb{display:flex;gap:7px;flex-wrap:wrap;margin-top:16px}
@@ -860,7 +861,7 @@ V9;6;Line;25928.25;-6731.10;26066.02;-6731.10;137.77
 V9;6;Line;26066.02;-6731.10;30928.95;-6731.10;4862.94
 V9;6;Line;30928.95;-6731.10;30928.95;-10561.54;3830.44
 V9;6;Line;30928.95;-10561.54;27008.67;-10561.54;3920.29
-V9;6;Line;27008.67;-10561.54;27008.67;-17609.05;7047.51
+V9;6;Line;27008.67;-10561.54;27008.67;-10561.54;3920.29
 V9;6;Line;27008.67;-17609.05;25928.25;-17609.05;1080.42
 V9;6;Line;25928.25;-17609.05;25928.25;-10541.07;7067.98
 V9;6;Line;25928.25;-10541.07;25928.25;-6868.87;3672.20
@@ -1295,7 +1296,6 @@ async function loadDriveImages() {
 async function fetchRoomInfo() {
   if (isInfoLoaded) return; 
   try {
-    // Gọi song song API vẽ tọa độ (lấy số phòng thực tế) và API Info
     const [mapRes, infoRes] = await Promise.all([
       fetch(API_MAP),
       fetch(API_INFO)
@@ -1310,28 +1310,22 @@ async function fetchRoomInfo() {
     const mapArray = Array.isArray(rawMapData) ? rawMapData : (rawMapData.data || rawMapData.items || []);
     const infoArray = Array.isArray(rawInfoData) ? rawInfoData : (rawInfoData.data || rawInfoData.items || []);
 
-    // ── BƯỚC 1: QUÉT API TỌA ĐỘ ĐỂ LẤY PHÒNG ĐƯA VÀO HARDCODE GỐC ──
     mapArray.forEach(item => {
-      // Hỗ trợ cả 2 dạng viết hoa và viết thường từ API trả về
       const roomNumStr = item.Room_Number || item.room_number || item['Room_Number'] || item['room_number'] || "";
       const roomNum = String(roomNumStr).trim();
 
-      // Bỏ qua phòng rỗng hoặc khu vực vệ sinh/hành lang
       if (!roomNum || /LB|CR|WC/i.test(roomNum)) return;
 
-      // Phân tách (Ví dụ: "AD-206" -> Tòa: "AD", Phòng: "206")
       const parts = roomNum.split('-');
       if (parts.length >= 2) {
         const bldCode = parts[0].toUpperCase().trim();
         const roomCode = parts.slice(1).join('-').trim();
 
-        // CHỈ thêm phòng nếu Tòa nhà đó ĐÃ TỒN TẠI trong mảng BUILDINGS (Khóa chặt)
         const targetBld = BUILDINGS.find(b => b.code === bldCode);
         if (targetBld) {
           if (!targetBld.rooms.includes(roomCode)) {
             targetBld.rooms.push(roomCode);
           }
-          // Tự động tính số tầng cao nhất
           const floorNum = parseInt(roomCode.charAt(0));
           if (!isNaN(floorNum) && floorNum > targetBld.floors) {
             targetBld.floors = floorNum;
@@ -1340,23 +1334,20 @@ async function fetchRoomInfo() {
       }
     });
 
-    // Sắp xếp số phòng theo thứ tự tăng dần
     BUILDINGS.forEach(bld => {
       bld.rooms.sort(new Intl.Collator('en', { numeric: true, sensitivity: 'base' }).compare);
     });
 
-    // ── BƯỚC 2: QUÉT API INFO ĐỂ LƯU THÔNG TIN CHI TIẾT (ĐÃ CHUẨN HÓA) ──
     infoArray.forEach(row => {
-  let roomId = row.room_number || row.room_id; // Đã chuẩn hóa thành room_number
-  if (roomId) {
-    sheetRoomData[String(roomId).trim()] = row; 
-  }
-});
+      let roomId = row.room_number || row.room_id; 
+      if (roomId) {
+        sheetRoomData[String(roomId).trim()] = row; 
+      }
+    });
 
     isInfoLoaded = true;
     console.log("✅ Đã trích xuất số phòng từ API Tọa độ vào các Tòa nhà!");
 
-    // Cập nhật ngay các thanh Dropdown trên giao diện
     refreshBuildingDropdowns();
 
   } catch (e) {
@@ -1400,7 +1391,6 @@ async function performSearch(query) {
   const normalizedQuery = query.trim().toLowerCase();
   if (!isInfoLoaded) await fetchRoomInfo();
 
-  // BƯỚC 1: TÌM THEO TÊN TÒA NHÀ
   let foundBuilding = BUILDINGS.find(b => 
     b.code.toLowerCase().includes(normalizedQuery) || 
     b.name.toLowerCase().includes(normalizedQuery)
@@ -1438,7 +1428,6 @@ async function performSearch(query) {
     return;
   }
   
-  // BƯỚC 2: TÌM CHI TIẾT THEO SỐ PHÒNG TRONG API
   let matchedRoom = null;
   if (sheetRoomData && Object.keys(sheetRoomData).length > 0) {
     for (const roomId of Object.keys(sheetRoomData)) {
@@ -1562,7 +1551,6 @@ function onFloorChange() {
   if (!bld) return;
 
   const prefix = String(floor);
-  // Hiển thị mảng phòng đã được đồng bộ từ API Tọa độ phía trên
   bld.rooms.forEach(r => {
     if (r.startsWith(prefix)) {
       const opt = document.createElement('option');
@@ -1635,7 +1623,6 @@ async function loadMapFromSheets(fid) {
     let dataArray = Array.isArray(rawMapData) ? rawMapData : (rawMapData.data || rawMapData.items || []);
     if (!dataArray || dataArray.length === 0) return null;
 
-    // Bóc tách thông tin Tòa và Tầng từ fid (Ví dụ: 'bld_ad_f6' -> Tòa AD, Tầng 6)
     const bldInternalId = fid.split('_f')[0]; 
     const fNum = fid.split('_f')[1]; 
     
@@ -1646,12 +1633,10 @@ async function loadMapFromSheets(fid) {
     }
     const floorPrefix = `${targetBldCode}-${fNum}`; 
 
-    // ── BƯỚC 1: QUÉT TÌM BIÊN TOÀN TÒA (LÀM MỐC X, Y CHUNG) ──
     let globalMinX = Infinity, globalMinY = Infinity;
     let globalMaxX = -Infinity, globalMaxY = -Infinity;
     let hasBuildingData = false;
 
-    // Quét toàn bộ file để lấy biên độ chuẩn của tất cả các tầng gộp lại
     dataArray.forEach(d => {
       const rnStr = d.Room_Number || d.room_number || d['Room_Number'] || d['room_number'] || "";
       const rn = String(rnStr).trim();
@@ -1670,23 +1655,19 @@ async function loadMapFromSheets(fid) {
 
     if (!hasBuildingData) return null;
 
-    // ── BƯỚC 2: TÍNH TOÁN WIDTH, HEIGHT VÀ PADDING CỐ ĐỊNH ──
     let bldWidth = globalMaxX - globalMinX;
     let bldHeight = globalMaxY - globalMinY;
     
-    // Padding 5% viền ngoài
     let padX = bldWidth * 0.05;
     let padY = bldHeight * 0.05;
     
     let paddedWidth = bldWidth + padX * 2;
     let paddedHeight = bldHeight + padY * 2;
     
-    // ── BƯỚC 3: KHÓA SCALE CHUNG CHO VIEWBOX 1000px ──
     let vbW = 1000;
     let uniformScale = vbW / paddedWidth;
-    let vbH = paddedHeight * uniformScale; // Chiều cao tự động dãn theo đúng tỷ lệ thực
+    let vbH = paddedHeight * uniformScale; 
 
-    // ── BƯỚC 4: HÀM CHUYỂN ĐỔI MỐC TỌA ĐỘ VĨNH VIỄN BÁM THEO GLOBAL MIN ──
     function mapX(realX) { 
       return (realX - globalMinX + padX) * uniformScale; 
     }
@@ -1694,7 +1675,6 @@ async function loadMapFromSheets(fid) {
       return (globalMaxY - realY + padY) * uniformScale; 
     }
 
-    // ── BƯỚC 5: LỌC DỮ LIỆU ĐỂ VẼ RIÊNG TẦNG ĐƯỢC CHỌN ──
     const floorData = dataArray.filter(item => {
       const rnStr = item.Room_Number || item.room_number || item['Room_Number'] || item['room_number'] || "";
       let rn = String(rnStr).trim();
@@ -1710,7 +1690,6 @@ async function loadMapFromSheets(fid) {
     
     if (floorData.length === 0) return null;
 
-    // Lắp ghép đường dẫn (paths) của các phòng thuộc tầng hiện tại
     const rooms = {};
     floorData.forEach(d => {
       const rNumStr = d.Room_Number || d.room_number || d['Room_Number'] || d['room_number'] || "";
@@ -1728,7 +1707,6 @@ async function loadMapFromSheets(fid) {
       rooms[rNum].maxY = Math.max(rooms[rNum].maxY, sy, ey);
     });
 
-    // Xuất chuỗi đồ họa SVG
     let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${vbW} ${vbH}" style="width:100%;height:auto;display:block">
       <rect x="0" y="0" width="${vbW}" height="${vbH}" fill="#eef2f9"/>`;
       
@@ -1739,7 +1717,6 @@ async function loadMapFromSheets(fid) {
       let dString = "", lastX = null, lastY = null;
       rData.paths.forEach(p => {
         if (lastX === null || Math.abs(p.sx - lastX) > 0.1 || Math.abs(p.sy - lastY) > 0.1) {
-          // 👉 Sử dụng mapX và mapY đã khóa mốc Toàn Tòa
           dString += `M ${mapX(p.sx).toFixed(2)} ${mapY(p.sy).toFixed(2)} `;
         }
         dString += `L ${mapX(p.ex).toFixed(2)} ${mapY(p.ey).toFixed(2)} `;
@@ -1858,11 +1835,11 @@ async function renderMap(bid, fid, n) {
   }
 }
 
+// ─── HÀM BÓC TÁCH DỮ LIỆU ĐƯỢC TỐI ƯU HÓA ───
 function getRD(rid) {
   const trimmedRid = String(rid).trim();
   let roomInfo = sheetRoomData[trimmedRid];
   
-  // Quét linh hoạt theo đối tượng trả về
   if (!roomInfo) {
     for (const key of Object.keys(sheetRoomData)) {
       if (String(key).trim() === trimmedRid) { roomInfo = sheetRoomData[key]; break; }
@@ -1870,17 +1847,20 @@ function getRD(rid) {
   }
   
   if (roomInfo) {
-    // Ưu tiên hiển thị Tiên Tiếng Việt (heading_2) trước, nếu không có nhả Tiếng Anh (heading_1)
-    const roomName = roomInfo.heading_2 && roomInfo.heading_2 !== "___" ? roomInfo.heading_2 : 
-                    (roomInfo.heading_1 && roomInfo.heading_1 !== "___" ? roomInfo.heading_1 : `Phòng ${trimmedRid}`);
+    let occupancy = '__';
+    // Đảm bảo gộp danh sách người sử dụng bằng ký tự ngắt dòng (\n)
+    if (roomInfo.occupants_list && Array.isArray(roomInfo.occupants_list) && roomInfo.occupants_list.length > 0) {
+      occupancy = roomInfo.occupants_list.join('\n'); 
+    }
 
     return {
-      name: roomName,
+      // Bóc tách bạch 2 trường tên: name_en (tiêu đề lớn) và name_vn (tiêu đề nhỏ)
+      name_en: roomInfo.heading_1 && roomInfo.heading_1 !== "___" ? roomInfo.heading_1 : `Room ${trimmedRid}`,
+      name_vn: roomInfo.heading_2 && roomInfo.heading_2 !== "___" ? roomInfo.heading_2 : `Phòng ${trimmedRid}`,
       department: roomInfo.department || '__', 
-      // Chuỗi hiển thị nhân viên đã gộp sẵn sạch sẽ từ Backend
-      occupancy: roomInfo.occupant_display || '__', 
+      occupancy: occupancy, 
       area: roomInfo.area || '--', 
-      height: roomInfo.height || roomInfo.unbounded_height || '--',
+      height: roomInfo.unbounded_height || roomInfo.height || '--',
       type: roomInfo.fm_room_type || '--',
       cap: roomInfo.capacity || '--', 
       func: roomInfo.fm_room_function || '--',
@@ -1889,11 +1869,12 @@ function getRD(rid) {
   }
   
   return {
-    name: `Phòng ${trimmedRid}`, department: '--', occupancy: '--', 
-    area: '--', height: '--', type: '--', cap: '--', func: '--', status: 'Hoạt động'
+    name_en: `Room ${trimmedRid}`, name_vn: `Phòng ${trimmedRid}`, 
+    department: '--', occupancy: '--', area: '--', height: '--', type: '--', cap: '--', func: '--', status: 'Hoạt động'
   };
 }
 
+// ─── HÀM MAP DỮ LIỆU VÀO GIAO DIỆN CHI TIẾT ───
 function rC(rid) {
   ST.rid = rid; ST.tab = '2D';
   const rd = getRD(rid); ST.rd = rd;
@@ -1902,21 +1883,19 @@ function rC(rid) {
   
   document.getElementById('rbc').innerHTML = `<b>${b.name}</b> › ${fn} › ${rid}`;
   
-  // Đổ 3 thông số nhanh
   document.getElementById('rar').textContent = rd.area;
   document.getElementById('rhgt').textContent = rd.height;
   document.getElementById('rcp').textContent = rd.cap;
   
-  // Đổ danh sách chi tiết
   document.getElementById('rocc').textContent = rd.occupancy; 
   document.getElementById('rdep').textContent = rd.department; 
   document.getElementById('rtype').textContent = rd.type; 
   document.getElementById('rfunc').textContent = rd.func;
   
-  document.getElementById('rnum').textContent = rid;
-  document.getElementById('rnm').textContent = rd.name;
+  // Áp dụng gán nhãn: Nhãn phụ phía trên đổ name_vn, Tiêu đề chính đổ name_en
+  document.getElementById('rnum').textContent = rd.name_vn || "___";
+  document.getElementById('rnm').textContent = rd.name_en || "___";
   
-  // LOGIC ĐỔI MÀU TRẠNG THÁI CHUẨN XANH - VÀNG - ĐỎ
   const badge = document.getElementById('rbdg');
   badge.textContent = rd.status.toUpperCase();
   
@@ -1965,7 +1944,7 @@ function sT(tab, rd) {
     }
   } else {
     f.style.background = '#fff3e6';
-    f.innerHTML = `<div style="text-align:center;padding:22px 14px"><div style="font-size:42px;margin-bottom:10px">🏛</div><div style="font-size:13px;font-weight:700;color:#002554;margin-bottom:3px">Phối cảnh 3D</div><div style="font-size:11px;color:#8896a8">${ST.rid} — ${rd.name}</div></div>`;
+    f.innerHTML = `<div style="text-align:center;padding:22px 14px"><div style="font-size:42px;margin-bottom:10px">🏛</div><div style="font-size:13px;font-weight:700;color:#002554;margin-bottom:3px">Phối cảnh 3D</div><div style="font-size:11px;color:#8896a8">${ST.rid} — ${rd.name_en}</div></div>`;
   }
 }
 </script>
