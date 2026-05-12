@@ -1,39 +1,32 @@
-name: Update Data
+name: Update Info Data
 
 on:
   schedule:
-    - cron: '*/10 * * * *'
-  workflow_dispatch:
+    - cron: '*/5 * * * *'  # Run every 5 minutes
+  workflow_dispatch:      # Allow manual trigger
 
 jobs:
-  update-data:
+  update-info-data:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Fetch map_data.json
-        run: |
-          curl -s -L "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/gviz/tq?tqx=out:json" \
-            | sed '1d' | sed '$d' | sed 's/}/*\/)};/' > map_data.json
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-      - name: Fetch info_data.json
-        run: |
-          curl -s -L "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/gviz/tq?tqx=out:json" \
-            | sed '1d' | sed '$d' | sed 's/}/*\/)};/' > info_data.json
+      - name: Run info data sync script
+        run: node sync_info_data.js
 
-      - name: Fetch drive_data.json
-        run: |
-          curl -s -L "https://script.google.com/macros/s/AKfycbw4PtDoCILXSiIn1AAYzJhUhSvmJ6ufKD-5R-QKZGzbBy-yQTfC_bPTKJEErwt1d_iS/exec" \
-            -o drive_data.json
-
-      - name: Commit and push changes
+      - name: Commit and push changes (only if info_data.json changed)
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add map_data.json info_data.json drive_data.json
+          git add info_data.json
           if ! git diff --staged --quiet; then
-            git commit -m "chore: auto-update data files [skip ci]"
+            git commit -m "chore: auto-update info_data.json [skip ci]"
             git push
           else
             echo "No changes to commit"
