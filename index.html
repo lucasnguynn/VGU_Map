@@ -1343,22 +1343,39 @@ async function fetchRoomInfo() {
       bld.rooms.sort(new Intl.Collator('en', { numeric: true, sensitivity: 'base' }).compare);
     });
 
-    // ── BƯỚC 2: QUÉT API INFO ĐỂ LƯU THÔNG TIN CHI TIẾT ──
+    // ── BƯỚC 2: QUÉT API INFO ĐỂ LƯU THÔNG TIN CHI TIẾT (ĐÃ CHUẨN HÓA) ──
     infoArray.forEach(row => {
+      // Quét linh hoạt mọi định dạng ID phòng mà API có thể nhả về
       let roomId = row.room_id || row.room_number || row.Room_Number || row['Number'];
       if (roomId) {
         roomId = String(roomId).trim();
+        
+        // Trích xuất dải người sử dụng (Hỗ trợ cả chuỗi Flat và mảng Array)
+        let occupancyData = [];
+        if (Array.isArray(row.occupants)) {
+          occupancyData = row.occupants;
+        } else if (Array.isArray(row.occupants_list)) {
+          occupancyData = row.occupants_list;
+        } else if (row.occupant || row.FM_Staff_Name) {
+          // Cắt chuỗi nếu API trả về dạng Flat Text
+          const rawOcc = String(row.occupant || row.FM_Staff_Name || "");
+          occupancyData = rawOcc.split(/,|\n/).map(s => s.trim()).filter(s => s !== "");
+        }
+
+        // Áp dụng gán giá trị với bộ quét bao quát toàn bộ Header cũ và mới
         sheetRoomData[roomId] = { 
           room_id: roomId,
-          name_en: row.name_en || row.heading_1 || '',
-          name_vn: row.name_vn || row.heading_2 || '',
-          department: row.department || '__',
-          occupants: row.occupants || row.occupants_list || [],
-          area: row.area || '--',
-          height: row.height || row.unbounded_height || '--',
-          type: row.type || row.fm_room_type || 'Chưa phân loại',
-          function: row.function || row.fm_room_function || '__',
+          name_en: row.name_en || row.Name || row['Room: Name'] || '',
+          name_vn: row.name_vn || row['Tên phòng'] || row.heading_2 || '',
+          department: row.department || row.Department || '__',
+          occupants: occupancyData,
+          area: row.area || row.Area || row['Room: Area'] || '--',
+          height: row.height || row.Height || row['Abound height'] || '--',
+          type: row.type || row.FM_Room_Type || 'Chưa phân loại',
+          function: row.function || row.FM_Room_Function || row.Function || '__',
           is_active: row.is_active !== undefined ? row.is_active : true,
+          // Bổ sung luồng thiết bị nếu có
+          equipment: row.equipment || row.Equipment || row['Thiết bị'] || '',
           ...row
         };
       }
@@ -1880,23 +1897,23 @@ function getRD(rid) {
   
   if (roomInfo) {
     let occupancy = '__';
+    // Đã gộp mảng mượt mà từ fetchRoomInfo, bung trực tiếp ra chuỗi
     if (roomInfo.occupants && Array.isArray(roomInfo.occupants) && roomInfo.occupants.length > 0) {
       occupancy = roomInfo.occupants.join(', ');
-    } else if (roomInfo.occupants_list && Array.isArray(roomInfo.occupants_list) && roomInfo.occupants_list.length > 0) {
-      occupancy = roomInfo.occupants_list.join(', ');
     }
 
-    let rawEquip = roomInfo.equipment || roomInfo['Equipment'] || '';
+    // Quét linh hoạt cột thiết bị
+    let rawEquip = roomInfo.equipment || roomInfo['Equipment'] || roomInfo['Thiết bị'] || '';
     let equipArray = rawEquip ? String(rawEquip).split(',').map(e => e.trim()) : [];
 
     return {
-      name: roomInfo.name_vn || roomInfo.heading_2 || roomInfo.name_en || roomInfo.heading_1 || `Phòng ${trimmedRid}`,
+      name: roomInfo.name_vn || roomInfo.name_en || `Phòng ${trimmedRid}`,
       owner: roomInfo.department || '__', 
       occupancy: occupancy, 
       area: roomInfo.area || '--', 
       height: roomInfo.height || '--',
       type: roomInfo.type || 'Chưa phân loại',
-      cap: roomInfo.capacity || '--', 
+      cap: roomInfo.capacity || roomInfo.Capacity || '--', 
       func: roomInfo.function || '__',
       equip: equipArray,
       status: roomInfo.is_active !== false ? 'Hoạt động' : 'Không hoạt động'
