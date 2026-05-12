@@ -1137,30 +1137,30 @@ function parseBuildingCSV(csvText) {
 //  🏢 DỮ LIỆU TÒA NHÀ (Metadata — không chứa coords hardcode)
 // ═══════════════════════════════════════════════════════════════
 const BUILDINGS = [
-  {code:'D1',name:'Ký túc xá D1',floors:7,rooms:['101','102','103','104','105','106']},
-  {code:'D2',name:'Ký túc xá D2',floors:7,rooms:['101','102','103','104','105','106']},
-  {code:'FC',name:'Canteen',floors:3,rooms:['101','102','201','202','301']},
-  {code:'CH',name:'Ceremony Hall',floors:2,rooms:['101','102','103','201','202']},
-  {code:'LI',name:'Thư viện',floors:4,rooms:['101','102','103','104','201','202','203']},
-  {code:'LH',name:'Giảng đường',floors:5,rooms:['101','102','201','202','203','301','302','401','501']},
-  {code:'B1',name:'Tòa học thuật B1',floors:6,rooms:['101','102','103','201','202']},
-  {code:'B2',name:'Tòa học thuật B2',floors:6,rooms:['101','102','103','201','202']},
-  {code:'B3',name:'Tòa học thuật B3',floors:6,rooms:['101','102','103','201','202']},
-  {code:'B5',name:'Tòa học thuật B5',floors:6,rooms:['101','102','103','201','202']},
-  {code:'B6',name:'Tòa học thuật B6',floors:6,rooms:['101','102','103','201','202']},
-  {code:'AD',name:'Tòa Hành chính',floors:6,rooms:['101','102','103','201','202','203','301','302','401','402']},
-  {code:'GH',name:'Căn hộ Guest House',floors:2,rooms:['101','102','201','202']},
-  {code:'25',name:'Công viên khu Guest House',floors:3,rooms:['101','102','201','202','301']},
-  {code:'SH',name:'Nhà thi đấu Thể thao',floors:1,rooms:['101','102','103','104']},
-  {code:'CP',name:'Nhà máy năng lượng',floors:1,rooms:['A1','A2','B1','B2']},
-  {code:'V1',name:'Biệt thự V1',floors:2,rooms:['101','102','201','202']},
-  {code:'V2',name:'Biệt thự V2',floors:2,rooms:['101','102','201','202']},
-  {code:'V3',name:'Biệt thự V3',floors:2,rooms:['101','102','201','202']},
-  {code:'V4',name:'Biệt thự V4',floors:2,rooms:['101','102','201','202']},
-  {code:'V5',name:'Biệt thự V5',floors:2,rooms:['101','102','201','202']},
-  {code:'V6',name:'Biệt thự V6',floors:2,rooms:['101','102','201','202']},
-  {code:'V7',name:'Biệt thự V7',floors:2,rooms:['101','102','201','202']},
-  {code:'V8',name:'Biệt thự V8',floors:2,rooms:['101','102','201','202']}
+  {code:'D1', name:'Ký túc xá D1', floors:7, rooms:[]},
+  {code:'D2', name:'Ký túc xá D2', floors:7, rooms:[]},
+  {code:'FC', name:'Canteen', floors:3, rooms:[]},
+  {code:'CH', name:'Ceremony Hall', floors:2, rooms:[]},
+  {code:'LI', name:'Thư viện', floors:4, rooms:[]},
+  {code:'LH', name:'Giảng đường', floors:5, rooms:[]},
+  {code:'B1', name:'Tòa học thuật B1', floors:6, rooms:[]},
+  {code:'B2', name:'Tòa học thuật B2', floors:6, rooms:[]},
+  {code:'B3', name:'Tòa học thuật B3', floors:6, rooms:[]},
+  {code:'B5', name:'Tòa học thuật B5', floors:6, rooms:[]},
+  {code:'B6', name:'Tòa học thuật B6', floors:6, rooms:[]},
+  {code:'AD', name:'Tòa Hành chính', floors:6, rooms:[]},
+  {code:'GH', name:'Căn hộ Guest House', floors:2, rooms:[]},
+  {code:'25', name:'Công viên khu Guest House', floors:3, rooms:[]},
+  {code:'SH', name:'Nhà thi đấu Thể thao', floors:1, rooms:[]},
+  {code:'CP', name:'Nhà máy năng lượng', floors:1, rooms:[]},
+  {code:'V1', name:'Biệt thự V1', floors:2, rooms:[]},
+  {code:'V2', name:'Biệt thự V2', floors:2, rooms:[]},
+  {code:'V3', name:'Biệt thự V3', floors:2, rooms:[]},
+  {code:'V4', name:'Biệt thự V4', floors:2, rooms:[]},
+  {code:'V5', name:'Biệt thự V5', floors:2, rooms:[]},
+  {code:'V6', name:'Biệt thự V6', floors:2, rooms:[]},
+  {code:'V7', name:'Biệt thự V7', floors:2, rooms:[]},
+  {code:'V8', name:'Biệt thự V8', floors:2, rooms:[]}
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -1764,101 +1764,95 @@ async function loadDriveImages() {
   }
 })();
 
+// Biến lưu trữ API Tọa độ (Bạn thay bằng URL API thực tế của bạn)
+const API_COORDS = "./map_data.json"; 
+
 async function fetchRoomInfo() {
   if (isInfoLoaded) return; 
   try {
-    const response = await fetch(API_INFO);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    
-    let rawData = await response.json();
-    let dataArray = Array.isArray(rawData) ? rawData : (rawData.data || rawData.items || []);
-    
-    if (!dataArray || dataArray.length === 0) {
-      console.warn("⚠️ API trả về dữ liệu trống");
-      return;
-    }
-    
-    dataArray.forEach(row => {
-      // Quét linh hoạt các định dạng key API trả về
-      let roomId = row.room_number || row.Room_Number || row['Room: Number'] || row['room_number'] || row['Number'] || row['Room_Number'];
+    // 1. TẢI CẢ 2 API SONG SONG: API Tọa độ (để lấy danh sách phòng thực) và API Info
+    const [coordsRes, infoRes] = await Promise.all([
+      fetch(API_COORDS),
+      fetch(API_INFO)
+    ]);
+
+    if (!coordsRes.ok) throw new Error(`HTTP Coords ${coordsRes.status}`);
+    if (!infoRes.ok) throw new Error(`HTTP Info ${infoRes.status}`);
+
+    const rawCoords = await coordsRes.json();
+    const rawInfo = await infoRes.json();
+
+    const coordsArray = Array.isArray(rawCoords) ? rawCoords : (rawCoords.data || rawCoords.items || []);
+    const infoArray = Array.isArray(rawInfo) ? rawInfo : (rawInfo.data || rawInfo.items || []);
+
+    // ═══════════════════════════════════════════════════════════════
+    //  LOGIC 1: ĐỒNG BỘ DANH SÁCH PHÒNG TỪ API TỌA ĐỘ VÀO HARDCODE
+    // ═══════════════════════════════════════════════════════════════
+    coordsArray.forEach(item => {
+      const roomNumStr = item.Room_Number || item.room_number || "";
+      const roomNum = String(roomNumStr).trim();
       
-      if (roomId) {
-        roomId = String(roomId).trim();
+      // Bỏ qua các phòng trống hoặc khu công cộng (LB, CR, WC) không cần hiện ở search bar
+      if (!roomNum || /LB|CR|WC/i.test(roomNum)) return;
+
+      // Phân tách mã phòng (Ví dụ: "AD-206" -> Tòa: "AD", Phòng: "206")
+      const parts = roomNum.split('-');
+      if (parts.length >= 2) {
+        const bldCode = parts[0].toUpperCase().trim();
+        const roomCode = parts.slice(1).join('-').trim();
+
+        // CHỈ ĐỐI CHIẾU VỚI DANH SÁCH TÒA HARDCODE GỐC
+        const targetBld = BUILDINGS.find(b => b.code === bldCode);
         
-        if (!sheetRoomData[roomId]) {
-          sheetRoomData[roomId] = { 
-            room_id: roomId,
-            name_en: row.heading_1 || row.name_en || row['Room: Name'] || '',
-            name_vn: row.heading_2 || row.name_vn || row['Room: Name'] || '',
-            department: row.department || row.Department || '__',
-            occupants: row.occupants_list || row.occupants || [],
-            area: row.area || row['Room: Area'] || '--',
-            height: row.unbounded_height || row.height || row['Abound height'] || '--',
-            type: row.fm_room_type || row.FM_Room_Type || row['FM_Room_Type'] || 'Chưa phân loại',
-            function: row.fm_room_function || row.function || row.Function || '__',
-            is_active: row.is_active !== undefined ? row.is_active : true,
-            ...row,
-            staffList: []
-          };
-        }
-        
-        // Xử lý gộp danh sách nhân viên
-        let staffName = row.FM_Staff_Name || row.staff_name;
-        if (staffName && staffName.trim() !== "" && !sheetRoomData[roomId].staffList.includes(staffName)) {
-          sheetRoomData[roomId].staffList.push(staffName);
-        }
-        
-        if (row.occupants_list && Array.isArray(row.occupants_list)) {
-          row.occupants_list.forEach(occ => {
-            if (occ && occ.trim() !== "" && !sheetRoomData[roomId].staffList.includes(occ)) {
-              sheetRoomData[roomId].staffList.push(occ);
-            }
-          });
-        }
-        
-        // --- LOGIC PHÂN TÍCH VÀ BỔ SUNG PHÒNG VÀO SEARCH BAR ---
-        // Bỏ qua hoàn toàn các khu vực công cộng (LB, CR, WC)
-        if (!/(LB|CR|WC)/i.test(roomId)) {
-          const parts = roomId.split('-');
+        // Nếu Tòa nhà có trong hardcode và phòng đó chưa được thêm vào mảng -> Thêm vào
+        if (targetBld && !targetBld.rooms.includes(roomCode)) {
+          targetBld.rooms.push(roomCode);
           
-          if (parts.length >= 2) {
-            const bldCode = parts[0].toUpperCase().trim();
-            const afterHyphen = parts.slice(1).join('-').trim(); // Lấy toàn bộ phần sau dấu '-' đầu tiên
-            
-            // Xác nhận chuỗi bắt đầu bằng chữ số (ký tự đầu là tầng, toàn bộ chuỗi sau là số phòng)
-            if (/^\d/.test(afterHyphen)) {
-              const roomNum = afterHyphen; 
-              
-              let bldEntry = BUILDINGS.find(b => b.code === bldCode);
-              if (!bldEntry) {
-                bldEntry = { code: bldCode, name: `${bldCode} Building`, floors: 6, rooms: [] };
-                BUILDINGS.push(bldEntry);
-              }
-              
-              if (!bldEntry.rooms.includes(roomNum)) {
-                bldEntry.rooms.push(roomNum);
-                // Sắp xếp mảng phòng theo thứ tự tự nhiên (101, 102... 614)
-                bldEntry.rooms.sort(new Intl.Collator('en', { numeric: true, sensitivity: 'base' }).compare);
-              }
-            }
+          // Tự động cập nhật số tầng (floors) nếu phát hiện đầu số phòng lớn hơn floors hiện tại
+          const detectedFloor = parseInt(roomCode.charAt(0));
+          if (!isNaN(detectedFloor) && detectedFloor > targetBld.floors) {
+            targetBld.floors = detectedFloor;
           }
         }
       }
     });
-    
-    isInfoLoaded = true;
-    console.log(`✅ Đã tải thông tin ${Object.keys(sheetRoomData).length} phòng từ API`);
 
-    // LÀM MỚI GIAO DIỆN: Bắt buộc gọi sau khi dữ liệu đã nạp xong
+    // Sắp xếp lại danh sách phòng của từng tòa theo thứ tự tự nhiên (101 -> 102 -> 201)
+    BUILDINGS.forEach(bld => {
+      bld.rooms.sort(new Intl.Collator('en', { numeric: true, sensitivity: 'base' }).compare);
+    });
+
+    // ═══════════════════════════════════════════════════════════════
+    //  LOGIC 2: LƯU TRỮ THÔNG TIN CHI TIẾT PHÒNG TỪ API INFO (Giữ nguyên)
+    // ═══════════════════════════════════════════════════════════════
+    infoArray.forEach(row => {
+      let roomId = row.room_id || row.room_number || row.Room_Number || row['Number'];
+      if (roomId) {
+        roomId = String(roomId).trim();
+        sheetRoomData[roomId] = { 
+          room_id: roomId,
+          name_en: row.name_en || row.heading_1 || '',
+          name_vn: row.name_vn || row.heading_2 || '',
+          department: row.department || '__',
+          occupants: row.occupants || row.occupants_list || [],
+          area: row.area || '--',
+          height: row.height || row.unbounded_height || '--',
+          type: row.type || row.fm_room_type || 'Chưa phân loại',
+          function: row.function || row.fm_room_function || '__',
+          is_active: row.is_active !== undefined ? row.is_active : true,
+          ...row
+        };
+      }
+    });
+
+    isInfoLoaded = true;
+    console.log("✅ Đã cập nhật mảng Hardcode gốc thành công từ API Tọa độ!");
+
+    // Cập nhật lại giao diện Dropdown để hiển thị ngay số phòng mới
     refreshBuildingDropdowns();
-    
-    // Nếu người dùng đã chọn sẵn Tòa nhà/Tầng trước đó, tự động kích hoạt lại dropdown số phòng
-    if (selBuilding.value && selFloor.value) {
-      onFloorChange();
-    }
-    
+
   } catch (e) {
-    console.error("❌ Lỗi tải API thông tin phòng:", e);
+    console.error("❌ Lỗi nạp dữ liệu đồng bộ:", e);
   }
 }
 
