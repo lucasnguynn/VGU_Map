@@ -1,12 +1,12 @@
 /**
  * VGUMap Service Worker
  *
- * Strategies:
  * - Cache-first for static shell assets
- * - Network-first for JSON data files
+ * - Network-first for JSON data assets
+ * - Query-string-safe caching: ignoreSearch + normalized cache keys
  */
 
-const VERSION = 'v2';
+const VERSION = 'v3';
 const STATIC_CACHE = `vgumap-static-${VERSION}`;
 const DATA_CACHE = `vgumap-data-${VERSION}`;
 
@@ -23,30 +23,21 @@ const DATA_PATHS = new Set(['/map_data.json', '/info_data.json', '/drive_data.js
 function toCacheKey(request) {
   const url = new URL(request.url);
   url.search = '';
-  return new Request(url.toString(), {
-    method: 'GET',
-    headers: request.headers,
-    mode: request.mode,
-    credentials: request.credentials,
-    redirect: request.redirect
-  });
+  return new Request(url.toString(), { method: 'GET' });
 }
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(STATIC_CACHE)
-      .then((cache) => cache.addAll(STATIC_ASSETS))
-      .then(() => self.skipWaiting())
-  );
+  event.waitUntil((async () => {
+    const cache = await caches.open(STATIC_CACHE);
+    await cache.addAll(STATIC_ASSETS);
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
     const names = await caches.keys();
-    await Promise.all(names.map((name) => {
-      if (name !== STATIC_CACHE && name !== DATA_CACHE) return caches.delete(name);
-      return Promise.resolve();
-    }));
+    await Promise.all(names.map((name) => (name !== STATIC_CACHE && name !== DATA_CACHE ? caches.delete(name) : Promise.resolve())));
     await self.clients.claim();
   })());
 });
@@ -54,13 +45,9 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
-  if (url.origin !== self.location.origin) {
-    event.respondWith(cacheFirst(event.request));
-    return;
-  }
+  if (url.origin !== self.location.origin) return;
 
-  const pathname = url.pathname;
-  if (DATA_PATHS.has(pathname)) {
+  if (DATA_PATHS.has(url.pathname)) {
     event.respondWith(networkFirstData(event.request));
     return;
   }
@@ -69,14 +56,15 @@ self.addEventListener('fetch', (event) => {
 });
 
 async function cacheFirst(request) {
-  const cached = await caches.match(request, { ignoreSearch: true });
+  const cacheKey = toCacheKey(request);
+  const cached = await caches.match(cacheKey, { ignoreSearch: true });
   if (cached) return cached;
 
   try {
     const response = await fetch(request);
     if (response && response.ok) {
       const cache = await caches.open(STATIC_CACHE);
-      await cache.put(toCacheKey(request), response.clone());
+      await cache.put(cacheKey, response.clone());
     }
     return response;
   } catch (_) {
@@ -96,6 +84,7 @@ async function networkFirstData(request) {
   } catch (error) {
     const cached = await caches.match(cacheKey, { ignoreSearch: true });
     if (cached) return cached;
+
     return new Response(JSON.stringify({ error: 'No data available offline', message: error.message }), {
       status: 503,
       headers: { 'Content-Type': 'application/json' }
@@ -104,6 +93,5 @@ async function networkFirstData(request) {
 }
 
 self.addEventListener('message', (event) => {
-  if (!event.data) return;
-  if (event.data.type === 'SKIP_WAITING') self.skipWaiting();
+  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
