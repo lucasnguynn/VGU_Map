@@ -260,6 +260,21 @@ async function main() {
         console.log('--- Saving to file ---');
         saveToFile(outputFile, outputPayload);
 
+        // ── Sync drive_data.json ──
+        const DRIVE_API = 'https://script.google.com/macros/s/AKfycbw4PtDoCILXSiIn1AAYzJhUhSvmJ6ufKD-5R-QKZGzbBy-yQTfC_bPTKJEErwt1d_iS/exec ';
+        const driveOutputFile = path.join(__dirname, 'drive_data.json');
+
+        console.log('--- Fetching DRIVE data ---');
+        try {
+          const driveRaw = await fetchData(DRIVE_API);
+          if (driveRaw && typeof driveRaw === 'object') {
+            saveToFile(driveOutputFile, driveRaw);
+            console.log('✅ drive_data.json updated');
+          }
+        } catch (driveErr) {
+          console.warn('⚠️ Drive data fetch failed, keeping existing file:', driveErr.message);
+        }
+
         // Summary
         const totalDuration = Date.now() - totalStart;
         console.log('\n═══════════════════════════════════════════════════════');

@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 452,
-  "last_updated": "2026-05-12T21:40:35.576Z",
+  "last_updated": "2026-05-13T07:55:39.710Z",
   "data": [
     {
       "sheet_source": "B3",
@@ -12,12 +12,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "LOADING",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "158.04",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -30,12 +29,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "SELF STUDY",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "29.71",
       "unbounded_height": "5050",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -48,12 +46,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "ROOF CONC",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "293.85",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -66,12 +63,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "TECH.ROOM",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "10.49",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -84,12 +80,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "ROOF CONC",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "331.14",
       "unbounded_height": "5050",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -102,12 +97,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "ROOF CONC",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "309.66",
       "unbounded_height": "5050",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -120,12 +114,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "172.01",
       "unbounded_height": "5050",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -138,12 +131,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "JANITOR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "2.42",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -156,12 +148,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "ELEVATOR LOBBY NO CEILING",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "38.96",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -174,12 +165,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "LOBBY",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "133.43",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -192,12 +182,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "OUTDOOR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "657.86",
       "unbounded_height": "5050",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -210,12 +199,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "11.94",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -228,12 +216,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "16.83",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -246,12 +233,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "10.68",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -264,12 +250,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 1",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "3.71",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -282,12 +267,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "40.88",
       "unbounded_height": "5050",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -300,12 +284,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "83.81",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -318,12 +301,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "53.77",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -336,12 +318,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "44.22",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -354,12 +335,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "45.07",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -372,12 +352,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "JANITOR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "2.42",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -390,12 +369,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "ELEVATOR CORR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "11.51",
       "unbounded_height": "5050",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -408,12 +386,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "ELEVATOR CORR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "10.21",
       "unbounded_height": "5050",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -426,12 +403,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "11.94",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -444,12 +420,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "16.83",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -462,12 +437,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "10.68",
       "unbounded_height": "3921",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -480,12 +454,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "12.50",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -498,12 +471,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 1",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "3.71",
       "unbounded_height": "5000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -516,12 +488,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "40.03",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -534,12 +505,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "88.59",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -552,12 +522,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "43.87",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -570,12 +539,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "44.87",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -588,12 +556,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "JANITOR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "2.42",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -606,12 +573,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "ELEVATOR CORR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "11.51",
       "unbounded_height": "5050",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -624,12 +590,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "31.88",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -642,12 +607,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "11.94",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -660,12 +624,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "16.83",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -678,12 +641,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "10.68",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -696,12 +658,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "12.50",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -714,12 +675,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 1",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "3.71",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -732,12 +692,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "Not Enclosed",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -750,12 +709,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "37.44",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -768,12 +726,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "90.73",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -786,12 +743,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "22.15",
       "unbounded_height": "5050",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -804,12 +760,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "JANITOR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "2.42",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -822,12 +777,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "ELEVATOR CORR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "11.47",
       "unbounded_height": "5050",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -840,12 +794,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "ELEVATOR CORR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "8.94",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -858,12 +811,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "ROOF PVC",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "330.34",
       "unbounded_height": "5050",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -876,12 +828,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "11.94",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -894,12 +845,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "16.83",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -912,12 +862,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 1",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "3.71",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -930,12 +879,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "52.29",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -948,12 +896,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "37.32",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -966,12 +913,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "38.57",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -984,12 +930,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "62.22",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1002,12 +947,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "64.56",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1020,12 +964,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "12.80",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1038,12 +981,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "JANITOR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "2.42",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1056,12 +998,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "ELEVATOR CORR",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "11.51",
       "unbounded_height": "5050",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1074,12 +1015,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "11.94",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1092,12 +1032,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "16.83",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1110,12 +1049,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 1",
-      "fm_building_code": "",
+      "fm_building_code": "B3",
       "area": "3.71",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1133,7 +1071,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1151,7 +1088,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1169,7 +1105,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1187,7 +1122,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1205,7 +1139,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1223,7 +1156,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1241,7 +1173,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1259,7 +1190,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1277,7 +1207,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1295,7 +1224,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1313,7 +1241,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1331,7 +1258,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1351,9 +1277,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Nguyễn Đức Thịnh",
       "is_active": true,
-      "occupants_flat": "Nguyễn Đức Thịnh"
+      "occupants_flat": "Nguyễn Đức Thịnh",
+      "occupant_display": "Nguyễn Đức Thịnh"
     },
     {
       "sheet_source": "B3",
@@ -1369,7 +1295,6 @@
       "unbounded_height": "5050",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1389,9 +1314,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Trịnh Thị Thanh Huyền",
       "is_active": true,
-      "occupants_flat": "Dr. Trịnh Thị Thanh Huyền"
+      "occupants_flat": "Dr. Trịnh Thị Thanh Huyền",
+      "occupant_display": "Dr. Trịnh Thị Thanh Huyền"
     },
     {
       "sheet_source": "B3",
@@ -1407,7 +1332,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1425,7 +1349,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1443,7 +1366,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1461,7 +1383,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1481,9 +1402,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Đào Thị Bích Vân",
       "is_active": true,
-      "occupants_flat": "Dr. Đào Thị Bích Vân"
+      "occupants_flat": "Dr. Đào Thị Bích Vân",
+      "occupant_display": "Dr. Đào Thị Bích Vân"
     },
     {
       "sheet_source": "B3",
@@ -1499,7 +1420,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1517,7 +1437,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1535,7 +1454,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1553,7 +1471,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1571,7 +1488,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1589,7 +1505,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1609,9 +1524,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Trần Quang Nhu",
       "is_active": true,
-      "occupants_flat": "Trần Quang Nhu"
+      "occupants_flat": "Trần Quang Nhu",
+      "occupant_display": "Trần Quang Nhu"
     },
     {
       "sheet_source": "B3",
@@ -1627,7 +1542,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1645,7 +1559,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1663,7 +1576,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1681,7 +1593,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1701,9 +1612,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Nguyễn Minh Hiếu",
       "is_active": true,
-      "occupants_flat": "Nguyễn Minh Hiếu"
+      "occupants_flat": "Nguyễn Minh Hiếu",
+      "occupant_display": "Nguyễn Minh Hiếu"
     },
     {
       "sheet_source": "B3",
@@ -1712,8 +1623,7 @@
       "heading_2": "PHÒNG NGHIÊN CỨU THÍ NGHIỆM",
       "department": "ECE",
       "occupants_list": [
-        "Biện Minh Trí",
-        "Nguyễn Võ Thất Thuyết"
+        "Biện Minh Trí"
       ],
       "fm_room_function": "Laboratory",
       "fm_room_type": "LABORATORY",
@@ -1722,9 +1632,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Biện Minh Trí, Nguyễn Võ Thất Thuyết",
       "is_active": true,
-      "occupants_flat": "Biện Minh Trí, Nguyễn Võ Thất Thuyết"
+      "occupants_flat": "Biện Minh Trí",
+      "occupant_display": "Biện Minh Trí"
     },
     {
       "sheet_source": "B3",
@@ -1740,7 +1650,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1758,7 +1667,6 @@
       "unbounded_height": "5050",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1778,9 +1686,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Assoc. Prof. Dr. Bùi Minh Dương",
       "is_active": true,
-      "occupants_flat": "Assoc. Prof. Dr. Bùi Minh Dương"
+      "occupants_flat": "Assoc. Prof. Dr. Bùi Minh Dương",
+      "occupant_display": "Assoc. Prof. Dr. Bùi Minh Dương"
     },
     {
       "sheet_source": "B3",
@@ -1796,7 +1704,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1816,9 +1723,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Wai Yip Liu",
       "is_active": true,
-      "occupants_flat": "Dr. Wai Yip Liu"
+      "occupants_flat": "Dr. Wai Yip Liu",
+      "occupant_display": "Dr. Wai Yip Liu"
     },
     {
       "sheet_source": "B3",
@@ -1836,9 +1743,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Võ Bích Hiển",
       "is_active": true,
-      "occupants_flat": "Dr. Võ Bích Hiển"
+      "occupants_flat": "Dr. Võ Bích Hiển",
+      "occupant_display": "Dr. Võ Bích Hiển"
     },
     {
       "sheet_source": "B3",
@@ -1854,7 +1761,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1874,9 +1780,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Udo Klein",
       "is_active": true,
-      "occupants_flat": "Dr. Udo Klein"
+      "occupants_flat": "Dr. Udo Klein",
+      "occupant_display": "Dr. Udo Klein"
     },
     {
       "sheet_source": "B3",
@@ -1894,9 +1800,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Nguyễn Ngô Phong",
       "is_active": true,
-      "occupants_flat": "Dr. Nguyễn Ngô Phong"
+      "occupants_flat": "Dr. Nguyễn Ngô Phong",
+      "occupant_display": "Dr. Nguyễn Ngô Phong"
     },
     {
       "sheet_source": "B3",
@@ -1912,7 +1818,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1932,9 +1837,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Nguyễn Tuấn Khanh",
       "is_active": true,
-      "occupants_flat": "Dr. Nguyễn Tuấn Khanh"
+      "occupants_flat": "Dr. Nguyễn Tuấn Khanh",
+      "occupant_display": "Dr. Nguyễn Tuấn Khanh"
     },
     {
       "sheet_source": "B3",
@@ -1952,9 +1857,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Nguyễn Thị Hoài Linh",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Hoài Linh"
+      "occupants_flat": "Nguyễn Thị Hoài Linh",
+      "occupant_display": "Nguyễn Thị Hoài Linh"
     },
     {
       "sheet_source": "B3",
@@ -1970,7 +1875,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -1988,7 +1892,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2006,7 +1909,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2024,7 +1926,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2042,7 +1943,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2062,9 +1962,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Assoc. Prof. Dr. Đỗ Xuân Phú",
       "is_active": true,
-      "occupants_flat": "Assoc. Prof. Dr. Đỗ Xuân Phú"
+      "occupants_flat": "Assoc. Prof. Dr. Đỗ Xuân Phú",
+      "occupant_display": "Assoc. Prof. Dr. Đỗ Xuân Phú"
     },
     {
       "sheet_source": "B3",
@@ -2082,9 +1982,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Lê Duy Cân",
       "is_active": true,
-      "occupants_flat": "Lê Duy Cân"
+      "occupants_flat": "Lê Duy Cân",
+      "occupant_display": "Lê Duy Cân"
     },
     {
       "sheet_source": "B3",
@@ -2102,9 +2002,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Nguyễn Hoàng Vĩnh Khang",
       "is_active": true,
-      "occupants_flat": "Nguyễn Hoàng Vĩnh Khang"
+      "occupants_flat": "Nguyễn Hoàng Vĩnh Khang",
+      "occupant_display": "Nguyễn Hoàng Vĩnh Khang"
     },
     {
       "sheet_source": "B3",
@@ -2120,7 +2020,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2138,7 +2037,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2156,7 +2054,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2174,7 +2071,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2192,7 +2088,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2210,7 +2105,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2228,7 +2122,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2246,7 +2139,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2264,7 +2156,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2282,7 +2173,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2300,7 +2190,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2318,7 +2207,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2329,9 +2217,7 @@
       "heading_2": "VĂN PHÒNG",
       "department": "VPK",
       "occupants_list": [
-        "Phí Tường Uyên",
-        "Nguyễn Thị Tựu",
-        "Trần Tuyết Ân"
+        "Phí Tường Uyên"
       ],
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
@@ -2340,9 +2226,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Phí Tường Uyên, Nguyễn Thị Tựu, Trần Tuyết Ân",
       "is_active": true,
-      "occupants_flat": "Phí Tường Uyên, Nguyễn Thị Tựu, Trần Tuyết Ân"
+      "occupants_flat": "Phí Tường Uyên",
+      "occupant_display": "Phí Tường Uyên"
     },
     {
       "sheet_source": "B3",
@@ -2358,7 +2244,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2378,9 +2263,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Assoc. Prof. Dr. Phạm Thành Dương",
       "is_active": true,
-      "occupants_flat": "Assoc. Prof. Dr. Phạm Thành Dương"
+      "occupants_flat": "Assoc. Prof. Dr. Phạm Thành Dương",
+      "occupant_display": "Assoc. Prof. Dr. Phạm Thành Dương"
     },
     {
       "sheet_source": "B3",
@@ -2398,9 +2283,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Assoc. Prof. Dr. Thái Truyển Đại Chấn",
       "is_active": true,
-      "occupants_flat": "Assoc. Prof. Dr. Thái Truyển Đại Chấn"
+      "occupants_flat": "Assoc. Prof. Dr. Thái Truyển Đại Chấn",
+      "occupant_display": "Assoc. Prof. Dr. Thái Truyển Đại Chấn"
     },
     {
       "sheet_source": "B3",
@@ -2418,9 +2303,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Assoc. Prof.Dr. Hồ Xuân Thịnh",
       "is_active": true,
-      "occupants_flat": "Assoc. Prof.Dr. Hồ Xuân Thịnh"
+      "occupants_flat": "Assoc. Prof.Dr. Hồ Xuân Thịnh",
+      "occupant_display": "Assoc. Prof.Dr. Hồ Xuân Thịnh"
     },
     {
       "sheet_source": "B3",
@@ -2436,7 +2321,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2447,8 +2331,7 @@
       "heading_2": "VĂN PHÒNG",
       "department": "VPK",
       "occupants_list": [
-        "Nguyễn Thanh Ngân",
-        "Trần Thị Yến"
+        "Nguyễn Thanh Ngân"
       ],
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
@@ -2457,9 +2340,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Nguyễn Thanh Ngân, Trần Thị Yến",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thanh Ngân, Trần Thị Yến"
+      "occupants_flat": "Nguyễn Thanh Ngân",
+      "occupant_display": "Nguyễn Thanh Ngân"
     },
     {
       "sheet_source": "B3",
@@ -2475,7 +2358,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2493,7 +2375,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2511,7 +2392,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2529,7 +2409,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2549,9 +2428,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Nguyễn Hồng Vi",
       "is_active": true,
-      "occupants_flat": "Dr. Nguyễn Hồng Vi"
+      "occupants_flat": "Dr. Nguyễn Hồng Vi",
+      "occupant_display": "Dr. Nguyễn Hồng Vi"
     },
     {
       "sheet_source": "B3",
@@ -2569,9 +2448,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Dicky Januarizky Silitonga",
       "is_active": true,
-      "occupants_flat": "Dr. Dicky Januarizky Silitonga"
+      "occupants_flat": "Dr. Dicky Januarizky Silitonga",
+      "occupant_display": "Dr. Dicky Januarizky Silitonga"
     },
     {
       "sheet_source": "B3",
@@ -2589,9 +2468,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Lê Đoàn Quốc Bảo",
       "is_active": true,
-      "occupants_flat": "Dr. Lê Đoàn Quốc Bảo"
+      "occupants_flat": "Dr. Lê Đoàn Quốc Bảo",
+      "occupant_display": "Dr. Lê Đoàn Quốc Bảo"
     },
     {
       "sheet_source": "B3",
@@ -2607,7 +2486,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2627,9 +2505,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Lê Nhật Tâm",
       "is_active": true,
-      "occupants_flat": "Dr. Lê Nhật Tâm"
+      "occupants_flat": "Dr. Lê Nhật Tâm",
+      "occupant_display": "Dr. Lê Nhật Tâm"
     },
     {
       "sheet_source": "B3",
@@ -2647,9 +2525,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr.Lưu Văn Thành",
       "is_active": true,
-      "occupants_flat": "Dr.Lưu Văn Thành"
+      "occupants_flat": "Dr.Lưu Văn Thành",
+      "occupant_display": "Dr.Lưu Văn Thành"
     },
     {
       "sheet_source": "B3",
@@ -2665,7 +2543,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2685,9 +2562,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Said Zahedani",
       "is_active": true,
-      "occupants_flat": "Dr. Said Zahedani"
+      "occupants_flat": "Dr. Said Zahedani",
+      "occupant_display": "Dr. Said Zahedani"
     },
     {
       "sheet_source": "B3",
@@ -2703,7 +2580,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2723,9 +2599,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Nguyễn Xuân Thanh",
       "is_active": true,
-      "occupants_flat": "Dr. Nguyễn Xuân Thanh"
+      "occupants_flat": "Dr. Nguyễn Xuân Thanh",
+      "occupant_display": "Dr. Nguyễn Xuân Thanh"
     },
     {
       "sheet_source": "B3",
@@ -2741,7 +2617,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2761,9 +2636,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Trần Tuấn Minh",
       "is_active": true,
-      "occupants_flat": "Dr. Trần Tuấn Minh"
+      "occupants_flat": "Dr. Trần Tuấn Minh",
+      "occupant_display": "Dr. Trần Tuấn Minh"
     },
     {
       "sheet_source": "B3",
@@ -2779,7 +2654,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2799,9 +2673,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Nguyễn Thiện Bình",
       "is_active": true,
-      "occupants_flat": "Dr. Nguyễn Thiện Bình"
+      "occupants_flat": "Dr. Nguyễn Thiện Bình",
+      "occupant_display": "Dr. Nguyễn Thiện Bình"
     },
     {
       "sheet_source": "B3",
@@ -2819,9 +2693,9 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Nguyễn Hải Vân",
       "is_active": true,
-      "occupants_flat": "Dr. Nguyễn Hải Vân"
+      "occupants_flat": "Dr. Nguyễn Hải Vân",
+      "occupant_display": "Dr. Nguyễn Hải Vân"
     },
     {
       "sheet_source": "B3",
@@ -2837,7 +2711,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2855,7 +2728,6 @@
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2868,12 +2740,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
-      "fm_building_code": "EV",
+      "fm_building_code": "B3",
       "area": "11.18",
       "unbounded_height": "5050",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2886,12 +2757,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
-      "fm_building_code": "EV",
+      "fm_building_code": "B3",
       "area": "14.64",
       "unbounded_height": "5050",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2904,12 +2774,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "STAIR 01",
-      "fm_building_code": "ST",
+      "fm_building_code": "B3",
       "area": "59.48",
       "unbounded_height": "5050",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2922,12 +2791,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "STAIR 02",
-      "fm_building_code": "ST",
+      "fm_building_code": "B3",
       "area": "16.52",
       "unbounded_height": "5050",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2945,7 +2813,6 @@
       "unbounded_height": "24.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2963,7 +2830,6 @@
       "unbounded_height": "12.1",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2981,7 +2847,6 @@
       "unbounded_height": "45.8",
       "capacity": "--",
       "status": "Bảo trì",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2999,7 +2864,6 @@
       "unbounded_height": "8.3",
       "capacity": "--",
       "status": "Không hoạt động",
-      "occupant_display": "___",
       "is_active": false,
       "occupants_flat": ""
     },
@@ -3017,7 +2881,6 @@
       "unbounded_height": "62",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3035,7 +2898,6 @@
       "unbounded_height": "3.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3043,16 +2905,11 @@
       "sheet_source": "AD",
       "room_number": "AD-207",
       "heading_1": "Office - HR",
-      "heading_2": "Văn phòng Nhân sự",
+      "heading_2": "Văn phòng Nhân s���",
       "department": "___",
       "occupants_list": [
         "Nguyễn Thị Thu Hà",
-        "Lê Thị A",
-        "Hồ Thị Thanh Hằng",
-        "Lê Thị Mai",
-        "Nguyễn Phúc Như Quỳnh",
-        "Nguyễn Thu Quỳnh Trang",
-        "Bùi Thanh Mến"
+        "Lê Thị A"
       ],
       "fm_room_function": "Counseling",
       "fm_room_type": "Office",
@@ -3061,9 +2918,9 @@
       "unbounded_height": "19.4",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Nguyễn Thị Thu Hà, Lê Thị A, Hồ Thị Thanh Hằng, Lê Thị Mai, Nguyễn Phúc Như Quỳnh, Nguyễn Thu Quỳnh Trang, Bùi Thanh Mến",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Thu Hà, Lê Thị A, Hồ Thị Thanh Hằng, Lê Thị Mai, Nguyễn Phúc Như Quỳnh, Nguyễn Thu Quỳnh Trang, Bùi Thanh Mến"
+      "occupants_flat": "Nguyễn Thị Thu Hà, Lê Thị A",
+      "occupant_display": "Nguyễn Thị Thu Hà, Lê Thị A"
     },
     {
       "sheet_source": "AD",
@@ -3079,7 +2936,6 @@
       "unbounded_height": "38.2",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3090,12 +2946,7 @@
       "heading_2": "Văn phòng Truyền thông",
       "department": "___",
       "occupants_list": [
-        "Bùi Tố Nguyên",
-        "Nguyễn Ngọc Khánh Linh",
-        "Nguyễn Bình Hải Đăng",
-        "Phạm Thị Cẩm My",
-        "Bùi Thanh Tịnh",
-        "Huỳnh Ngọc Thành"
+        "Bùi Tố Nguyên"
       ],
       "fm_room_function": "Unassigned",
       "fm_room_type": "Vacant",
@@ -3104,9 +2955,9 @@
       "unbounded_height": "29.1",
       "capacity": "--",
       "status": "Không hoạt động",
-      "occupant_display": "Bùi Tố Nguyên, Nguyễn Ngọc Khánh Linh, Nguyễn Bình Hải Đăng, Phạm Thị Cẩm My, Bùi Thanh Tịnh, Huỳnh Ngọc Thành",
       "is_active": false,
-      "occupants_flat": "Bùi Tố Nguyên, Nguyễn Ngọc Khánh Linh, Nguyễn Bình Hải Đăng, Phạm Thị Cẩm My, Bùi Thanh Tịnh, Huỳnh Ngọc Thành"
+      "occupants_flat": "Bùi Tố Nguyên",
+      "occupant_display": "Bùi Tố Nguyên"
     },
     {
       "sheet_source": "AD",
@@ -3124,9 +2975,9 @@
       "unbounded_height": "51.6",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Lê Thị Hạnh",
       "is_active": true,
-      "occupants_flat": "Lê Thị Hạnh"
+      "occupants_flat": "Lê Thị Hạnh",
+      "occupant_display": "Lê Thị Hạnh"
     },
     {
       "sheet_source": "AD",
@@ -3142,7 +2993,6 @@
       "unbounded_height": "14.7",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3160,7 +3010,6 @@
       "unbounded_height": "70.3",
       "capacity": "--",
       "status": "Không hoạt động",
-      "occupant_display": "___",
       "is_active": false,
       "occupants_flat": ""
     },
@@ -3180,9 +3029,9 @@
       "unbounded_height": "9.2",
       "capacity": "--",
       "status": "Không hoạt động",
-      "occupant_display": "Trịnh Thanh Vi",
       "is_active": false,
-      "occupants_flat": "Trịnh Thanh Vi"
+      "occupants_flat": "Trịnh Thanh Vi",
+      "occupant_display": "Trịnh Thanh Vi"
     },
     {
       "sheet_source": "AD",
@@ -3198,7 +3047,6 @@
       "unbounded_height": "33.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3209,14 +3057,7 @@
       "heading_2": "Kho Thiết bị CNTT",
       "department": "___",
       "occupants_list": [
-        "Phạm Chi Mai",
-        "Nguyễn Hoàng Thiên Thư",
-        "Trần Thị Ngọc Thủy",
-        "Tô Diễm Huỳnh",
-        "Nguyễn Thị Mỹ Hường",
-        "Nguyễn Ngọc Anh Thư",
-        "Huỳnh Anh Hậu",
-        "Nguyễn Ngọc Thiên Thanh"
+        "Phạm Chi Mai"
       ],
       "fm_room_function": "Recruitment",
       "fm_room_type": "Office",
@@ -3225,9 +3066,9 @@
       "unbounded_height": "5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Phạm Chi Mai, Nguyễn Hoàng Thiên Thư, Trần Thị Ngọc Thủy, Tô Diễm Huỳnh, Nguyễn Thị Mỹ Hường, Nguyễn Ngọc Anh Thư, Huỳnh Anh Hậu, Nguyễn Ngọc Thiên Thanh",
       "is_active": true,
-      "occupants_flat": "Phạm Chi Mai, Nguyễn Hoàng Thiên Thư, Trần Thị Ngọc Thủy, Tô Diễm Huỳnh, Nguyễn Thị Mỹ Hường, Nguyễn Ngọc Anh Thư, Huỳnh Anh Hậu, Nguyễn Ngọc Thiên Thanh"
+      "occupants_flat": "Phạm Chi Mai",
+      "occupant_display": "Phạm Chi Mai"
     },
     {
       "sheet_source": "AD",
@@ -3236,10 +3077,7 @@
       "heading_2": "Phòng Sửa chữa Phần cứng",
       "department": "___",
       "occupants_list": [
-        "Đỗ Hữu Tuấn Anh",
-        "Lê Trần Tú Uyên",
-        "Phan Hồng Thy",
-        "Nguyễn Hoàng Hải"
+        "Đỗ Hữu Tuấn Anh"
       ],
       "fm_room_function": "Maintenance",
       "fm_room_type": "Support",
@@ -3248,9 +3086,9 @@
       "unbounded_height": "42.1",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Đỗ Hữu Tuấn Anh, Lê Trần Tú Uyên, Phan Hồng Thy, Nguyễn Hoàng Hải",
       "is_active": true,
-      "occupants_flat": "Đỗ Hữu Tuấn Anh, Lê Trần Tú Uyên, Phan Hồng Thy, Nguyễn Hoàng Hải"
+      "occupants_flat": "Đỗ Hữu Tuấn Anh",
+      "occupant_display": "Đỗ Hữu Tuấn Anh"
     },
     {
       "sheet_source": "AD",
@@ -3268,9 +3106,9 @@
       "unbounded_height": "55.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Vũ Quốc Hữu",
       "is_active": true,
-      "occupants_flat": "Vũ Quốc Hữu"
+      "occupants_flat": "Vũ Quốc Hữu",
+      "occupant_display": "Vũ Quốc Hữu"
     },
     {
       "sheet_source": "AD",
@@ -3286,7 +3124,6 @@
       "unbounded_height": "18.2",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3297,8 +3134,7 @@
       "heading_2": "Phòng họp nhỏ 2",
       "department": "___",
       "occupants_list": [
-        "Đỗ Tuấn Hải",
-        "Lê Tuấn Nghĩa"
+        "Đỗ Tuấn Hải"
       ],
       "fm_room_function": "Media Production",
       "fm_room_type": "Studio",
@@ -3307,9 +3143,9 @@
       "unbounded_height": "27.4",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Đỗ Tuấn Hải, Lê Tuấn Nghĩa",
       "is_active": true,
-      "occupants_flat": "Đỗ Tuấn Hải, Lê Tuấn Nghĩa"
+      "occupants_flat": "Đỗ Tuấn Hải",
+      "occupant_display": "Đỗ Tuấn Hải"
     },
     {
       "sheet_source": "AD",
@@ -3327,9 +3163,9 @@
       "unbounded_height": "61.2",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Nguyễn Thị Hằng Nga",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Hằng Nga"
+      "occupants_flat": "Nguyễn Thị Hằng Nga",
+      "occupant_display": "Nguyễn Thị Hằng Nga"
     },
     {
       "sheet_source": "AD",
@@ -3338,9 +3174,7 @@
       "heading_2": "Phòng họp Hội đồng",
       "department": "___",
       "occupants_list": [
-        "Lê Văn Thành",
-        "Nguyễn Đồng Ngân",
-        "Phạm Minh Vương"
+        "Lê Văn Thành"
       ],
       "fm_room_function": "Pantry",
       "fm_room_type": "Service",
@@ -3349,9 +3183,9 @@
       "unbounded_height": "39",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Lê Văn Thành, Nguyễn Đồng Ngân, Phạm Minh Vương",
       "is_active": true,
-      "occupants_flat": "Lê Văn Thành, Nguyễn Đồng Ngân, Phạm Minh Vương"
+      "occupants_flat": "Lê Văn Thành",
+      "occupant_display": "Lê Văn Thành"
     },
     {
       "sheet_source": "AD",
@@ -3367,7 +3201,6 @@
       "unbounded_height": "11.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3378,8 +3211,7 @@
       "heading_2": "Phòng Thảo luận nhóm 2",
       "department": "___",
       "occupants_list": [
-        "Trần Quốc Khánh",
-        "Mr. Nguyễn Văn Hu���nh"
+        "Trần Quốc Khánh"
       ],
       "fm_room_function": "Janitorial",
       "fm_room_type": "Support",
@@ -3388,9 +3220,9 @@
       "unbounded_height": "22.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Trần Quốc Khánh, Mr. Nguyễn Văn Hu���nh",
       "is_active": true,
-      "occupants_flat": "Trần Quốc Khánh, Mr. Nguyễn Văn Hu���nh"
+      "occupants_flat": "Trần Quốc Khánh",
+      "occupant_display": "Trần Quốc Khánh"
     },
     {
       "sheet_source": "AD",
@@ -3408,9 +3240,9 @@
       "unbounded_height": "85.4",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Đồng Văn Tín",
       "is_active": true,
-      "occupants_flat": "Đồng Văn Tín"
+      "occupants_flat": "Đồng Văn Tín",
+      "occupant_display": "Đồng Văn Tín"
     },
     {
       "sheet_source": "AD",
@@ -3426,7 +3258,6 @@
       "unbounded_height": "7.1",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3437,10 +3268,7 @@
       "heading_2": "Phòng Giao ban",
       "department": "___",
       "occupants_list": [
-        "Nguyễn Quang Liêm",
-        "Võ Văn Nam",
-        "Trần Nguyên Hảo",
-        "Nguyễn Anh Thọ"
+        "Nguyễn Quang Liêm"
       ],
       "fm_room_function": "Unassigned",
       "fm_room_type": "Vacant",
@@ -3449,9 +3277,9 @@
       "unbounded_height": "48.3",
       "capacity": "--",
       "status": "Không hoạt động",
-      "occupant_display": "Nguyễn Quang Liêm, Võ Văn Nam, Trần Nguyên Hảo, Nguyễn Anh Thọ",
       "is_active": false,
-      "occupants_flat": "Nguyễn Quang Liêm, Võ Văn Nam, Trần Nguyên Hảo, Nguyễn Anh Thọ"
+      "occupants_flat": "Nguyễn Quang Liêm",
+      "occupant_display": "Nguyễn Quang Liêm"
     },
     {
       "sheet_source": "AD",
@@ -3460,9 +3288,7 @@
       "heading_2": "Phòng Đào tạo",
       "department": "___",
       "occupants_list": [
-        "Nguyễn Hữu Dần",
-        "Lê Ngọc Thành",
-        "Phạm Bảo Tài"
+        "Nguyễn Hữu Dần"
       ],
       "fm_room_function": "Admissions",
       "fm_room_type": "Office",
@@ -3471,9 +3297,9 @@
       "unbounded_height": "31",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Nguyễn Hữu Dần, Lê Ngọc Thành, Phạm Bảo Tài",
       "is_active": true,
-      "occupants_flat": "Nguyễn Hữu Dần, Lê Ngọc Thành, Phạm Bảo Tài"
+      "occupants_flat": "Nguyễn Hữu Dần",
+      "occupant_display": "Nguyễn Hữu Dần"
     },
     {
       "sheet_source": "AD",
@@ -3489,7 +3315,6 @@
       "unbounded_height": "64.7",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3500,9 +3325,7 @@
       "heading_2": "Không gian Làm việc chung",
       "department": "___",
       "occupants_list": [
-        "Vương Thanh Hải",
-        "Phạm Thanh Hải",
-        "Mr. Vũ Nam Long"
+        "Vương Thanh Hải"
       ],
       "fm_room_function": "Audit",
       "fm_room_type": "Office",
@@ -3511,9 +3334,9 @@
       "unbounded_height": "35.2",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Vương Thanh Hải, Phạm Thanh Hải, Mr. Vũ Nam Long",
       "is_active": true,
-      "occupants_flat": "Vương Thanh Hải, Phạm Thanh Hải, Mr. Vũ Nam Long"
+      "occupants_flat": "Vương Thanh Hải",
+      "occupant_display": "Vương Thanh Hải"
     },
     {
       "sheet_source": "AD",
@@ -3529,7 +3352,6 @@
       "unbounded_height": "15.9",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3547,7 +3369,6 @@
       "unbounded_height": "73.1",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3565,7 +3386,6 @@
       "unbounded_height": "41.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3583,7 +3403,6 @@
       "unbounded_height": "20.6",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3601,7 +3420,6 @@
       "unbounded_height": "78",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3619,7 +3437,6 @@
       "unbounded_height": "10.4",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3637,7 +3454,6 @@
       "unbounded_height": "50.2",
       "capacity": "--",
       "status": "Không hoạt động",
-      "occupant_display": "___",
       "is_active": false,
       "occupants_flat": ""
     },
@@ -3655,7 +3471,6 @@
       "unbounded_height": "25.3",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3673,7 +3488,6 @@
       "unbounded_height": "58.9",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3691,7 +3505,6 @@
       "unbounded_height": "32.4",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3709,7 +3522,6 @@
       "unbounded_height": "44.7",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3717,7 +3529,7 @@
       "sheet_source": "AD",
       "room_number": "AD-304",
       "heading_1": "Staff Dining",
-      "heading_2": "Nhà ăn Cán bộ/Giảng vi��n",
+      "heading_2": "Nhà ăn Cán bộ/Giảng viên",
       "department": "___",
       "occupants_list": [],
       "fm_room_function": "Locker Room",
@@ -3727,7 +3539,6 @@
       "unbounded_height": "13.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3747,9 +3558,9 @@
       "unbounded_height": "82.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Assoc. Prof. Garcia Clavel Manuel",
       "is_active": true,
-      "occupants_flat": "Assoc. Prof. Garcia Clavel Manuel"
+      "occupants_flat": "Assoc. Prof. Garcia Clavel Manuel",
+      "occupant_display": "Assoc. Prof. Garcia Clavel Manuel"
     },
     {
       "sheet_source": "AD",
@@ -3765,7 +3576,6 @@
       "unbounded_height": "6.2",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3783,7 +3593,6 @@
       "unbounded_height": "28.1",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3801,7 +3610,6 @@
       "unbounded_height": "68.4",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3819,7 +3627,6 @@
       "unbounded_height": "53.1",
       "capacity": "--",
       "status": "Không hoạt động",
-      "occupant_display": "___",
       "is_active": false,
       "occupants_flat": ""
     },
@@ -3837,7 +3644,6 @@
       "unbounded_height": "16.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3848,10 +3654,7 @@
       "heading_2": "Kho Giấy và Bút",
       "department": "___",
       "occupants_list": [
-        "Dr. Nguyễn Ngọc Hiếu",
-        "Dr. Phạm Thái Sơn",
-        "Dr. Hứa Trần Minh Trí",
-        "Dr. Đào Thị Bích Vân"
+        "Dr. Nguyễn Ngọc Hiếu"
       ],
       "fm_room_function": "Benefits",
       "fm_room_type": "Office",
@@ -3860,9 +3663,9 @@
       "unbounded_height": "34.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Nguyễn Ngọc Hiếu, Dr. Phạm Thái Sơn, Dr. Hứa Trần Minh Trí, Dr. Đào Thị Bích Vân",
       "is_active": true,
-      "occupants_flat": "Dr. Nguyễn Ngọc Hiếu, Dr. Phạm Thái Sơn, Dr. Hứa Trần Minh Trí, Dr. Đào Thị Bích Vân"
+      "occupants_flat": "Dr. Nguyễn Ngọc Hiếu",
+      "occupant_display": "Dr. Nguyễn Ngọc Hiếu"
     },
     {
       "sheet_source": "AD",
@@ -3878,7 +3681,6 @@
       "unbounded_height": "63.2",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3896,7 +3698,6 @@
       "unbounded_height": "40.6",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3914,7 +3715,6 @@
       "unbounded_height": "19.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3932,7 +3732,6 @@
       "unbounded_height": "79.2",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3952,9 +3751,9 @@
       "unbounded_height": "8.9",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Đồng Quang Huấn",
       "is_active": true,
-      "occupants_flat": "Dr. Đồng Quang Huấn"
+      "occupants_flat": "Dr. Đồng Quang Huấn",
+      "occupant_display": "Dr. Đồng Quang Huấn"
     },
     {
       "sheet_source": "AD",
@@ -3970,7 +3769,6 @@
       "unbounded_height": "30.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3990,9 +3788,9 @@
       "unbounded_height": "57.3",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Đinh Hải Dũng",
       "is_active": true,
-      "occupants_flat": "Dr. Đinh Hải Dũng"
+      "occupants_flat": "Dr. Đinh Hải Dũng",
+      "occupant_display": "Dr. Đinh Hải Dũng"
     },
     {
       "sheet_source": "AD",
@@ -4008,7 +3806,6 @@
       "unbounded_height": "46.2",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -4026,7 +3823,6 @@
       "unbounded_height": "12.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -4044,7 +3840,6 @@
       "unbounded_height": "88.1",
       "capacity": "--",
       "status": "Không hoạt động",
-      "occupant_display": "___",
       "is_active": false,
       "occupants_flat": ""
     },
@@ -4062,7 +3857,6 @@
       "unbounded_height": "4.2",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -4080,7 +3874,6 @@
       "unbounded_height": "47",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -4098,7 +3891,6 @@
       "unbounded_height": "26.7",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -4116,7 +3908,6 @@
       "unbounded_height": "66.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -4134,7 +3925,6 @@
       "unbounded_height": "37.1",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -4152,7 +3942,6 @@
       "unbounded_height": "17.3",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -4170,7 +3959,6 @@
       "unbounded_height": "72",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -4188,7 +3976,6 @@
       "unbounded_height": "43.9",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -4199,8 +3986,7 @@
       "heading_2": "Hộp Kỹ thuật Nước",
       "department": "___",
       "occupants_list": [
-        "Trần Văn Tiến",
-        "Trịnh Nguyễn Hoàng Thi"
+        "Trần Văn Tiến"
       ],
       "fm_room_function": "Lounge",
       "fm_room_type": "Public",
@@ -4209,9 +3995,9 @@
       "unbounded_height": "21.4",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Trần Văn Tiến, Trịnh Nguyễn Hoàng Thi",
       "is_active": true,
-      "occupants_flat": "Trần Văn Tiến, Trịnh Nguyễn Hoàng Thi"
+      "occupants_flat": "Trần Văn Tiến",
+      "occupant_display": "Trần Văn Tiến"
     },
     {
       "sheet_source": "AD",
@@ -4229,9 +4015,9 @@
       "unbounded_height": "75.6",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Lã Vĩnh Trung",
       "is_active": true,
-      "occupants_flat": "Dr. Lã Vĩnh Trung"
+      "occupants_flat": "Dr. Lã Vĩnh Trung",
+      "occupant_display": "Dr. Lã Vĩnh Trung"
     },
     {
       "sheet_source": "AD",
@@ -4249,9 +4035,9 @@
       "unbounded_height": "9.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Nguyễn Thị Hoài",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Hoài"
+      "occupants_flat": "Nguyễn Thị Hoài",
+      "occupant_display": "Nguyễn Thị Hoài"
     },
     {
       "sheet_source": "AD",
@@ -4260,8 +4046,7 @@
       "heading_2": "Phòng Kỹ thuật Thang máy",
       "department": "___",
       "occupants_list": [
-        "Lê Thị Hoa",
-        "Huỳnh Đỗ Hiếu Như"
+        "Lê Thị Hoa"
       ],
       "fm_room_function": "Software QA",
       "fm_room_type": "Operations",
@@ -4270,9 +4055,9 @@
       "unbounded_height": "52.4",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Lê Thị Hoa, Huỳnh Đỗ Hiếu Như",
       "is_active": true,
-      "occupants_flat": "Lê Thị Hoa, Huỳnh Đỗ Hiếu Như"
+      "occupants_flat": "Lê Thị Hoa",
+      "occupant_display": "Lê Thị Hoa"
     },
     {
       "sheet_source": "AD",
@@ -4290,9 +4075,9 @@
       "unbounded_height": "29.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Võ Phan Hoàng Trang",
       "is_active": true,
-      "occupants_flat": "Võ Phan Hoàng Trang"
+      "occupants_flat": "Võ Phan Hoàng Trang",
+      "occupant_display": "Võ Phan Hoàng Trang"
     },
     {
       "sheet_source": "AD",
@@ -4301,8 +4086,7 @@
       "heading_2": "Phòng Quy hoạch Không gian",
       "department": "___",
       "occupants_list": [
-        "Nguyễn Ngọc Đoan Trang",
-        "Nguyễn Thị Mỹ Tiên"
+        "Nguyễn Ngọc Đoan Trang"
       ],
       "fm_room_function": "Unassigned",
       "fm_room_type": "Vacant",
@@ -4311,9 +4095,9 @@
       "unbounded_height": "59.5",
       "capacity": "--",
       "status": "Không hoạt động",
-      "occupant_display": "Nguyễn Ngọc Đoan Trang, Nguyễn Thị Mỹ Tiên",
       "is_active": false,
-      "occupants_flat": "Nguyễn Ngọc Đoan Trang, Nguyễn Thị Mỹ Tiên"
+      "occupants_flat": "Nguyễn Ngọc Đoan Trang",
+      "occupant_display": "Nguyễn Ngọc Đoan Trang"
     },
     {
       "sheet_source": "AD",
@@ -4329,7 +4113,6 @@
       "unbounded_height": "36",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -4347,7 +4130,6 @@
       "unbounded_height": "49.1",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -4365,7 +4147,6 @@
       "unbounded_height": "14.2",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -4383,7 +4164,6 @@
       "unbounded_height": "81.7",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -4391,11 +4171,10 @@
       "sheet_source": "AD",
       "room_number": "AD-342A",
       "heading_1": "Restroom Supply",
-      "heading_2": "Kho Đ��� Dùng Nhà vệ sinh",
+      "heading_2": "Kho Đồ Dùng Nhà vệ sinh",
       "department": "___",
       "occupants_list": [
-        "Nguyễn Thanh Duy",
-        "Lê Hồng Duyên"
+        "Nguyễn Thanh Duy"
       ],
       "fm_room_function": "Safety Gear",
       "fm_room_type": "Storage",
@@ -4404,9 +4183,9 @@
       "unbounded_height": "6.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Nguyễn Thanh Duy, Lê Hồng Duyên",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thanh Duy, Lê Hồng Duyên"
+      "occupants_flat": "Nguyễn Thanh Duy",
+      "occupant_display": "Nguyễn Thanh Duy"
     },
     {
       "sheet_source": "AD",
@@ -4415,8 +4194,7 @@
       "heading_2": "Phòng Xử lý Rác thải",
       "department": "___",
       "occupants_list": [
-        "Ngô Xuân Thúy Hằng",
-        "Trần Thị Bích Thuận"
+        "Ngô Xuân Thúy Hằng"
       ],
       "fm_room_function": "Department Head",
       "fm_room_type": "Office",
@@ -4425,9 +4203,9 @@
       "unbounded_height": "24.1",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Ngô Xuân Thúy Hằng, Trần Thị Bích Thuận",
       "is_active": true,
-      "occupants_flat": "Ngô Xuân Thúy Hằng, Trần Thị Bích Thuận"
+      "occupants_flat": "Ngô Xuân Thúy Hằng",
+      "occupant_display": "Ngô Xuân Thúy Hằng"
     },
     {
       "sheet_source": "AD",
@@ -4436,8 +4214,7 @@
       "heading_2": "Phòng Tập kết Phế liệu",
       "department": "___",
       "occupants_list": [
-        "Nguyễn Thị Huỳnh",
-        "Đào Thị Vân Anh"
+        "Nguyễn Thị Huỳnh"
       ],
       "fm_room_function": "Design Studio",
       "fm_room_type": "Studio",
@@ -4446,19 +4223,18 @@
       "unbounded_height": "67.9",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Nguyễn Thị Huỳnh, Đào Thị Vân Anh",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Huỳnh, Đào Thị Vân Anh"
+      "occupants_flat": "Nguyễn Thị Huỳnh",
+      "occupant_display": "Nguyễn Thị Huỳnh"
     },
     {
       "sheet_source": "AD",
       "room_number": "AD-345",
       "heading_1": "Hazardous Waste",
-      "heading_2": "Kho Chất th���i Nguy hại",
+      "heading_2": "Kho Chất thải Nguy hại",
       "department": "___",
       "occupants_list": [
-        "Sử Thị Ái Diễm",
-        "Trương Thị Huyền"
+        "Sử Thị Ái Diễm"
       ],
       "fm_room_function": "Information Desk",
       "fm_room_type": "Public",
@@ -4467,9 +4243,9 @@
       "unbounded_height": "54.6",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Sử Thị Ái Diễm, Trương Thị Huyền",
       "is_active": true,
-      "occupants_flat": "Sử Thị Ái Diễm, Trương Thị Huyền"
+      "occupants_flat": "Sử Thị Ái Diễm",
+      "occupant_display": "Sử Thị Ái Diễm"
     },
     {
       "sheet_source": "AD",
@@ -4487,9 +4263,9 @@
       "unbounded_height": "18.7",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Trần Thị Thu Yên",
       "is_active": true,
-      "occupants_flat": "Trần Thị Thu Yên"
+      "occupants_flat": "Trần Thị Thu Yên",
+      "occupant_display": "Trần Thị Thu Yên"
     },
     {
       "sheet_source": "AD",
@@ -4498,9 +4274,7 @@
       "heading_2": "Phòng Rửa Thiết bị",
       "department": "___",
       "occupants_list": [
-        "Đặng Thị Thanh Thúy",
-        "Dương Đình Khánh",
-        "Võ Thị Mai Hương"
+        "Đặng Thị Thanh Thúy"
       ],
       "fm_room_function": "Elevator Control",
       "fm_room_type": "Utility",
@@ -4508,10 +4282,10 @@
       "area": "770",
       "unbounded_height": "33.1",
       "capacity": "--",
-      "status": "Hoạt động",
-      "occupant_display": "Đặng Thị Thanh Thúy, Dương Đình Khánh, Võ Thị Mai Hương",
+      "status": "Hoạt ��ộng",
       "is_active": true,
-      "occupants_flat": "Đặng Thị Thanh Thúy, Dương Đình Khánh, Võ Thị Mai Hương"
+      "occupants_flat": "Đặng Thị Thanh Thúy",
+      "occupant_display": "Đặng Thị Thanh Thúy"
     },
     {
       "sheet_source": "AD",
@@ -4520,8 +4294,7 @@
       "heading_2": "Phòng Chăm sóc Cảnh quan",
       "department": "___",
       "occupants_list": [
-        "Đào Thị Thu Dung",
-        "Nguyễn Công Việt"
+        "Đào Thị Thu Dung"
       ],
       "fm_room_function": "Waste Management",
       "fm_room_type": "Support",
@@ -4530,9 +4303,9 @@
       "unbounded_height": "65.1",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Đào Thị Thu Dung, Nguyễn Công Việt",
       "is_active": true,
-      "occupants_flat": "Đào Thị Thu Dung, Nguyễn Công Việt"
+      "occupants_flat": "Đào Thị Thu Dung",
+      "occupant_display": "Đào Thị Thu Dung"
     },
     {
       "sheet_source": "AD",
@@ -4550,9 +4323,9 @@
       "unbounded_height": "41",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Trần Đức Khánh",
       "is_active": true,
-      "occupants_flat": "Dr. Trần Đức Khánh"
+      "occupants_flat": "Dr. Trần Đức Khánh",
+      "occupant_display": "Dr. Trần Đức Khánh"
     },
     {
       "sheet_source": "AD",
@@ -4568,7 +4341,6 @@
       "unbounded_height": "22",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -4579,8 +4351,7 @@
       "heading_2": "Phòng Điều phối Xe",
       "department": "___",
       "occupants_list": [
-        "Nguyễn Mai Linh",
-        "Trần Văn Phúc"
+        "Nguyễn Mai Linh"
       ],
       "fm_room_function": "Unassigned",
       "fm_room_type": "Vacant",
@@ -4589,9 +4360,9 @@
       "unbounded_height": "77.3",
       "capacity": "--",
       "status": "Không hoạt động",
-      "occupant_display": "Nguyễn Mai Linh, Trần Văn Phúc",
       "is_active": false,
-      "occupants_flat": "Nguyễn Mai Linh, Trần Văn Phúc"
+      "occupants_flat": "Nguyễn Mai Linh",
+      "occupant_display": "Nguyễn Mai Linh"
     },
     {
       "sheet_source": "AD",
@@ -4600,8 +4371,7 @@
       "heading_2": "Phòng Điều khiển An ninh",
       "department": "___",
       "occupants_list": [
-        "Nguyễn Thị Hòa",
-        "Phạm Tú Bình"
+        "Nguyễn Thị Hòa"
       ],
       "fm_room_function": "Club Workspace",
       "fm_room_type": "Office",
@@ -4610,9 +4380,9 @@
       "unbounded_height": "11.2",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Nguyễn Thị Hòa, Phạm Tú Bình",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Hòa, Phạm Tú Bình"
+      "occupants_flat": "Nguyễn Thị Hòa",
+      "occupant_display": "Nguyễn Thị Hòa"
     },
     {
       "sheet_source": "AD",
@@ -4621,9 +4391,7 @@
       "heading_2": "Trung tâm Chỉ huy",
       "department": "___",
       "occupants_list": [
-        "Trần Thị Trang",
-        "Trần Ngọc Thùy Ngân",
-        "Ngô Thị Kiều Phương"
+        "Trần Thị Trang"
       ],
       "fm_room_function": "Key Control",
       "fm_room_type": "Operations",
@@ -4632,9 +4400,9 @@
       "unbounded_height": "31.7",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Trần Thị Trang, Trần Ngọc Thùy Ngân, Ngô Thị Kiều Phương",
       "is_active": true,
-      "occupants_flat": "Trần Thị Trang, Trần Ngọc Thùy Ngân, Ngô Thị Kiều Phương"
+      "occupants_flat": "Trần Thị Trang",
+      "occupant_display": "Trần Thị Trang"
     },
     {
       "sheet_source": "AD",
@@ -4650,7 +4418,6 @@
       "unbounded_height": "56.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -4670,9 +4437,9 @@
       "unbounded_height": "45.3",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Nguyễn Thị Hoa",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Hoa"
+      "occupants_flat": "Nguyễn Thị Hoa",
+      "occupant_display": "Nguyễn Thị Hoa"
     },
     {
       "sheet_source": "AD",
@@ -4688,7 +4455,6 @@
       "unbounded_height": "13",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -4706,7 +4472,6 @@
       "unbounded_height": "86.2",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -4717,11 +4482,7 @@
       "heading_2": "Chốt Gác An ninh 1",
       "department": "___",
       "occupants_list": [
-        "Nguyễn Thị Bông",
-        "Võ Quốc Cường",
-        "Nguyễn Văn Xuân",
-        "Nguyễn Văn Dần",
-        "Nguyễn Anh Xuân"
+        "Nguyễn Thị Bông"
       ],
       "fm_room_function": "Video Conference",
       "fm_room_type": "Conference",
@@ -4730,9 +4491,9 @@
       "unbounded_height": "5.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Nguyễn Thị Bông, Võ Quốc Cường, Nguyễn Văn Xuân, Nguyễn Văn Dần, Nguyễn Anh Xuân",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Bông, Võ Quốc Cường, Nguyễn Văn Xuân, Nguyễn Văn Dần, Nguyễn Anh Xuân"
+      "occupants_flat": "Nguyễn Thị Bông",
+      "occupant_display": "Nguyễn Thị Bông"
     },
     {
       "sheet_source": "AD",
@@ -4748,7 +4509,6 @@
       "unbounded_height": "49.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -4766,7 +4526,6 @@
       "unbounded_height": "27.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -4784,7 +4543,6 @@
       "unbounded_height": "62.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -4802,7 +4560,6 @@
       "unbounded_height": "34.2",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -4820,7 +4577,6 @@
       "unbounded_height": "15.1",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -4838,7 +4594,6 @@
       "unbounded_height": "69.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -4856,7 +4611,6 @@
       "unbounded_height": "42.6",
       "capacity": "--",
       "status": "Không hoạt động",
-      "occupant_display": "___",
       "is_active": false,
       "occupants_flat": ""
     },
@@ -4876,9 +4630,9 @@
       "unbounded_height": "20.3",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Lê Thái Cường",
       "is_active": true,
-      "occupants_flat": "Lê Thái Cường"
+      "occupants_flat": "Lê Thái Cường",
+      "occupant_display": "Lê Thái Cường"
     },
     {
       "sheet_source": "AD",
@@ -4895,10 +4649,10 @@
       "area": "1410",
       "unbounded_height": "80.5",
       "capacity": "--",
-      "status": "Hoạt động",
-      "occupant_display": "Lê Thái Cường",
+      "status": "Hoạt ��ộng",
       "is_active": true,
-      "occupants_flat": "Lê Thái Cường"
+      "occupants_flat": "Lê Thái Cường",
+      "occupant_display": "Lê Thái Cường"
     },
     {
       "sheet_source": "AD",
@@ -4916,9 +4670,9 @@
       "unbounded_height": "7.9",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Trần Hồng Ngọc",
       "is_active": true,
-      "occupants_flat": "Dr. Trần Hồng Ngọc"
+      "occupants_flat": "Dr. Trần Hồng Ngọc",
+      "occupant_display": "Dr. Trần Hồng Ngọc"
     },
     {
       "sheet_source": "AD",
@@ -4936,9 +4690,9 @@
       "unbounded_height": "46.7",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Lê Thái Cường",
       "is_active": true,
-      "occupants_flat": "Lê Thái Cường"
+      "occupants_flat": "Lê Thái Cường",
+      "occupant_display": "Lê Thái Cường"
     },
     {
       "sheet_source": "AD",
@@ -4954,7 +4708,6 @@
       "unbounded_height": "23.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -4972,7 +4725,6 @@
       "unbounded_height": "60.4",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -4990,7 +4742,6 @@
       "unbounded_height": "31.9",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5010,9 +4761,9 @@
       "unbounded_height": "47.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Trần Hữu Tâm",
       "is_active": true,
-      "occupants_flat": "Dr. Trần Hữu Tâm"
+      "occupants_flat": "Dr. Trần Hữu Tâm",
+      "occupant_display": "Dr. Trần Hữu Tâm"
     },
     {
       "sheet_source": "AD",
@@ -5030,9 +4781,9 @@
       "unbounded_height": "12",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Lê Thái Cường",
       "is_active": true,
-      "occupants_flat": "Lê Thái Cường"
+      "occupants_flat": "Lê Thái Cường",
+      "occupant_display": "Lê Thái Cường"
     },
     {
       "sheet_source": "AD",
@@ -5048,7 +4799,6 @@
       "unbounded_height": "83.9",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5066,7 +4816,6 @@
       "unbounded_height": "4.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5084,7 +4833,6 @@
       "unbounded_height": "28.9",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5104,9 +4852,9 @@
       "unbounded_height": "67.2",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Lê Duy Hùng",
       "is_active": true,
-      "occupants_flat": "Lê Duy Hùng"
+      "occupants_flat": "Lê Duy Hùng",
+      "occupant_display": "Lê Duy Hùng"
     },
     {
       "sheet_source": "AD",
@@ -5124,9 +4872,9 @@
       "unbounded_height": "51.9",
       "capacity": "--",
       "status": "Không hoạt động",
-      "occupant_display": "Dr. Lê Lam Sơn",
       "is_active": false,
-      "occupants_flat": "Dr. Lê Lam Sơn"
+      "occupants_flat": "Dr. Lê Lam Sơn",
+      "occupant_display": "Dr. Lê Lam Sơn"
     },
     {
       "sheet_source": "AD",
@@ -5144,9 +4892,9 @@
       "unbounded_height": "17.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Nguyễn Tuấn Cường",
       "is_active": true,
-      "occupants_flat": "Dr. Nguyễn Tuấn Cường"
+      "occupants_flat": "Dr. Nguyễn Tuấn Cường",
+      "occupant_display": "Dr. Nguyễn Tuấn Cường"
     },
     {
       "sheet_source": "AD",
@@ -5164,9 +4912,9 @@
       "unbounded_height": "35.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Lê Thái Cường",
       "is_active": true,
-      "occupants_flat": "Lê Thái Cường"
+      "occupants_flat": "Lê Thái Cường",
+      "occupant_display": "Lê Thái Cường"
     },
     {
       "sheet_source": "AD",
@@ -5184,9 +4932,9 @@
       "unbounded_height": "65.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Trần Hồng Ngọc",
       "is_active": true,
-      "occupants_flat": "Dr. Trần Hồng Ngọc"
+      "occupants_flat": "Dr. Trần Hồng Ngọc",
+      "occupant_display": "Dr. Trần Hồng Ngọc"
     },
     {
       "sheet_source": "AD",
@@ -5204,9 +4952,9 @@
       "unbounded_height": "40.1",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Lê Thùy Đoan Trang",
       "is_active": true,
-      "occupants_flat": "Lê Thùy Đoan Trang"
+      "occupants_flat": "Lê Thùy Đoan Trang",
+      "occupant_display": "Lê Thùy Đoan Trang"
     },
     {
       "sheet_source": "AD",
@@ -5224,9 +4972,9 @@
       "unbounded_height": "22.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Trương Đình Huy",
       "is_active": true,
-      "occupants_flat": "Dr. Trương Đình Huy"
+      "occupants_flat": "Dr. Trương Đình Huy",
+      "occupant_display": "Dr. Trương Đình Huy"
     },
     {
       "sheet_source": "AD",
@@ -5244,9 +4992,9 @@
       "unbounded_height": "76.1",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Trần Thị Thu Hương",
       "is_active": true,
-      "occupants_flat": "Dr. Trần Thị Thu Hương"
+      "occupants_flat": "Dr. Trần Thị Thu Hương",
+      "occupant_display": "Dr. Trần Thị Thu Hương"
     },
     {
       "sheet_source": "AD",
@@ -5262,7 +5010,6 @@
       "unbounded_height": "10.1",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5280,7 +5027,6 @@
       "unbounded_height": "30.2",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5293,12 +5039,11 @@
       "occupants_list": [],
       "fm_room_function": "Mother's Room",
       "fm_room_type": "Service",
-      "fm_building_code": "",
+      "fm_building_code": "AD",
       "area": "1040",
       "unbounded_height": "58.1",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5311,12 +5056,11 @@
       "occupants_list": [],
       "fm_room_function": "Chiller",
       "fm_room_type": "Utility",
-      "fm_building_code": "",
+      "fm_building_code": "AD",
       "area": "885",
       "unbounded_height": "48.6",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5329,12 +5073,11 @@
       "occupants_list": [],
       "fm_room_function": "Pallet Storage",
       "fm_room_type": "Storage",
-      "fm_building_code": "",
+      "fm_building_code": "AD",
       "area": "330",
       "unbounded_height": "11.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5347,12 +5090,11 @@
       "occupants_list": [],
       "fm_room_function": "Staging",
       "fm_room_type": "Operations",
-      "fm_building_code": "",
+      "fm_building_code": "AD",
       "area": "1500",
       "unbounded_height": "87.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5365,12 +5107,11 @@
       "occupants_list": [],
       "fm_room_function": "Disposal",
       "fm_room_type": "Support",
-      "fm_building_code": "",
+      "fm_building_code": "AD",
       "area": "115",
       "unbounded_height": "3.9",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5383,12 +5124,11 @@
       "occupants_list": [],
       "fm_room_function": "Unassigned",
       "fm_room_type": "Vacant",
-      "fm_building_code": "",
+      "fm_building_code": "AD",
       "area": "930",
       "unbounded_height": "47.8",
       "capacity": "--",
       "status": "Không hoạt động",
-      "occupant_display": "___",
       "is_active": false,
       "occupants_flat": ""
     },
@@ -5406,7 +5146,6 @@
       "unbounded_height": "26.1",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5426,9 +5165,9 @@
       "unbounded_height": "66.9",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Nguyễn Minh Thông",
       "is_active": true,
-      "occupants_flat": "Nguyễn Minh Thông"
+      "occupants_flat": "Nguyễn Minh Thông",
+      "occupant_display": "Nguyễn Minh Thông"
     },
     {
       "sheet_source": "AD",
@@ -5444,7 +5183,6 @@
       "unbounded_height": "36.7",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5462,7 +5200,6 @@
       "unbounded_height": "16.2",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5480,7 +5217,6 @@
       "unbounded_height": "71.2",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5498,7 +5234,6 @@
       "unbounded_height": "43.4",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5516,7 +5251,6 @@
       "unbounded_height": "21",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5534,7 +5268,6 @@
       "unbounded_height": "78.7",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5552,7 +5285,6 @@
       "unbounded_height": "8.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5570,7 +5302,6 @@
       "unbounded_height": "50.9",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5588,7 +5319,6 @@
       "unbounded_height": "29.3",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5606,7 +5336,6 @@
       "unbounded_height": "59.9",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5624,7 +5353,6 @@
       "unbounded_height": "32.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5642,7 +5370,6 @@
       "unbounded_height": "46.5",
       "capacity": "--",
       "status": "Không hoạt động",
-      "occupant_display": "___",
       "is_active": false,
       "occupants_flat": ""
     },
@@ -5660,7 +5387,6 @@
       "unbounded_height": "14",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5678,7 +5404,6 @@
       "unbounded_height": "82.1",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5696,7 +5421,6 @@
       "unbounded_height": "6",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5714,7 +5438,6 @@
       "unbounded_height": "25",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5732,7 +5455,6 @@
       "unbounded_height": "68.1",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5750,7 +5472,6 @@
       "unbounded_height": "53.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5768,7 +5489,6 @@
       "unbounded_height": "18.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5786,7 +5506,6 @@
       "unbounded_height": "33.9",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5805,10 +5524,10 @@
       "area": "1135",
       "unbounded_height": "63.9",
       "capacity": "--",
-      "status": "Hoạt đ��ng",
-      "occupant_display": "Trương Ngọc Hùng",
+      "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Trương Ngọc Hùng"
+      "occupants_flat": "Trương Ngọc Hùng",
+      "occupant_display": "Trương Ngọc Hùng"
     },
     {
       "sheet_source": "AD",
@@ -5824,7 +5543,6 @@
       "unbounded_height": "41.2",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5842,7 +5560,6 @@
       "unbounded_height": "20.9",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5853,11 +5570,7 @@
       "heading_2": "Kho Hóa chất 2",
       "department": "___",
       "occupants_list": [
-        "Ms. Lâm Bửu Kiều",
-        "Nguyễn Thế Tuấn",
-        "Trương Phúc Thịnh",
-        "Nguyễn Thanh Tùng",
-        "Nguyễn Thị Mỹ Tiên"
+        "Ms. Lâm Bửu Kiều"
       ],
       "fm_room_function": "Helpdesk Counter",
       "fm_room_type": "Support",
@@ -5866,9 +5579,9 @@
       "unbounded_height": "78.9",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Ms. Lâm Bửu Kiều, Nguyễn Thế Tuấn, Trương Phúc Thịnh, Nguyễn Thanh Tùng, Nguyễn Thị Mỹ Tiên",
       "is_active": true,
-      "occupants_flat": "Ms. Lâm Bửu Kiều, Nguyễn Thế Tuấn, Trương Phúc Thịnh, Nguyễn Thanh Tùng, Nguyễn Thị Mỹ Tiên"
+      "occupants_flat": "Ms. Lâm Bửu Kiều",
+      "occupant_display": "Ms. Lâm Bửu Kiều"
     },
     {
       "sheet_source": "AD",
@@ -5877,9 +5590,7 @@
       "heading_2": "Phòng Kỹ thuật Điện/Data 2",
       "department": "___",
       "occupants_list": [
-        "Ms. Nguyễn Thị Khánh Giao",
-        "Trần Hồng Sự",
-        "Phạm Hoàng Sơn"
+        "Ms. Nguyễn Thị Khánh Giao"
       ],
       "fm_room_function": "Shared Desks",
       "fm_room_type": "Office",
@@ -5888,9 +5599,9 @@
       "unbounded_height": "10.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Ms. Nguyễn Thị Khánh Giao, Trần Hồng Sự, Phạm Hoàng Sơn",
       "is_active": true,
-      "occupants_flat": "Ms. Nguyễn Thị Khánh Giao, Trần Hồng Sự, Phạm Hoàng Sơn"
+      "occupants_flat": "Ms. Nguyễn Thị Khánh Giao",
+      "occupant_display": "Ms. Nguyễn Thị Khánh Giao"
     },
     {
       "sheet_source": "AD",
@@ -5899,11 +5610,7 @@
       "heading_2": "Phòng Kỹ thuật Cơ khí 2",
       "department": "___",
       "occupants_list": [
-        "Nguyễn Thành Công",
-        "Lê Đình Hùng",
-        "Phạm Đăng Khoa",
-        "Trần Văn Tuấn",
-        "Nguyễn Ngọc Tài"
+        "Nguyễn Thành Công"
       ],
       "fm_room_function": "Unassigned",
       "fm_room_type": "Vacant",
@@ -5912,9 +5619,9 @@
       "unbounded_height": "31.4",
       "capacity": "--",
       "status": "Không hoạt động",
-      "occupant_display": "Nguyễn Thành Công, Lê Đình Hùng, Phạm Đăng Khoa, Trần Văn Tuấn, Nguyễn Ngọc Tài",
       "is_active": false,
-      "occupants_flat": "Nguyễn Thành Công, Lê Đình Hùng, Phạm Đăng Khoa, Trần Văn Tuấn, Nguyễn Ngọc Tài"
+      "occupants_flat": "Nguyễn Thành Công",
+      "occupant_display": "Nguyễn Thành Công"
     },
     {
       "sheet_source": "AD",
@@ -5930,7 +5637,6 @@
       "unbounded_height": "57.6",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5948,7 +5654,6 @@
       "unbounded_height": "44.9",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -5959,8 +5664,7 @@
       "heading_2": "Kho Dụng cụ 2",
       "department": "___",
       "occupants_list": [
-        "Doãn Ngọc Tín",
-        "Nguyễn Thị Thu Hường"
+        "Doãn Ngọc Tín"
       ],
       "fm_room_function": "Forecasting",
       "fm_room_type": "Office",
@@ -5969,9 +5673,9 @@
       "unbounded_height": "13.4",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Doãn Ngọc Tín, Nguyễn Thị Thu Hường",
       "is_active": true,
-      "occupants_flat": "Doãn Ngọc Tín, Nguyễn Thị Thu Hường"
+      "occupants_flat": "Doãn Ngọc Tín",
+      "occupant_display": "Doãn Ngọc Tín"
     },
     {
       "sheet_source": "AD",
@@ -5980,8 +5684,7 @@
       "heading_2": "Phòng Hệ thống Lạnh 2",
       "department": "___",
       "occupants_list": [
-        "Nguyễn Việt Tiến",
-        "Nguyễn Quang Hảo"
+        "Nguyễn Việt Tiến"
       ],
       "fm_room_function": "Records Archive",
       "fm_room_type": "Storage",
@@ -5990,9 +5693,9 @@
       "unbounded_height": "84.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Nguyễn Việt Tiến, Nguyễn Quang Hảo",
       "is_active": true,
-      "occupants_flat": "Nguyễn Việt Tiến, Nguyễn Quang Hảo"
+      "occupants_flat": "Nguyễn Việt Tiến",
+      "occupant_display": "Nguyễn Việt Tiến"
     },
     {
       "sheet_source": "AD",
@@ -6010,9 +5713,9 @@
       "unbounded_height": "6.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Nguyễn Thị Đoan Trang",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Đoan Trang"
+      "occupants_flat": "Nguyễn Thị Đoan Trang",
+      "occupant_display": "Nguyễn Thị Đoan Trang"
     },
     {
       "sheet_source": "AD",
@@ -6030,9 +5733,9 @@
       "unbounded_height": "48.9",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Ms. Tạ Thị Thu Hiền",
       "is_active": true,
-      "occupants_flat": "Ms. Tạ Thị Thu Hiền"
+      "occupants_flat": "Ms. Tạ Thị Thu Hiền",
+      "occupant_display": "Ms. Tạ Thị Thu Hiền"
     },
     {
       "sheet_source": "AD",
@@ -6048,7 +5751,6 @@
       "unbounded_height": "27",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6066,7 +5768,6 @@
       "unbounded_height": "61.7",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6084,7 +5785,6 @@
       "unbounded_height": "34.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6102,7 +5802,6 @@
       "unbounded_height": "15.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6120,7 +5819,6 @@
       "unbounded_height": "69.1",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6138,7 +5836,6 @@
       "unbounded_height": "42",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6156,7 +5853,6 @@
       "unbounded_height": "20.1",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6174,7 +5870,6 @@
       "unbounded_height": "79.9",
       "capacity": "--",
       "status": "Không hoạt động",
-      "occupant_display": "___",
       "is_active": false,
       "occupants_flat": ""
     },
@@ -6192,7 +5887,6 @@
       "unbounded_height": "9.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6210,7 +5904,6 @@
       "unbounded_height": "47.4",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6228,7 +5921,6 @@
       "unbounded_height": "24.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6246,7 +5938,6 @@
       "unbounded_height": "58.4",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6264,7 +5955,6 @@
       "unbounded_height": "32.1",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6282,7 +5972,6 @@
       "unbounded_height": "45",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6300,7 +5989,6 @@
       "unbounded_height": "12.2",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6318,7 +6006,6 @@
       "unbounded_height": "83.2",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6336,7 +6023,6 @@
       "unbounded_height": "5.2",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6354,7 +6040,6 @@
       "unbounded_height": "29.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6372,7 +6057,6 @@
       "unbounded_height": "68.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6390,7 +6074,6 @@
       "unbounded_height": "52.7",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6408,7 +6091,6 @@
       "unbounded_height": "18",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6426,7 +6108,6 @@
       "unbounded_height": "36.4",
       "capacity": "--",
       "status": "Không hoạt động",
-      "occupant_display": "___",
       "is_active": false,
       "occupants_flat": ""
     },
@@ -6444,7 +6125,6 @@
       "unbounded_height": "64.3",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6461,8 +6141,7 @@
       "area": "840",
       "unbounded_height": "43",
       "capacity": "--",
-      "status": "Hoạt động",
-      "occupant_display": "___",
+      "status": "Hoạt đ���ng",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6480,7 +6159,6 @@
       "unbounded_height": "21.7",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6498,7 +6176,6 @@
       "unbounded_height": "76.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6516,7 +6193,6 @@
       "unbounded_height": "10.6",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6534,7 +6210,6 @@
       "unbounded_height": "30.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6552,7 +6227,6 @@
       "unbounded_height": "57.1",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6570,7 +6244,6 @@
       "unbounded_height": "49.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6588,7 +6261,6 @@
       "unbounded_height": "12.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6606,7 +6278,6 @@
       "unbounded_height": "87.9",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6624,7 +6295,6 @@
       "unbounded_height": "4",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6642,7 +6312,6 @@
       "unbounded_height": "46.9",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6660,7 +6329,6 @@
       "unbounded_height": "25.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6678,7 +6346,6 @@
       "unbounded_height": "66.2",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6696,7 +6363,6 @@
       "unbounded_height": "35.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6716,9 +6382,9 @@
       "unbounded_height": "16.9",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Christoff Hans Wiethoff",
       "is_active": true,
-      "occupants_flat": "Christoff Hans Wiethoff"
+      "occupants_flat": "Christoff Hans Wiethoff",
+      "occupant_display": "Christoff Hans Wiethoff"
     },
     {
       "sheet_source": "AD",
@@ -6727,8 +6393,7 @@
       "heading_2": "Phòng Họp Trực tuyến 2",
       "department": "___",
       "occupants_list": [
-        "Thái Thị Hà Trang",
-        "Nguyễn Võ Chí Thục"
+        "Thái Thị Hà Trang"
       ],
       "fm_room_function": "___",
       "fm_room_type": "___",
@@ -6737,9 +6402,9 @@
       "unbounded_height": "71.7",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Thái Thị Hà Trang, Nguyễn Võ Chí Thục",
       "is_active": true,
-      "occupants_flat": "Thái Thị Hà Trang, Nguyễn Võ Chí Thục"
+      "occupants_flat": "Thái Thị Hà Trang",
+      "occupant_display": "Thái Thị Hà Trang"
     },
     {
       "sheet_source": "AD",
@@ -6748,8 +6413,7 @@
       "heading_2": "Phòng Hoạch định Chiến lược 2",
       "department": "___",
       "occupants_list": [
-        "Nguyễn Thị Hiền",
-        "Đặng Khánh Linh"
+        "Nguyễn Thị Hiền"
       ],
       "fm_room_function": "___",
       "fm_room_type": "___",
@@ -6758,9 +6422,9 @@
       "unbounded_height": "44.3",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Nguyễn Thị Hiền, Đặng Khánh Linh",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Hiền, Đặng Khánh Linh"
+      "occupants_flat": "Nguyễn Thị Hiền",
+      "occupant_display": "Nguyễn Thị Hiền"
     },
     {
       "sheet_source": "AD",
@@ -6769,7 +6433,7 @@
       "heading_2": "Phòng Giao ban 2",
       "department": "___",
       "occupants_list": [
-        "Lâm Thị Hồng Gấm"
+        "Lâm Thị Hồng G���m"
       ],
       "fm_room_function": "___",
       "fm_room_type": "___",
@@ -6778,9 +6442,9 @@
       "unbounded_height": "21.2",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Lâm Thị Hồng Gấm",
       "is_active": true,
-      "occupants_flat": "Lâm Thị Hồng Gấm"
+      "occupants_flat": "Lâm Thị Hồng G���m",
+      "occupant_display": "Lâm Thị Hồng G���m"
     },
     {
       "sheet_source": "AD",
@@ -6796,7 +6460,6 @@
       "unbounded_height": "77.7",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6814,7 +6477,6 @@
       "unbounded_height": "9",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6832,7 +6494,6 @@
       "unbounded_height": "51.4",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6850,7 +6511,6 @@
       "unbounded_height": "28.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6870,9 +6530,9 @@
       "unbounded_height": "59.2",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Nguyễn Thị Quế Trân",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Quế Trân"
+      "occupants_flat": "Nguyễn Thị Quế Trân",
+      "occupant_display": "Nguyễn Thị Quế Trân"
     },
     {
       "sheet_source": "AD",
@@ -6888,7 +6548,6 @@
       "unbounded_height": "33",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6906,7 +6565,6 @@
       "unbounded_height": "48",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6917,8 +6575,7 @@
       "heading_2": "Kho Lưu trữ Tạm thời 2",
       "department": "___",
       "occupants_list": [
-        "Nguyễn Hồng Dung",
-        "Lại Thị An"
+        "Nguyễn Hồng Dung"
       ],
       "fm_room_function": "___",
       "fm_room_type": "___",
@@ -6927,9 +6584,9 @@
       "unbounded_height": "13.6",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Nguyễn Hồng Dung, Lại Thị An",
       "is_active": true,
-      "occupants_flat": "Nguyễn Hồng Dung, Lại Thị An"
+      "occupants_flat": "Nguyễn Hồng Dung",
+      "occupant_display": "Nguyễn Hồng Dung"
     },
     {
       "sheet_source": "AD",
@@ -6947,9 +6604,9 @@
       "unbounded_height": "81.9",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Nguyễn Thị Phương Lan",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Phương Lan"
+      "occupants_flat": "Nguyễn Thị Phương Lan",
+      "occupant_display": "Nguyễn Thị Phương Lan"
     },
     {
       "sheet_source": "AD",
@@ -6967,9 +6624,9 @@
       "unbounded_height": "6.4",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Prof.Dr. René Thiele",
       "is_active": true,
-      "occupants_flat": "Prof.Dr. René Thiele"
+      "occupants_flat": "Prof.Dr. René Thiele",
+      "occupant_display": "Prof.Dr. René Thiele"
     },
     {
       "sheet_source": "AD",
@@ -6985,7 +6642,6 @@
       "unbounded_height": "24.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -7003,7 +6659,6 @@
       "unbounded_height": "67.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -7021,7 +6676,6 @@
       "unbounded_height": "54.2",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -7041,9 +6695,9 @@
       "unbounded_height": "18.3",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Thomas Aulig",
       "is_active": true,
-      "occupants_flat": "Dr. Thomas Aulig"
+      "occupants_flat": "Dr. Thomas Aulig",
+      "occupant_display": "Dr. Thomas Aulig"
     },
     {
       "sheet_source": "AD",
@@ -7052,8 +6706,7 @@
       "heading_2": "___",
       "department": "___",
       "occupants_list": [
-        "Nguyễn Thị Thanh Hiền",
-        "Nguyễn Thị Thùy Trang"
+        "Nguyễn Thị Thanh Hiền"
       ],
       "fm_room_function": "___",
       "fm_room_type": "___",
@@ -7062,9 +6715,9 @@
       "unbounded_height": "33.7",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Nguyễn Thị Thanh Hiền, Nguyễn Thị Thùy Trang",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Thanh Hiền, Nguyễn Thị Thùy Trang"
+      "occupants_flat": "Nguyễn Thị Thanh Hiền",
+      "occupant_display": "Nguyễn Thị Thanh Hiền"
     },
     {
       "sheet_source": "AD",
@@ -7082,9 +6735,9 @@
       "unbounded_height": "64.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Hà Thúc Viên",
       "is_active": true,
-      "occupants_flat": "Dr. Hà Thúc Viên"
+      "occupants_flat": "Dr. Hà Thúc Viên",
+      "occupant_display": "Dr. Hà Thúc Viên"
     },
     {
       "sheet_source": "AD",
@@ -7100,7 +6753,6 @@
       "unbounded_height": "40.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -7118,7 +6770,6 @@
       "unbounded_height": "21.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -7136,7 +6787,6 @@
       "unbounded_height": "77.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -7154,7 +6804,6 @@
       "unbounded_height": "11",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -7172,7 +6821,6 @@
       "unbounded_height": "31.2",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -7190,7 +6838,6 @@
       "unbounded_height": "56.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -7203,12 +6850,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
-      "fm_building_code": "",
+      "fm_building_code": "AD",
       "area": "865",
       "unbounded_height": "45.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -7226,7 +6872,6 @@
       "unbounded_height": "13.2",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -7244,7 +6889,6 @@
       "unbounded_height": "85.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -7262,7 +6906,6 @@
       "unbounded_height": "5.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -7280,7 +6923,6 @@
       "unbounded_height": "50.5",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -7298,7 +6940,6 @@
       "unbounded_height": "27.8",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -7316,7 +6957,6 @@
       "unbounded_height": "62.1",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -7334,7 +6974,6 @@
       "unbounded_height": "34",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -7352,7 +6991,6 @@
       "unbounded_height": "14.9",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -7370,7 +7008,6 @@
       "unbounded_height": "70",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -7388,7 +7025,6 @@
       "unbounded_height": "42.3",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -7406,7 +7042,6 @@
       "unbounded_height": "20.4",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -7424,7 +7059,6 @@
       "unbounded_height": "80.9",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -7442,7 +7076,6 @@
       "unbounded_height": "8.1",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -7455,12 +7088,11 @@
       "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
-      "fm_building_code": "",
+      "fm_building_code": "AD",
       "area": "920",
       "unbounded_height": "47.2",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "___",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -7470,13 +7102,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Nguyễn Thị Kim Tri",
-        "Hoàng Thị Hằng",
-        "Nguyễn Thị Kim Yến",
-        "Nguyễn Thiên Khánh",
-        "Nguyễn Văn Tám"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "LB",
@@ -7484,9 +7110,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Nguyễn Thị Kim Tri, Hoàng Thị Hằng, Nguyễn Thị Kim Yến, Nguyễn Thiên Khánh, Nguyễn Văn Tám",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Kim Tri, Hoàng Thị Hằng, Nguyễn Thị Kim Yến, Nguyễn Thiên Khánh, Nguyễn Văn Tám"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -7494,9 +7119,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Dr. Đặng Thị Ngọc Lan"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B1",
@@ -7504,9 +7127,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Đặng Thị Ngọc Lan",
       "is_active": true,
-      "occupants_flat": "Dr. Đặng Thị Ngọc Lan"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -7514,19 +7136,16 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Trần Tuấn Anh"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B1",
       "area": "13.31 m²",
       "unbounded_height": "--",
       "capacity": "--",
-      "status": "Hoạt động",
-      "occupant_display": "Trần Tuấn Anh",
+      "status": "Hoạt đ���ng",
       "is_active": true,
-      "occupants_flat": "Trần Tuấn Anh"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -7534,10 +7153,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Dr. Nguyễn Phạm Duy Anh",
-        "Nguyễn Thành Được"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B1",
@@ -7545,9 +7161,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Nguyễn Phạm Duy Anh, Nguyễn Thành Được",
       "is_active": true,
-      "occupants_flat": "Dr. Nguyễn Phạm Duy Anh, Nguyễn Thành Được"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -7555,9 +7170,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Dr. Đỗ Đức Tân"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B1",
@@ -7565,9 +7178,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Đỗ Đức Tân",
       "is_active": true,
-      "occupants_flat": "Dr. Đỗ Đức Tân"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -7575,10 +7187,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "M.sc. Terence Curtis",
-        "Mr. Alex Steven Turner"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B1",
@@ -7586,9 +7195,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "M.sc. Terence Curtis, Mr. Alex Steven Turner",
       "is_active": true,
-      "occupants_flat": "M.sc. Terence Curtis, Mr. Alex Steven Turner"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -7596,10 +7204,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Trần Ngọc Tiến",
-        "Mr. Michael Smithson"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B1",
@@ -7607,9 +7212,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Trần Ngọc Tiến, Mr. Michael Smithson",
       "is_active": true,
-      "occupants_flat": "Trần Ngọc Tiến, Mr. Michael Smithson"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -7617,10 +7221,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Nguyễn Đình Hải",
-        "Đỗ Xuân Vinh"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B1",
@@ -7628,9 +7229,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Nguyễn Đình Hải, Đỗ Xuân Vinh",
       "is_active": true,
-      "occupants_flat": "Nguyễn Đình Hải, Đỗ Xuân Vinh"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -7638,9 +7238,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Ms. Ozaraga Jan Lianne Martinez"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B1",
@@ -7648,9 +7246,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Ms. Ozaraga Jan Lianne Martinez",
       "is_active": true,
-      "occupants_flat": "Ms. Ozaraga Jan Lianne Martinez"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -7658,11 +7255,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Phan Thị Bích Sơn",
-        "Tôn Nữ Nguyệt An",
-        "Ms. Vũ Thị Thu An"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B1",
@@ -7670,9 +7263,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Phan Thị Bích Sơn, Tôn Nữ Nguyệt An, Ms. Vũ Thị Thu An",
       "is_active": true,
-      "occupants_flat": "Phan Thị Bích Sơn, Tôn Nữ Nguyệt An, Ms. Vũ Thị Thu An"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -7680,11 +7272,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Ms. Châu Trần Khánh Hà",
-        "Ms. Huỳnh Hiếu Ngân",
-        "Nguyễn Thị Nhật Linh"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B1",
@@ -7692,9 +7280,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Ms. Châu Trần Khánh Hà, Ms. Huỳnh Hiếu Ngân, Nguyễn Thị Nhật Linh",
       "is_active": true,
-      "occupants_flat": "Ms. Châu Trần Khánh Hà, Ms. Huỳnh Hiếu Ngân, Nguyễn Thị Nhật Linh"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -7702,9 +7289,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Mr. Niels Christian Tyroll Beck"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B1",
@@ -7712,9 +7297,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Mr. Niels Christian Tyroll Beck",
       "is_active": true,
-      "occupants_flat": "Mr. Niels Christian Tyroll Beck"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -7722,11 +7306,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Lê Thị Cẩm Thủy",
-        "Lê Vũ Bảo Trâm",
-        "Nguyễn Bảo Trân"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B1",
@@ -7734,9 +7314,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Lê Thị Cẩm Thủy, Lê Vũ Bảo Trâm, Nguyễn Bảo Trân",
       "is_active": true,
-      "occupants_flat": "Lê Thị Cẩm Thủy, Lê Vũ Bảo Trâm, Nguyễn Bảo Trân"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -7744,9 +7323,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Võ Thị Bích Ngọc"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B6",
@@ -7754,9 +7331,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Võ Thị Bích Ngọc",
       "is_active": true,
-      "occupants_flat": "Võ Thị Bích Ngọc"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -7764,9 +7340,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Dr. Lê Thị Thu Hương"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B6",
@@ -7774,9 +7348,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Lê Thị Thu Hương",
       "is_active": true,
-      "occupants_flat": "Dr. Lê Thị Thu Hương"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -7784,10 +7357,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Thu Alexander Quynh",
-        "Dr. Lê Thị Thúy Hằng"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B6",
@@ -7795,9 +7365,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Thu Alexander Quynh, Dr. Lê Thị Thúy Hằng",
       "is_active": true,
-      "occupants_flat": "Thu Alexander Quynh, Dr. Lê Thị Thúy Hằng"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -7805,9 +7374,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Phan Thanh Tú Tuấn"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B6",
@@ -7815,9 +7382,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Phan Thanh Tú Tuấn",
       "is_active": true,
-      "occupants_flat": "Phan Thanh Tú Tuấn"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -7825,15 +7391,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Nguyễn Hoài Vũ",
-        "Trần Tuấn Nghi",
-        "Phạm Phú Song Hưng",
-        "Nguyễn Thị Hương Lan",
-        "Nguyễn Võ Vạn Lịch",
-        "Nguyễn Thị Bích Huệ",
-        "Nguyễn Lĩnh Tâm"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B6",
@@ -7841,9 +7399,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Nguyễn Hoài Vũ, Trần Tuấn Nghi, Phạm Phú Song Hưng, Nguyễn Thị Hương Lan, Nguyễn Võ Vạn Lịch, Nguyễn Thị Bích Huệ, Nguyễn Lĩnh Tâm",
       "is_active": true,
-      "occupants_flat": "Nguyễn Hoài Vũ, Trần Tuấn Nghi, Phạm Phú Song Hưng, Nguyễn Thị Hương Lan, Nguyễn Võ Vạn Lịch, Nguyễn Thị Bích Huệ, Nguyễn Lĩnh Tâm"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -7851,9 +7408,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Trần Tuấn Anh"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B6",
@@ -7861,9 +7416,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Trần Tuấn Anh",
       "is_active": true,
-      "occupants_flat": "Trần Tuấn Anh"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -7871,9 +7425,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Dr. Nguyễn Minh Quang"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B6",
@@ -7881,9 +7433,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Nguyễn Minh Quang",
       "is_active": true,
-      "occupants_flat": "Dr. Nguyễn Minh Quang"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -7891,9 +7442,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Dr. Nguyễn Tấn Tiên"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B6",
@@ -7901,9 +7450,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Nguyễn Tấn Tiên",
       "is_active": true,
-      "occupants_flat": "Dr. Nguyễn Tấn Tiên"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -7911,9 +7459,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Dr. Nguyễn Tấn Hưng"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B6",
@@ -7921,9 +7467,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Nguyễn Tấn Hưng",
       "is_active": true,
-      "occupants_flat": "Dr. Nguyễn Tấn Hưng"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -7931,9 +7476,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Mr. Phan Lâm Vẹn"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B6",
@@ -7941,9 +7484,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Mr. Phan Lâm Vẹn",
       "is_active": true,
-      "occupants_flat": "Mr. Phan Lâm Vẹn"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -7951,9 +7493,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Dr. Nguyễn Đình Hùng"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B6",
@@ -7961,9 +7501,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Nguyễn Đình Hùng",
       "is_active": true,
-      "occupants_flat": "Dr. Nguyễn Đình Hùng"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -7971,19 +7510,16 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Dr. Nguyễn Đinh Vinh Mẫn"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B6",
       "area": "13.36 m²",
       "unbounded_height": "--",
       "capacity": "--",
-      "status": "Hoạt động",
-      "occupant_display": "Dr. Nguyễn Đinh Vinh Mẫn",
+      "status": "Ho���t động",
       "is_active": true,
-      "occupants_flat": "Dr. Nguyễn Đinh Vinh Mẫn"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -7991,10 +7527,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Dr. Nguyễn Trọng Nghĩa",
-        "Dr. Lê Mạnh Tuấn"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B6",
@@ -8002,9 +7535,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Nguyễn Trọng Nghĩa, Dr. Lê Mạnh Tuấn",
       "is_active": true,
-      "occupants_flat": "Dr. Nguyễn Trọng Nghĩa, Dr. Lê Mạnh Tuấn"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -8012,9 +7544,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Lê Đình Phi"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B1",
@@ -8022,9 +7552,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Lê Đình Phi",
       "is_active": true,
-      "occupants_flat": "Lê Đình Phi"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -8032,9 +7561,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Lê Ngọc Hải Vy"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B2",
@@ -8042,9 +7569,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Lê Ngọc Hải Vy",
       "is_active": true,
-      "occupants_flat": "Lê Ngọc Hải Vy"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -8052,9 +7578,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Lê Hoàng Trọng Minh"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B5",
@@ -8062,9 +7586,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Lê Hoàng Trọng Minh",
       "is_active": true,
-      "occupants_flat": "Lê Hoàng Trọng Minh"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -8072,9 +7595,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Nguyễn Tấn Dũng"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B5",
@@ -8082,9 +7603,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Nguyễn Tấn Dũng",
       "is_active": true,
-      "occupants_flat": "Nguyễn Tấn Dũng"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -8092,9 +7612,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Đỗ Hữu Minh Hiếu"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B5",
@@ -8102,9 +7620,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Đỗ Hữu Minh Hiếu",
       "is_active": true,
-      "occupants_flat": "Đỗ Hữu Minh Hiếu"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -8112,9 +7629,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Đỗ Quí Duyên"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B5",
@@ -8122,9 +7637,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Đỗ Quí Duyên",
       "is_active": true,
-      "occupants_flat": "Đỗ Quí Duyên"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -8132,9 +7646,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Hồ Công Hùng"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B5",
@@ -8142,9 +7654,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Hồ Công Hùng",
       "is_active": true,
-      "occupants_flat": "Hồ Công Hùng"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -8152,9 +7663,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Dr. Dương Hiếu Linh"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B5",
@@ -8162,9 +7671,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Dương Hiếu Linh",
       "is_active": true,
-      "occupants_flat": "Dr. Dương Hiếu Linh"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -8172,9 +7680,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Assoc. Prof. Dr. Trần Lê Lựu"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B2",
@@ -8182,9 +7688,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Assoc. Prof. Dr. Trần Lê Lựu",
       "is_active": true,
-      "occupants_flat": "Assoc. Prof. Dr. Trần Lê Lựu"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -8192,9 +7697,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Dr. Đoàn Văn Bình"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B2",
@@ -8202,9 +7705,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Đoàn Văn Bình",
       "is_active": true,
-      "occupants_flat": "Dr. Đoàn Văn Bình"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -8212,9 +7714,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Dr. Eva De Melo Ferreira"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B2",
@@ -8222,9 +7722,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Eva De Melo Ferreira",
       "is_active": true,
-      "occupants_flat": "Dr. Eva De Melo Ferreira"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -8232,9 +7731,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Đào Văn Trí"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B2",
@@ -8242,9 +7739,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Đào Văn Trí",
       "is_active": true,
-      "occupants_flat": "Đào Văn Trí"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -8252,9 +7748,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Assoc. Prof. Dr. Vũ Anh Tuấn"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B6",
@@ -8262,9 +7756,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Assoc. Prof. Dr. Vũ Anh Tuấn",
       "is_active": true,
-      "occupants_flat": "Assoc. Prof. Dr. Vũ Anh Tuấn"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -8272,9 +7765,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Dr. Huỳnh Đức Nguyên"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B6",
@@ -8282,9 +7773,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Huỳnh Đức Nguyên",
       "is_active": true,
-      "occupants_flat": "Dr. Huỳnh Đức Nguyên"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -8292,9 +7782,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Dr. Lê Thị Hương"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B6",
@@ -8302,9 +7790,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Lê Thị Hương",
       "is_active": true,
-      "occupants_flat": "Dr. Lê Thị Hương"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -8312,9 +7799,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Dr. Lê Minh Hạnh"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B1",
@@ -8322,9 +7807,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Lê Minh Hạnh",
       "is_active": true,
-      "occupants_flat": "Dr. Lê Minh Hạnh"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -8332,9 +7816,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Dr. Lê Văn Hà"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B1",
@@ -8342,9 +7824,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Lê Văn Hà",
       "is_active": true,
-      "occupants_flat": "Dr. Lê Văn Hà"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -8352,9 +7833,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Dr. Nguyễn Thúy Mai"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B1",
@@ -8362,9 +7841,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Nguyễn Thúy Mai",
       "is_active": true,
-      "occupants_flat": "Dr. Nguyễn Thúy Mai"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -8372,9 +7850,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Dr. Omer Cayirli"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B1",
@@ -8382,9 +7858,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Omer Cayirli",
       "is_active": true,
-      "occupants_flat": "Dr. Omer Cayirli"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -8392,9 +7867,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Dr. Nguyễn Thị Viết Lý"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B1",
@@ -8402,9 +7875,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Nguyễn Thị Viết Lý",
       "is_active": true,
-      "occupants_flat": "Dr. Nguyễn Thị Viết Lý"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -8412,9 +7884,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Dr. Guglielmo Giuggioli"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B1",
@@ -8422,9 +7892,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Guglielmo Giuggioli",
       "is_active": true,
-      "occupants_flat": "Dr. Guglielmo Giuggioli"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -8432,9 +7901,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Dr. Trương Huỳnh Sáng"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B1",
@@ -8442,9 +7909,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Dr. Trương Huỳnh Sáng",
       "is_active": true,
-      "occupants_flat": "Dr. Trương Huỳnh Sáng"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -8452,11 +7918,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Phạm Ngọc Thẩm",
-        "Trần Trọng Hiếu",
-        "Dr. Trần Bình Đại"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B1",
@@ -8464,9 +7926,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Phạm Ngọc Thẩm, Trần Trọng Hiếu, Dr. Trần Bình Đại",
       "is_active": true,
-      "occupants_flat": "Phạm Ngọc Thẩm, Trần Trọng Hiếu, Dr. Trần Bình Đại"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -8474,10 +7935,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Nguyễn Hữu Phước",
-        "Lê Thị Thủy"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B1",
@@ -8485,9 +7943,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Nguyễn Hữu Phước, Lê Thị Thủy",
       "is_active": true,
-      "occupants_flat": "Nguyễn Hữu Phước, Lê Thị Thủy"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -8495,9 +7952,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Đàm Phương Ngọc Tỷ"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B1",
@@ -8505,9 +7960,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Đàm Phương Ngọc Tỷ",
       "is_active": true,
-      "occupants_flat": "Đàm Phương Ngọc Tỷ"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -8515,11 +7969,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Nguyễn Thị Kim Ngân",
-        "Nguyễn Trần Phương Anh",
-        "Phùng Ngọc Huyền"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B1",
@@ -8527,9 +7977,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Nguyễn Thị Kim Ngân, Nguyễn Trần Phương Anh, Phùng Ngọc Huyền",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Kim Ngân, Nguyễn Trần Phương Anh, Phùng Ngọc Huyền"
+      "occupants_flat": ""
     },
     {
       "sheet_source": "Danh sách Nhân viên",
@@ -8537,14 +7986,7 @@
       "heading_1": "___",
       "heading_2": "___",
       "department": "___",
-      "occupants_list": [
-        "Vũ Tiến Nhật",
-        "Phan Tài Nhân",
-        "Trần Xuân Bắc",
-        "Mr. Tạ Quang Thắng",
-        "Mr. Phùng Văn Hiền",
-        "Mr. Đỗ Thanh Long"
-      ],
+      "occupants_list": [],
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "D2",
@@ -8552,9 +7994,8 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
-      "occupant_display": "Vũ Tiến Nhật, Phan Tài Nhân, Trần Xuân Bắc, Mr. Tạ Quang Thắng, Mr. Phùng Văn Hiền, Mr. Đỗ Thanh Long",
       "is_active": true,
-      "occupants_flat": "Vũ Tiến Nhật, Phan Tài Nhân, Trần Xuân Bắc, Mr. Tạ Quang Thắng, Mr. Phùng Văn Hiền, Mr. Đỗ Thanh Long"
+      "occupants_flat": ""
     }
   ]
 }
