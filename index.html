@@ -1266,108 +1266,74 @@ selRoom.disabled  = true;
 // ═══════════════════════════════════════════════════════════════
 //  🔗 ĐỒNG BỘ DỮ LIỆU TỪ CÁC API
 // ═══════════════════════════════════════════════════════════════
-// ── Chỉ còn 1 URL duy nhất (Thay ID script mới của bạn vào đây) ──
-const UNIFIED_API = "https://script.google.com/macros/s/AKfycby82gfG2wxrw1xelQN7epMROvhtVa0ToOEtzNV0LRynbwk7j_yNJzbYJ5jKQ7-OKBBIcQ/exec";
-const CACHE_KEY     = 'vgumap_cache_v1';
+// ── Chỉ còn 1 URL ──
+const UNIFIED_API   = "https://script.google.com/macros/s/AKfycby82gfG2wxrw1xelQN7epMROvhtVa0ToOEtzNV0LRynbwk7j_yNJzbYJ5jKQ7-OKBBIcQ/exec?type=all";
+const CACHE_KEY     = 'vgumap_v1';
 const CACHE_MINUTES = 30;
 
-// Biến toàn cục
 let sheetRoomData = {};
 let driveImages   = {};
 let isInfoLoaded  = false;
 
-// Hàm khởi tạo dữ liệu
 (async function initializeData() {
-  // 1. Thử đọc cache trước
+  // 1️⃣ Đọc cache nếu còn hạn
   try {
     const cached = localStorage.getItem(CACHE_KEY);
     if (cached) {
-      const { data, timestamp } = JSON.parse(cached);
-      const ageMin = (Date.now() - timestamp) / 60000;
-      if (ageMin < CACHE_MINUTES) {
+      const { data, ts } = JSON.parse(cached);
+      if ((Date.now() - ts) / 60000 < CACHE_MINUTES) {
         applyData(data);
-        console.log(`✅ Cache hit (còn ${Math.round(CACHE_MINUTES - ageMin)}p)`);
+        console.log('⚡ Từ cache — không cần fetch');
         return;
       }
     }
   } catch(_) {}
 
-  // 2. Fetch API gộp nếu không có cache hoặc cache hết hạn
+  // 2️⃣ Fetch API gộp
   try {
-    console.log('🌐 Đang tải dữ liệu từ Google Sheets...');
     const t0  = performance.now();
-    const res = await fetch(UNIFIED_API);
-    const raw = await res.json();
-    const ms  = Math.round(performance.now() - t0);
-    
-    if (raw.status === "success") {
-      console.log(`✅ Tải xong 3-in-1 API trong ${ms}ms`);
-      applyData(raw);
-
-      // 3. Lưu cache mới
-      localStorage.setItem(CACHE_KEY, JSON.stringify({
-        data: raw,
-        timestamp: Date.now()
-      }));
-    } else {
-      throw new Error("Dữ liệu API trả về không hợp lệ");
-    }
+    const raw = await fetch(UNIFIED_API).then(r => r.json());
+    console.log(`✅ Fetch xong: ${Math.round(performance.now()-t0)}ms`);
+    applyData(raw);
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ data: raw, ts: Date.now() }));
   } catch(e) {
-    console.error('❌ Lỗi tải API:', e);
+    console.error('❌ Lỗi fetch:', e);
   }
 })();
 
-// ── Áp dụng data vào các biến toàn cục ──
 function applyData(raw) {
-  // 1. Gán Drive images
+  // Drive
   driveImages = raw.drive || {};
 
-  // 2. Gán Info data — chuyển mảng thành object key=room_number
-  const infoArr = raw.info || [];
-  sheetRoomData = {}; // Reset trước khi gán
-  infoArr.forEach(room => {
-    if (room.room_number) {
-      sheetRoomData[room.room_number.trim()] = room;
-    }
+  // Info → object keyed by room_number
+  (raw.info || []).forEach(r => {
+    if (r.room_number) sheetRoomData[r.room_number.trim()] = r;
   });
 
-  // 3. Map data — populate BUILDINGS.rooms
-  const mapArr = raw.map || [];
-  mapArr.forEach(item => {
-    const roomNum = String(item.Room_Number || item.room_number || "").trim();
-    if (!roomNum || /LB|CR|WC/i.test(roomNum)) return;
-
-    const parts = roomNum.split('-');
-    if (parts.length < 2) return;
-
-    const bldCode  = parts[0].toUpperCase();
-    const roomCode = parts.slice(1).join('-');
-    
-    // Giả định đối tượng BUILDINGS đã được khai báo trước đó trong app của bạn
-    if (typeof BUILDINGS !== 'undefined') {
-      const targetBld = BUILDINGS.find(b => b.code === bldCode);
-      if (targetBld && !targetBld.rooms.includes(roomCode)) {
-        targetBld.rooms.push(roomCode);
-      }
-    }
+  // Map → populate BUILDINGS.rooms
+  (raw.map || []).forEach(item => {
+    const rn = String(item.Room_Number || item.room_number || "").trim();
+    if (!rn || /LB|CR|WC/i.test(rn)) return;
+    const [bldCode, ...rest] = rn.split('-');
+    const roomCode = rest.join('-');
+    const bld = BUILDINGS.find(b => b.code === bldCode.toUpperCase());
+    if (bld && !bld.rooms.includes(roomCode)) bld.rooms.push(roomCode);
   });
 
-  // Sort lại danh sách phòng trong từng tòa nhà
-  if (typeof BUILDINGS !== 'undefined') {
-    BUILDINGS.forEach(b => {
-      b.rooms.sort(new Intl.Collator('en', { numeric: true }).compare);
-    });
-    refreshBuildingDropdowns(); // Gọi hàm cập nhật giao diện của bạn
-  }
+  BUILDINGS.forEach(b =>
+    b.rooms.sort(new Intl.Collator('en', { numeric: true }).compare)
+  );
 
   isInfoLoaded = true;
-  console.log(`📦 Đã nạp: ${Object.keys(driveImages).length} ảnh | ${Object.keys(sheetRoomData).length} phòng | ${mapArr.length} map segments`);
+  refreshBuildingDropdowns();
+
+  console.log(`📦 map:${(raw.map||[]).length} | info:${Object.keys(sheetRoomData).length} | drive:${Object.keys(driveImages).length}`);
 }
 
-// Xóa cache thủ công khi cần (gọi clearVGUCache() trong DevTools Console)
+// Dùng trong console khi cần force reload
 function clearVGUCache() {
   localStorage.removeItem(CACHE_KEY);
-  console.log('🗑️ Cache đã xóa — Tải lại trang (F5) để fetch dữ liệu mới nhất từ Google Sheets');
+  console.log('🗑️ Cache xóa — F5 để tải lại');
 }
 
 // ═══════════════════════════════════════════════════════════════
