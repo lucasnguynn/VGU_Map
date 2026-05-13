@@ -5,7 +5,7 @@ const path = require('path');
 
 const API_ENDPOINTS = {
   MAP: 'https://script.google.com/macros/s/AKfycbxFmunolmZ5LSC6exu6OnGE0dZi9VYrf6gWBqMJQOrFUe8MdRQAiz0XT825JwkGd-O0/exec',
-  INFO: 'https://script.google.com/macros/s/AKfycbzhMONbzVtaRnlIe3hiumaNXBPbQN6qybuANtguLcWMO1ZM0Nmu0NtWZ2yfGsJWORM5dA/exec',
+  INFO: 'https://script.google.com/macros/s/AKfycbz3qWkjrU3ue194Y0KLJVMGWu0_z30TbryExqw2k9Buyt4NIVqKxzsqgQQUQMdZkUdA/exec',
   DRIVE: 'https://script.google.com/macros/s/AKfycbw4PtDoCILXSiIn1AAYzJhUhSvmJ6ufKD-5R-QKZGzbBy-yQTfC_bPTKJEErwt1d_iS/exec'
 };
 
