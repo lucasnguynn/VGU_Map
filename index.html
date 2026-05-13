@@ -1143,7 +1143,9 @@ const BUILDINGS = [
 let lMap, bldLayerGroup;
 let polygonLayers = {};
 let selectedPolygon = null;
-let globalBounds = null; 
+let globalBounds = null;
+let cleanupMapResizeHandler = null;
+const dataRequestCache = new Map();
 
 const defaultPolyStyle   = { color:'#002554', fillColor:'#002554', fillOpacity:0.05, weight:2 };
 const highlightPolyStyle = { color:'#f58220', weight:4, fillColor:'#f58220', fillOpacity:0.3 };
@@ -1200,27 +1202,37 @@ function initLeafletMap() {
     console.log(`Clicked: [${Math.round(e.latlng.lat)}, ${Math.round(e.latlng.lng)}]`);
   });
   
-  setupMapResizeHandler();
+  cleanupMapResizeHandler = setupMapResizeHandler();
+}
+
+function destroyLeafletMap() {
+  if (cleanupMapResizeHandler) { cleanupMapResizeHandler(); cleanupMapResizeHandler = null; }
+  if (lMap) { lMap.off(); lMap.remove(); lMap = null; }
+  if (bldLayerGroup) { bldLayerGroup = null; }
+  polygonLayers = {};
+  selectedPolygon = null;
 }
 
 function setupMapResizeHandler() {
   let resizeTimeout;
-  function handleResize() {
+  const handleResize = () => {
     if (!lMap || !globalBounds) return;
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
+      if (!lMap) return;
       lMap.invalidateSize(false);
       lMap.fitBounds(globalBounds, { animate: true, duration: 0.3 });
-    }, 250);
-  }
+    }, 200);
+  };
+
   window.addEventListener('resize', handleResize, { passive: true });
   window.addEventListener('orientationchange', handleResize, { passive: true });
-  
-  // Cleanup listener on page unload to prevent memory leaks
-  window.addEventListener('beforeunload', () => {
+
+  return () => {
+    clearTimeout(resizeTimeout);
     window.removeEventListener('resize', handleResize);
     window.removeEventListener('orientationchange', handleResize);
-  });
+  };
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1282,6 +1294,7 @@ const API_MAP = "./map_data.json";
 const API_INFO = "./info_data.json";
 const API_DRIVE_JSON = './drive_data.json';
 const API_DRIVE_LIST = "https://script.google.com/macros/s/AKfycbw4PtDoCILXSiIn1AAYzJhUhSvmJ6ufKD-5R-QKZGzbBy-yQTfC_bPTKJEErwt1d_iS/exec";
+const DATA_VERSION = '2026-05-13';
 
 let sheetRoomData = {};
 let driveImages = {};
@@ -1295,13 +1308,25 @@ function safeExtractArray(payload) {
 }
 
 async function fetchJsonSafe(url) {
-  const res = await fetch(url + '?v=' + Date.now(), { cache: 'no-cache' });
-  if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
-  try {
-    return await res.json();
-  } catch (e) {
-    throw new Error(`Malformed JSON at ${url}: ${e.message}`);
-  }
+  const normalizedUrl = `${url}?v=${DATA_VERSION}`;
+  if (dataRequestCache.has(normalizedUrl)) return dataRequestCache.get(normalizedUrl);
+
+  const req = (async () => {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12000);
+    try {
+      const res = await fetch(normalizedUrl, { cache: 'no-store', signal: controller.signal });
+      if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+      return await res.json();
+    } catch (e) {
+      throw new Error(`Fetch failed for ${url}: ${e.message}`);
+    } finally {
+      clearTimeout(timeout);
+    }
+  })();
+
+  dataRequestCache.set(normalizedUrl, req);
+  return req;
 }
 
 
@@ -1316,7 +1341,7 @@ async function loadDriveImages() {
   }
   // Fallback: live API (slower, used only when static file is missing)
   try {
-    const res = await fetch(API_DRIVE_LIST + '?t=' + Date.now());
+    const res = await fetch(`${API_DRIVE_LIST}?v=${DATA_VERSION}`, { cache: 'no-store' });
     if (!res.ok) throw new Error(`API HTTP ${res.status}`);
     driveImages = await res.json();
     console.log('✅ Drive images loaded from live API (fallback)');
@@ -1390,6 +1415,8 @@ async function fetchRoomInfo() {
     refreshBuildingDropdowns();
 
   } catch (e) {
+    document.getElementById('resultText').textContent = 'Không thể tải dữ liệu phòng. Vui lòng thử lại khi có mạng ổn định.';
+    document.getElementById('resultBanner').classList.add('show');
     console.error("❌ Lỗi xử lý đồng bộ dữ liệu API:", e);
   }
 }
@@ -2146,6 +2173,8 @@ function onIframeError(fileId, rid) {
 // ═══════════════════════════════════════════════════════════════
 //  SERVICE WORKER REGISTRATION FOR PWA
 // ═══════════════════════════════════════════════════════════════
+window.addEventListener('beforeunload', destroyLeafletMap);
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
     navigator.serviceWorker.register('./sw.js')
