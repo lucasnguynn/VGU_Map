@@ -117,7 +117,8 @@ self.addEventListener('fetch', (event) => {
 // ═══════════════════════════════════════════════════════════════
 async function cacheFirstStrategy(request) {
   try {
-    const cachedResponse = await caches.match(request);
+    // FIX: Use ignoreSearch: true to match cached URLs regardless of query strings
+    const cachedResponse = await caches.match(request, { ignoreSearch: true });
     
     if (cachedResponse) {
       console.log('[SW] Cache HIT:', request.url);
@@ -166,7 +167,8 @@ async function networkFirstStrategy(request) {
     console.warn('[SW] Network failed, trying cache:', request.url, error.message);
     
     // Network failed, try to get from cache
-    const cachedResponse = await caches.match(request);
+    // FIX: Use ignoreSearch: true to match cached URLs regardless of query strings (cache-busting timestamps)
+    const cachedResponse = await caches.match(request, { ignoreSearch: true });
     
     if (cachedResponse) {
       console.log('[SW] Cache fallback successful:', request.url);
