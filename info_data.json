@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 452,
-  "last_updated": "2026-05-13T07:55:39.710Z",
+  "last_updated": "2026-05-13T09:31:57.815Z",
   "data": [
     {
       "sheet_source": "B3",
@@ -628,7 +628,7 @@
       "area": "16.83",
       "unbounded_height": "4000",
       "capacity": "--",
-      "status": "Hoạt động",
+      "status": "Hoạt ��ộng",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -2905,7 +2905,7 @@
       "sheet_source": "AD",
       "room_number": "AD-207",
       "heading_1": "Office - HR",
-      "heading_2": "Văn phòng Nhân s���",
+      "heading_2": "Văn phòng Nhân sự",
       "department": "___",
       "occupants_list": [
         "Nguyễn Thị Thu Hà",
@@ -4282,7 +4282,7 @@
       "area": "770",
       "unbounded_height": "33.1",
       "capacity": "--",
-      "status": "Hoạt ��ộng",
+      "status": "Hoạt động",
       "is_active": true,
       "occupants_flat": "Đặng Thị Thanh Thúy",
       "occupant_display": "Đặng Thị Thanh Thúy"
@@ -4649,7 +4649,7 @@
       "area": "1410",
       "unbounded_height": "80.5",
       "capacity": "--",
-      "status": "Hoạt ��ộng",
+      "status": "Hoạt động",
       "is_active": true,
       "occupants_flat": "Lê Thái Cường",
       "occupant_display": "Lê Thái Cường"
@@ -4871,7 +4871,7 @@
       "area": "985",
       "unbounded_height": "51.9",
       "capacity": "--",
-      "status": "Không hoạt động",
+      "status": "Kh��ng hoạt động",
       "is_active": false,
       "occupants_flat": "Dr. Lê Lam Sơn",
       "occupant_display": "Dr. Lê Lam Sơn"
@@ -5566,8 +5566,8 @@
     {
       "sheet_source": "AD",
       "room_number": "AD-435",
-      "heading_1": "Chemical Storage 2",
-      "heading_2": "Kho Hóa chất 2",
+      "heading_1": "Student Prepresentative",
+      "heading_2": "Phòng đại biệu sinh viên",
       "department": "___",
       "occupants_list": [
         "Ms. Lâm Bửu Kiều"
@@ -6141,7 +6141,7 @@
       "area": "840",
       "unbounded_height": "43",
       "capacity": "--",
-      "status": "Hoạt đ���ng",
+      "status": "Hoạt động",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6433,7 +6433,7 @@
       "heading_2": "Phòng Giao ban 2",
       "department": "___",
       "occupants_list": [
-        "Lâm Thị Hồng G���m"
+        "Lâm Thị Hồng Gấm"
       ],
       "fm_room_function": "___",
       "fm_room_type": "___",
@@ -6443,8 +6443,8 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Lâm Thị Hồng G���m",
-      "occupant_display": "Lâm Thị Hồng G���m"
+      "occupants_flat": "Lâm Thị Hồng Gấm",
+      "occupant_display": "Lâm Thị Hồng Gấm"
     },
     {
       "sheet_source": "AD",
@@ -6734,7 +6734,7 @@
       "area": "1140",
       "unbounded_height": "64.5",
       "capacity": "--",
-      "status": "Hoạt động",
+      "status": "Hoạt đ���ng",
       "is_active": true,
       "occupants_flat": "Dr. Hà Thúc Viên",
       "occupant_display": "Dr. Hà Thúc Viên"
@@ -7143,7 +7143,7 @@
       "area": "13.31 m²",
       "unbounded_height": "--",
       "capacity": "--",
-      "status": "Hoạt đ���ng",
+      "status": "Hoạt động",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -7517,7 +7517,7 @@
       "area": "13.36 m²",
       "unbounded_height": "--",
       "capacity": "--",
-      "status": "Ho���t động",
+      "status": "Hoạt động",
       "is_active": true,
       "occupants_flat": ""
     },
