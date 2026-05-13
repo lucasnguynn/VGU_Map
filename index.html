@@ -1924,7 +1924,7 @@ function rC(rid) {
 }
 
 function sT(tab, rd) {
-  rd = rd || ST.rd; 
+  rd = rd || ST.rd;
   if (!rd) return;
   ST.tab = tab;
 
@@ -1932,38 +1932,89 @@ function sT(tab, rd) {
   document.getElementById('t3d').classList.toggle('on', tab === '3D');
   const f = document.getElementById('ifr');
 
+  // ── Normalisation de la clé (trim + uppercase) ──
   const sanitizedRid = String(ST.rid).trim().toUpperCase();
-  let fileId = driveImages[sanitizedRid];
-  
-  // Quét dự phòng nếu key bị lệch khoảng trắng
-  if (!fileId) {
-    for (const [key, value] of Object.entries(driveImages)) {
-      if (String(key).trim().toUpperCase() === sanitizedRid) { fileId = value; break; }
+  let fileId = null;
+
+  // Recherche exacte d'abord, puis recherche souple
+  for (const [key, value] of Object.entries(driveImages)) {
+    if (String(key).trim().toUpperCase() === sanitizedRid) {
+      fileId = value;
+      break;
     }
   }
+
+  // Debug: log dans la console pour vérifier
+  console.log(`[sT] rid="${ST.rid}" → sanitized="${sanitizedRid}" → fileId="${fileId}"`);
+  console.log('[sT] Clés disponibles dans driveImages:', Object.keys(driveImages).slice(0, 10));
 
   if (tab === '2D') {
     if (fileId) {
       f.style.background = '#fff';
-      
-      // TRƯỜNG HỢP 1: Render trực tiếp bằng khung Preview của Google Drive
-      // Thích hợp cho cả file PDF lẫn file Ảnh
-      const previewUrl = `https://drive.google.com/file/d/${fileId}/preview`;
 
-      f.innerHTML = `<iframe src="${previewUrl}" 
-                             style="width:100%; height:100%; border:none; display:block;" 
-                             loading="lazy" 
-                             allow="autoplay"
-                             title="Sơ đồ ${ST.rid}">
-                     </iframe>`;
+      // ── STRATÉGIE MULTI-TENTATIVES pour contourner les restrictions Drive ──
+      // Tentative 1: lien de prévisualisation direct (PNG/JPG)
+      const directUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
+      // Tentative 2: prévisualisation embed
+      const previewUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+      // Tentative 3: thumbnail (toujours accessible)
+      const thumbUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w1200`;
+
+      f.innerHTML = `
+        <div id="img-wrap-${sanitizedRid}" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;">
+          <img 
+            src="${thumbUrl}"
+            alt="Sơ đồ ${sanitizedRid}"
+            style="max-width:100%;max-height:100%;object-fit:contain;display:block;"
+            onerror="tryIframe('${fileId}', '${sanitizedRid}', '${previewUrl}')"
+          />
+          <div style="margin-top:6px;font-size:11px;color:#8896a8">
+            <a href="https://drive.google.com/file/d/${fileId}/view" target="_blank" 
+               style="color:var(--or);text-decoration:none;font-weight:600">
+              ↗ Mở file gốc
+            </a>
+          </div>
+        </div>`;
     } else {
       f.style.background = '#e8eef9';
-      f.innerHTML = `<div style="text-align:center;padding:22px 14px"><div style="font-size:42px;margin-bottom:10px">📐</div><div style="font-size:13px;font-weight:700;color:#002554;margin-bottom:3px">Sơ đồ mặt bằng 2D</div><div style="font-size:11px;color:#8896a8">Đang chờ cập nhật file cho ${ST.rid}</div></div>`;
+      f.innerHTML = `
+        <div style="text-align:center;padding:22px 14px">
+          <div style="font-size:42px;margin-bottom:10px">📐</div>
+          <div style="font-size:13px;font-weight:700;color:#002554;margin-bottom:3px">Sơ đồ mặt bằng 2D</div>
+          <div style="font-size:11px;color:#8896a8">Chưa có file cho phòng <b>${sanitizedRid}</b></div>
+          <div style="font-size:10px;color:#c0c8d8;margin-top:4px">
+            Kiểm tra: tên file trong Drive có chứa "<b>${sanitizedRid}</b>" không?
+          </div>
+        </div>`;
     }
   } else {
+    // Tab 3D (inchangé)
     f.style.background = '#fff3e6';
-    f.innerHTML = `<div style="text-align:center;padding:22px 14px"><div style="font-size:42px;margin-bottom:10px">🏛</div><div style="font-size:13px;font-weight:700;color:#002554;margin-bottom:3px">Phối cảnh 3D</div><div style="font-size:11px;color:#8896a8">${ST.rid} — ${rd.name_en}</div></div>`;
+    f.innerHTML = `<div style="text-align:center;padding:22px 14px">
+      <div style="font-size:42px;margin-bottom:10px">🏛</div>
+      <div style="font-size:13px;font-weight:700;color:#002554;margin-bottom:3px">Phối cảnh 3D</div>
+      <div style="font-size:11px;color:#8896a8">${sanitizedRid} — ${rd.name_en}</div>
+    </div>`;
   }
+}
+
+// ── Fallback: si l'img échoue, tente un iframe ──
+function tryIframe(fileId, rid, previewUrl) {
+  const wrap = document.getElementById(`img-wrap-${rid}`);
+  if (!wrap) return;
+  console.log(`[tryIframe] Image échouée, tentative iframe pour ${rid}`);
+  wrap.innerHTML = `
+    <iframe 
+      src="${previewUrl}" 
+      style="width:100%;height:100%;border:none;" 
+      loading="lazy"
+      title="Sơ đồ ${rid}">
+    </iframe>
+    <div style="position:absolute;bottom:4px;right:8px;font-size:10px;">
+      <a href="https://drive.google.com/file/d/${fileId}/view" target="_blank" 
+         style="color:var(--or);text-decoration:none;font-weight:600">↗ Mở Drive</a>
+    </div>`;
+  wrap.style.position = 'relative';
 }
 </script>
 </body>
