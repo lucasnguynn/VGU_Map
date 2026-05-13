@@ -28,8 +28,8 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Run info data sync script
-        run: node sync_info_data.js
+      - name: Run unified data sync script
+        run: node sync_all_data.js
 
       - name: Commit and push changes (only if info_data.json changed)
         run: |
