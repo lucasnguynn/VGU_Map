@@ -270,7 +270,7 @@ function doGet(e) {
       }
     }
     
-    // Build response
+    // Build response with no-cache headers to prevent Google Apps Script caching
     var response = {
       status: 'success',
       total_rooms: allRooms.length,
@@ -280,7 +280,10 @@ function doGet(e) {
     
     return ContentService
       .createTextOutput(JSON.stringify(response))
-      .setMimeType(ContentService.MimeType.JSON);
+      .setMimeType(ContentService.MimeType.JSON)
+      .setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+      .setHeader('Pragma', 'no-cache')
+      .setHeader('Expires', '0');
     
   } catch (error) {
     // Error handling
