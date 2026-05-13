@@ -1932,11 +1932,9 @@ function sT(tab, rd) {
   document.getElementById('t3d').classList.toggle('on', tab === '3D');
   const f = document.getElementById('ifr');
 
-  // ── Normalisation de la clé (trim + uppercase) ──
   const sanitizedRid = String(ST.rid).trim().toUpperCase();
   let fileId = null;
 
-  // Recherche exacte d'abord, puis recherche souple
   for (const [key, value] of Object.entries(driveImages)) {
     if (String(key).trim().toUpperCase() === sanitizedRid) {
       fileId = value;
@@ -1944,77 +1942,136 @@ function sT(tab, rd) {
     }
   }
 
-  // Debug: log dans la console pour vérifier
-  console.log(`[sT] rid="${ST.rid}" → sanitized="${sanitizedRid}" → fileId="${fileId}"`);
-  console.log('[sT] Clés disponibles dans driveImages:', Object.keys(driveImages).slice(0, 10));
+  console.log(`[sT] rid="${sanitizedRid}" → fileId="${fileId}"`);
 
   if (tab === '2D') {
     if (fileId) {
-      f.style.background = '#fff';
+      f.style.background = '#f8f9fc';
+      f.style.position = 'relative';
 
-      // ── STRATÉGIE MULTI-TENTATIVES pour contourner les restrictions Drive ──
-      // Tentative 1: lien de prévisualisation direct (PNG/JPG)
-      const directUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
-      // Tentative 2: prévisualisation embed
-      const previewUrl = `https://drive.google.com/file/d/${fileId}/preview`;
-      // Tentative 3: thumbnail (toujours accessible)
-      const thumbUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w1200`;
+      // ── PHƯƠNG PHÁP TỐT NHẤT CHO PDF: dùng Google Drive Viewer ──
+      // Không dùng /preview (bị block iframe)
+      // Không dùng /uc?export=view (không hỗ trợ PDF)
+      // Dùng Google Docs Viewer — luôn render được PDF thành HTML
+      const googleViewerUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+      const docsViewerUrl   = `https://docs.google.com/viewer?srcid=${fileId}&pid=explorer&efh=false&a=v&chrome=false&embedded=true`;
 
       f.innerHTML = `
-        <div id="img-wrap-${sanitizedRid}" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;">
-          <img 
-            src="${thumbUrl}"
-            alt="Sơ đồ ${sanitizedRid}"
-            style="max-width:100%;max-height:100%;object-fit:contain;display:block;"
-            onerror="tryIframe('${fileId}', '${sanitizedRid}', '${previewUrl}')"
-          />
-          <div style="margin-top:6px;font-size:11px;color:#8896a8">
-            <a href="https://drive.google.com/file/d/${fileId}/view" target="_blank" 
-               style="color:var(--or);text-decoration:none;font-weight:600">
-              ↗ Mở file gốc
-            </a>
+        <div style="width:100%;height:100%;position:relative;display:flex;flex-direction:column;">
+          
+          <!-- Thanh toolbar nhỏ -->
+          <div style="
+            display:flex;align-items:center;justify-content:space-between;
+            padding:6px 10px;background:#f0f3fa;border-bottom:1px solid #dde2ec;
+            flex-shrink:0;
+          ">
+            <span style="font-size:11px;font-weight:600;color:#002554;">📄 ${sanitizedRid} — Sơ đồ 2D</span>
+            <div style="display:flex;gap:6px;">
+              <a href="https://drive.google.com/file/d/${fileId}/view" target="_blank"
+                 style="font-size:10px;font-weight:600;color:#fff;background:#F58220;
+                        padding:3px 8px;border-radius:3px;text-decoration:none;">
+                ↗ Mở Drive
+              </a>
+              <button onclick="switchViewer('${fileId}','${sanitizedRid}')" 
+                style="font-size:10px;font-weight:600;color:#002554;background:#fff;
+                       border:1px solid #dde2ec;padding:3px 8px;border-radius:3px;cursor:pointer;">
+                🔄 Thử cách khác
+              </button>
+            </div>
           </div>
+
+          <!-- iframe viewer -->
+          <div style="flex:1;position:relative;">
+            <iframe 
+              id="pdf-iframe-${sanitizedRid}"
+              src="${googleViewerUrl}"
+              style="width:100%;height:100%;border:none;display:block;"
+              loading="lazy"
+              title="Sơ đồ ${sanitizedRid}"
+              onload="onIframeLoad(this)"
+              onerror="onIframeError('${fileId}','${sanitizedRid}')">
+            </iframe>
+            <!-- Loading spinner -->
+            <div id="pdf-loading-${sanitizedRid}" style="
+              position:absolute;inset:0;display:flex;flex-direction:column;
+              align-items:center;justify-content:center;background:#f8f9fc;
+              font-size:13px;color:#8896a8;gap:10px;pointer-events:none;
+            ">
+              <div style="width:32px;height:32px;border:3px solid #dde2ec;
+                          border-top-color:#F58220;border-radius:50%;
+                          animation:spin .8s linear infinite;"></div>
+              <span>Đang tải sơ đồ...</span>
+            </div>
+          </div>
+
         </div>`;
+
+      // CSS spinner
+      if (!document.getElementById('pdf-spin-style')) {
+        const s = document.createElement('style');
+        s.id = 'pdf-spin-style';
+        s.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+        document.head.appendChild(s);
+      }
+
     } else {
       f.style.background = '#e8eef9';
       f.innerHTML = `
         <div style="text-align:center;padding:22px 14px">
           <div style="font-size:42px;margin-bottom:10px">📐</div>
-          <div style="font-size:13px;font-weight:700;color:#002554;margin-bottom:3px">Sơ đồ mặt bằng 2D</div>
-          <div style="font-size:11px;color:#8896a8">Chưa có file cho phòng <b>${sanitizedRid}</b></div>
-          <div style="font-size:10px;color:#c0c8d8;margin-top:4px">
-            Kiểm tra: tên file trong Drive có chứa "<b>${sanitizedRid}</b>" không?
+          <div style="font-size:13px;font-weight:700;color:#002554;margin-bottom:3px">
+            Chưa có sơ đồ cho phòng <b>${sanitizedRid}</b>
+          </div>
+          <div style="font-size:11px;color:#8896a8;margin-top:6px;">
+            Kiểm tra tên file trong Drive có dạng:<br>
+            <code style="background:#eef;padding:2px 6px;border-radius:3px;">
+              ${sanitizedRid}_TenFile.pdf
+            </code>
           </div>
         </div>`;
     }
+
   } else {
-    // Tab 3D (inchangé)
     f.style.background = '#fff3e6';
-    f.innerHTML = `<div style="text-align:center;padding:22px 14px">
-      <div style="font-size:42px;margin-bottom:10px">🏛</div>
-      <div style="font-size:13px;font-weight:700;color:#002554;margin-bottom:3px">Phối cảnh 3D</div>
-      <div style="font-size:11px;color:#8896a8">${sanitizedRid} — ${rd.name_en}</div>
-    </div>`;
+    f.innerHTML = `
+      <div style="text-align:center;padding:22px 14px">
+        <div style="font-size:42px;margin-bottom:10px">🏛</div>
+        <div style="font-size:13px;font-weight:700;color:#002554;margin-bottom:3px">Phối cảnh 3D</div>
+        <div style="font-size:11px;color:#8896a8">${sanitizedRid} — ${rd.name_en}</div>
+      </div>`;
   }
 }
 
-// ── Fallback: si l'img échoue, tente un iframe ──
-function tryIframe(fileId, rid, previewUrl) {
-  const wrap = document.getElementById(`img-wrap-${rid}`);
-  if (!wrap) return;
-  console.log(`[tryIframe] Image échouée, tentative iframe pour ${rid}`);
-  wrap.innerHTML = `
-    <iframe 
-      src="${previewUrl}" 
-      style="width:100%;height:100%;border:none;" 
-      loading="lazy"
-      title="Sơ đồ ${rid}">
-    </iframe>
-    <div style="position:absolute;bottom:4px;right:8px;font-size:10px;">
-      <a href="https://drive.google.com/file/d/${fileId}/view" target="_blank" 
-         style="color:var(--or);text-decoration:none;font-weight:600">↗ Mở Drive</a>
-    </div>`;
-  wrap.style.position = 'relative';
+// ── Ẩn spinner khi iframe load xong ──
+function onIframeLoad(iframe) {
+  const rid = iframe.id.replace('pdf-iframe-', '');
+  const loading = document.getElementById(`pdf-loading-${rid}`);
+  if (loading) loading.style.display = 'none';
+}
+
+// ── Thử viewer thay thế nếu iframe đầu bị block ──
+let viewerToggle = {};
+function switchViewer(fileId, rid) {
+  const iframe = document.getElementById(`pdf-iframe-${rid}`);
+  if (!iframe) return;
+  
+  const loading = document.getElementById(`pdf-loading-${rid}`);
+  if (loading) loading.style.display = 'flex';
+
+  viewerToggle[rid] = !viewerToggle[rid];
+  
+  if (viewerToggle[rid]) {
+    // Thử Google Docs Viewer
+    iframe.src = `https://docs.google.com/viewer?srcid=${fileId}&pid=explorer&efh=false&a=v&chrome=false&embedded=true`;
+  } else {
+    // Quay lại Drive preview
+    iframe.src = `https://drive.google.com/file/d/${fileId}/preview`;
+  }
+}
+
+function onIframeError(fileId, rid) {
+  console.warn(`[PDF] iframe error cho ${rid}, thử viewer khác...`);
+  switchViewer(fileId, rid);
 }
 </script>
 </body>
