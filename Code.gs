@@ -1,97 +1,201 @@
 function doGet(e) {
   try {
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var sheets = ss.getSheets();
-    var allRooms = [];
-    var roomIndexMap = Object.create(null);
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheets = ss.getSheets();
+    const roomsMap = {};
 
-    for (var i = 0; i < sheets.length; i++) {
-      var sheet = sheets[i];
-      var sheetName = sheet.getName();
-      var normalizedSheetName = normalizeHeader(sheetName);
-      if (normalizedSheetName === 'danh_sach_nhan_vien' || normalizedSheetName === 'nhan_vien' || normalizedSheetName.indexOf('staff') !== -1) continue;
+    sheets.forEach(sheet => {
+      const sheetName = sheet.getName();
+      const normalizedSheetName = normalizeHeader(sheetName);
 
-      var data = sheet.getDataRange().getValues();
-      if (!data || data.length < 2) continue;
+      // Always skip employee list sheets.
+      if (normalizedSheetName.includes("danh_sach_nhan_vien")) return;
 
-      var rawHeaders = data[0];
-      var headerIndexMap = Object.create(null);
-      for (var h = 0; h < rawHeaders.length; h++) {
-        var k = normalizeHeader(rawHeaders[h]);
-        if (k && headerIndexMap[k] === undefined) headerIndexMap[k] = h;
-      }
+      const data = sheet.getDataRange().getValues();
+      if (!data || data.length === 0) return;
 
-      for (var r = 1; r < data.length; r++) {
-        var row = data[r];
-        if (isEmptyRow(row)) continue;
+      const headerRowIndex = detectHeaderRowIndex(data);
+      if (headerRowIndex < 0 || headerRowIndex >= data.length - 1) return;
 
-        var roomNumber = safeToString(getByKey(row, headerIndexMap, 'room_number'));
-        if (!roomNumber) continue;
+      const normalizedHeaders = buildNormalizedHeaders(data[headerRowIndex]);
 
-        var roomName = safeToString(getByKey(row, headerIndexMap, 'room_name')) || safeToString(getByKey(row, headerIndexMap, 'heading_1'));
-        var heading2 = safeToString(getByKey(row, headerIndexMap, 'ten_phong')) || safeToString(getByKey(row, headerIndexMap, 'heading_2'));
-        var department = safeToString(getByKey(row, headerIndexMap, 'department')) || '___';
-        var roomFunction = safeToString(getByKey(row, headerIndexMap, 'fm_room_function')) || safeToString(getByKey(row, headerIndexMap, 'function')) || '___';
-        var roomType = safeToString(getByKey(row, headerIndexMap, 'fm_room_type')) || safeToString(getByKey(row, headerIndexMap, 'type'));
-        var area = safeToString(getByKey(row, headerIndexMap, 'area'), 2) || '0';
-        var capacity = safeToString(getByKey(row, headerIndexMap, 'capacity'), 2) || '--';
-        var status = safeToString(getByKey(row, headerIndexMap, 'status'));
-        var isActiveRaw = getByKey(row, headerIndexMap, 'is_active');
-        var occupant = safeToString(getByKey(row, headerIndexMap, 'occupant_name')) || safeToString(getByKey(row, headerIndexMap, 'staff_name')) || safeToString(getByKey(row, headerIndexMap, 'name'));
+      for (let i = headerRowIndex + 1; i < data.length; i++) {
+        const row = data[i];
+        if (isBlankRow(row)) continue;
 
-        var isActive = normalizeBoolean(isActiveRaw);
-        if (!status) status = isActive === false ? 'Không hoạt động' : 'Hoạt động';
-        if (isActive === null) isActive = status === 'Hoạt động';
+        const rowData = toRowObject(row, normalizedHeaders);
 
-        var key = sheetName + '|' + roomNumber;
-        var idx = roomIndexMap[key];
-        if (idx === undefined) {
-          idx = allRooms.length;
-          roomIndexMap[key] = idx;
-          allRooms.push({
+        const roomNumber = getFirstString(rowData, [
+          "number",
+          "room_number",
+          "room_number_",
+          "ma_phong",
+          "so_phong"
+        ]);
+
+        if (!roomNumber || roomNumber.toLowerCase().includes("total")) continue;
+
+        if (!roomsMap[roomNumber]) {
+          roomsMap[roomNumber] = {
             sheet_source: sheetName,
             room_number: roomNumber,
-            heading_1: roomName || '',
-            heading_2: heading2 || '',
-            department: department,
+            heading_1: getFirstString(rowData, ["name", "heading_1", "ten", "ten_phong"], "___"),
+            heading_2: getFirstString(rowData, ["ten_phong", "heading_2", "name"], "___"),
+            department: getFirstString(rowData, ["department", "phong_ban", "bo_phan"], "___"),
             occupants_list: [],
-            fm_room_function: roomFunction,
-            fm_room_type: roomType || '',
-            fm_building_code: safeToString(getByKey(row, headerIndexMap, 'fm_building_code')) || '',
-            area: area,
-            unbounded_height: safeToString(getByKey(row, headerIndexMap, 'unbounded_height'), 2) || '',
-            capacity: capacity,
-            status: status,
-            is_active: isActive,
-            equipment: safeToString(getByKey(row, headerIndexMap, 'equipment')) || '',
-            abound_height: safeToString(getByKey(row, headerIndexMap, 'abound_height'), 2) || ''
-          });
+            fm_room_function: getFirstString(rowData, ["fm_room_function", "function", "chuc_nang"], "___"),
+            fm_room_type: getFirstString(rowData, ["fm_room_type", "type", "loai"], "___"),
+            fm_building_code: getFirstString(rowData, ["fm_room_buildingcode", "building_code", "toa_nha"], ""),
+            area: getSafeNumberText(rowData, ["area", "room_area"], "--"),
+            unbounded_height: getSafeNumberText(rowData, ["unbounded_height", "height"], "--"),
+            capacity: getSafeNumberText(rowData, ["capacity", "suc_chua"], "0"),
+            raw_status: getFirstString(rowData, ["status", "trang_thai"], "")
+          };
         }
 
-        var room = allRooms[idx];
-        if (occupant && room.occupants_list.indexOf(occupant) === -1) room.occupants_list.push(occupant);
-        if (room.department === '___' && department !== '___') room.department = department;
-        if (room.fm_room_function === '___' && roomFunction !== '___') room.fm_room_function = roomFunction;
-        if (!room.fm_room_type && roomType) room.fm_room_type = roomType;
-        if (room.area === '0' && area !== '0') room.area = area;
-        if (room.capacity === '--' && capacity !== '--') room.capacity = capacity;
-      }
-    }
+        const occupant = getFirstString(rowData, ["occupant", "nhan_su", "nguoi_su_dung"], "");
+        if (occupant && roomsMap[roomNumber].occupants_list.indexOf(occupant) === -1) {
+          roomsMap[roomNumber].occupants_list.push(occupant);
+        }
 
-    return buildJsonResponse({ status: 'success', total_rooms: allRooms.length, last_updated: new Date().toISOString(), data: allRooms });
+        const statusVal = getFirstString(rowData, ["status", "trang_thai"], "");
+        if (statusVal) roomsMap[roomNumber].raw_status = statusVal;
+      }
+    });
+
+    const resultData = Object.keys(roomsMap).map(roomKey => {
+      const room = roomsMap[roomKey];
+      const rawStatus = String(room.raw_status || "").toLowerCase();
+      const roomType = String(room.fm_room_type || "").toLowerCase();
+      const roomFunc = String(room.fm_room_function || "").toLowerCase();
+
+      let statusText = "Hoạt động";
+      if (rawStatus.includes("operational")) {
+        statusText = "Hoạt động";
+      } else if (
+        rawStatus.includes("at-rest") ||
+        rawStatus.includes("maintenance") ||
+        roomType.includes("repair") ||
+        roomFunc.includes("sửa chữa")
+      ) {
+        statusText = "Bảo trì";
+      } else if (
+        rawStatus.includes("out of order") ||
+        roomType.includes("vacant") ||
+        roomFunc.includes("unassigned")
+      ) {
+        statusText = "Không hoạt động";
+      } else if (roomType.includes("vacant") || roomFunc.includes("unassigned")) {
+        statusText = "Không hoạt động";
+      }
+
+      room.status = statusText;
+      room.is_active = statusText !== "Không hoạt động";
+
+      if (!room.fm_building_code && room.room_number.indexOf("-") > -1) {
+        room.fm_building_code = room.room_number.split("-")[0].toUpperCase();
+      }
+
+      delete room.raw_status;
+      return room;
+    });
+
+    return jsonResponse({
+      status: "success",
+      total_rooms: resultData.length,
+      last_updated: new Date().toISOString(),
+      data: resultData
+    });
   } catch (error) {
-    return buildJsonResponse({ status: 'error', message: String(error), data: [] });
+    return jsonResponse({
+      status: "error",
+      message: (error && error.message) ? error.message : String(error),
+      last_updated: new Date().toISOString(),
+      data: []
+    });
   }
 }
 
-function normalizeHeader(value) {
-  return String(value || '').toLowerCase().trim().replace(/\s+/g, '_').replace(/[:\.\/\\\-]+/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+// Normalize headers: lowercase, trim, remove accents, replace non-alnum with underscores.
+function normalizeHeader(header) {
+  const text = (header === null || header === undefined) ? "" : String(header);
+  return text
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
 }
-function getByKey(row, map, key) { var i = map[normalizeHeader(key)]; return i === undefined ? null : row[i]; }
-function safeToString(v, dec) { if (v === null || v === undefined || v === '') return ''; if (typeof v === 'number' && dec !== undefined) return String(Number(v.toFixed(dec))); return String(v).trim(); }
-function normalizeBoolean(v) { if (v === true || v === 1 || String(v).toLowerCase() === 'true') return true; if (v === false || v === 0 || String(v).toLowerCase() === 'false') return false; return null; }
-function isEmptyRow(row) { for (var i = 0; i < row.length; i++) { if (row[i] !== null && row[i] !== undefined && row[i] !== '') return false; } return true; }
-function buildJsonResponse(obj) {
-  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON)
-    .setHeader('Cache-Control', 'no-cache, no-store, must-revalidate').setHeader('Pragma', 'no-cache').setHeader('Expires', '0');
+
+function buildNormalizedHeaders(headerRow) {
+  return headerRow.map((cell, idx) => {
+    const normalized = normalizeHeader(cell);
+    return normalized || ("col_" + idx);
+  });
+}
+
+function toRowObject(row, normalizedHeaders) {
+  const obj = {};
+  normalizedHeaders.forEach((key, idx) => {
+    if (key) obj[key] = row[idx];
+  });
+  return obj;
+}
+
+function getFirstString(rowData, keys, fallback) {
+  for (let i = 0; i < keys.length; i++) {
+    const val = rowData[keys[i]];
+    if (val !== null && val !== undefined) {
+      const text = String(val).trim();
+      if (text) return text;
+    }
+  }
+  return fallback || "";
+}
+
+function getSafeNumberText(rowData, keys, fallback) {
+  for (let i = 0; i < keys.length; i++) {
+    const val = rowData[keys[i]];
+    if (val === null || val === undefined || String(val).trim() === "") continue;
+
+    if (typeof val === "number") return String(val);
+
+    const text = String(val).trim();
+    const parsed = parseFloat(text.toString().replace(/,/g, ""));
+    if (!isNaN(parsed)) return String(parsed);
+    return text;
+  }
+  return fallback;
+}
+
+function isBlankRow(row) {
+  return !row || row.every(cell => cell === "" || cell === null || cell === undefined);
+}
+
+function detectHeaderRowIndex(data) {
+  // Prefer a row containing known header signals; fallback to first non-blank row.
+  const signals = ["number", "room_number", "name", "department", "status", "area", "capacity"];
+  const scanLimit = Math.min(data.length, 10);
+
+  for (let i = 0; i < scanLimit; i++) {
+    const row = data[i];
+    if (!row || row.length === 0) continue;
+
+    const normalizedRow = row.map(normalizeHeader);
+    const score = signals.reduce((acc, signal) => acc + (normalizedRow.indexOf(signal) > -1 ? 1 : 0), 0);
+    if (score >= 2) return i;
+  }
+
+  for (let j = 0; j < scanLimit; j++) {
+    if (!isBlankRow(data[j])) return j;
+  }
+
+  return -1;
+}
+
+function jsonResponse(payload) {
+  return ContentService
+    .createTextOutput(JSON.stringify(payload))
+    .setMimeType(ContentService.MimeType.JSON);
 }
