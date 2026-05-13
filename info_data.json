@@ -1,7 +1,7 @@
 {
   "status": "success",
-  "total_rooms": 452,
-  "last_updated": "2026-05-13T16:35:00.675Z",
+  "total_rooms": 399,
+  "last_updated": "2026-05-13T18:20:26.474Z",
   "data": [
     {
       "sheet_source": "B3",
@@ -10,6 +10,7 @@
       "heading_2": "SÂN GIAO NHẬP HÀNG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "LOADING",
       "fm_building_code": "B3",
@@ -27,6 +28,7 @@
       "heading_2": "KHU TỰ HỌC",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "SELF STUDY",
       "fm_building_code": "B3",
@@ -44,6 +46,7 @@
       "heading_2": "PHÒNG KỸ THUẬT",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "ROOF CONC",
       "fm_building_code": "B3",
@@ -61,6 +64,7 @@
       "heading_2": "PHÒNG ĐIỆN",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "TECH.ROOM",
       "fm_building_code": "B3",
@@ -78,6 +82,7 @@
       "heading_2": "SÂN THƯỢNG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "ROOF CONC",
       "fm_building_code": "B3",
@@ -95,6 +100,7 @@
       "heading_2": "SÂN THƯỢNG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "ROOF CONC",
       "fm_building_code": "B3",
@@ -112,6 +118,7 @@
       "heading_2": "KHÔNG GIAN BÊN NGOÀI - SÂN TRONG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B3",
@@ -129,6 +136,7 @@
       "heading_2": "PHÒNG TẠP VỤ",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "JANITOR",
       "fm_building_code": "B3",
@@ -146,6 +154,7 @@
       "heading_2": "SẢNH THANG MÁY 02",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "ELEVATOR LOBBY NO CEILING",
       "fm_building_code": "B3",
@@ -163,6 +172,7 @@
       "heading_2": "SẢNH",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "LOBBY",
       "fm_building_code": "B3",
@@ -180,6 +190,7 @@
       "heading_2": "KHÔNG GIAN BÊN NGOÀI - CÓ MÁI CHE",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "OUTDOOR",
       "fm_building_code": "B3",
@@ -197,6 +208,7 @@
       "heading_2": "NHÀ VỆ SINH NAM",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
       "fm_building_code": "B3",
@@ -214,6 +226,7 @@
       "heading_2": "NHÀ VỆ SINH NỮ",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
       "fm_building_code": "B3",
@@ -231,6 +244,7 @@
       "heading_2": "NHÀ VỆ SINH NAM",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
       "fm_building_code": "B3",
@@ -248,6 +262,7 @@
       "heading_2": "WC NGƯỜI TÀN TẬT",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 1",
       "fm_building_code": "B3",
@@ -265,6 +280,7 @@
       "heading_2": "HÀNH LANG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
       "fm_building_code": "B3",
@@ -282,6 +298,7 @@
       "heading_2": "HÀNH LANG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
       "fm_building_code": "B3",
@@ -299,6 +316,7 @@
       "heading_2": "HÀNH LANG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
       "fm_building_code": "B3",
@@ -316,6 +334,7 @@
       "heading_2": "HÀNH LANG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
       "fm_building_code": "B3",
@@ -333,6 +352,7 @@
       "heading_2": "HÀNH LANG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
       "fm_building_code": "B3",
@@ -350,6 +370,7 @@
       "heading_2": "PHÒNG TẠP VỤ",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "JANITOR",
       "fm_building_code": "B3",
@@ -367,6 +388,7 @@
       "heading_2": "SẢNH THANG MÁY 01",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "ELEVATOR CORR",
       "fm_building_code": "B3",
@@ -384,6 +406,7 @@
       "heading_2": "SẢNH THANG MÁY 02",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "ELEVATOR CORR",
       "fm_building_code": "B3",
@@ -401,6 +424,7 @@
       "heading_2": "NHÀ VỆ SINH NAM",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
       "fm_building_code": "B3",
@@ -418,6 +442,7 @@
       "heading_2": "NHÀ VỆ SINH NỮ",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
       "fm_building_code": "B3",
@@ -435,6 +460,7 @@
       "heading_2": "NHÀ VỆ SINH NAM",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
       "fm_building_code": "B3",
@@ -452,10 +478,11 @@
       "heading_2": "NHÀ VỆ SINH NỮ",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
       "fm_building_code": "B3",
-      "area": "12.50",
+      "area": "12.5",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
@@ -469,6 +496,7 @@
       "heading_2": "WC NGƯỜI TÀN TẬT",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 1",
       "fm_building_code": "B3",
@@ -486,6 +514,7 @@
       "heading_2": "HÀNH LANG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
       "fm_building_code": "B3",
@@ -503,6 +532,7 @@
       "heading_2": "HÀNH LANG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
       "fm_building_code": "B3",
@@ -520,6 +550,7 @@
       "heading_2": "HÀNH LANG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
       "fm_building_code": "B3",
@@ -537,6 +568,7 @@
       "heading_2": "HÀNH LANG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
       "fm_building_code": "B3",
@@ -554,6 +586,7 @@
       "heading_2": "PHÒNG TẠP VỤ",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "JANITOR",
       "fm_building_code": "B3",
@@ -571,6 +604,7 @@
       "heading_2": "SẢNH THANG MÁY 01",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "ELEVATOR CORR",
       "fm_building_code": "B3",
@@ -588,6 +622,7 @@
       "heading_2": "SẢNH THANG MÁY 02",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
       "fm_building_code": "B3",
@@ -605,6 +640,7 @@
       "heading_2": "NHÀ VỆ SINH NAM",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
       "fm_building_code": "B3",
@@ -622,6 +658,7 @@
       "heading_2": "NHÀ VỆ SINH NỮ",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
       "fm_building_code": "B3",
@@ -639,6 +676,7 @@
       "heading_2": "NHÀ VỆ SINH NAM",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
       "fm_building_code": "B3",
@@ -656,10 +694,11 @@
       "heading_2": "NHÀ VỆ SINH NỮ",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
       "fm_building_code": "B3",
-      "area": "12.50",
+      "area": "12.5",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
@@ -673,6 +712,7 @@
       "heading_2": "WC NGƯỜI TÀN TẬT",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 1",
       "fm_building_code": "B3",
@@ -690,6 +730,7 @@
       "heading_2": "HÀNH LANG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
       "fm_building_code": "B3",
@@ -707,6 +748,7 @@
       "heading_2": "HÀNH LANG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
       "fm_building_code": "B3",
@@ -724,6 +766,7 @@
       "heading_2": "HÀNH LANG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
       "fm_building_code": "B3",
@@ -741,6 +784,7 @@
       "heading_2": "HÀNH LANG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
       "fm_building_code": "B3",
@@ -758,6 +802,7 @@
       "heading_2": "PHÒNG TẠP VỤ",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "JANITOR",
       "fm_building_code": "B3",
@@ -775,6 +820,7 @@
       "heading_2": "SẢNH THANG MÁY 01",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "ELEVATOR CORR",
       "fm_building_code": "B3",
@@ -792,6 +838,7 @@
       "heading_2": "SẢNH THANG MÁY 02",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "ELEVATOR CORR",
       "fm_building_code": "B3",
@@ -809,6 +856,7 @@
       "heading_2": "SÂN THƯỢNG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "ROOF PVC",
       "fm_building_code": "B3",
@@ -826,6 +874,7 @@
       "heading_2": "NHÀ VỆ SINH NAM",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
       "fm_building_code": "B3",
@@ -843,6 +892,7 @@
       "heading_2": "NHÀ VỆ SINH NỮ",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
       "fm_building_code": "B3",
@@ -860,6 +910,7 @@
       "heading_2": "WC NGƯỜI TÀN TẬT",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 1",
       "fm_building_code": "B3",
@@ -877,6 +928,7 @@
       "heading_2": "HÀNH LANG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
       "fm_building_code": "B3",
@@ -894,6 +946,7 @@
       "heading_2": "HÀNH LANG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
       "fm_building_code": "B3",
@@ -911,6 +964,7 @@
       "heading_2": "HÀNH LANG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
       "fm_building_code": "B3",
@@ -928,6 +982,7 @@
       "heading_2": "HÀNH LANG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
       "fm_building_code": "B3",
@@ -945,6 +1000,7 @@
       "heading_2": "HÀNH LANG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
       "fm_building_code": "B3",
@@ -962,10 +1018,11 @@
       "heading_2": "HÀNH LANG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "IN.CORR",
       "fm_building_code": "B3",
-      "area": "12.80",
+      "area": "12.8",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
@@ -979,6 +1036,7 @@
       "heading_2": "PHÒNG TẠP VỤ",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "JANITOR",
       "fm_building_code": "B3",
@@ -996,6 +1054,7 @@
       "heading_2": "SẢNH THANG MÁY 01",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "ELEVATOR CORR",
       "fm_building_code": "B3",
@@ -1013,6 +1072,7 @@
       "heading_2": "NHÀ VỆ SINH NAM",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
       "fm_building_code": "B3",
@@ -1030,6 +1090,7 @@
       "heading_2": "NHÀ VỆ SINH NỮ",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
       "fm_building_code": "B3",
@@ -1047,6 +1108,7 @@
       "heading_2": "WC NGƯỜI TÀN TẬT",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 1",
       "fm_building_code": "B3",
@@ -1064,6 +1126,7 @@
       "heading_2": "PHÒNG CƠ KHÍ",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "TECH.ROOM",
       "fm_building_code": "B3",
@@ -1081,6 +1144,7 @@
       "heading_2": "KHU VỰC HỌC BÊN NGOÀI",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Other functions",
       "fm_room_type": "OTHER - SelfStudy",
       "fm_building_code": "B3",
@@ -1098,6 +1162,7 @@
       "heading_2": "PHÒNG THỰC HÀNH ĐIỆN",
       "department": "ECE",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Workshop",
       "fm_room_type": "WORKSHOP",
       "fm_building_code": "B3",
@@ -1115,6 +1180,7 @@
       "heading_2": "PHÒNG ĐIỆN",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "TECH.ROOM",
       "fm_building_code": "B3",
@@ -1132,6 +1198,7 @@
       "heading_2": "KHU TỰ HỌC",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Other functions",
       "fm_room_type": "OTHER - SelfStudy",
       "fm_building_code": "B3",
@@ -1149,6 +1216,7 @@
       "heading_2": "THÔNG TIN LIÊN LẠC VÀ KỸ THUẬT SỐ",
       "department": "ECE",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Laboratory",
       "fm_room_type": "LABORATORY",
       "fm_building_code": "B3",
@@ -1163,9 +1231,10 @@
       "sheet_source": "B3",
       "room_number": "B3-205",
       "heading_1": "DIG. VIS. LAB",
-      "heading_2": "___",
+      "heading_2": "DIG. VIS. LAB",
       "department": "ECE",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Laboratory",
       "fm_room_type": "LABORATORY",
       "fm_building_code": "B3",
@@ -1183,6 +1252,7 @@
       "heading_2": "PHÒNG HỌC CÓ MÁY TÍNH",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Laboratory",
       "fm_room_type": "LABORATORY",
       "fm_building_code": "B3",
@@ -1200,6 +1270,7 @@
       "heading_2": "PHÒNG MÁY CHỦ",
       "department": "ECE",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Laboratory",
       "fm_room_type": "LABORATORY",
       "fm_building_code": "B3",
@@ -1217,6 +1288,7 @@
       "heading_2": "PHÒNG HỌC VI TÍNH",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Teaching",
       "fm_room_type": "CLASSROOM",
       "fm_building_code": "B3",
@@ -1234,6 +1306,7 @@
       "heading_2": "PHÒNG HỌC VI TÍNH",
       "department": "ECE",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Teaching",
       "fm_room_type": "CLASSROOM",
       "fm_building_code": "B3",
@@ -1251,6 +1324,7 @@
       "heading_2": "PHÒNG HỌC CÓ MÁY TÍNH",
       "department": "ECE",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Teaching",
       "fm_room_type": "CLASSROOM",
       "fm_building_code": "B3",
@@ -1270,6 +1344,7 @@
       "occupants_list": [
         "Nguyễn Đức Thịnh"
       ],
+      "occupant_display": "Nguyễn Đức Thịnh",
       "fm_room_function": "Laboratory",
       "fm_room_type": "LABORATORY",
       "fm_building_code": "B3",
@@ -1278,8 +1353,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Nguyễn Đức Thịnh",
-      "occupant_display": "Nguyễn Đức Thịnh"
+      "occupants_flat": "Nguyễn Đức Thịnh"
     },
     {
       "sheet_source": "B3",
@@ -1288,6 +1362,7 @@
       "heading_2": "PHÒNG CHUẨN BỊ",
       "department": "ECE",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Laboratory",
       "fm_room_type": "LABORATORY",
       "fm_building_code": "B3",
@@ -1307,6 +1382,7 @@
       "occupants_list": [
         "Dr. Trịnh Thị Thanh Huyền"
       ],
+      "occupant_display": "Dr. Trịnh Thị Thanh Huyền",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - Prof",
       "fm_building_code": "B3",
@@ -1315,8 +1391,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Trịnh Thị Thanh Huyền",
-      "occupant_display": "Dr. Trịnh Thị Thanh Huyền"
+      "occupants_flat": "Dr. Trịnh Thị Thanh Huyền"
     },
     {
       "sheet_source": "B3",
@@ -1325,6 +1400,7 @@
       "heading_2": "VĂN PHÒNG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -1342,6 +1418,7 @@
       "heading_2": "VĂN PHÒNG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -1359,10 +1436,11 @@
       "heading_2": "PHÒNG TỰ HỌC",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Other functions",
       "fm_room_type": "OTHER - SelfStudy",
       "fm_building_code": "B3",
-      "area": "26.90",
+      "area": "26.9",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
@@ -1376,6 +1454,7 @@
       "heading_2": "VĂN PHÒNG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -1395,6 +1474,7 @@
       "occupants_list": [
         "Dr. Đào Thị Bích Vân"
       ],
+      "occupant_display": "Dr. Đào Thị Bích Vân",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -1403,8 +1483,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Đào Thị Bích Vân",
-      "occupant_display": "Dr. Đào Thị Bích Vân"
+      "occupants_flat": "Dr. Đào Thị Bích Vân"
     },
     {
       "sheet_source": "B3",
@@ -1413,6 +1492,7 @@
       "heading_2": "PHÒNG NHÂN VIÊN",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Other functions",
       "fm_room_type": "FOOD LOUNGE",
       "fm_building_code": "B3",
@@ -1430,6 +1510,7 @@
       "heading_2": "VĂN PHÒNG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -1447,6 +1528,7 @@
       "heading_2": "PHÒNG HỌP",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Administration",
       "fm_room_type": "MEETING - Faculty",
       "fm_building_code": "B3",
@@ -1464,6 +1546,7 @@
       "heading_2": "XƯỞNG THỰC HÀNH CƠ KHÍ",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Workshop",
       "fm_room_type": "WORKSHOP",
       "fm_building_code": "B3",
@@ -1481,6 +1564,7 @@
       "heading_2": "PHÒNG ĐIỆN",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "TECH.ROOM",
       "fm_building_code": "B3",
@@ -1495,9 +1579,10 @@
       "sheet_source": "B3",
       "room_number": "B3-303",
       "heading_1": "PCP RAPID PROTOTYPING",
-      "heading_2": "___",
+      "heading_2": "PCP RAPID PROTOTYPING",
       "department": "ECE",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Workshop",
       "fm_room_type": "WORKSHOP",
       "fm_building_code": "B3",
@@ -1517,16 +1602,16 @@
       "occupants_list": [
         "Trần Quang Nhu"
       ],
+      "occupant_display": "Trần Quang Nhu",
       "fm_room_function": "Laboratory",
       "fm_room_type": "LABORATORY",
       "fm_building_code": "B3",
-      "area": "57.30",
+      "area": "57.3",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Trần Quang Nhu",
-      "occupant_display": "Trần Quang Nhu"
+      "occupants_flat": "Trần Quang Nhu"
     },
     {
       "sheet_source": "B3",
@@ -1535,6 +1620,7 @@
       "heading_2": "PHÒNG THÍ NGHIỆM GIẢNG DẠY",
       "department": "ECE",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Laboratory",
       "fm_room_type": "LABORATORY",
       "fm_building_code": "B3",
@@ -1552,6 +1638,7 @@
       "heading_2": "PHÒNG NGHIÊN CỨU THÍ NGHIỆM",
       "department": "ECE",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Laboratory",
       "fm_room_type": "LABORATORY",
       "fm_building_code": "B3",
@@ -1566,9 +1653,10 @@
       "sheet_source": "B3",
       "room_number": "B3-304D",
       "heading_1": "ELECTRONIC + ELECTRICAL MEASURING",
-      "heading_2": "___",
+      "heading_2": "ELECTRONIC + ELECTRICAL MEASURING",
       "department": "ECE",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Laboratory",
       "fm_room_type": "LABORATORY",
       "fm_building_code": "B3",
@@ -1583,9 +1671,10 @@
       "sheet_source": "B3",
       "room_number": "B3-304E",
       "heading_1": "ELECTRONIC + ELECTRICAL MEASURING",
-      "heading_2": "___",
+      "heading_2": "ELECTRONIC + ELECTRICAL MEASURING",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Laboratory",
       "fm_room_type": "LABORATORY",
       "fm_building_code": "B3",
@@ -1605,6 +1694,7 @@
       "occupants_list": [
         "Nguyễn Minh Hiếu"
       ],
+      "occupant_display": "Nguyễn Minh Hiếu",
       "fm_room_function": "Laboratory",
       "fm_room_type": "LABORATORY",
       "fm_building_code": "B3",
@@ -1613,8 +1703,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Nguyễn Minh Hiếu",
-      "occupant_display": "Nguyễn Minh Hiếu"
+      "occupants_flat": "Nguyễn Minh Hiếu"
     },
     {
       "sheet_source": "B3",
@@ -1625,16 +1714,16 @@
       "occupants_list": [
         "Biện Minh Trí"
       ],
+      "occupant_display": "Biện Minh Trí",
       "fm_room_function": "Laboratory",
       "fm_room_type": "LABORATORY",
       "fm_building_code": "B3",
-      "area": "72.80",
+      "area": "72.8",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Biện Minh Trí",
-      "occupant_display": "Biện Minh Trí"
+      "occupants_flat": "Biện Minh Trí"
     },
     {
       "sheet_source": "B3",
@@ -1643,6 +1732,7 @@
       "heading_2": "PHÒNG NGHIÊN CỨU GIẢNG DẠY",
       "department": "ECE",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Laboratory",
       "fm_room_type": "LABORATORY",
       "fm_building_code": "B3",
@@ -1660,6 +1750,7 @@
       "heading_2": "PHÒNG CHUẨN BỊ",
       "department": "ECE",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Laboratory",
       "fm_room_type": "LABORATORY",
       "fm_building_code": "B3",
@@ -1679,6 +1770,7 @@
       "occupants_list": [
         "Assoc. Prof. Dr. Bùi Minh Dương"
       ],
+      "occupant_display": "Assoc. Prof. Dr. Bùi Minh Dương",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -1687,8 +1779,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Assoc. Prof. Dr. Bùi Minh Dương",
-      "occupant_display": "Assoc. Prof. Dr. Bùi Minh Dương"
+      "occupants_flat": "Assoc. Prof. Dr. Bùi Minh Dương"
     },
     {
       "sheet_source": "B3",
@@ -1697,6 +1788,7 @@
       "heading_2": "P. IN ẤN / SAO CHÉP",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Other functions",
       "fm_room_type": "OTHER - PrintingArea",
       "fm_building_code": "B3",
@@ -1716,6 +1808,7 @@
       "occupants_list": [
         "Dr. Wai Yip Liu"
       ],
+      "occupant_display": "Dr. Wai Yip Liu",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -1724,8 +1817,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Wai Yip Liu",
-      "occupant_display": "Dr. Wai Yip Liu"
+      "occupants_flat": "Dr. Wai Yip Liu"
     },
     {
       "sheet_source": "B3",
@@ -1736,6 +1828,7 @@
       "occupants_list": [
         "Dr. Võ Bích Hiển"
       ],
+      "occupant_display": "Dr. Võ Bích Hiển",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -1744,8 +1837,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Võ Bích Hiển",
-      "occupant_display": "Dr. Võ Bích Hiển"
+      "occupants_flat": "Dr. Võ Bích Hiển"
     },
     {
       "sheet_source": "B3",
@@ -1754,6 +1846,7 @@
       "heading_2": "PHÒNG TỰ HỌC",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Other functions",
       "fm_room_type": "OTHER - SelfStudy",
       "fm_building_code": "B3",
@@ -1773,6 +1866,7 @@
       "occupants_list": [
         "Dr. Udo Klein"
       ],
+      "occupant_display": "Dr. Udo Klein",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -1781,8 +1875,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Udo Klein",
-      "occupant_display": "Dr. Udo Klein"
+      "occupants_flat": "Dr. Udo Klein"
     },
     {
       "sheet_source": "B3",
@@ -1793,6 +1886,7 @@
       "occupants_list": [
         "Dr. Nguyễn Ngô Phong"
       ],
+      "occupant_display": "Dr. Nguyễn Ngô Phong",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -1801,8 +1895,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Nguyễn Ngô Phong",
-      "occupant_display": "Dr. Nguyễn Ngô Phong"
+      "occupants_flat": "Dr. Nguyễn Ngô Phong"
     },
     {
       "sheet_source": "B3",
@@ -1811,6 +1904,7 @@
       "heading_2": "PHÒNG NHÂN VIÊN",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Other functions",
       "fm_room_type": "FOOD LOUNGE",
       "fm_building_code": "B3",
@@ -1830,6 +1924,7 @@
       "occupants_list": [
         "Dr. Nguyễn Tuấn Khanh"
       ],
+      "occupant_display": "Dr. Nguyễn Tuấn Khanh",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -1838,8 +1933,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Nguyễn Tuấn Khanh",
-      "occupant_display": "Dr. Nguyễn Tuấn Khanh"
+      "occupants_flat": "Dr. Nguyễn Tuấn Khanh"
     },
     {
       "sheet_source": "B3",
@@ -1850,6 +1944,7 @@
       "occupants_list": [
         "Nguyễn Thị Hoài Linh"
       ],
+      "occupant_display": "Nguyễn Thị Hoài Linh",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - Prof",
       "fm_building_code": "B3",
@@ -1858,8 +1953,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Hoài Linh",
-      "occupant_display": "Nguyễn Thị Hoài Linh"
+      "occupants_flat": "Nguyễn Thị Hoài Linh"
     },
     {
       "sheet_source": "B3",
@@ -1868,6 +1962,7 @@
       "heading_2": "PHÒNG HỘI NGHỊ",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Administration",
       "fm_room_type": "MEETING - Faculty",
       "fm_building_code": "B3",
@@ -1885,6 +1980,7 @@
       "heading_2": "PHÒNG HỌC MÁY TÍNH",
       "department": "ECE",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Laboratory",
       "fm_room_type": "LABORATORY",
       "fm_building_code": "B3",
@@ -1902,6 +1998,7 @@
       "heading_2": "PHÒNG ĐIỆN",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "TECH.ROOM",
       "fm_building_code": "B3",
@@ -1919,6 +2016,7 @@
       "heading_2": "PHÒNG NHÂN VIÊN",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Other functions",
       "fm_room_type": "FOOD LOUNGE",
       "fm_building_code": "B3",
@@ -1936,6 +2034,7 @@
       "heading_2": "PHÒNG HỌP",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Administration",
       "fm_room_type": "MEETING - Faculty",
       "fm_building_code": "B3",
@@ -1955,6 +2054,7 @@
       "occupants_list": [
         "Assoc. Prof. Dr. Đỗ Xuân Phú"
       ],
+      "occupant_display": "Assoc. Prof. Dr. Đỗ Xuân Phú",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -1963,8 +2063,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Assoc. Prof. Dr. Đỗ Xuân Phú",
-      "occupant_display": "Assoc. Prof. Dr. Đỗ Xuân Phú"
+      "occupants_flat": "Assoc. Prof. Dr. Đỗ Xuân Phú"
     },
     {
       "sheet_source": "B3",
@@ -1975,16 +2074,16 @@
       "occupants_list": [
         "Lê Duy Cân"
       ],
+      "occupant_display": "Lê Duy Cân",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
-      "area": "18.10",
+      "area": "18.1",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Lê Duy Cân",
-      "occupant_display": "Lê Duy Cân"
+      "occupants_flat": "Lê Duy Cân"
     },
     {
       "sheet_source": "B3",
@@ -1995,6 +2094,7 @@
       "occupants_list": [
         "Nguyễn Hoàng Vĩnh Khang"
       ],
+      "occupant_display": "Nguyễn Hoàng Vĩnh Khang",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -2003,8 +2103,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Nguyễn Hoàng Vĩnh Khang",
-      "occupant_display": "Nguyễn Hoàng Vĩnh Khang"
+      "occupants_flat": "Nguyễn Hoàng Vĩnh Khang"
     },
     {
       "sheet_source": "B3",
@@ -2013,6 +2112,7 @@
       "heading_2": "VĂN PHÒNG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -2030,6 +2130,7 @@
       "heading_2": "VĂN PHÒNG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -2047,6 +2148,7 @@
       "heading_2": "P. TỰ HỌC/ IN ẤN / SAO CHÉP",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Other functions",
       "fm_room_type": "OTHER - PrintingArea",
       "fm_building_code": "B3",
@@ -2064,6 +2166,7 @@
       "heading_2": "PHÒNG THÍ NGHIỆM GIẢNG DẠY",
       "department": "MST",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Laboratory",
       "fm_room_type": "LABORATORY",
       "fm_building_code": "B3",
@@ -2081,6 +2184,7 @@
       "heading_2": "KHO",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Other functions",
       "fm_room_type": "STORAGE",
       "fm_building_code": "B3",
@@ -2098,6 +2202,7 @@
       "heading_2": "PHÒNG CHUẨN BỊ",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Laboratory",
       "fm_room_type": "LABORATORY",
       "fm_building_code": "B3",
@@ -2115,6 +2220,7 @@
       "heading_2": "P. NGHIÊN CỨU THỰC HÀNH ĐIỆN",
       "department": "ECE, MST",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Laboratory",
       "fm_room_type": "LABORATORY",
       "fm_building_code": "B3",
@@ -2132,6 +2238,7 @@
       "heading_2": "PHÒNG THÍ NGHIỆM GIẢNG DẠY",
       "department": "MST",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Laboratory",
       "fm_room_type": "LABORATORY",
       "fm_building_code": "B3",
@@ -2149,6 +2256,7 @@
       "heading_2": "PHÒNG CHUẨN BỊ",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Laboratory",
       "fm_room_type": "LABORATORY",
       "fm_building_code": "B3",
@@ -2166,6 +2274,7 @@
       "heading_2": "PHÒNG THÍ NGHIỆM GIẢNG DẠY",
       "department": "MST",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Laboratory",
       "fm_room_type": "LABORATORY",
       "fm_building_code": "B3",
@@ -2183,6 +2292,7 @@
       "heading_2": "PHÒNG ĐIỆN",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "TECH.ROOM",
       "fm_building_code": "B3",
@@ -2200,6 +2310,7 @@
       "heading_2": "PHÒNG NHÂN VIÊN",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Other functions",
       "fm_room_type": "FOOD LOUNGE",
       "fm_building_code": "B3",
@@ -2219,6 +2330,7 @@
       "occupants_list": [
         "Phí Tường Uyên"
       ],
+      "occupant_display": "Phí Tường Uyên",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -2227,8 +2339,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Phí Tường Uyên",
-      "occupant_display": "Phí Tường Uyên"
+      "occupants_flat": "Phí Tường Uyên"
     },
     {
       "sheet_source": "B3",
@@ -2237,6 +2348,7 @@
       "heading_2": "VĂN PHÒNG CỦA TRƯỞNG KHOA",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -2256,16 +2368,16 @@
       "occupants_list": [
         "Assoc. Prof. Dr. Phạm Thành Dương"
       ],
+      "occupant_display": "Assoc. Prof. Dr. Phạm Thành Dương",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
-      "area": "18.10",
+      "area": "18.1",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Assoc. Prof. Dr. Phạm Thành Dương",
-      "occupant_display": "Assoc. Prof. Dr. Phạm Thành Dương"
+      "occupants_flat": "Assoc. Prof. Dr. Phạm Thành Dương"
     },
     {
       "sheet_source": "B3",
@@ -2276,6 +2388,7 @@
       "occupants_list": [
         "Assoc. Prof. Dr. Thái Truyển Đại Chấn"
       ],
+      "occupant_display": "Assoc. Prof. Dr. Thái Truyển Đại Chấn",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -2284,8 +2397,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Assoc. Prof. Dr. Thái Truyển Đại Chấn",
-      "occupant_display": "Assoc. Prof. Dr. Thái Truyển Đại Chấn"
+      "occupants_flat": "Assoc. Prof. Dr. Thái Truyển Đại Chấn"
     },
     {
       "sheet_source": "B3",
@@ -2296,6 +2408,7 @@
       "occupants_list": [
         "Assoc. Prof.Dr. Hồ Xuân Thịnh"
       ],
+      "occupant_display": "Assoc. Prof.Dr. Hồ Xuân Thịnh",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -2304,8 +2417,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Assoc. Prof.Dr. Hồ Xuân Thịnh",
-      "occupant_display": "Assoc. Prof.Dr. Hồ Xuân Thịnh"
+      "occupants_flat": "Assoc. Prof.Dr. Hồ Xuân Thịnh"
     },
     {
       "sheet_source": "B3",
@@ -2314,6 +2426,7 @@
       "heading_2": "P. IN ẤN / SAO CHÉP",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Other functions",
       "fm_room_type": "OTHER - PrintingArea",
       "fm_building_code": "B3",
@@ -2333,6 +2446,7 @@
       "occupants_list": [
         "Nguyễn Thanh Ngân"
       ],
+      "occupant_display": "Nguyễn Thanh Ngân",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -2341,8 +2455,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thanh Ngân",
-      "occupant_display": "Nguyễn Thanh Ngân"
+      "occupants_flat": "Nguyễn Thanh Ngân"
     },
     {
       "sheet_source": "B3",
@@ -2351,6 +2464,7 @@
       "heading_2": "PHÒNG HỌP",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Administration",
       "fm_room_type": "MEETING - Faculty",
       "fm_building_code": "B3",
@@ -2368,6 +2482,7 @@
       "heading_2": "KHO",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Other functions",
       "fm_room_type": "STORAGE",
       "fm_building_code": "B3",
@@ -2385,6 +2500,7 @@
       "heading_2": "KHO",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Other functions",
       "fm_room_type": "STORAGE",
       "fm_building_code": "B3",
@@ -2402,6 +2518,7 @@
       "heading_2": "VĂN PHÒNG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -2421,6 +2538,7 @@
       "occupants_list": [
         "Dr. Nguyễn Hồng Vi"
       ],
+      "occupant_display": "Dr. Nguyễn Hồng Vi",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -2429,8 +2547,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Nguyễn Hồng Vi",
-      "occupant_display": "Dr. Nguyễn Hồng Vi"
+      "occupants_flat": "Dr. Nguyễn Hồng Vi"
     },
     {
       "sheet_source": "B3",
@@ -2441,6 +2558,7 @@
       "occupants_list": [
         "Dr. Dicky Januarizky Silitonga"
       ],
+      "occupant_display": "Dr. Dicky Januarizky Silitonga",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -2449,8 +2567,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Dicky Januarizky Silitonga",
-      "occupant_display": "Dr. Dicky Januarizky Silitonga"
+      "occupants_flat": "Dr. Dicky Januarizky Silitonga"
     },
     {
       "sheet_source": "B3",
@@ -2461,6 +2578,7 @@
       "occupants_list": [
         "Dr. Lê Đoàn Quốc Bảo"
       ],
+      "occupant_display": "Dr. Lê Đoàn Quốc Bảo",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -2469,8 +2587,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Lê Đoàn Quốc Bảo",
-      "occupant_display": "Dr. Lê Đoàn Quốc Bảo"
+      "occupants_flat": "Dr. Lê Đoàn Quốc Bảo"
     },
     {
       "sheet_source": "B3",
@@ -2479,6 +2596,7 @@
       "heading_2": "KHO",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Other functions",
       "fm_room_type": "STORAGE",
       "fm_building_code": "B3",
@@ -2498,6 +2616,7 @@
       "occupants_list": [
         "Dr. Lê Nhật Tâm"
       ],
+      "occupant_display": "Dr. Lê Nhật Tâm",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -2506,8 +2625,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Lê Nhật Tâm",
-      "occupant_display": "Dr. Lê Nhật Tâm"
+      "occupants_flat": "Dr. Lê Nhật Tâm"
     },
     {
       "sheet_source": "B3",
@@ -2518,6 +2636,7 @@
       "occupants_list": [
         "Dr.Lưu Văn Thành"
       ],
+      "occupant_display": "Dr.Lưu Văn Thành",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -2526,8 +2645,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr.Lưu Văn Thành",
-      "occupant_display": "Dr.Lưu Văn Thành"
+      "occupants_flat": "Dr.Lưu Văn Thành"
     },
     {
       "sheet_source": "B3",
@@ -2536,6 +2654,7 @@
       "heading_2": "KHO",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Other functions",
       "fm_room_type": "STORAGE",
       "fm_building_code": "B3",
@@ -2555,6 +2674,7 @@
       "occupants_list": [
         "Dr. Said Zahedani"
       ],
+      "occupant_display": "Dr. Said Zahedani",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -2563,8 +2683,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Said Zahedani",
-      "occupant_display": "Dr. Said Zahedani"
+      "occupants_flat": "Dr. Said Zahedani"
     },
     {
       "sheet_source": "B3",
@@ -2573,6 +2692,7 @@
       "heading_2": "KHO",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Other functions",
       "fm_room_type": "STORAGE",
       "fm_building_code": "B3",
@@ -2592,6 +2712,7 @@
       "occupants_list": [
         "Dr. Nguyễn Xuân Thanh"
       ],
+      "occupant_display": "Dr. Nguyễn Xuân Thanh",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -2600,8 +2721,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Nguyễn Xuân Thanh",
-      "occupant_display": "Dr. Nguyễn Xuân Thanh"
+      "occupants_flat": "Dr. Nguyễn Xuân Thanh"
     },
     {
       "sheet_source": "B3",
@@ -2610,10 +2730,11 @@
       "heading_2": "KHO",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Other functions",
       "fm_room_type": "STORAGE",
       "fm_building_code": "B3",
-      "area": "12.50",
+      "area": "12.5",
       "unbounded_height": "4000",
       "capacity": "--",
       "status": "Hoạt động",
@@ -2629,6 +2750,7 @@
       "occupants_list": [
         "Dr. Trần Tuấn Minh"
       ],
+      "occupant_display": "Dr. Trần Tuấn Minh",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -2637,8 +2759,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Trần Tuấn Minh",
-      "occupant_display": "Dr. Trần Tuấn Minh"
+      "occupants_flat": "Dr. Trần Tuấn Minh"
     },
     {
       "sheet_source": "B3",
@@ -2647,6 +2768,7 @@
       "heading_2": "VĂN PHÒNG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - Prof",
       "fm_building_code": "B3",
@@ -2666,6 +2788,7 @@
       "occupants_list": [
         "Dr. Nguyễn Thiện Bình"
       ],
+      "occupant_display": "Dr. Nguyễn Thiện Bình",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -2674,8 +2797,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Nguyễn Thiện Bình",
-      "occupant_display": "Dr. Nguyễn Thiện Bình"
+      "occupants_flat": "Dr. Nguyễn Thiện Bình"
     },
     {
       "sheet_source": "B3",
@@ -2686,6 +2808,7 @@
       "occupants_list": [
         "Dr. Nguyễn Hải Vân"
       ],
+      "occupant_display": "Dr. Nguyễn Hải Vân",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - faculty",
       "fm_building_code": "B3",
@@ -2694,8 +2817,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Nguyễn Hải Vân",
-      "occupant_display": "Dr. Nguyễn Hải Vân"
+      "occupants_flat": "Dr. Nguyễn Hải Vân"
     },
     {
       "sheet_source": "B3",
@@ -2704,6 +2826,7 @@
       "heading_2": "VĂN PHÒNG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE - Prof",
       "fm_building_code": "B3",
@@ -2721,6 +2844,7 @@
       "heading_2": "PHÒNG ĐIỆN",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "TECH.ROOM",
       "fm_building_code": "B3",
@@ -2738,6 +2862,7 @@
       "heading_2": "THANG MÁY 01",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B3",
@@ -2755,6 +2880,7 @@
       "heading_2": "THANG MÁY 02",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "B3",
@@ -2772,6 +2898,7 @@
       "heading_2": "THANG ST-01",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "STAIR 01",
       "fm_building_code": "B3",
@@ -2789,6 +2916,7 @@
       "heading_2": "THANG ST-02",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "STAIR 02",
       "fm_building_code": "B3",
@@ -2806,6 +2934,7 @@
       "heading_2": "Sảnh Chính",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Circulation",
       "fm_room_type": "Support",
       "fm_building_code": "AD",
@@ -2823,6 +2952,7 @@
       "heading_2": "Quầy Lễ tân",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Data Control",
       "fm_room_type": "Operations",
       "fm_building_code": "AD",
@@ -2840,6 +2970,7 @@
       "heading_2": "Khu vực chờ",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "MEP Service",
       "fm_room_type": "Utility",
       "fm_building_code": "AD",
@@ -2857,6 +2988,7 @@
       "heading_2": "Phòng Giám đốc",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Material Storage",
       "fm_room_type": "Storage",
       "fm_building_code": "AD",
@@ -2874,6 +3006,7 @@
       "heading_2": "Phòng Phó Giám đốc",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Food Preparation",
       "fm_room_type": "Service",
       "fm_building_code": "AD",
@@ -2891,6 +3024,7 @@
       "heading_2": "Văn phòng Hành chính",
       "department": "Finance",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "General Inventory",
       "fm_room_type": "Storage",
       "fm_building_code": "AD",
@@ -2911,6 +3045,7 @@
         "Nguyễn Thị Thu Hà",
         "Lê Thị A"
       ],
+      "occupant_display": "Nguyễn Thị Thu Hà, Lê Thị A",
       "fm_room_function": "Counseling",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -2919,8 +3054,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Thu Hà, Lê Thị A",
-      "occupant_display": "Nguyễn Thị Thu Hà, Lê Thị A"
+      "occupants_flat": "Nguyễn Thị Thu Hà, Lê Thị A"
     },
     {
       "sheet_source": "AD",
@@ -2929,6 +3063,7 @@
       "heading_2": "Văn phòng Kế toán",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "System Monitoring",
       "fm_room_type": "Operations",
       "fm_building_code": "AD",
@@ -2948,6 +3083,7 @@
       "occupants_list": [
         "Bùi Tố Nguyên"
       ],
+      "occupant_display": "Bùi Tố Nguyên",
       "fm_room_function": "Unassigned",
       "fm_room_type": "Vacant",
       "fm_building_code": "AD",
@@ -2956,8 +3092,7 @@
       "capacity": "--",
       "status": "Không hoạt động",
       "is_active": false,
-      "occupants_flat": "Bùi Tố Nguyên",
-      "occupant_display": "Bùi Tố Nguyên"
+      "occupants_flat": "Bùi Tố Nguyên"
     },
     {
       "sheet_source": "AD",
@@ -2968,6 +3103,7 @@
       "occupants_list": [
         "Lê Thị Hạnh"
       ],
+      "occupant_display": "Lê Thị Hạnh",
       "fm_room_function": "Technical Help",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -2976,8 +3112,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Lê Thị Hạnh",
-      "occupant_display": "Lê Thị Hạnh"
+      "occupants_flat": "Lê Thị Hạnh"
     },
     {
       "sheet_source": "AD",
@@ -2986,6 +3121,7 @@
       "heading_2": "Phòng Máy chủ",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Accounting",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -3003,6 +3139,7 @@
       "heading_2": "Phòng Thiết bị Mạng",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Unassigned",
       "fm_room_type": "Vacant",
       "fm_building_code": "AD",
@@ -3022,6 +3159,7 @@
       "occupants_list": [
         "Trịnh Thanh Vi"
       ],
+      "occupant_display": "Trịnh Thanh Vi",
       "fm_room_function": "Unassigned",
       "fm_room_type": "Vacant",
       "fm_building_code": "AD",
@@ -3030,8 +3168,7 @@
       "capacity": "--",
       "status": "Không hoạt động",
       "is_active": false,
-      "occupants_flat": "Trịnh Thanh Vi",
-      "occupant_display": "Trịnh Thanh Vi"
+      "occupants_flat": "Trịnh Thanh Vi"
     },
     {
       "sheet_source": "AD",
@@ -3040,6 +3177,7 @@
       "heading_2": "Phòng Tổng đài",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Administration",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -3059,6 +3197,7 @@
       "occupants_list": [
         "Phạm Chi Mai"
       ],
+      "occupant_display": "Phạm Chi Mai",
       "fm_room_function": "Recruitment",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -3067,18 +3206,18 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Phạm Chi Mai",
-      "occupant_display": "Phạm Chi Mai"
+      "occupants_flat": "Phạm Chi Mai"
     },
     {
       "sheet_source": "AD",
       "room_number": "AD-224",
-      "heading_1": "Hardware Repair",
-      "heading_2": "Phòng Sửa chữa Phần cứng",
+      "heading_1": "MSR",
+      "heading_2": "Phòng Marketing và Tuyển sinh",
       "department": "___",
       "occupants_list": [
         "Đỗ Hữu Tuấn Anh"
       ],
+      "occupant_display": "Đỗ Hữu Tuấn Anh",
       "fm_room_function": "Maintenance",
       "fm_room_type": "Support",
       "fm_building_code": "AD",
@@ -3087,18 +3226,18 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Đỗ Hữu Tuấn Anh",
-      "occupant_display": "Đỗ Hữu Tuấn Anh"
+      "occupants_flat": "Đỗ Hữu Tuấn Anh"
     },
     {
       "sheet_source": "AD",
       "room_number": "AD-226",
-      "heading_1": "Software QA",
-      "heading_2": "Phòng Kiểm thử Phần mềm",
+      "heading_1": "MSR",
+      "heading_2": "Phòng Marketing và Tuyển sinh (Kho)",
       "department": "___",
       "occupants_list": [
         "Vũ Quốc Hữu"
       ],
+      "occupant_display": "Vũ Quốc Hữu",
       "fm_room_function": "Research",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -3107,8 +3246,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Vũ Quốc Hữu",
-      "occupant_display": "Vũ Quốc Hữu"
+      "occupants_flat": "Vũ Quốc Hữu"
     },
     {
       "sheet_source": "AD",
@@ -3117,6 +3255,7 @@
       "heading_2": "Phòng họp nhỏ 1",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Meeting",
       "fm_room_type": "Conference",
       "fm_building_code": "AD",
@@ -3136,6 +3275,7 @@
       "occupants_list": [
         "Đỗ Tuấn Hải"
       ],
+      "occupant_display": "Đỗ Tuấn Hải",
       "fm_room_function": "Media Production",
       "fm_room_type": "Studio",
       "fm_building_code": "AD",
@@ -3144,8 +3284,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Đỗ Tuấn Hải",
-      "occupant_display": "Đỗ Tuấn Hải"
+      "occupants_flat": "Đỗ Tuấn Hải"
     },
     {
       "sheet_source": "AD",
@@ -3156,6 +3295,7 @@
       "occupants_list": [
         "Nguyễn Thị Hằng Nga"
       ],
+      "occupant_display": "Nguyễn Thị Hằng Nga",
       "fm_room_function": "Waiting Area",
       "fm_room_type": "Public",
       "fm_building_code": "AD",
@@ -3164,8 +3304,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Hằng Nga",
-      "occupant_display": "Nguyễn Thị Hằng Nga"
+      "occupants_flat": "Nguyễn Thị Hằng Nga"
     },
     {
       "sheet_source": "AD",
@@ -3176,6 +3315,7 @@
       "occupants_list": [
         "Lê Văn Thành"
       ],
+      "occupant_display": "Lê Văn Thành",
       "fm_room_function": "Pantry",
       "fm_room_type": "Service",
       "fm_building_code": "AD",
@@ -3184,8 +3324,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Lê Văn Thành",
-      "occupant_display": "Lê Văn Thành"
+      "occupants_flat": "Lê Văn Thành"
     },
     {
       "sheet_source": "AD",
@@ -3194,6 +3333,7 @@
       "heading_2": "Phòng Thảo luận nhóm 1",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Electrical Load",
       "fm_room_type": "Utility",
       "fm_building_code": "AD",
@@ -3213,6 +3353,7 @@
       "occupants_list": [
         "Trần Quốc Khánh"
       ],
+      "occupant_display": "Trần Quốc Khánh",
       "fm_room_function": "Janitorial",
       "fm_room_type": "Support",
       "fm_building_code": "AD",
@@ -3221,8 +3362,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Trần Quốc Khánh",
-      "occupant_display": "Trần Quốc Khánh"
+      "occupants_flat": "Trần Quốc Khánh"
     },
     {
       "sheet_source": "AD",
@@ -3233,6 +3373,7 @@
       "occupants_list": [
         "Đồng Văn Tín"
       ],
+      "occupant_display": "Đồng Văn Tín",
       "fm_room_function": "Server Rack",
       "fm_room_type": "Operations",
       "fm_building_code": "AD",
@@ -3241,8 +3382,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Đồng Văn Tín",
-      "occupant_display": "Đồng Văn Tín"
+      "occupants_flat": "Đồng Văn Tín"
     },
     {
       "sheet_source": "AD",
@@ -3251,6 +3391,7 @@
       "heading_2": "Phòng Hoạch định Chiến lược",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Archive",
       "fm_room_type": "Storage",
       "fm_building_code": "AD",
@@ -3270,6 +3411,7 @@
       "occupants_list": [
         "Nguyễn Quang Liêm"
       ],
+      "occupant_display": "Nguyễn Quang Liêm",
       "fm_room_function": "Unassigned",
       "fm_room_type": "Vacant",
       "fm_building_code": "AD",
@@ -3278,8 +3420,7 @@
       "capacity": "--",
       "status": "Không hoạt động",
       "is_active": false,
-      "occupants_flat": "Nguyễn Quang Liêm",
-      "occupant_display": "Nguyễn Quang Liêm"
+      "occupants_flat": "Nguyễn Quang Liêm"
     },
     {
       "sheet_source": "AD",
@@ -3290,6 +3431,7 @@
       "occupants_list": [
         "Nguyễn Hữu Dần"
       ],
+      "occupant_display": "Nguyễn Hữu Dần",
       "fm_room_function": "Admissions",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -3298,8 +3440,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Nguyễn Hữu Dần",
-      "occupant_display": "Nguyễn Hữu Dần"
+      "occupants_flat": "Nguyễn Hữu Dần"
     },
     {
       "sheet_source": "AD",
@@ -3308,6 +3449,7 @@
       "heading_2": "Phòng Hội thảo",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Access Control",
       "fm_room_type": "Operations",
       "fm_building_code": "AD",
@@ -3327,6 +3469,7 @@
       "occupants_list": [
         "Vương Thanh Hải"
       ],
+      "occupant_display": "Vương Thanh Hải",
       "fm_room_function": "Audit",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -3335,8 +3478,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Vương Thanh Hải",
-      "occupant_display": "Vương Thanh Hải"
+      "occupants_flat": "Vương Thanh Hải"
     },
     {
       "sheet_source": "AD",
@@ -3345,6 +3487,7 @@
       "heading_2": "Không gian Làm việc Mở",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Training",
       "fm_room_type": "Conference",
       "fm_building_code": "AD",
@@ -3362,6 +3505,7 @@
       "heading_2": "Khu vực Ngồi linh hoạt",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Breakroom",
       "fm_room_type": "Service",
       "fm_building_code": "AD",
@@ -3379,6 +3523,7 @@
       "heading_2": "Buồng Gọi điện 1",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Tool Storage",
       "fm_room_type": "Storage",
       "fm_building_code": "AD",
@@ -3396,6 +3541,7 @@
       "heading_2": "Buồng Gọi điện 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Shipping/Receiving",
       "fm_room_type": "Support",
       "fm_building_code": "AD",
@@ -3413,6 +3559,7 @@
       "heading_2": "Phòng Làm việc Tập trung",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Hardware Repair",
       "fm_room_type": "Operations",
       "fm_building_code": "AD",
@@ -3430,6 +3577,7 @@
       "heading_2": "Khu vực Đọc sách/Nghỉ",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Advising",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -3447,6 +3595,7 @@
       "heading_2": "Phòng chuẩn bị đồ uống 1",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Unassigned",
       "fm_room_type": "Vacant",
       "fm_building_code": "AD",
@@ -3464,6 +3613,7 @@
       "heading_2": "Phòng chuẩn bị đồ uống 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Boardroom",
       "fm_room_type": "Conference",
       "fm_building_code": "AD",
@@ -3481,6 +3631,7 @@
       "heading_2": "Phòng Nghỉ giữa giờ",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "PR Office",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -3498,6 +3649,7 @@
       "heading_2": "Bếp nấu ăn",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Dining",
       "fm_room_type": "Public",
       "fm_building_code": "AD",
@@ -3515,6 +3667,7 @@
       "heading_2": "Nhà ăn Cán bộ",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "HVAC Control",
       "fm_room_type": "Utility",
       "fm_building_code": "AD",
@@ -3532,6 +3685,7 @@
       "heading_2": "Nhà ăn Cán bộ/Giảng viên",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Locker Room",
       "fm_room_type": "Service",
       "fm_building_code": "AD",
@@ -3551,6 +3705,7 @@
       "occupants_list": [
         "Assoc. Prof. Garcia Clavel Manuel"
       ],
+      "occupant_display": "Assoc. Prof. Garcia Clavel Manuel",
       "fm_room_function": "Network Hub",
       "fm_room_type": "Operations",
       "fm_building_code": "AD",
@@ -3559,8 +3714,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Assoc. Prof. Garcia Clavel Manuel",
-      "occupant_display": "Assoc. Prof. Garcia Clavel Manuel"
+      "occupants_flat": "Assoc. Prof. Garcia Clavel Manuel"
     },
     {
       "sheet_source": "AD",
@@ -3569,6 +3723,7 @@
       "heading_2": "Kho Thực phẩm khô",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Supply Closet",
       "fm_room_type": "Storage",
       "fm_building_code": "AD",
@@ -3586,6 +3741,7 @@
       "heading_2": "Khu vực Rửa chén/dĩa",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Health Services",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -3603,6 +3759,7 @@
       "heading_2": "Kho vật tư chung",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "CCTV Monitoring",
       "fm_room_type": "Operations",
       "fm_building_code": "AD",
@@ -3620,6 +3777,7 @@
       "heading_2": "Kho Lưu trữ Hồ sơ",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Unassigned",
       "fm_room_type": "Vacant",
       "fm_building_code": "AD",
@@ -3637,6 +3795,7 @@
       "heading_2": "Kho Tài liệu Mật",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Payroll",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -3656,6 +3815,7 @@
       "occupants_list": [
         "Dr. Nguyễn Ngọc Hiếu"
       ],
+      "occupant_display": "Dr. Nguyễn Ngọc Hiếu",
       "fm_room_function": "Benefits",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -3664,8 +3824,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Nguyễn Ngọc Hiếu",
-      "occupant_display": "Dr. Nguyễn Ngọc Hiếu"
+      "occupants_flat": "Dr. Nguyễn Ngọc Hiếu"
     },
     {
       "sheet_source": "AD",
@@ -3674,6 +3833,7 @@
       "heading_2": "Kho Biểu mẫu",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Repair Shop",
       "fm_room_type": "Support",
       "fm_building_code": "AD",
@@ -3691,6 +3851,7 @@
       "heading_2": "Kho Văn phòng phẩm",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Grading",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -3708,6 +3869,7 @@
       "heading_2": "Kho Hàng dự trữ",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Event Planning",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -3725,6 +3887,7 @@
       "heading_2": "Kho Lưu trữ Tạm thời",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Reception",
       "fm_room_type": "Public",
       "fm_building_code": "AD",
@@ -3744,6 +3907,7 @@
       "occupants_list": [
         "Dr. Đồng Quang Huấn"
       ],
+      "occupant_display": "Dr. Đồng Quang Huấn",
       "fm_room_function": "Copy/Print",
       "fm_room_type": "Support",
       "fm_building_code": "AD",
@@ -3752,8 +3916,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Đồng Quang Huấn",
-      "occupant_display": "Dr. Đồng Quang Huấn"
+      "occupants_flat": "Dr. Đồng Quang Huấn"
     },
     {
       "sheet_source": "AD",
@@ -3762,6 +3925,7 @@
       "heading_2": "Kho Hóa chất",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Plumbing Chase",
       "fm_room_type": "Utility",
       "fm_building_code": "AD",
@@ -3781,6 +3945,7 @@
       "occupants_list": [
         "Dr. Đinh Hải Dũng"
       ],
+      "occupant_display": "Dr. Đinh Hải Dũng",
       "fm_room_function": "Chemical Storage",
       "fm_room_type": "Storage",
       "fm_building_code": "AD",
@@ -3789,8 +3954,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Đinh Hải Dũng",
-      "occupant_display": "Dr. Đinh Hải Dũng"
+      "occupants_flat": "Dr. Đinh Hải Dũng"
     },
     {
       "sheet_source": "AD",
@@ -3799,6 +3963,7 @@
       "heading_2": "Phòng Kỹ thuật Cơ khí",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Telecom Switch",
       "fm_room_type": "Operations",
       "fm_building_code": "AD",
@@ -3816,6 +3981,7 @@
       "heading_2": "Phòng Bảo trì",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Mailroom",
       "fm_room_type": "Support",
       "fm_building_code": "AD",
@@ -3833,6 +3999,7 @@
       "heading_2": "Xưởng Sửa chữa",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Unassigned",
       "fm_room_type": "Vacant",
       "fm_building_code": "AD",
@@ -3850,6 +4017,7 @@
       "heading_2": "Kho Dụng cụ",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Student Union",
       "fm_room_type": "Public",
       "fm_building_code": "AD",
@@ -3867,6 +4035,7 @@
       "heading_2": "Phòng Hệ thống Lạnh",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Patrol Briefing",
       "fm_room_type": "Operations",
       "fm_building_code": "AD",
@@ -3884,6 +4053,7 @@
       "heading_2": "Phòng Lò hơi",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Billing",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -3901,6 +4071,7 @@
       "heading_2": "Phòng Máy phát điện",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Employee Relations",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -3918,6 +4089,7 @@
       "heading_2": "Trạm Biến áp",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Groundskeeping",
       "fm_room_type": "Support",
       "fm_building_code": "AD",
@@ -3935,6 +4107,7 @@
       "heading_2": "Phòng Tủ điện Chính",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Seminar",
       "fm_room_type": "Conference",
       "fm_building_code": "AD",
@@ -3952,6 +4125,7 @@
       "heading_2": "Phòng Bơm PCCC",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Private Suite",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -3969,6 +4143,7 @@
       "heading_2": "Phòng Xử lý Nước",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Cold Storage",
       "fm_room_type": "Storage",
       "fm_building_code": "AD",
@@ -3988,6 +4163,7 @@
       "occupants_list": [
         "Trần Văn Tiến"
       ],
+      "occupant_display": "Trần Văn Tiến",
       "fm_room_function": "Lounge",
       "fm_room_type": "Public",
       "fm_building_code": "AD",
@@ -3996,8 +4172,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Trần Văn Tiến",
-      "occupant_display": "Trần Văn Tiến"
+      "occupants_flat": "Trần Văn Tiến"
     },
     {
       "sheet_source": "AD",
@@ -4008,6 +4183,7 @@
       "occupants_list": [
         "Dr. Lã Vĩnh Trung"
       ],
+      "occupant_display": "Dr. Lã Vĩnh Trung",
       "fm_room_function": "Generator",
       "fm_room_type": "Utility",
       "fm_building_code": "AD",
@@ -4016,8 +4192,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Lã Vĩnh Trung",
-      "occupant_display": "Dr. Lã Vĩnh Trung"
+      "occupants_flat": "Dr. Lã Vĩnh Trung"
     },
     {
       "sheet_source": "AD",
@@ -4028,6 +4203,7 @@
       "occupants_list": [
         "Nguyễn Thị Hoài"
       ],
+      "occupant_display": "Nguyễn Thị Hoài",
       "fm_room_function": "Overstock",
       "fm_room_type": "Storage",
       "fm_building_code": "AD",
@@ -4036,8 +4212,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Hoài",
-      "occupant_display": "Nguyễn Thị Hoài"
+      "occupants_flat": "Nguyễn Thị Hoài"
     },
     {
       "sheet_source": "AD",
@@ -4048,6 +4223,7 @@
       "occupants_list": [
         "Lê Thị Hoa"
       ],
+      "occupant_display": "Lê Thị Hoa",
       "fm_room_function": "Software QA",
       "fm_room_type": "Operations",
       "fm_building_code": "AD",
@@ -4056,8 +4232,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Lê Thị Hoa",
-      "occupant_display": "Lê Thị Hoa"
+      "occupants_flat": "Lê Thị Hoa"
     },
     {
       "sheet_source": "AD",
@@ -4068,6 +4243,7 @@
       "occupants_list": [
         "Võ Phan Hoàng Trang"
       ],
+      "occupant_display": "Võ Phan Hoàng Trang",
       "fm_room_function": "Record Keeping",
       "fm_room_type": "Storage",
       "fm_building_code": "AD",
@@ -4076,8 +4252,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Võ Phan Hoàng Trang",
-      "occupant_display": "Võ Phan Hoàng Trang"
+      "occupants_flat": "Võ Phan Hoàng Trang"
     },
     {
       "sheet_source": "AD",
@@ -4088,6 +4263,7 @@
       "occupants_list": [
         "Nguyễn Ngọc Đoan Trang"
       ],
+      "occupant_display": "Nguyễn Ngọc Đoan Trang",
       "fm_room_function": "Unassigned",
       "fm_room_type": "Vacant",
       "fm_building_code": "AD",
@@ -4096,8 +4272,7 @@
       "capacity": "--",
       "status": "Không hoạt động",
       "is_active": false,
-      "occupants_flat": "Nguyễn Ngọc Đoan Trang",
-      "occupant_display": "Nguyễn Ngọc Đoan Trang"
+      "occupants_flat": "Nguyễn Ngọc Đoan Trang"
     },
     {
       "sheet_source": "AD",
@@ -4106,6 +4281,7 @@
       "heading_2": "Xưởng Làm Biển báo",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Career Services",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -4123,6 +4299,7 @@
       "heading_2": "Phòng Cấp phát Khóa",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Emergency Response",
       "fm_room_type": "Operations",
       "fm_building_code": "AD",
@@ -4140,6 +4317,7 @@
       "heading_2": "Phòng Trực Vệ sinh 1",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Budgeting",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -4157,6 +4335,7 @@
       "heading_2": "Phòng Trực Vệ sinh 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Onboarding",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -4176,6 +4355,7 @@
       "occupants_list": [
         "Nguyễn Thanh Duy"
       ],
+      "occupant_display": "Nguyễn Thanh Duy",
       "fm_room_function": "Safety Gear",
       "fm_room_type": "Storage",
       "fm_building_code": "AD",
@@ -4184,8 +4364,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thanh Duy",
-      "occupant_display": "Nguyễn Thanh Duy"
+      "occupants_flat": "Nguyễn Thanh Duy"
     },
     {
       "sheet_source": "AD",
@@ -4196,6 +4375,7 @@
       "occupants_list": [
         "Ngô Xuân Thúy Hằng"
       ],
+      "occupant_display": "Ngô Xuân Thúy Hằng",
       "fm_room_function": "Department Head",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -4204,8 +4384,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Ngô Xuân Thúy Hằng",
-      "occupant_display": "Ngô Xuân Thúy Hằng"
+      "occupants_flat": "Ngô Xuân Thúy Hằng"
     },
     {
       "sheet_source": "AD",
@@ -4216,6 +4395,7 @@
       "occupants_list": [
         "Nguyễn Thị Huỳnh"
       ],
+      "occupant_display": "Nguyễn Thị Huỳnh",
       "fm_room_function": "Design Studio",
       "fm_room_type": "Studio",
       "fm_building_code": "AD",
@@ -4224,8 +4404,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Huỳnh",
-      "occupant_display": "Nguyễn Thị Huỳnh"
+      "occupants_flat": "Nguyễn Thị Huỳnh"
     },
     {
       "sheet_source": "AD",
@@ -4236,6 +4415,7 @@
       "occupants_list": [
         "Sử Thị Ái Diễm"
       ],
+      "occupant_display": "Sử Thị Ái Diễm",
       "fm_room_function": "Information Desk",
       "fm_room_type": "Public",
       "fm_building_code": "AD",
@@ -4244,8 +4424,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Sử Thị Ái Diễm",
-      "occupant_display": "Sử Thị Ái Diễm"
+      "occupants_flat": "Sử Thị Ái Diễm"
     },
     {
       "sheet_source": "AD",
@@ -4256,6 +4435,7 @@
       "occupants_list": [
         "Trần Thị Thu Yên"
       ],
+      "occupant_display": "Trần Thị Thu Yên",
       "fm_room_function": "Conference Room",
       "fm_room_type": "Conference",
       "fm_building_code": "AD",
@@ -4264,8 +4444,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Trần Thị Thu Yên",
-      "occupant_display": "Trần Thị Thu Yên"
+      "occupants_flat": "Trần Thị Thu Yên"
     },
     {
       "sheet_source": "AD",
@@ -4276,6 +4455,7 @@
       "occupants_list": [
         "Đặng Thị Thanh Thúy"
       ],
+      "occupant_display": "Đặng Thị Thanh Thúy",
       "fm_room_function": "Elevator Control",
       "fm_room_type": "Utility",
       "fm_building_code": "AD",
@@ -4284,8 +4464,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Đặng Thị Thanh Thúy",
-      "occupant_display": "Đặng Thị Thanh Thúy"
+      "occupants_flat": "Đặng Thị Thanh Thúy"
     },
     {
       "sheet_source": "AD",
@@ -4296,6 +4475,7 @@
       "occupants_list": [
         "Đào Thị Thu Dung"
       ],
+      "occupant_display": "Đào Thị Thu Dung",
       "fm_room_function": "Waste Management",
       "fm_room_type": "Support",
       "fm_building_code": "AD",
@@ -4304,8 +4484,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Đào Thị Thu Dung",
-      "occupant_display": "Đào Thị Thu Dung"
+      "occupants_flat": "Đào Thị Thu Dung"
     },
     {
       "sheet_source": "AD",
@@ -4316,6 +4495,7 @@
       "occupants_list": [
         "Dr. Trần Đức Khánh"
       ],
+      "occupant_display": "Dr. Trần Đức Khánh",
       "fm_room_function": "Backup Storage",
       "fm_room_type": "Operations",
       "fm_building_code": "AD",
@@ -4324,8 +4504,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Trần Đức Khánh",
-      "occupant_display": "Dr. Trần Đức Khánh"
+      "occupants_flat": "Dr. Trần Đức Khánh"
     },
     {
       "sheet_source": "AD",
@@ -4334,6 +4513,7 @@
       "heading_2": "Khu vực Tập kết Hàng",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Stationery",
       "fm_room_type": "Storage",
       "fm_building_code": "AD",
@@ -4353,6 +4533,7 @@
       "occupants_list": [
         "Nguyễn Mai Linh"
       ],
+      "occupant_display": "Nguyễn Mai Linh",
       "fm_room_function": "Unassigned",
       "fm_room_type": "Vacant",
       "fm_building_code": "AD",
@@ -4361,8 +4542,7 @@
       "capacity": "--",
       "status": "Không hoạt động",
       "is_active": false,
-      "occupants_flat": "Nguyễn Mai Linh",
-      "occupant_display": "Nguyễn Mai Linh"
+      "occupants_flat": "Nguyễn Mai Linh"
     },
     {
       "sheet_source": "AD",
@@ -4373,6 +4553,7 @@
       "occupants_list": [
         "Nguyễn Thị Hòa"
       ],
+      "occupant_display": "Nguyễn Thị Hòa",
       "fm_room_function": "Club Workspace",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -4381,8 +4562,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Hòa",
-      "occupant_display": "Nguyễn Thị Hòa"
+      "occupants_flat": "Nguyễn Thị Hòa"
     },
     {
       "sheet_source": "AD",
@@ -4393,6 +4573,7 @@
       "occupants_list": [
         "Trần Thị Trang"
       ],
+      "occupant_display": "Trần Thị Trang",
       "fm_room_function": "Key Control",
       "fm_room_type": "Operations",
       "fm_building_code": "AD",
@@ -4401,8 +4582,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Trần Thị Trang",
-      "occupant_display": "Trần Thị Trang"
+      "occupants_flat": "Trần Thị Trang"
     },
     {
       "sheet_source": "AD",
@@ -4411,6 +4591,7 @@
       "heading_2": "Phòng Giám sát Camera",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Purchasing",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -4430,6 +4611,7 @@
       "occupants_list": [
         "Nguyễn Thị Hoa"
       ],
+      "occupant_display": "Nguyễn Thị Hoa",
       "fm_room_function": "Compliance",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -4438,8 +4620,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Hoa",
-      "occupant_display": "Nguyễn Thị Hoa"
+      "occupants_flat": "Nguyễn Thị Hoa"
     },
     {
       "sheet_source": "AD",
@@ -4448,6 +4629,7 @@
       "heading_2": "Quầy Cấp Thẻ Tạm",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Vehicle Dispatch",
       "fm_room_type": "Support",
       "fm_building_code": "AD",
@@ -4465,6 +4647,7 @@
       "heading_2": "Quầy Đồ thất lạc",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Visiting Scholar",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -4484,6 +4667,7 @@
       "occupants_list": [
         "Nguyễn Thị Bông"
       ],
+      "occupant_display": "Nguyễn Thị Bông",
       "fm_room_function": "Video Conference",
       "fm_room_type": "Conference",
       "fm_building_code": "AD",
@@ -4492,8 +4676,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Bông",
-      "occupant_display": "Nguyễn Thị Bông"
+      "occupants_flat": "Nguyễn Thị Bông"
     },
     {
       "sheet_source": "AD",
@@ -4502,6 +4685,7 @@
       "heading_2": "Chốt Gác An ninh 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Dry Goods",
       "fm_room_type": "Storage",
       "fm_building_code": "AD",
@@ -4519,6 +4703,7 @@
       "heading_2": "Phòng Tạm giữ",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Quiet Room",
       "fm_room_type": "Public",
       "fm_building_code": "AD",
@@ -4536,6 +4721,7 @@
       "heading_2": "Phòng Làm việc Đặc biệt",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Fire Pump",
       "fm_room_type": "Utility",
       "fm_building_code": "AD",
@@ -4553,6 +4739,7 @@
       "heading_2": "Phòng Ứng phó Khẩn cấp",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Staging Area",
       "fm_room_type": "Support",
       "fm_building_code": "AD",
@@ -4570,6 +4757,7 @@
       "heading_2": "Phòng Y tế",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "User Testing",
       "fm_room_type": "Operations",
       "fm_building_code": "AD",
@@ -4587,6 +4775,7 @@
       "heading_2": "Phòng Chăm sóc Sức khỏe",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Filing",
       "fm_room_type": "Storage",
       "fm_building_code": "AD",
@@ -4604,6 +4793,7 @@
       "heading_2": "Phòng Thay đồ",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Unassigned",
       "fm_room_type": "Vacant",
       "fm_building_code": "AD",
@@ -4623,6 +4813,7 @@
       "occupants_list": [
         "Lê Thái Cường"
       ],
+      "occupant_display": "Lê Thái Cường",
       "fm_room_function": "Tutoring",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -4631,8 +4822,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Lê Thái Cường",
-      "occupant_display": "Lê Thái Cường"
+      "occupants_flat": "Lê Thái Cường"
     },
     {
       "sheet_source": "AD",
@@ -4643,6 +4833,7 @@
       "occupants_list": [
         "Lê Thái Cường"
       ],
+      "occupant_display": "Lê Thái Cường",
       "fm_room_function": "Lost and Found",
       "fm_room_type": "Support",
       "fm_building_code": "AD",
@@ -4651,8 +4842,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Lê Thái Cường",
-      "occupant_display": "Lê Thái Cường"
+      "occupants_flat": "Lê Thái Cường"
     },
     {
       "sheet_source": "AD",
@@ -4663,6 +4853,7 @@
       "occupants_list": [
         "Dr. Trần Hồng Ngọc"
       ],
+      "occupant_display": "Dr. Trần Hồng Ngọc",
       "fm_room_function": "Tax",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -4671,8 +4862,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Trần Hồng Ngọc",
-      "occupant_display": "Dr. Trần Hồng Ngọc"
+      "occupants_flat": "Dr. Trần Hồng Ngọc"
     },
     {
       "sheet_source": "AD",
@@ -4683,6 +4873,7 @@
       "occupants_list": [
         "Lê Thái Cường"
       ],
+      "occupant_display": "Lê Thái Cường",
       "fm_room_function": "Staff Development",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -4691,8 +4882,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Lê Thái Cường",
-      "occupant_display": "Lê Thái Cường"
+      "occupants_flat": "Lê Thái Cường"
     },
     {
       "sheet_source": "AD",
@@ -4701,6 +4891,7 @@
       "heading_2": "Phòng Phó Giám đốc 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Blueprint Archive",
       "fm_room_type": "Storage",
       "fm_building_code": "AD",
@@ -4718,6 +4909,7 @@
       "heading_2": "Văn phòng Hành chính 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Emeritus",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -4735,6 +4927,7 @@
       "heading_2": "Văn phòng Nhân sự 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Market Research",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -4754,6 +4947,7 @@
       "occupants_list": [
         "Dr. Trần Hữu Tâm"
       ],
+      "occupant_display": "Dr. Trần Hữu Tâm",
       "fm_room_function": "Lobby",
       "fm_room_type": "Public",
       "fm_building_code": "AD",
@@ -4762,8 +4956,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Trần Hữu Tâm",
-      "occupant_display": "Dr. Trần Hữu Tâm"
+      "occupants_flat": "Dr. Trần Hữu Tâm"
     },
     {
       "sheet_source": "AD",
@@ -4774,6 +4967,7 @@
       "occupants_list": [
         "Lê Thái Cường"
       ],
+      "occupant_display": "Lê Thái Cường",
       "fm_room_function": "Collaboration",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -4782,8 +4976,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Lê Thái Cường",
-      "occupant_display": "Lê Thái Cường"
+      "occupants_flat": "Lê Thái Cường"
     },
     {
       "sheet_source": "AD",
@@ -4792,6 +4985,7 @@
       "heading_2": "VP Hỗ trợ Kỹ thuật IT 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Water Treatment",
       "fm_room_type": "Utility",
       "fm_building_code": "AD",
@@ -4809,6 +5003,7 @@
       "heading_2": "Phòng Máy chủ 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Laundry",
       "fm_room_type": "Service",
       "fm_building_code": "AD",
@@ -4826,6 +5021,7 @@
       "heading_2": "Phòng Thiết bị Mạng 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "UPS Room",
       "fm_room_type": "Operations",
       "fm_building_code": "AD",
@@ -4845,6 +5041,7 @@
       "occupants_list": [
         "Lê Duy Hùng"
       ],
+      "occupant_display": "Lê Duy Hùng",
       "fm_room_function": "Forms Storage",
       "fm_room_type": "Storage",
       "fm_building_code": "AD",
@@ -4853,8 +5050,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Lê Duy Hùng",
-      "occupant_display": "Lê Duy Hùng"
+      "occupants_flat": "Lê Duy Hùng"
     },
     {
       "sheet_source": "AD",
@@ -4865,6 +5061,7 @@
       "occupants_list": [
         "Dr. Lê Lam Sơn"
       ],
+      "occupant_display": "Dr. Lê Lam Sơn",
       "fm_room_function": "Unassigned",
       "fm_room_type": "Vacant",
       "fm_building_code": "AD",
@@ -4873,8 +5070,7 @@
       "capacity": "--",
       "status": "Không hoạt động",
       "is_active": false,
-      "occupants_flat": "Dr. Lê Lam Sơn",
-      "occupant_display": "Dr. Lê Lam Sơn"
+      "occupants_flat": "Dr. Lê Lam Sơn"
     },
     {
       "sheet_source": "AD",
@@ -4885,6 +5081,7 @@
       "occupants_list": [
         "Dr. Nguyễn Tuấn Cường"
       ],
+      "occupant_display": "Dr. Nguyễn Tuấn Cường",
       "fm_room_function": "Orientation",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -4893,8 +5090,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Nguyễn Tuấn Cường",
-      "occupant_display": "Dr. Nguyễn Tuấn Cường"
+      "occupants_flat": "Dr. Nguyễn Tuấn Cường"
     },
     {
       "sheet_source": "AD",
@@ -4905,6 +5101,7 @@
       "occupants_list": [
         "Lê Thái Cường"
       ],
+      "occupant_display": "Lê Thái Cường",
       "fm_room_function": "Interrogation",
       "fm_room_type": "Operations",
       "fm_building_code": "AD",
@@ -4913,8 +5110,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Lê Thái Cường",
-      "occupant_display": "Lê Thái Cường"
+      "occupants_flat": "Lê Thái Cường"
     },
     {
       "sheet_source": "AD",
@@ -4925,6 +5121,7 @@
       "occupants_list": [
         "Dr. Trần Hồng Ngọc"
       ],
+      "occupant_display": "Dr. Trần Hồng Ngọc",
       "fm_room_function": "Investments",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -4933,8 +5130,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Trần Hồng Ngọc",
-      "occupant_display": "Dr. Trần Hồng Ngọc"
+      "occupants_flat": "Dr. Trần Hồng Ngọc"
     },
     {
       "sheet_source": "AD",
@@ -4945,6 +5141,7 @@
       "occupants_list": [
         "Lê Thùy Đoan Trang"
       ],
+      "occupant_display": "Lê Thùy Đoan Trang",
       "fm_room_function": "Internship",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -4953,8 +5150,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Lê Thùy Đoan Trang",
-      "occupant_display": "Lê Thùy Đoan Trang"
+      "occupants_flat": "Lê Thùy Đoan Trang"
     },
     {
       "sheet_source": "AD",
@@ -4965,6 +5161,7 @@
       "occupants_list": [
         "Dr. Trương Đình Huy"
       ],
+      "occupant_display": "Dr. Trương Đình Huy",
       "fm_room_function": "Key Management",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -4973,8 +5170,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Trương Đình Huy",
-      "occupant_display": "Dr. Trương Đình Huy"
+      "occupants_flat": "Dr. Trương Đình Huy"
     },
     {
       "sheet_source": "AD",
@@ -4985,6 +5181,7 @@
       "occupants_list": [
         "Dr. Trần Thị Thu Hương"
       ],
+      "occupant_display": "Dr. Trần Thị Thu Hương",
       "fm_room_function": "TA Office",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -4993,8 +5190,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Trần Thị Thu Hương",
-      "occupant_display": "Dr. Trần Thị Thu Hương"
+      "occupants_flat": "Dr. Trần Thị Thu Hương"
     },
     {
       "sheet_source": "AD",
@@ -5003,6 +5199,7 @@
       "heading_2": "Phòng họp Hội đồng 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Strategy Room",
       "fm_room_type": "Conference",
       "fm_building_code": "AD",
@@ -5020,6 +5217,7 @@
       "heading_2": "Phòng Thảo luận nhóm 3",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Washing",
       "fm_room_type": "Service",
       "fm_building_code": "AD",
@@ -5037,6 +5235,7 @@
       "heading_2": "Phòng Thảo luận nhóm 4",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Mother's Room",
       "fm_room_type": "Service",
       "fm_building_code": "AD",
@@ -5054,6 +5253,7 @@
       "heading_2": "HÀNH LANG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Chiller",
       "fm_room_type": "Utility",
       "fm_building_code": "AD",
@@ -5071,6 +5271,7 @@
       "heading_2": "HÀNH LANG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Pallet Storage",
       "fm_room_type": "Storage",
       "fm_building_code": "AD",
@@ -5088,6 +5289,7 @@
       "heading_2": "HÀNH LANG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Staging",
       "fm_room_type": "Operations",
       "fm_building_code": "AD",
@@ -5105,6 +5307,7 @@
       "heading_2": "HÀNH LANG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Disposal",
       "fm_room_type": "Support",
       "fm_building_code": "AD",
@@ -5122,6 +5325,7 @@
       "heading_2": "HÀNH LANG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Unassigned",
       "fm_room_type": "Vacant",
       "fm_building_code": "AD",
@@ -5139,6 +5343,7 @@
       "heading_2": "Không gian Làm việc chung 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Disability Services",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -5158,6 +5363,7 @@
       "occupants_list": [
         "Nguyễn Minh Thông"
       ],
+      "occupant_display": "Nguyễn Minh Thông",
       "fm_room_function": "Guard Post",
       "fm_room_type": "Operations",
       "fm_building_code": "AD",
@@ -5166,8 +5372,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Nguyễn Minh Thông",
-      "occupant_display": "Nguyễn Minh Thông"
+      "occupants_flat": "Nguyễn Minh Thông"
     },
     {
       "sheet_source": "AD",
@@ -5176,6 +5381,7 @@
       "heading_2": "Khu vực Ngồi linh hoạt 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Treasury",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -5193,6 +5399,7 @@
       "heading_2": "Buồng Gọi điện 3",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Wellness",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -5210,6 +5417,7 @@
       "heading_2": "Buồng Gọi điện 4",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Signage Shop",
       "fm_room_type": "Support",
       "fm_building_code": "AD",
@@ -5227,6 +5435,7 @@
       "heading_2": "Phòng Làm việc Tập trung 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Postdoc Workspace",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -5244,6 +5453,7 @@
       "heading_2": "Khu vực Đọc sách/Nghỉ 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Branding",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -5261,6 +5471,7 @@
       "heading_2": "Phòng chuẩn bị đồ uống 3",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Lounge Area",
       "fm_room_type": "Public",
       "fm_building_code": "AD",
@@ -5278,6 +5489,7 @@
       "heading_2": "Phòng chuẩn bị đồ uống 4",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Focus Room",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -5295,6 +5507,7 @@
       "heading_2": "Phòng Nghỉ giữa giờ 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Exhaust Fan",
       "fm_room_type": "Utility",
       "fm_building_code": "AD",
@@ -5312,6 +5525,7 @@
       "heading_2": "Bếp nấu ăn 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Equipment Wash",
       "fm_room_type": "Service",
       "fm_building_code": "AD",
@@ -5329,6 +5543,7 @@
       "heading_2": "Nhà ăn Cán bộ 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Patch Panel",
       "fm_room_type": "Operations",
       "fm_building_code": "AD",
@@ -5346,6 +5561,7 @@
       "heading_2": "Nhà ăn Cán bộ/Giảng viên 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Overflow Seating",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -5363,6 +5579,7 @@
       "heading_2": "Kho Lạnh 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Unassigned",
       "fm_room_type": "Vacant",
       "fm_building_code": "AD",
@@ -5380,6 +5597,7 @@
       "heading_2": "Kho Thực phẩm khô 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Alumni Relations",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -5397,6 +5615,7 @@
       "heading_2": "Khu vực Rửa chén/dĩa 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Command Center",
       "fm_room_type": "Operations",
       "fm_building_code": "AD",
@@ -5414,6 +5633,7 @@
       "heading_2": "Kho vật tư chung 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Risk Management",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -5431,6 +5651,7 @@
       "heading_2": "Kho Lưu trữ Hồ sơ 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Labor Relations",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -5448,6 +5669,7 @@
       "heading_2": "Kho Tài liệu Mật 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Energy Management",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -5465,6 +5687,7 @@
       "heading_2": "Kho Giấy và Bút 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Adjunct Office",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -5482,6 +5705,7 @@
       "heading_2": "Kho Biểu mẫu 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Briefing Room",
       "fm_room_type": "Conference",
       "fm_building_code": "AD",
@@ -5499,6 +5723,7 @@
       "heading_2": "Kho Văn phòng phẩm 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Vending",
       "fm_room_type": "Public",
       "fm_building_code": "AD",
@@ -5518,6 +5743,7 @@
       "occupants_list": [
         "Trương Ngọc Hùng"
       ],
+      "occupant_display": "Trương Ngọc Hùng",
       "fm_room_function": "Wellness Room",
       "fm_room_type": "Service",
       "fm_building_code": "AD",
@@ -5526,8 +5752,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Trương Ngọc Hùng",
-      "occupant_display": "Trương Ngọc Hùng"
+      "occupants_flat": "Trương Ngọc Hùng"
     },
     {
       "sheet_source": "AD",
@@ -5536,6 +5761,7 @@
       "heading_2": "Kho Lưu trữ Tạm thời 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Boiler",
       "fm_room_type": "Utility",
       "fm_building_code": "AD",
@@ -5553,6 +5779,7 @@
       "heading_2": "Kho Bản vẽ Kỹ thuật 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Bulk Storage",
       "fm_room_type": "Storage",
       "fm_building_code": "AD",
@@ -5572,6 +5799,7 @@
       "occupants_list": [
         "Ms. Lâm Bửu Kiều"
       ],
+      "occupant_display": "Ms. Lâm Bửu Kiều",
       "fm_room_function": "Helpdesk Counter",
       "fm_room_type": "Support",
       "fm_building_code": "AD",
@@ -5580,8 +5808,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Ms. Lâm Bửu Kiều",
-      "occupant_display": "Ms. Lâm Bửu Kiều"
+      "occupants_flat": "Ms. Lâm Bửu Kiều"
     },
     {
       "sheet_source": "AD",
@@ -5592,6 +5819,7 @@
       "occupants_list": [
         "Ms. Nguyễn Thị Khánh Giao"
       ],
+      "occupant_display": "Ms. Nguyễn Thị Khánh Giao",
       "fm_room_function": "Shared Desks",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -5600,8 +5828,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Ms. Nguyễn Thị Khánh Giao",
-      "occupant_display": "Ms. Nguyễn Thị Khánh Giao"
+      "occupants_flat": "Ms. Nguyễn Thị Khánh Giao"
     },
     {
       "sheet_source": "AD",
@@ -5612,6 +5839,7 @@
       "occupants_list": [
         "Nguyễn Thành Công"
       ],
+      "occupant_display": "Nguyễn Thành Công",
       "fm_room_function": "Unassigned",
       "fm_room_type": "Vacant",
       "fm_building_code": "AD",
@@ -5620,8 +5848,7 @@
       "capacity": "--",
       "status": "Không hoạt động",
       "is_active": false,
-      "occupants_flat": "Nguyễn Thành Công",
-      "occupant_display": "Nguyễn Thành Công"
+      "occupants_flat": "Nguyễn Thành Công"
     },
     {
       "sheet_source": "AD",
@@ -5630,6 +5857,7 @@
       "heading_2": "Phòng Bảo trì 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "International",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -5647,6 +5875,7 @@
       "heading_2": "Xưởng Sửa chữa 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Holding Room",
       "fm_room_type": "Operations",
       "fm_building_code": "AD",
@@ -5666,6 +5895,7 @@
       "occupants_list": [
         "Doãn Ngọc Tín"
       ],
+      "occupant_display": "Doãn Ngọc Tín",
       "fm_room_function": "Forecasting",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -5674,8 +5904,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Doãn Ngọc Tín",
-      "occupant_display": "Doãn Ngọc Tín"
+      "occupants_flat": "Doãn Ngọc Tín"
     },
     {
       "sheet_source": "AD",
@@ -5686,6 +5915,7 @@
       "occupants_list": [
         "Nguyễn Việt Tiến"
       ],
+      "occupant_display": "Nguyễn Việt Tiến",
       "fm_room_function": "Records Archive",
       "fm_room_type": "Storage",
       "fm_building_code": "AD",
@@ -5694,8 +5924,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Nguyễn Việt Tiến",
-      "occupant_display": "Nguyễn Việt Tiến"
+      "occupants_flat": "Nguyễn Việt Tiến"
     },
     {
       "sheet_source": "AD",
@@ -5706,6 +5935,7 @@
       "occupants_list": [
         "Nguyễn Thị Đoan Trang"
       ],
+      "occupant_display": "Nguyễn Thị Đoan Trang",
       "fm_room_function": "Hazardous Waste",
       "fm_room_type": "Storage",
       "fm_building_code": "AD",
@@ -5714,8 +5944,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Đoan Trang",
-      "occupant_display": "Nguyễn Thị Đoan Trang"
+      "occupants_flat": "Nguyễn Thị Đoan Trang"
     },
     {
       "sheet_source": "AD",
@@ -5726,6 +5955,7 @@
       "occupants_list": [
         "Ms. Tạ Thị Thu Hiền"
       ],
+      "occupant_display": "Ms. Tạ Thị Thu Hiền",
       "fm_room_function": "Reading Room",
       "fm_room_type": "Public",
       "fm_building_code": "AD",
@@ -5734,8 +5964,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Ms. Tạ Thị Thu Hiền",
-      "occupant_display": "Ms. Tạ Thị Thu Hiền"
+      "occupants_flat": "Ms. Tạ Thị Thu Hiền"
     },
     {
       "sheet_source": "AD",
@@ -5744,6 +5973,7 @@
       "heading_2": "Trạm Biến áp 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Content Creation",
       "fm_room_type": "Studio",
       "fm_building_code": "AD",
@@ -5761,6 +5991,7 @@
       "heading_2": "Phòng Tủ điện Chính 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Coat Check",
       "fm_room_type": "Support",
       "fm_building_code": "AD",
@@ -5778,6 +6009,7 @@
       "heading_2": "Phòng Bơm PCCC 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Huddle Room",
       "fm_room_type": "Conference",
       "fm_building_code": "AD",
@@ -5795,6 +6027,7 @@
       "heading_2": "Phòng Xử lý Nước 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Solar Inverter",
       "fm_room_type": "Utility",
       "fm_building_code": "AD",
@@ -5812,6 +6045,7 @@
       "heading_2": "Hộp Kỹ thuật Nước 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Restroom Supply",
       "fm_room_type": "Storage",
       "fm_building_code": "AD",
@@ -5829,6 +6063,7 @@
       "heading_2": "Phòng Quạt Hút gió 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Fiber Optic",
       "fm_room_type": "Operations",
       "fm_building_code": "AD",
@@ -5846,6 +6081,7 @@
       "heading_2": "Phòng Biến tần Năng lượng 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Hot Desking",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -5863,6 +6099,7 @@
       "heading_2": "Phòng Kỹ thuật Thang máy 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Unassigned",
       "fm_room_type": "Vacant",
       "fm_building_code": "AD",
@@ -5880,6 +6117,7 @@
       "heading_2": "Phòng Quản lý Năng lượng 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Housing",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -5897,6 +6135,7 @@
       "heading_2": "Phòng Quy hoạch Không gian 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Badge Issuing",
       "fm_room_type": "Support",
       "fm_building_code": "AD",
@@ -5914,6 +6153,7 @@
       "heading_2": "Xưởng Làm Biển báo 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Grants Management",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -5931,6 +6171,7 @@
       "heading_2": "Phòng Cấp phát Khóa 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Compensation",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -5948,6 +6189,7 @@
       "heading_2": "Phòng Trực Vệ sinh 3",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Space Planning",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -5965,6 +6207,7 @@
       "heading_2": "Phòng Trực Vệ sinh 4",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Lounge",
       "fm_room_type": "Public",
       "fm_building_code": "AD",
@@ -5982,6 +6225,7 @@
       "heading_2": "Kho Đồ Dùng Nhà vệ sinh 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Library",
       "fm_room_type": "Public",
       "fm_building_code": "AD",
@@ -5999,13 +6243,14 @@
       "heading_2": "Phòng Xử lý Rác thải 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Staff Dining",
       "fm_room_type": "Service",
       "fm_building_code": "AD",
       "area": "1455",
       "unbounded_height": "83.2",
       "capacity": "--",
-      "status": "Hoạt động",
+      "status": "Hoạt ��ộng",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -6016,6 +6261,7 @@
       "heading_2": "Phòng Tập kết Phế liệu 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Phone Booth",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -6033,6 +6279,7 @@
       "heading_2": "Kho Chất thải Nguy hại 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Main Switchgear",
       "fm_room_type": "Utility",
       "fm_building_code": "AD",
@@ -6050,6 +6297,7 @@
       "heading_2": "Phòng Giặt ủi 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Loading Dock",
       "fm_room_type": "Support",
       "fm_building_code": "AD",
@@ -6067,6 +6315,7 @@
       "heading_2": "Phòng Rửa Thiết bị 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Asset Management",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -6084,6 +6333,7 @@
       "heading_2": "Phòng Chăm sóc Cảnh quan 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Temporary Storage",
       "fm_room_type": "Storage",
       "fm_building_code": "AD",
@@ -6101,6 +6351,7 @@
       "heading_2": "Khu vực Giao nhận 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Unassigned",
       "fm_room_type": "Vacant",
       "fm_building_code": "AD",
@@ -6118,6 +6369,7 @@
       "heading_2": "Khu vực Tập kết Hàng 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Financial Aid",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -6135,6 +6387,7 @@
       "heading_2": "Phòng Điều phối Xe 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Surveillance",
       "fm_room_type": "Operations",
       "fm_building_code": "AD",
@@ -6152,6 +6405,7 @@
       "heading_2": "Phòng Điều khiển An ninh 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Accounts Payable",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -6169,6 +6423,7 @@
       "heading_2": "Trung tâm Chỉ huy 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Diversity",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -6186,6 +6441,7 @@
       "heading_2": "Phòng Giám sát Camera 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Vendor Staging",
       "fm_room_type": "Support",
       "fm_building_code": "AD",
@@ -6203,6 +6459,7 @@
       "heading_2": "Phòng Cấp phát Thẻ 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "Shared Workspace",
       "fm_room_type": "Office",
       "fm_building_code": "AD",
@@ -6220,6 +6477,7 @@
       "heading_2": "Quầy Cấp Thẻ Tạm 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6237,6 +6495,7 @@
       "heading_2": "Quầy Đồ thất lạc 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6254,6 +6513,7 @@
       "heading_2": "Chốt Gác An ninh 3",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6271,6 +6531,7 @@
       "heading_2": "Chốt Gác An ninh 4",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6288,6 +6549,7 @@
       "heading_2": "Phòng Tạm giữ 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6305,6 +6567,7 @@
       "heading_2": "Phòng Làm việc Đặc biệt 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6322,6 +6585,7 @@
       "heading_2": "Phòng Ứng phó Khẩn cấp 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6339,6 +6603,7 @@
       "heading_2": "Phòng Y tế 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6356,6 +6621,7 @@
       "heading_2": "Phòng Chăm sóc Sức khỏe 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6375,6 +6641,7 @@
       "occupants_list": [
         "Christoff Hans Wiethoff"
       ],
+      "occupant_display": "Christoff Hans Wiethoff",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6383,8 +6650,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Christoff Hans Wiethoff",
-      "occupant_display": "Christoff Hans Wiethoff"
+      "occupants_flat": "Christoff Hans Wiethoff"
     },
     {
       "sheet_source": "AD",
@@ -6395,6 +6661,7 @@
       "occupants_list": [
         "Thái Thị Hà Trang"
       ],
+      "occupant_display": "Thái Thị Hà Trang",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6403,8 +6670,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Thái Thị Hà Trang",
-      "occupant_display": "Thái Thị Hà Trang"
+      "occupants_flat": "Thái Thị Hà Trang"
     },
     {
       "sheet_source": "AD",
@@ -6415,6 +6681,7 @@
       "occupants_list": [
         "Nguyễn Thị Hiền"
       ],
+      "occupant_display": "Nguyễn Thị Hiền",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6423,8 +6690,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Hiền",
-      "occupant_display": "Nguyễn Thị Hiền"
+      "occupants_flat": "Nguyễn Thị Hiền"
     },
     {
       "sheet_source": "AD",
@@ -6435,6 +6701,7 @@
       "occupants_list": [
         "Lâm Thị Hồng Gấm"
       ],
+      "occupant_display": "Lâm Thị Hồng Gấm",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6443,8 +6710,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Lâm Thị Hồng Gấm",
-      "occupant_display": "Lâm Thị Hồng Gấm"
+      "occupants_flat": "Lâm Thị Hồng Gấm"
     },
     {
       "sheet_source": "AD",
@@ -6453,6 +6719,7 @@
       "heading_2": "Phòng Đào tạo 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6470,6 +6737,7 @@
       "heading_2": "Phòng Hội thảo 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6487,6 +6755,7 @@
       "heading_2": "Phòng Biến tần Năng lượng 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6504,6 +6773,7 @@
       "heading_2": "Phòng Kỹ thuật Thang máy 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6523,6 +6793,7 @@
       "occupants_list": [
         "Nguyễn Thị Quế Trân"
       ],
+      "occupant_display": "Nguyễn Thị Quế Trân",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6531,8 +6802,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Quế Trân",
-      "occupant_display": "Nguyễn Thị Quế Trân"
+      "occupants_flat": "Nguyễn Thị Quế Trân"
     },
     {
       "sheet_source": "AD",
@@ -6541,6 +6811,7 @@
       "heading_2": "Phòng Quy hoạch Không gian 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6558,6 +6829,7 @@
       "heading_2": "Kho Hàng dự trữ 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6577,6 +6849,7 @@
       "occupants_list": [
         "Nguyễn Hồng Dung"
       ],
+      "occupant_display": "Nguyễn Hồng Dung",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6585,8 +6858,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Nguyễn Hồng Dung",
-      "occupant_display": "Nguyễn Hồng Dung"
+      "occupants_flat": "Nguyễn Hồng Dung"
     },
     {
       "sheet_source": "AD",
@@ -6597,6 +6869,7 @@
       "occupants_list": [
         "Nguyễn Thị Phương Lan"
       ],
+      "occupant_display": "Nguyễn Thị Phương Lan",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6605,8 +6878,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Phương Lan",
-      "occupant_display": "Nguyễn Thị Phương Lan"
+      "occupants_flat": "Nguyễn Thị Phương Lan"
     },
     {
       "sheet_source": "AD",
@@ -6617,6 +6889,7 @@
       "occupants_list": [
         "Prof.Dr. René Thiele"
       ],
+      "occupant_display": "Prof.Dr. René Thiele",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6625,8 +6898,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Prof.Dr. René Thiele",
-      "occupant_display": "Prof.Dr. René Thiele"
+      "occupants_flat": "Prof.Dr. René Thiele"
     },
     {
       "sheet_source": "AD",
@@ -6635,6 +6907,7 @@
       "heading_2": "Phòng Kỹ thuật Điện/Data 2",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6652,6 +6925,7 @@
       "heading_2": "___",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6669,6 +6943,7 @@
       "heading_2": "___",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6688,6 +6963,7 @@
       "occupants_list": [
         "Dr. Thomas Aulig"
       ],
+      "occupant_display": "Dr. Thomas Aulig",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6696,8 +6972,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Thomas Aulig",
-      "occupant_display": "Dr. Thomas Aulig"
+      "occupants_flat": "Dr. Thomas Aulig"
     },
     {
       "sheet_source": "AD",
@@ -6709,6 +6984,7 @@
         "Nguyễn Thị Thanh Hiền",
         "Nguyễn Thị Thùy Trang"
       ],
+      "occupant_display": "Nguyễn Thị Thanh Hiền, Nguyễn Thị Thùy Trang",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6717,8 +6993,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Thanh Hiền, Nguyễn Thị Thùy Trang",
-      "occupant_display": "Nguyễn Thị Thanh Hiền, Nguyễn Thị Thùy Trang"
+      "occupants_flat": "Nguyễn Thị Thanh Hiền, Nguyễn Thị Thùy Trang"
     },
     {
       "sheet_source": "AD",
@@ -6729,6 +7004,7 @@
       "occupants_list": [
         "Dr. Hà Thúc Viên"
       ],
+      "occupant_display": "Dr. Hà Thúc Viên",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6737,8 +7013,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Dr. Hà Thúc Viên",
-      "occupant_display": "Dr. Hà Thúc Viên"
+      "occupants_flat": "Dr. Hà Thúc Viên"
     },
     {
       "sheet_source": "AD",
@@ -6747,6 +7022,7 @@
       "heading_2": "___",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6764,6 +7040,7 @@
       "heading_2": "___",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6781,6 +7058,7 @@
       "heading_2": "___",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6798,6 +7076,7 @@
       "heading_2": "___",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6815,6 +7094,7 @@
       "heading_2": "___",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6832,6 +7112,7 @@
       "heading_2": "___",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6849,6 +7130,7 @@
       "heading_2": "Sảnh thang máy 3",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6866,6 +7148,7 @@
       "heading_2": "___",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6883,6 +7166,7 @@
       "heading_2": "___",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6900,6 +7184,7 @@
       "heading_2": "___",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6917,6 +7202,7 @@
       "heading_2": "___",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6934,6 +7220,7 @@
       "heading_2": "___",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6951,6 +7238,7 @@
       "heading_2": "___",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6968,6 +7256,7 @@
       "heading_2": "___",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -6985,6 +7274,7 @@
       "heading_2": "___",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -7002,6 +7292,7 @@
       "heading_2": "___",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -7019,6 +7310,7 @@
       "heading_2": "___",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -7036,6 +7328,7 @@
       "heading_2": "___",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -7053,6 +7346,7 @@
       "heading_2": "___",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -7070,6 +7364,7 @@
       "heading_2": "___",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
@@ -7087,912 +7382,12 @@
       "heading_2": "HÀNH LANG",
       "department": "___",
       "occupants_list": [],
+      "occupant_display": "",
       "fm_room_function": "___",
       "fm_room_type": "___",
       "fm_building_code": "AD",
       "area": "920",
       "unbounded_height": "47.2",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "LB-207",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "LB",
-      "area": "77.58 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B1-206",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B1",
-      "area": "13.31 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B1-212",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B1",
-      "area": "13.31 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B1-208",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B1",
-      "area": "13.31 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B1-310",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B1",
-      "area": "37.19 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B1-209",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B1",
-      "area": "13.31 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B1-207",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B1",
-      "area": "13.31 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B1-205",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B1",
-      "area": "18.36 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B1-210",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B1",
-      "area": "13.31 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B1-213",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B1",
-      "area": "13.31 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B1-211",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B1",
-      "area": "13.31 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B1-214",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B1",
-      "area": "14.78 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B1-203",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B1",
-      "area": "56.67 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B6-231",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B6",
-      "area": "13.36 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B6-430",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B6",
-      "area": "29.26 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B6-433",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B6",
-      "area": "18.01 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B6-515",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B6",
-      "area": "19.17 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B6-428",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B6",
-      "area": "51.21 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B6-422",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B6",
-      "area": "13.33 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B6-410",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B6",
-      "area": "13.36 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B6-204",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B6",
-      "area": "46.70 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B6-221",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B6",
-      "area": "13.36 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B6-108",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B6",
-      "area": "384.36 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B6-230",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B6",
-      "area": "13.36 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B6-229",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B6",
-      "area": "13.36 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B6-228",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B6",
-      "area": "13.36 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B1-104",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B1",
-      "area": "50.24 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B2-407",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B2",
-      "area": "17.03 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B5-329",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B5",
-      "area": "13.31 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B5-321",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B5",
-      "area": "13.31 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B5-219",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B5",
-      "area": "13.31 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B5-333",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B5",
-      "area": "13.24 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B5-330",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B5",
-      "area": "13.31 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B5-422",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B5",
-      "area": "18.01 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B2-503",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B2",
-      "area": "18.62 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B2-403",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B2",
-      "area": "18.56 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B2-405",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B2",
-      "area": "18.05 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B2-504",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B2",
-      "area": "18.05 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B6-320",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B6",
-      "area": "24.42 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B6-325",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B6",
-      "area": "13.36 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B6-323",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B6",
-      "area": "13.26 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B1-506",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B1",
-      "area": "18.10 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B1-504",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B1",
-      "area": "18.01 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B1-503",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B1",
-      "area": "18.47 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B1-522",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B1",
-      "area": "13.33 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B1-521",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B1",
-      "area": "13.33 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt ��ộng",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B1-523",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B1",
-      "area": "13.33 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B1-520",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B1",
-      "area": "13.33 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B1-524",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B1",
-      "area": "13.33 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B1-525",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B1",
-      "area": "13.33 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B1-531",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B1",
-      "area": "13.33 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "B1-508",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "B1",
-      "area": "40.71 m²",
-      "unbounded_height": "--",
-      "capacity": "--",
-      "status": "Hoạt động",
-      "is_active": true,
-      "occupants_flat": ""
-    },
-    {
-      "sheet_source": "Danh sách Nhân viên",
-      "room_number": "D2-107",
-      "heading_1": "___",
-      "heading_2": "___",
-      "department": "___",
-      "occupants_list": [],
-      "fm_room_function": "___",
-      "fm_room_type": "___",
-      "fm_building_code": "D2",
-      "area": "153.35 m²",
-      "unbounded_height": "--",
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
