@@ -261,7 +261,7 @@ async function main() {
         saveToFile(outputFile, outputPayload);
 
         // ── Sync drive_data.json ──
-        const DRIVE_API = 'https://script.google.com/macros/s/AKfycbw4PtDoCILXSiIn1AAYzJhUhSvmJ6ufKD-5R-QKZGzbBy-yQTfC_bPTKJEErwt1d_iS/exec ';
+        const DRIVE_API = 'https://script.google.com/macros/s/AKfycbw4PtDoCILXSiIn1AAYzJhUhSvmJ6ufKD-5R-QKZGzbBy-yQTfC_bPTKJEErwt1d_iS/exec  ';
         const driveOutputFile = path.join(__dirname, 'drive_data.json');
 
         console.log('--- Fetching DRIVE data ---');

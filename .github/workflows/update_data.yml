@@ -5,13 +5,17 @@ on:
     - cron: '*/5 * * * *'  # Run every 5 minutes
   workflow_dispatch:      # Allow manual trigger
 
+permissions:
+  contents: write
+
 concurrency:
   group: update-data
-  cancel-in-progress: true  # Cancel any in-progress run when a new one starts
+  cancel-in-progress: false  # Wait for in-progress run to finish before starting new one
 
 jobs:
   update-info-data:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
