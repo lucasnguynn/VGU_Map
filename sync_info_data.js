@@ -232,9 +232,10 @@ async function main() {
     const outputFile = OUTPUT_FILE;
 
     try {
-        // Step 1: Fetch data from API
+        // Step 1: Fetch data from API (with cache-buster to prevent caching)
         console.log('--- Fetching INFO data ---');
-        const rawData = await fetchData(API_ENDPOINTS.INFO);
+        const infoUrlWithCacheBuster = API_ENDPOINTS.INFO + '?t=' + Date.now();
+        const rawData = await fetchData(infoUrlWithCacheBuster);
 
         // Step 2: Validate response
         console.log('--- Validating response ---');
@@ -261,12 +262,14 @@ async function main() {
         saveToFile(outputFile, outputPayload);
 
         // ── Sync drive_data.json ──
-        const DRIVE_API = 'https://script.google.com/macros/s/AKfycbw4PtDoCILXSiIn1AAYzJhUhSvmJ6ufKD-5R-QKZGzbBy-yQTfC_bPTKJEErwt1d_iS/exec  ';
+        const DRIVE_API = 'https://script.google.com/macros/s/AKfycbw4PtDoCILXSiIn1AAYzJhUhSvmJ6ufKD-5R-QKZGzbBy-yQTfC_bPTKJEErwt1d_iS/exec';
         const driveOutputFile = path.join(__dirname, 'drive_data.json');
 
         console.log('--- Fetching DRIVE data ---');
         try {
-          const driveRaw = await fetchData(DRIVE_API);
+          // Add cache-buster to prevent caching
+          const driveUrlWithCacheBuster = DRIVE_API + '?t=' + Date.now();
+          const driveRaw = await fetchData(driveUrlWithCacheBuster);
           if (driveRaw && typeof driveRaw === 'object') {
             saveToFile(driveOutputFile, driveRaw);
             console.log('✅ drive_data.json updated');

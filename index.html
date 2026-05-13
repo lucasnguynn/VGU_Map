@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VGUMap - Tra cứu Kiến trúc & Phòng ốc VGU</title>
+<link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
@@ -1276,9 +1277,9 @@ let driveImages = {};
 let isInfoLoaded = false;
 
 async function loadDriveImages() {
-  // Primary: read from static file (fast, cached by browser)
+  // Primary: read from static file with cache-busting to ensure fresh data
   try {
-    const res = await fetch(API_DRIVE_JSON, { cache: 'default' });
+    const res = await fetch(API_DRIVE_JSON + '?v=' + Date.now(), { cache: 'no-cache' });
     if (!res.ok) throw new Error(`Static file HTTP ${res.status}`);
     driveImages = await res.json();
     console.log('✅ Drive images loaded from static JSON');
@@ -1288,7 +1289,7 @@ async function loadDriveImages() {
   }
   // Fallback: live API (slower, used only when static file is missing)
   try {
-    const res = await fetch(API_DRIVE_LIST);
+    const res = await fetch(API_DRIVE_LIST + '?t=' + Date.now());
     if (!res.ok) throw new Error(`API HTTP ${res.status}`);
     driveImages = await res.json();
     console.log('✅ Drive images loaded from live API (fallback)');
@@ -1310,8 +1311,8 @@ async function fetchRoomInfo() {
   if (isInfoLoaded) return; 
   try {
     const [mapRes, infoRes] = await Promise.all([
-      fetch(API_MAP),
-      fetch(API_INFO, { cache: 'default' })
+      fetch(API_MAP + '?v=' + Date.now(), { cache: 'no-cache' }),
+      fetch(API_INFO + '?v=' + Date.now(), { cache: 'no-cache' })
     ]);
 
     if (!mapRes.ok) throw new Error(`HTTP Map ${mapRes.status}`);
@@ -1667,7 +1668,7 @@ function goToFloorMap() {
 async function loadMapFromSheets(fid) {
   try {
     const [mapResponse] = await Promise.all([
-      fetch(API_MAP),
+      fetch(API_MAP + '?v=' + Date.now(), { cache: 'no-cache' }),
       fetchRoomInfo() 
     ]);
 
@@ -2120,6 +2121,21 @@ function switchViewer(fileId, rid) {
 function onIframeError(fileId, rid) {
   console.warn(`[PDF] iframe error cho ${rid}, thử viewer khác...`);
   switchViewer(fileId, rid);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SERVICE WORKER REGISTRATION FOR PWA
+// ═══════════════════════════════════════════════════════════════
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('./sw.js')
+      .then(function(registration) {
+        console.log('✅ Service Worker registered:', registration.scope);
+      })
+      .catch(function(error) {
+        console.error('❌ Service Worker registration failed:', error);
+      });
+  });
 }
 </script>
 </body>
