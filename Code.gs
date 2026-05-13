@@ -25,6 +25,7 @@ function doGet(e) {
     var sheets = ss.getSheets();
     
     var allRooms = [];
+    var roomIndexMap = {}; // key: sheet|room_number -> index in allRooms
     
     // Iterate through all sheets except "Danh sách nhân viên"
     for (var i = 0; i < sheets.length; i++) {
@@ -33,7 +34,7 @@ function doGet(e) {
       
       // Skip the "Danh sách nhân viên" sheet
       if (sheetName.toLowerCase() === 'danh sách nhân viên' || 
-          sheetName.toLowerCase() === 'nhanh vien' ||
+          sheetName.toLowerCase() === 'nhân viên' ||
           sheetName.toLowerCase().includes('staff')) {
         continue;
       }
@@ -226,15 +227,10 @@ function doGet(e) {
         // Add occupant name if present
         var currentOccupant = occupantName || staffName || nameField || '';
         
-        // Check if this room already exists in allRooms
-        var existingRoomIndex = -1;
-        for (var er = 0; er < allRooms.length; er++) {
-          if (allRooms[er].room_number === roomNumber && allRooms[er].sheet_source === sheetName) {
-            existingRoomIndex = er;
-            break;
-          }
-        }
-        
+        // Check if this room already exists in allRooms (O(1) lookup)
+        var roomKey = sheetName + '|' + roomNumber;
+        var existingRoomIndex = roomIndexMap.hasOwnProperty(roomKey) ? roomIndexMap[roomKey] : -1;
+
         if (existingRoomIndex >= 0) {
           // Room exists, add occupant to occupants_list if not already present
           if (currentOccupant && currentOccupant.trim() !== '') {
@@ -266,6 +262,7 @@ function doGet(e) {
             roomEntry.occupants_list.push(currentOccupant);
           }
           allRooms.push(roomEntry);
+          roomIndexMap[roomKey] = allRooms.length - 1;
         }
       }
     }
