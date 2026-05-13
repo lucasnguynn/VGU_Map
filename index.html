@@ -349,7 +349,7 @@ polygon,polyline{transition:all .18s cubic-bezier(.4,0,.2,1)}
 <div class="ctrl-group search-group">
 <label>Tìm kiếm <small>/ Search</small></label>
 <div class="input-wrapper">
-<input type="text" id="searchInput" class="c1-select" placeholder="Tòa-Số phòng" oninput="onSearchInput()" onkeydown="handleSearchKey(event)">
+<input type="text" id="searchInput" class="c1-select" placeholder="Nhập tên tòa, phòng..." oninput="onSearchInput()" onkeydown="handleSearchKey(event)">
 <button type="button" onclick="clearSearch()" class="btn-clear" title="Xóa tìm kiếm">
 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
 </button>
@@ -1266,74 +1266,99 @@ selRoom.disabled  = true;
 // ═══════════════════════════════════════════════════════════════
 //  🔗 ĐỒNG BỘ DỮ LIỆU TỪ CÁC API
 // ═══════════════════════════════════════════════════════════════
-// ── Chỉ còn 1 URL ──
-const UNIFIED_API   = "https://script.google.com/macros/s/AKfycby82gfG2wxrw1xelQN7epMROvhtVa0ToOEtzNV0LRynbwk7j_yNJzbYJ5jKQ7-OKBBIcQ/exec?type=all";
-const CACHE_KEY     = 'vgumap_v1';
-const CACHE_MINUTES = 30;
+const API_MAP = "./map_data.json";
+const API_INFO = "./info_data.json";
+const API_DRIVE_LIST = "./drive_data.json";
 
 let sheetRoomData = {};
-let driveImages   = {};
-let isInfoLoaded  = false;
+let driveImages = {};
+let isInfoLoaded = false;
+
+async function loadDriveImages() {
+  try {
+    const response = await fetch(API_DRIVE_LIST);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    driveImages = await response.json();
+  } catch (e) { 
+    console.error("❌ Lỗi tải ảnh Drive:", e.message);
+  }
+}
 
 (async function initializeData() {
-  // 1️⃣ Đọc cache nếu còn hạn
   try {
-    const cached = localStorage.getItem(CACHE_KEY);
-    if (cached) {
-      const { data, ts } = JSON.parse(cached);
-      if ((Date.now() - ts) / 60000 < CACHE_MINUTES) {
-        applyData(data);
-        console.log('⚡ Từ cache — không cần fetch');
-        return;
-      }
-    }
-  } catch(_) {}
-
-  // 2️⃣ Fetch API gộp
-  try {
-    const t0  = performance.now();
-    const raw = await fetch(UNIFIED_API).then(r => r.json());
-    console.log(`✅ Fetch xong: ${Math.round(performance.now()-t0)}ms`);
-    applyData(raw);
-    localStorage.setItem(CACHE_KEY, JSON.stringify({ data: raw, ts: Date.now() }));
-  } catch(e) {
-    console.error('❌ Lỗi fetch:', e);
+    await Promise.all([loadDriveImages(), fetchRoomInfo()]);
+    console.log("✅ Hệ thống tải dữ liệu API hoàn tất!");
+  } catch (e) {
+    console.error("❌ Lỗi khởi tạo hệ thống:", e);
   }
 })();
 
-function applyData(raw) {
-  // Drive
-  driveImages = raw.drive || {};
+async function fetchRoomInfo() {
+  if (isInfoLoaded) return; 
+  try {
+    // TẠO CHUỖI RANDOM HOẶC TIMESTAMP ĐỂ PHÁ CACHE
+    const noCacheParam = '?t=' + new Date().getTime();
 
-  // Info → object keyed by room_number
-  (raw.info || []).forEach(r => {
-    if (r.room_number) sheetRoomData[r.room_number.trim()] = r;
-  });
+    // Thêm noCacheParam vào sau đuôi link API_INFO
+    const [mapRes, infoRes] = await Promise.all([
+      fetch(API_MAP),
+      fetch(API_INFO + noCacheParam) // <--- SỬA DÒNG NÀY
+    ]);
 
-  // Map → populate BUILDINGS.rooms
-  (raw.map || []).forEach(item => {
-    const rn = String(item.Room_Number || item.room_number || "").trim();
-    if (!rn || /LB|CR|WC/i.test(rn)) return;
-    const [bldCode, ...rest] = rn.split('-');
-    const roomCode = rest.join('-');
-    const bld = BUILDINGS.find(b => b.code === bldCode.toUpperCase());
-    if (bld && !bld.rooms.includes(roomCode)) bld.rooms.push(roomCode);
-  });
+    if (!mapRes.ok) throw new Error(`HTTP Map ${mapRes.status}`);
+    if (!infoRes.ok) throw new Error(`HTTP Info ${infoRes.status}`);
 
-  BUILDINGS.forEach(b =>
-    b.rooms.sort(new Intl.Collator('en', { numeric: true }).compare)
-  );
+    // ... (Giữ nguyên phần code xử lý bên dưới của bạn) ...
 
-  isInfoLoaded = true;
-  refreshBuildingDropdowns();
+    const rawMapData = await mapRes.json();
+    const rawInfoData = await infoRes.json();
 
-  console.log(`📦 map:${(raw.map||[]).length} | info:${Object.keys(sheetRoomData).length} | drive:${Object.keys(driveImages).length}`);
-}
+    const mapArray = Array.isArray(rawMapData) ? rawMapData : (rawMapData.data || rawMapData.items || []);
+    const infoArray = Array.isArray(rawInfoData) ? rawInfoData : (rawInfoData.data || rawInfoData.items || []);
 
-// Dùng trong console khi cần force reload
-function clearVGUCache() {
-  localStorage.removeItem(CACHE_KEY);
-  console.log('🗑️ Cache xóa — F5 để tải lại');
+    mapArray.forEach(item => {
+      const roomNumStr = item.Room_Number || item.room_number || item['Room_Number'] || item['room_number'] || "";
+      const roomNum = String(roomNumStr).trim();
+
+      if (!roomNum || /LB|CR|WC/i.test(roomNum)) return;
+
+      const parts = roomNum.split('-');
+      if (parts.length >= 2) {
+        const bldCode = parts[0].toUpperCase().trim();
+        const roomCode = parts.slice(1).join('-').trim();
+
+        const targetBld = BUILDINGS.find(b => b.code === bldCode);
+        if (targetBld) {
+          if (!targetBld.rooms.includes(roomCode)) {
+            targetBld.rooms.push(roomCode);
+          }
+          const floorNum = parseInt(roomCode.charAt(0));
+          if (!isNaN(floorNum) && floorNum > targetBld.floors) {
+            targetBld.floors = floorNum;
+          }
+        }
+      }
+    });
+
+    BUILDINGS.forEach(bld => {
+      bld.rooms.sort(new Intl.Collator('en', { numeric: true, sensitivity: 'base' }).compare);
+    });
+
+    infoArray.forEach(row => {
+      let roomId = row.room_number || row.room_id; 
+      if (roomId) {
+        sheetRoomData[String(roomId).trim()] = row; 
+      }
+    });
+
+    isInfoLoaded = true;
+    console.log("✅ Đã trích xuất số phòng từ API Tọa độ vào các Tòa nhà!");
+
+    refreshBuildingDropdowns();
+
+  } catch (e) {
+    console.error("❌ Lỗi xử lý đồng bộ dữ liệu API:", e);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1369,139 +1394,93 @@ function clearSearch() {
 }
 
 async function performSearch(query) {
-  const normalizedQuery = query.trim().toUpperCase();
-  if (!isInfoLoaded) {
-  // Chờ tối đa 3s cho data load xong
-  let waited = 0;
-  while (!isInfoLoaded && waited < 3000) {
-    await new Promise(r => setTimeout(r, 100));
-    waited += 100;
-  }
-}
+  const normalizedQuery = query.trim().toLowerCase();
+  if (!isInfoLoaded) await fetchRoomInfo();
 
-  // ══════════════════════════════════════════════════════
-  //  CÚ PHÁP: "TÒA-SỐ PHÒNG" — ví dụ: AD-204, B1-301
-  //  Ưu tiên xử lý trước tiên
-  // ══════════════════════════════════════════════════════
-  const roomSyntaxMatch = normalizedQuery.match(/^([A-Z]+\d*)-(\d+.*)$/);
-
-  if (roomSyntaxMatch) {
-    const bldCode  = roomSyntaxMatch[1]; // "AD"
-    const roomCode = roomSyntaxMatch[2]; // "204"
-    const fullRoom = normalizedQuery;    // "AD-204"
-
-    const targetBld = BUILDINGS.find(b => b.code === bldCode);
-
-    if (targetBld) {
-      // 1. Chọn tòa nhà
-      selBuilding.value = bldCode;
-      onBuildingChange(false);
-
-      // Highlight polygon trên map
-      if (polygonLayers[bldCode]) {
-        if (selectedPolygon) selectedPolygon.setStyle(defaultPolyStyle);
-        selectedPolygon = polygonLayers[bldCode];
-        selectedPolygon.setStyle(highlightPolyStyle);
-        lMap.flyToBounds(selectedPolygon.getBounds(), { padding:[50,50], duration:0.5 });
-      }
-
-      // 2. Xác định tầng từ ký tự đầu của roomCode
-      const floorNum = roomCode.charAt(0);
-      const floorOpt = Array.from(selFloor.options).find(o => o.value === floorNum);
-
-      if (floorOpt) {
-        selFloor.value = floorNum;
-        onFloorChange();
-
-        // 3. Tìm số phòng — thử khớp chính xác trước, rồi khớp mềm
-        const exactOpt = Array.from(selRoom.options).find(
-          o => o.value.toUpperCase() === roomCode
-        );
-        const softOpt = Array.from(selRoom.options).find(
-          o => o.value.toUpperCase().includes(roomCode)
-        );
-        const roomOpt = exactOpt || softOpt;
-
-        if (roomOpt) {
-          selRoom.value = roomOpt.value;
-
-          // 4. Hiện banner + nút xem mặt bằng
-          const bld = BUILDINGS.find(b => b.code === bldCode);
-          bannerText.innerHTML = `
-            <span style="display:flex;align-items:center;gap:8px">
-              ✅ Đã tìm thấy: <strong>${bldCode}-${roomOpt.value}</strong>
-              — ${bld.name}
-            </span>`;
-          banner.classList.add('show');
-          mapWrap.classList.add('has-result');
-
-          // Nếu có dữ liệu bản đồ tầng → mở thẳng trang phòng
-          if (bldCode === 'AD') {
-            btnViewFloor.style.display = 'block';
-            btnViewFloor.onclick = () => {
-              renderMap('bld_ad', `bld_ad_f${floorNum}`, parseInt(floorNum));
-              // Sau khi render xong, highlight phòng
-              setTimeout(() => rC(`${bldCode}-${roomOpt.value}`), 800);
-            };
-          }
-          return;
-        }
-      }
-
-      // Tòa đúng nhưng không tìm thấy số phòng cụ thể
-      bannerText.innerHTML = `
-        📍 Tòa <strong>${targetBld.name}</strong> — 
-        không tìm thấy phòng <strong>${fullRoom}</strong>`;
-      banner.classList.add('show');
-      return;
-    }
-
-    // Không tìm thấy tòa → thông báo rõ
-    bannerText.innerHTML = `
-      ❌ Không tìm thấy tòa nhà mã <strong>${bldCode}</strong>`;
-    banner.classList.add('show');
-    banner.style.background = '#fff5f5';
-    banner.style.borderColor = '#c0392b';
-    setTimeout(() => {
-      banner.style.background = '';
-      banner.style.borderColor = '';
-    }, 2000);
-    return;
-  }
-
-  // ══════════════════════════════════════════════════════
-  //  TÌM KIẾM THEO TÊN TÒA (giữ nguyên logic cũ)
-  // ══════════════════════════════════════════════════════
-  const normalizedLower = query.trim().toLowerCase();
-
-  let foundBuilding = BUILDINGS.find(b =>
-    b.code.toLowerCase().includes(normalizedLower) ||
-    b.name.toLowerCase().includes(normalizedLower)
+  let foundBuilding = BUILDINGS.find(b => 
+    b.code.toLowerCase().includes(normalizedQuery) || 
+    b.name.toLowerCase().includes(normalizedQuery)
   );
-
+  
   if (foundBuilding) {
     selBuilding.value = foundBuilding.code;
     onBuildingChange(false);
-
+    
     if (polygonLayers[foundBuilding.code]) {
       if (selectedPolygon) selectedPolygon.setStyle(defaultPolyStyle);
       selectedPolygon = polygonLayers[foundBuilding.code];
       selectedPolygon.setStyle(highlightPolyStyle);
       lMap.flyToBounds(selectedPolygon.getBounds(), { padding:[50,50], duration:0.5 });
     }
-
-    bannerText.innerHTML = `📍 Đã tìm thấy: <strong>${foundBuilding.name}</strong>`;
-    banner.classList.add('show');
-    if (foundBuilding.code === 'AD') btnViewFloor.style.display = 'block';
+    
+    const roomMatch = foundBuilding.rooms.find(r => r.toLowerCase().includes(normalizedQuery));
+    if (roomMatch) {
+      const floorNum = roomMatch.charAt(0);
+      const floorOpt = Array.from(selFloor.options).find(o => o.value === floorNum);
+      if (floorOpt) {
+        selFloor.value = floorNum;
+        onFloorChange();
+        const roomOpt = Array.from(selRoom.options).find(o => o.value === roomMatch);
+        if (roomOpt) {
+          selRoom.value = roomMatch;
+          doSearch();
+        }
+      }
+    } else {
+      bannerText.innerHTML = `📍 Đã tìm thấy: <strong>${foundBuilding.name}</strong>`;
+      banner.classList.add('show');
+      if (foundBuilding.code === 'AD') btnViewFloor.style.display = 'block';
+    }
     return;
   }
+  
+  let matchedRoom = null;
+  if (sheetRoomData && Object.keys(sheetRoomData).length > 0) {
+    for (const roomId of Object.keys(sheetRoomData)) {
+      if (roomId.toLowerCase() === normalizedQuery || roomId.toLowerCase().includes(normalizedQuery)) {
+        matchedRoom = roomId;
+        break;
+      }
+    }
+  }
 
-  // ══════════════════════════════════════════════════════
-  //  KHÔNG TÌM THẤY GÌ
-  // ══════════════════════════════════════════════════════
-  bannerText.innerHTML = `
-    ❌ Không tìm thấy "<strong>${query}</strong>" — 
-    thử cú pháp <strong>AD-204</strong>`;
+  if (matchedRoom) {
+    let buildingCode = null, floorNumber = null;
+    const roomUpper = matchedRoom.toUpperCase();
+    const bldMatch = roomUpper.match(/^([A-Z]+)-/);
+    if (bldMatch) {
+      buildingCode = bldMatch[1];
+      const numPart = roomUpper.replace(/^[A-Z]+-/, '');
+      const floorMatch = numPart.match(/^(\d+)/);
+      if (floorMatch) floorNumber = floorMatch[1];
+    }
+    
+    const targetBuilding = BUILDINGS.find(b => b.code === buildingCode);
+    if (targetBuilding) {
+      selBuilding.value = targetBuilding.code;
+      onBuildingChange(false);
+      
+      if (floorNumber) {
+        const floorOpt = Array.from(selFloor.options).find(o => o.value === floorNumber);
+        if (floorOpt) {
+          selFloor.value = floorNumber;
+          onFloorChange();
+          const roomOpt = Array.from(selRoom.options).find(o => o.value === matchedRoom);
+          if (roomOpt) {
+            selRoom.value = matchedRoom;
+            doSearch();
+            return;
+          }
+        }
+      }
+      bannerText.innerHTML = `🔍 Tìm thấy phòng: <strong>${matchedRoom}</strong> tại <strong>${targetBuilding.name}</strong>`;
+      banner.classList.add('show');
+      if (targetBuilding.code === 'AD') btnViewFloor.style.display = 'block';
+      return;
+    }
+  }
+
+  bannerText.innerHTML = `❌ Không tìm thấy kết quả cho "<strong>${searchInput.value}</strong>"`;
   banner.classList.add('show');
   banner.style.background = '#fff5f5';
   banner.style.borderColor = '#c0392b';
@@ -1639,26 +1618,16 @@ function goToFloorMap() {
 // ═══════════════════════════════════════════════════════════════
 async function loadMapFromSheets(fid) {
   try {
-    // Dùng data đã cache, không fetch lại
-let dataArray = [];
+    const [mapResponse] = await Promise.all([
+      fetch(API_MAP),
+      fetchRoomInfo() 
+    ]);
 
-// Thử lấy từ cache localStorage trước
-try {
-  const cached = localStorage.getItem(CACHE_KEY);
-  if (cached) {
-    const { data } = JSON.parse(cached);
-    dataArray = data.map || [];
-  }
-} catch(_) {}
-
-// Nếu cache rỗng, fetch lại từ UNIFIED_API
-if (dataArray.length === 0) {
-  const res = await fetch(UNIFIED_API);
-  const raw = await res.json();
-  dataArray = raw.map || [];
-}
-
-if (dataArray.length === 0) return null;
+    if (!mapResponse.ok) throw new Error(`HTTP ${mapResponse.status}`);
+    
+    let rawMapData = await mapResponse.json();
+    let dataArray = Array.isArray(rawMapData) ? rawMapData : (rawMapData.data || rawMapData.items || []);
+    if (!dataArray || dataArray.length === 0) return null;
 
     const bldInternalId = fid.split('_f')[0]; 
     const fNum = fid.split('_f')[1]; 
@@ -1963,9 +1932,11 @@ function sT(tab, rd) {
   document.getElementById('t3d').classList.toggle('on', tab === '3D');
   const f = document.getElementById('ifr');
 
+  // ── Normalisation de la clé (trim + uppercase) ──
   const sanitizedRid = String(ST.rid).trim().toUpperCase();
   let fileId = null;
 
+  // Recherche exacte d'abord, puis recherche souple
   for (const [key, value] of Object.entries(driveImages)) {
     if (String(key).trim().toUpperCase() === sanitizedRid) {
       fileId = value;
@@ -1973,136 +1944,77 @@ function sT(tab, rd) {
     }
   }
 
-  console.log(`[sT] rid="${sanitizedRid}" → fileId="${fileId}"`);
+  // Debug: log dans la console pour vérifier
+  console.log(`[sT] rid="${ST.rid}" → sanitized="${sanitizedRid}" → fileId="${fileId}"`);
+  console.log('[sT] Clés disponibles dans driveImages:', Object.keys(driveImages).slice(0, 10));
 
   if (tab === '2D') {
     if (fileId) {
-      f.style.background = '#f8f9fc';
-      f.style.position = 'relative';
+      f.style.background = '#fff';
 
-      // ── PHƯƠNG PHÁP TỐT NHẤT CHO PDF: dùng Google Drive Viewer ──
-      // Không dùng /preview (bị block iframe)
-      // Không dùng /uc?export=view (không hỗ trợ PDF)
-      // Dùng Google Docs Viewer — luôn render được PDF thành HTML
-      const googleViewerUrl = `https://drive.google.com/file/d/${fileId}/preview`;
-      const docsViewerUrl   = `https://docs.google.com/viewer?srcid=${fileId}&pid=explorer&efh=false&a=v&chrome=false&embedded=true`;
+      // ── STRATÉGIE MULTI-TENTATIVES pour contourner les restrictions Drive ──
+      // Tentative 1: lien de prévisualisation direct (PNG/JPG)
+      const directUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
+      // Tentative 2: prévisualisation embed
+      const previewUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+      // Tentative 3: thumbnail (toujours accessible)
+      const thumbUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w1200`;
 
       f.innerHTML = `
-        <div style="width:100%;height:100%;position:relative;display:flex;flex-direction:column;">
-          
-          <!-- Thanh toolbar nhỏ -->
-          <div style="
-            display:flex;align-items:center;justify-content:space-between;
-            padding:6px 10px;background:#f0f3fa;border-bottom:1px solid #dde2ec;
-            flex-shrink:0;
-          ">
-            <span style="font-size:11px;font-weight:600;color:#002554;">📄 ${sanitizedRid} — Sơ đồ 2D</span>
-            <div style="display:flex;gap:6px;">
-              <a href="https://drive.google.com/file/d/${fileId}/view" target="_blank"
-                 style="font-size:10px;font-weight:600;color:#fff;background:#F58220;
-                        padding:3px 8px;border-radius:3px;text-decoration:none;">
-                ↗ Mở Drive
-              </a>
-              <button onclick="switchViewer('${fileId}','${sanitizedRid}')" 
-                style="font-size:10px;font-weight:600;color:#002554;background:#fff;
-                       border:1px solid #dde2ec;padding:3px 8px;border-radius:3px;cursor:pointer;">
-                🔄 Thử cách khác
-              </button>
-            </div>
+        <div id="img-wrap-${sanitizedRid}" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;">
+          <img 
+            src="${thumbUrl}"
+            alt="Sơ đồ ${sanitizedRid}"
+            style="max-width:100%;max-height:100%;object-fit:contain;display:block;"
+            onerror="tryIframe('${fileId}', '${sanitizedRid}', '${previewUrl}')"
+          />
+          <div style="margin-top:6px;font-size:11px;color:#8896a8">
+            <a href="https://drive.google.com/file/d/${fileId}/view" target="_blank" 
+               style="color:var(--or);text-decoration:none;font-weight:600">
+              ↗ Mở file gốc
+            </a>
           </div>
-
-          <!-- iframe viewer -->
-          <div style="flex:1;position:relative;">
-            <iframe 
-              id="pdf-iframe-${sanitizedRid}"
-              src="${googleViewerUrl}"
-              style="width:100%;height:100%;border:none;display:block;"
-              loading="lazy"
-              title="Sơ đồ ${sanitizedRid}"
-              onload="onIframeLoad(this)"
-              onerror="onIframeError('${fileId}','${sanitizedRid}')">
-            </iframe>
-            <!-- Loading spinner -->
-            <div id="pdf-loading-${sanitizedRid}" style="
-              position:absolute;inset:0;display:flex;flex-direction:column;
-              align-items:center;justify-content:center;background:#f8f9fc;
-              font-size:13px;color:#8896a8;gap:10px;pointer-events:none;
-            ">
-              <div style="width:32px;height:32px;border:3px solid #dde2ec;
-                          border-top-color:#F58220;border-radius:50%;
-                          animation:spin .8s linear infinite;"></div>
-              <span>Đang tải sơ đồ...</span>
-            </div>
-          </div>
-
         </div>`;
-
-      // CSS spinner
-      if (!document.getElementById('pdf-spin-style')) {
-        const s = document.createElement('style');
-        s.id = 'pdf-spin-style';
-        s.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
-        document.head.appendChild(s);
-      }
-
     } else {
       f.style.background = '#e8eef9';
       f.innerHTML = `
         <div style="text-align:center;padding:22px 14px">
           <div style="font-size:42px;margin-bottom:10px">📐</div>
-          <div style="font-size:13px;font-weight:700;color:#002554;margin-bottom:3px">
-            Chưa có sơ đồ cho phòng <b>${sanitizedRid}</b>
-          </div>
-          <div style="font-size:11px;color:#8896a8;margin-top:6px;">
-            Kiểm tra tên file trong Drive có dạng:<br>
-            <code style="background:#eef;padding:2px 6px;border-radius:3px;">
-              ${sanitizedRid}_TenFile.pdf
-            </code>
+          <div style="font-size:13px;font-weight:700;color:#002554;margin-bottom:3px">Sơ đồ mặt bằng 2D</div>
+          <div style="font-size:11px;color:#8896a8">Chưa có file cho phòng <b>${sanitizedRid}</b></div>
+          <div style="font-size:10px;color:#c0c8d8;margin-top:4px">
+            Kiểm tra: tên file trong Drive có chứa "<b>${sanitizedRid}</b>" không?
           </div>
         </div>`;
     }
-
   } else {
+    // Tab 3D (inchangé)
     f.style.background = '#fff3e6';
-    f.innerHTML = `
-      <div style="text-align:center;padding:22px 14px">
-        <div style="font-size:42px;margin-bottom:10px">🏛</div>
-        <div style="font-size:13px;font-weight:700;color:#002554;margin-bottom:3px">Phối cảnh 3D</div>
-        <div style="font-size:11px;color:#8896a8">${sanitizedRid} — ${rd.name_en}</div>
-      </div>`;
+    f.innerHTML = `<div style="text-align:center;padding:22px 14px">
+      <div style="font-size:42px;margin-bottom:10px">🏛</div>
+      <div style="font-size:13px;font-weight:700;color:#002554;margin-bottom:3px">Phối cảnh 3D</div>
+      <div style="font-size:11px;color:#8896a8">${sanitizedRid} — ${rd.name_en}</div>
+    </div>`;
   }
 }
 
-// ── Ẩn spinner khi iframe load xong ──
-function onIframeLoad(iframe) {
-  const rid = iframe.id.replace('pdf-iframe-', '');
-  const loading = document.getElementById(`pdf-loading-${rid}`);
-  if (loading) loading.style.display = 'none';
-}
-
-// ── Thử viewer thay thế nếu iframe đầu bị block ──
-let viewerToggle = {};
-function switchViewer(fileId, rid) {
-  const iframe = document.getElementById(`pdf-iframe-${rid}`);
-  if (!iframe) return;
-  
-  const loading = document.getElementById(`pdf-loading-${rid}`);
-  if (loading) loading.style.display = 'flex';
-
-  viewerToggle[rid] = !viewerToggle[rid];
-  
-  if (viewerToggle[rid]) {
-    // Thử Google Docs Viewer
-    iframe.src = `https://docs.google.com/viewer?srcid=${fileId}&pid=explorer&efh=false&a=v&chrome=false&embedded=true`;
-  } else {
-    // Quay lại Drive preview
-    iframe.src = `https://drive.google.com/file/d/${fileId}/preview`;
-  }
-}
-
-function onIframeError(fileId, rid) {
-  console.warn(`[PDF] iframe error cho ${rid}, thử viewer khác...`);
-  switchViewer(fileId, rid);
+// ── Fallback: si l'img échoue, tente un iframe ──
+function tryIframe(fileId, rid, previewUrl) {
+  const wrap = document.getElementById(`img-wrap-${rid}`);
+  if (!wrap) return;
+  console.log(`[tryIframe] Image échouée, tentative iframe pour ${rid}`);
+  wrap.innerHTML = `
+    <iframe 
+      src="${previewUrl}" 
+      style="width:100%;height:100%;border:none;" 
+      loading="lazy"
+      title="Sơ đồ ${rid}">
+    </iframe>
+    <div style="position:absolute;bottom:4px;right:8px;font-size:10px;">
+      <a href="https://drive.google.com/file/d/${fileId}/view" target="_blank" 
+         style="color:var(--or);text-decoration:none;font-weight:600">↗ Mở Drive</a>
+    </div>`;
+  wrap.style.position = 'relative';
 }
 </script>
 </body>
