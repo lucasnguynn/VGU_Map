@@ -113,9 +113,9 @@ async function main() {
     const errors = [];
 
     const tasks = [
-        { name: 'MAP', url: API_ENDPOINTS.MAP, file: OUTPUT_FILES.map_data },
-        { name: 'INFO', url: API_ENDPOINTS.INFO, file: OUTPUT_FILES.info_data },
-        { name: 'DRIVE_LIST', url: API_ENDPOINTS.DRIVE_LIST, file: OUTPUT_FILES.drive_data }
+        { name: 'MAP', url: API_ENDPOINTS.MAP + '?t=' + Date.now(), file: OUTPUT_FILES.map_data },
+        { name: 'INFO', url: API_ENDPOINTS.INFO + '?t=' + Date.now(), file: OUTPUT_FILES.info_data },
+        { name: 'DRIVE_LIST', url: API_ENDPOINTS.DRIVE_LIST + '?t=' + Date.now(), file: OUTPUT_FILES.drive_data }
     ];
 
     for (const task of tasks) {
