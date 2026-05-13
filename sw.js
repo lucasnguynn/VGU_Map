@@ -1,205 +1,109 @@
 /**
  * VGUMap Service Worker
- * Production-ready PWA caching strategy
- * 
- * Caching Strategies:
- * - Cache First: Static assets (HTML, CSS, JS, Leaflet libraries)
- * - Network First: Dynamic JSON data files (map_data.json, info_data.json, drive_data.json)
+ *
+ * Strategies:
+ * - Cache-first for static shell assets
+ * - Network-first for JSON data files
  */
 
-const CACHE_NAME = 'vgumap-v1';
-const STATIC_CACHE = 'vgumap-static-v1';
-const DATA_CACHE = 'vgumap-data-v1';
+const VERSION = 'v2';
+const STATIC_CACHE = `vgumap-static-${VERSION}`;
+const DATA_CACHE = `vgumap-data-${VERSION}`;
 
-// Static assets to cache immediately (Cache First strategy)
 const STATIC_ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './js/config.js',
-  './js/data-service.js',
-  './js/renderer.js',
-  './js/room-service.js',
-  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
-  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
-  'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap'
+  './VGU MAP ALL.png',
+  './VGU-Full-Color-logo-05-_1_.svg'
 ];
 
-// Dynamic JSON files (Network First strategy)
-const DATA_URLS = [
-  './map_data.json',
-  './info_data.json',
-  './drive_data.json'
-];
+const DATA_PATHS = new Set(['/map_data.json', '/info_data.json', '/drive_data.json']);
 
-// ═══════════════════════════════════════════════════════════════
-// INSTALL EVENT - Cache static assets
-// ═══════════════════════════════════════════════════════════════
+function toCacheKey(request) {
+  const url = new URL(request.url);
+  url.search = '';
+  return new Request(url.toString(), {
+    method: 'GET',
+    headers: request.headers,
+    mode: request.mode,
+    credentials: request.credentials,
+    redirect: request.redirect
+  });
+}
+
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing Service Worker...');
-  
   event.waitUntil(
     caches.open(STATIC_CACHE)
-      .then((cache) => {
-        console.log('[SW] Caching static assets...');
-        return cache.addAll(STATIC_ASSETS);
-      })
-      .then(() => {
-        console.log('[SW] Static assets cached successfully');
-        // Skip waiting to activate immediately
-        return self.skipWaiting();
-      })
-      .catch((error) => {
-        console.error('[SW] Failed to cache static assets:', error);
-      })
+      .then((cache) => cache.addAll(STATIC_ASSETS))
+      .then(() => self.skipWaiting())
   );
 });
 
-// ═══════════════════════════════════════════════════════════════
-// ACTIVATE EVENT - Clean up old caches
-// ═══════════════════════════════════════════════════════════════
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating Service Worker...');
-  
-  event.waitUntil(
-    caches.keys()
-      .then((cacheNames) => {
-        return Promise.all(
-          cacheNames.map((cacheName) => {
-            // Delete old caches that don't match current versions
-            if (cacheName !== STATIC_CACHE && cacheName !== DATA_CACHE) {
-              console.log('[SW] Deleting old cache:', cacheName);
-              return caches.delete(cacheName);
-            }
-          })
-        );
-      })
-      .then(() => {
-        console.log('[SW] Service Worker activated');
-        // Claim all clients immediately
-        return self.clients.claim();
-      })
-  );
+  event.waitUntil((async () => {
+    const names = await caches.keys();
+    await Promise.all(names.map((name) => {
+      if (name !== STATIC_CACHE && name !== DATA_CACHE) return caches.delete(name);
+      return Promise.resolve();
+    }));
+    await self.clients.claim();
+  })());
 });
 
-// ═══════════════════════════════════════════════════════════════
-// FETCH EVENT - Handle requests with appropriate strategies
-// ═══════════════════════════════════════════════════════════════
 self.addEventListener('fetch', (event) => {
-  const requestUrl = new URL(event.request.url);
-  
-  // Check if this is a dynamic JSON data request
-  const isDataRequest = DATA_URLS.some(dataUrl => {
-    const fullDataUrl = new URL(dataUrl, self.location.origin).pathname;
-    return requestUrl.pathname === fullDataUrl || requestUrl.pathname.endsWith(dataUrl.replace('./', ''));
-  });
-  
-  // Also check for cache-busted URLs (e.g., map_data.json?v=1234567890)
-  const isCacheBustedDataRequest = DATA_URLS.some(dataUrl => {
-    const baseName = dataUrl.replace('./', '');
-    return requestUrl.pathname.includes(baseName);
-  });
-  
-  if (isDataRequest || isCacheBustedDataRequest) {
-    // NETWORK FIRST strategy for dynamic JSON data
-    // Always try to fetch from network first, fall back to cache
-    event.respondWith(networkFirstStrategy(event.request));
-  } else {
-    // CACHE FIRST strategy for static assets
-    // Serve from cache, fall back to network
-    event.respondWith(cacheFirstStrategy(event.request));
+  if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) {
+    event.respondWith(cacheFirst(event.request));
+    return;
   }
+
+  const pathname = url.pathname;
+  if (DATA_PATHS.has(pathname)) {
+    event.respondWith(networkFirstData(event.request));
+    return;
+  }
+
+  event.respondWith(cacheFirst(event.request));
 });
 
-// ═══════════════════════════════════════════════════════════════
-// CACHE FIRST STRATEGY
-// For static assets (HTML, CSS, JS, images, fonts)
-// ═══════════════════════════════════════════════════════════════
-async function cacheFirstStrategy(request) {
+async function cacheFirst(request) {
+  const cached = await caches.match(request, { ignoreSearch: true });
+  if (cached) return cached;
+
   try {
-    // Use ignoreSearch: true to match cached URLs even if query strings differ
-    const cachedResponse = await caches.match(request, { ignoreSearch: true });
-    
-    if (cachedResponse) {
-      console.log('[SW] Cache HIT:', request.url);
-      return cachedResponse;
-    }
-    
-    console.log('[SW] Cache MISS, fetching:', request.url);
-    const networkResponse = await fetch(request);
-    
-    // Only cache successful responses
-    if (networkResponse.ok) {
+    const response = await fetch(request);
+    if (response && response.ok) {
       const cache = await caches.open(STATIC_CACHE);
-      cache.put(request, networkResponse.clone());
+      await cache.put(toCacheKey(request), response.clone());
     }
-    
-    return networkResponse;
-  } catch (error) {
-    console.error('[SW] Cache First failed:', error);
-    // Return offline fallback if available
+    return response;
+  } catch (_) {
     return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-// NETWORK FIRST STRATEGY
-// For dynamic JSON data files (map_data.json, info_data.json, drive_data.json)
-// ═══════════════════════════════════════════════════════════════
-async function networkFirstStrategy(request) {
+async function networkFirstData(request) {
+  const cacheKey = toCacheKey(request);
   try {
-    // Try to fetch from network first
-    console.log('[SW] Network First - Fetching:', request.url);
-    const networkResponse = await fetch(request);
-    
-    if (networkResponse.ok) {
-      // Clone and cache the response for future use
-      // Cache using the base URL (without query string) as the key for consistent matching
+    const response = await fetch(request);
+    if (response && response.ok) {
       const cache = await caches.open(DATA_CACHE);
-      cache.put(request, networkResponse.clone());
-      console.log('[SW] Network success, cached:', request.url);
-      return networkResponse;
+      await cache.put(cacheKey, response.clone());
     }
-    
-    // If network response is not OK, throw to trigger cache fallback
-    throw new Error(`Network response not OK: ${networkResponse.status}`);
-    
+    return response;
   } catch (error) {
-    console.warn('[SW] Network failed, trying cache:', request.url, error.message);
-    
-    // Network failed, try to get from cache
-    // Use ignoreSearch: true to match cached URLs even if query strings differ (e.g., ?t=123456)
-    const cachedResponse = await caches.match(request, { ignoreSearch: true });
-    
-    if (cachedResponse) {
-      console.log('[SW] Cache fallback successful:', request.url);
-      return cachedResponse;
-    }
-    
-    // No cache available, return error response
-    console.error('[SW] No cache available for:', request.url);
-    return new Response(JSON.stringify({ error: 'No data available', message: error.message }), {
+    const cached = await caches.match(cacheKey, { ignoreSearch: true });
+    if (cached) return cached;
+    return new Response(JSON.stringify({ error: 'No data available offline', message: error.message }), {
       status: 503,
       headers: { 'Content-Type': 'application/json' }
     });
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-// MESSAGE HANDLER - For manual cache updates
-// ═══════════════════════════════════════════════════════════════
 self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    console.log('[SW] Skip waiting requested');
-    self.skipWaiting();
-  }
-  
-  if (event.data && event.data.type === 'CLEAR_DATA_CACHE') {
-    console.log('[SW] Clearing data cache...');
-    event.waitUntil(
-      caches.delete(DATA_CACHE).then(() => {
-        console.log('[SW] Data cache cleared');
-      })
-    );
-  }
+  if (!event.data) return;
+  if (event.data.type === 'SKIP_WAITING') self.skipWaiting();
 });

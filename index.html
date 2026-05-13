@@ -1287,12 +1287,28 @@ let sheetRoomData = {};
 let driveImages = {};
 let isInfoLoaded = false;
 
+function safeExtractArray(payload) {
+  if (Array.isArray(payload)) return payload;
+  if (payload && Array.isArray(payload.data)) return payload.data;
+  if (payload && Array.isArray(payload.items)) return payload.items;
+  return [];
+}
+
+async function fetchJsonSafe(url) {
+  const res = await fetch(url + '?v=' + Date.now(), { cache: 'no-cache' });
+  if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+  try {
+    return await res.json();
+  } catch (e) {
+    throw new Error(`Malformed JSON at ${url}: ${e.message}`);
+  }
+}
+
+
 async function loadDriveImages() {
   // Primary: read from static file with cache-busting to ensure fresh data
   try {
-    const res = await fetch(API_DRIVE_JSON + '?v=' + Date.now(), { cache: 'no-cache' });
-    if (!res.ok) throw new Error(`Static file HTTP ${res.status}`);
-    driveImages = await res.json();
+    driveImages = await fetchJsonSafe(API_DRIVE_JSON);
     console.log('✅ Drive images loaded from static JSON');
     return;
   } catch (e) {
@@ -1321,21 +1337,17 @@ async function loadDriveImages() {
 async function fetchRoomInfo() {
   if (isInfoLoaded) return; 
   try {
-    const [mapRes, infoRes] = await Promise.all([
-      fetch(API_MAP + '?v=' + Date.now(), { cache: 'no-cache' }),
-      fetch(API_INFO + '?v=' + Date.now(), { cache: 'no-cache' })
+    const [rawMapData, rawInfoData] = await Promise.all([
+      fetchJsonSafe(API_MAP),
+      fetchJsonSafe(API_INFO)
     ]);
 
-    if (!mapRes.ok) throw new Error(`HTTP Map ${mapRes.status}`);
-    if (!infoRes.ok) throw new Error(`HTTP Info ${infoRes.status}`);
+    const mapArray = safeExtractArray(rawMapData);
+    const infoArray = safeExtractArray(rawInfoData);
 
-    // ... (Giữ nguyên phần code xử lý bên dưới của bạn) ...
-
-    const rawMapData = await mapRes.json();
-    const rawInfoData = await infoRes.json();
-
-    const mapArray = Array.isArray(rawMapData) ? rawMapData : (rawMapData.data || rawMapData.items || []);
-    const infoArray = Array.isArray(rawInfoData) ? rawInfoData : (rawInfoData.data || rawInfoData.items || []);
+    if (mapArray.length === 0 || infoArray.length === 0) {
+      throw new Error('Empty MAP/INFO dataset received');
+    }
 
     mapArray.forEach(item => {
       const roomNumStr = item.Room_Number || item.room_number || item['Room_Number'] || item['room_number'] || "";
@@ -1678,15 +1690,12 @@ function goToFloorMap() {
 // ═══════════════════════════════════════════════════════════════
 async function loadMapFromSheets(fid) {
   try {
-    const [mapResponse] = await Promise.all([
-      fetch(API_MAP + '?v=' + Date.now(), { cache: 'no-cache' }),
+    const [rawMapData] = await Promise.all([
+      fetchJsonSafe(API_MAP),
       fetchRoomInfo() 
     ]);
 
-    if (!mapResponse.ok) throw new Error(`HTTP ${mapResponse.status}`);
-    
-    let rawMapData = await mapResponse.json();
-    let dataArray = Array.isArray(rawMapData) ? rawMapData : (rawMapData.data || rawMapData.items || []);
+    let dataArray = safeExtractArray(rawMapData);
     if (!dataArray || dataArray.length === 0) return null;
 
     const bldInternalId = fid.split('_f')[0]; 
@@ -2142,6 +2151,26 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js')
       .then(function(registration) {
         console.log('✅ Service Worker registered:', registration.scope);
+
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          if (!newWorker) return;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              const doRefresh = confirm('VGUMap has a new version. Reload now?');
+              if (doRefresh) {
+                newWorker.postMessage({ type: 'SKIP_WAITING' });
+              }
+            }
+          });
+        });
+
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (refreshing) return;
+          refreshing = true;
+          window.location.reload();
+        });
       })
       .catch(function(error) {
         console.error('❌ Service Worker registration failed:', error);
