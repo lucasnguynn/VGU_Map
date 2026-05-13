@@ -9,6 +9,7 @@
  * - Validates API response (status === 'success' and data array exists)
  * - Flattens occupants_list array to comma-separated string
  * - Failsafe: Never overwrites file if fetched data is invalid/empty
+ * - Handles unhandled promise rejections gracefully
  * 
  * Usage: node sync_info_data.js
  * 
@@ -18,6 +19,19 @@
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
+
+// ═══════════════════════════════════════════════════════════════
+// UNHANDLED REJECTION HANDLER - Prevent silent failures
+// ═══════════════════════════════════════════════════════════════
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+  // Don't exit immediately, let the main function handle errors
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('❌ Uncaught Exception:', error.message);
+  process.exit(1);
+});
 
 // ═══════════════════════════════════════════════════════════════
 // CONFIGURATION

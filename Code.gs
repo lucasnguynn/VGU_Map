@@ -278,6 +278,7 @@ function doGet(e) {
       data: allRooms
     };
     
+    // Return JSON response with no-cache headers to prevent Google Apps Script caching
     return ContentService
       .createTextOutput(JSON.stringify(response))
       .setMimeType(ContentService.MimeType.JSON)
@@ -293,8 +294,12 @@ function doGet(e) {
       data: []
     };
     
+    // Return error response with no-cache headers
     return ContentService
       .createTextOutput(JSON.stringify(errorResponse))
-      .setMimeType(ContentService.MimeType.JSON);
+      .setMimeType(ContentService.MimeType.JSON)
+      .setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+      .setHeader('Pragma', 'no-cache')
+      .setHeader('Expires', '0');
   }
 }
