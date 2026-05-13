@@ -1266,108 +1266,99 @@ selRoom.disabled  = true;
 // ═══════════════════════════════════════════════════════════════
 //  🔗 ĐỒNG BỘ DỮ LIỆU TỪ CÁC API
 // ═══════════════════════════════════════════════════════════════
-// ── Chỉ còn 1 URL duy nhất (Thay ID script mới của bạn vào đây) ──
-const UNIFIED_API = "https://script.google.com/macros/s/AKfycbw.../exec?type=all";
-const CACHE_KEY     = 'vgumap_cache_v1';
-const CACHE_MINUTES = 30;
+const API_MAP = "./map_data.json";
+const API_INFO = "./info_data.json";
+const API_DRIVE_LIST = "https://script.google.com/macros/s/AKfycbw4PtDoCILXSiIn1AAYzJhUhSvmJ6ufKD-5R-QKZGzbBy-yQTfC_bPTKJEErwt1d_iS/exec";
 
-// Biến toàn cục
 let sheetRoomData = {};
-let driveImages   = {};
-let isInfoLoaded  = false;
+let driveImages = {};
+let isInfoLoaded = false;
 
-// Hàm khởi tạo dữ liệu
+async function loadDriveImages() {
+  try {
+    const response = await fetch(API_DRIVE_LIST);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    driveImages = await response.json();
+  } catch (e) { 
+    console.error("❌ Lỗi tải ảnh Drive:", e.message);
+  }
+}
+
 (async function initializeData() {
-  // 1. Thử đọc cache trước
   try {
-    const cached = localStorage.getItem(CACHE_KEY);
-    if (cached) {
-      const { data, timestamp } = JSON.parse(cached);
-      const ageMin = (Date.now() - timestamp) / 60000;
-      if (ageMin < CACHE_MINUTES) {
-        applyData(data);
-        console.log(`✅ Cache hit (còn ${Math.round(CACHE_MINUTES - ageMin)}p)`);
-        return;
-      }
-    }
-  } catch(_) {}
-
-  // 2. Fetch API gộp nếu không có cache hoặc cache hết hạn
-  try {
-    console.log('🌐 Đang tải dữ liệu từ Google Sheets...');
-    const t0  = performance.now();
-    const res = await fetch(UNIFIED_API);
-    const raw = await res.json();
-    const ms  = Math.round(performance.now() - t0);
-    
-    if (raw.status === "success") {
-      console.log(`✅ Tải xong 3-in-1 API trong ${ms}ms`);
-      applyData(raw);
-
-      // 3. Lưu cache mới
-      localStorage.setItem(CACHE_KEY, JSON.stringify({
-        data: raw,
-        timestamp: Date.now()
-      }));
-    } else {
-      throw new Error("Dữ liệu API trả về không hợp lệ");
-    }
-  } catch(e) {
-    console.error('❌ Lỗi tải API:', e);
+    await Promise.all([loadDriveImages(), fetchRoomInfo()]);
+    console.log("✅ Hệ thống tải dữ liệu API hoàn tất!");
+  } catch (e) {
+    console.error("❌ Lỗi khởi tạo hệ thống:", e);
   }
 })();
 
-// ── Áp dụng data vào các biến toàn cục ──
-function applyData(raw) {
-  // 1. Gán Drive images
-  driveImages = raw.drive || {};
+async function fetchRoomInfo() {
+  if (isInfoLoaded) return; 
+  try {
+    // TẠO CHUỖI RANDOM HOẶC TIMESTAMP ĐỂ PHÁ CACHE
+    const noCacheParam = '?t=' + new Date().getTime();
 
-  // 2. Gán Info data — chuyển mảng thành object key=room_number
-  const infoArr = raw.info || [];
-  sheetRoomData = {}; // Reset trước khi gán
-  infoArr.forEach(room => {
-    if (room.room_number) {
-      sheetRoomData[room.room_number.trim()] = room;
-    }
-  });
+    // Thêm noCacheParam vào sau đuôi link API_INFO
+    const [mapRes, infoRes] = await Promise.all([
+      fetch(API_MAP),
+      fetch(API_INFO + noCacheParam) // <--- SỬA DÒNG NÀY
+    ]);
 
-  // 3. Map data — populate BUILDINGS.rooms
-  const mapArr = raw.map || [];
-  mapArr.forEach(item => {
-    const roomNum = String(item.Room_Number || item.room_number || "").trim();
-    if (!roomNum || /LB|CR|WC/i.test(roomNum)) return;
+    if (!mapRes.ok) throw new Error(`HTTP Map ${mapRes.status}`);
+    if (!infoRes.ok) throw new Error(`HTTP Info ${infoRes.status}`);
 
-    const parts = roomNum.split('-');
-    if (parts.length < 2) return;
+    // ... (Giữ nguyên phần code xử lý bên dưới của bạn) ...
 
-    const bldCode  = parts[0].toUpperCase();
-    const roomCode = parts.slice(1).join('-');
-    
-    // Giả định đối tượng BUILDINGS đã được khai báo trước đó trong app của bạn
-    if (typeof BUILDINGS !== 'undefined') {
-      const targetBld = BUILDINGS.find(b => b.code === bldCode);
-      if (targetBld && !targetBld.rooms.includes(roomCode)) {
-        targetBld.rooms.push(roomCode);
+    const rawMapData = await mapRes.json();
+    const rawInfoData = await infoRes.json();
+
+    const mapArray = Array.isArray(rawMapData) ? rawMapData : (rawMapData.data || rawMapData.items || []);
+    const infoArray = Array.isArray(rawInfoData) ? rawInfoData : (rawInfoData.data || rawInfoData.items || []);
+
+    mapArray.forEach(item => {
+      const roomNumStr = item.Room_Number || item.room_number || item['Room_Number'] || item['room_number'] || "";
+      const roomNum = String(roomNumStr).trim();
+
+      if (!roomNum || /LB|CR|WC/i.test(roomNum)) return;
+
+      const parts = roomNum.split('-');
+      if (parts.length >= 2) {
+        const bldCode = parts[0].toUpperCase().trim();
+        const roomCode = parts.slice(1).join('-').trim();
+
+        const targetBld = BUILDINGS.find(b => b.code === bldCode);
+        if (targetBld) {
+          if (!targetBld.rooms.includes(roomCode)) {
+            targetBld.rooms.push(roomCode);
+          }
+          const floorNum = parseInt(roomCode.charAt(0));
+          if (!isNaN(floorNum) && floorNum > targetBld.floors) {
+            targetBld.floors = floorNum;
+          }
+        }
       }
-    }
-  });
-
-  // Sort lại danh sách phòng trong từng tòa nhà
-  if (typeof BUILDINGS !== 'undefined') {
-    BUILDINGS.forEach(b => {
-      b.rooms.sort(new Intl.Collator('en', { numeric: true }).compare);
     });
-    refreshBuildingDropdowns(); // Gọi hàm cập nhật giao diện của bạn
+
+    BUILDINGS.forEach(bld => {
+      bld.rooms.sort(new Intl.Collator('en', { numeric: true, sensitivity: 'base' }).compare);
+    });
+
+    infoArray.forEach(row => {
+      let roomId = row.room_number || row.room_id; 
+      if (roomId) {
+        sheetRoomData[String(roomId).trim()] = row; 
+      }
+    });
+
+    isInfoLoaded = true;
+    console.log("✅ Đã trích xuất số phòng từ API Tọa độ vào các Tòa nhà!");
+
+    refreshBuildingDropdowns();
+
+  } catch (e) {
+    console.error("❌ Lỗi xử lý đồng bộ dữ liệu API:", e);
   }
-
-  isInfoLoaded = true;
-  console.log(`📦 Đã nạp: ${Object.keys(driveImages).length} ảnh | ${Object.keys(sheetRoomData).length} phòng | ${mapArr.length} map segments`);
-}
-
-// Xóa cache thủ công khi cần (gọi clearVGUCache() trong DevTools Console)
-function clearVGUCache() {
-  localStorage.removeItem(CACHE_KEY);
-  console.log('🗑️ Cache đã xóa — Tải lại trang (F5) để fetch dữ liệu mới nhất từ Google Sheets');
 }
 
 // ═══════════════════════════════════════════════════════════════
