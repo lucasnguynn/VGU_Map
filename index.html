@@ -1370,7 +1370,14 @@ function clearSearch() {
 
 async function performSearch(query) {
   const normalizedQuery = query.trim().toUpperCase();
-  if (!isInfoLoaded) await fetchRoomInfo();
+  if (!isInfoLoaded) {
+  // Chờ tối đa 3s cho data load xong
+  let waited = 0;
+  while (!isInfoLoaded && waited < 3000) {
+    await new Promise(r => setTimeout(r, 100));
+    waited += 100;
+  }
+}
 
   // ══════════════════════════════════════════════════════
   //  CÚ PHÁP: "TÒA-SỐ PHÒNG" — ví dụ: AD-204, B1-301
@@ -1632,16 +1639,26 @@ function goToFloorMap() {
 // ═══════════════════════════════════════════════════════════════
 async function loadMapFromSheets(fid) {
   try {
-    const [mapResponse] = await Promise.all([
-      fetch(API_MAP),
-      fetchRoomInfo() 
-    ]);
+    // Dùng data đã cache, không fetch lại
+let dataArray = [];
 
-    if (!mapResponse.ok) throw new Error(`HTTP ${mapResponse.status}`);
-    
-    let rawMapData = await mapResponse.json();
-    let dataArray = Array.isArray(rawMapData) ? rawMapData : (rawMapData.data || rawMapData.items || []);
-    if (!dataArray || dataArray.length === 0) return null;
+// Thử lấy từ cache localStorage trước
+try {
+  const cached = localStorage.getItem(CACHE_KEY);
+  if (cached) {
+    const { data } = JSON.parse(cached);
+    dataArray = data.map || [];
+  }
+} catch(_) {}
+
+// Nếu cache rỗng, fetch lại từ UNIFIED_API
+if (dataArray.length === 0) {
+  const res = await fetch(UNIFIED_API);
+  const raw = await res.json();
+  dataArray = raw.map || [];
+}
+
+if (dataArray.length === 0) return null;
 
     const bldInternalId = fid.split('_f')[0]; 
     const fNum = fid.split('_f')[1]; 
