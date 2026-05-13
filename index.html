@@ -349,7 +349,7 @@ polygon,polyline{transition:all .18s cubic-bezier(.4,0,.2,1)}
 <div class="ctrl-group search-group">
 <label>Tìm kiếm <small>/ Search</small></label>
 <div class="input-wrapper">
-<input type="text" id="searchInput" class="c1-select" placeholder="Nhập tên tòa, phòng..." oninput="onSearchInput()" onkeydown="handleSearchKey(event)">
+<input type="text" id="searchInput" class="c1-select" placeholder="Tòa-Số phòng" oninput="onSearchInput()" onkeydown="handleSearchKey(event)">
 <button type="button" onclick="clearSearch()" class="btn-clear" title="Xóa tìm kiếm">
 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
 </button>
@@ -1394,93 +1394,132 @@ function clearSearch() {
 }
 
 async function performSearch(query) {
-  const normalizedQuery = query.trim().toLowerCase();
+  const normalizedQuery = query.trim().toUpperCase();
   if (!isInfoLoaded) await fetchRoomInfo();
 
-  let foundBuilding = BUILDINGS.find(b => 
-    b.code.toLowerCase().includes(normalizedQuery) || 
-    b.name.toLowerCase().includes(normalizedQuery)
+  // ══════════════════════════════════════════════════════
+  //  CÚ PHÁP: "TÒA-SỐ PHÒNG" — ví dụ: AD-204, B1-301
+  //  Ưu tiên xử lý trước tiên
+  // ══════════════════════════════════════════════════════
+  const roomSyntaxMatch = normalizedQuery.match(/^([A-Z]+\d*)-(\d+.*)$/);
+
+  if (roomSyntaxMatch) {
+    const bldCode  = roomSyntaxMatch[1]; // "AD"
+    const roomCode = roomSyntaxMatch[2]; // "204"
+    const fullRoom = normalizedQuery;    // "AD-204"
+
+    const targetBld = BUILDINGS.find(b => b.code === bldCode);
+
+    if (targetBld) {
+      // 1. Chọn tòa nhà
+      selBuilding.value = bldCode;
+      onBuildingChange(false);
+
+      // Highlight polygon trên map
+      if (polygonLayers[bldCode]) {
+        if (selectedPolygon) selectedPolygon.setStyle(defaultPolyStyle);
+        selectedPolygon = polygonLayers[bldCode];
+        selectedPolygon.setStyle(highlightPolyStyle);
+        lMap.flyToBounds(selectedPolygon.getBounds(), { padding:[50,50], duration:0.5 });
+      }
+
+      // 2. Xác định tầng từ ký tự đầu của roomCode
+      const floorNum = roomCode.charAt(0);
+      const floorOpt = Array.from(selFloor.options).find(o => o.value === floorNum);
+
+      if (floorOpt) {
+        selFloor.value = floorNum;
+        onFloorChange();
+
+        // 3. Tìm số phòng — thử khớp chính xác trước, rồi khớp mềm
+        const exactOpt = Array.from(selRoom.options).find(
+          o => o.value.toUpperCase() === roomCode
+        );
+        const softOpt = Array.from(selRoom.options).find(
+          o => o.value.toUpperCase().includes(roomCode)
+        );
+        const roomOpt = exactOpt || softOpt;
+
+        if (roomOpt) {
+          selRoom.value = roomOpt.value;
+
+          // 4. Hiện banner + nút xem mặt bằng
+          const bld = BUILDINGS.find(b => b.code === bldCode);
+          bannerText.innerHTML = `
+            <span style="display:flex;align-items:center;gap:8px">
+              ✅ Đã tìm thấy: <strong>${bldCode}-${roomOpt.value}</strong>
+              — ${bld.name}
+            </span>`;
+          banner.classList.add('show');
+          mapWrap.classList.add('has-result');
+
+          // Nếu có dữ liệu bản đồ tầng → mở thẳng trang phòng
+          if (bldCode === 'AD') {
+            btnViewFloor.style.display = 'block';
+            btnViewFloor.onclick = () => {
+              renderMap('bld_ad', `bld_ad_f${floorNum}`, parseInt(floorNum));
+              // Sau khi render xong, highlight phòng
+              setTimeout(() => rC(`${bldCode}-${roomOpt.value}`), 800);
+            };
+          }
+          return;
+        }
+      }
+
+      // Tòa đúng nhưng không tìm thấy số phòng cụ thể
+      bannerText.innerHTML = `
+        📍 Tòa <strong>${targetBld.name}</strong> — 
+        không tìm thấy phòng <strong>${fullRoom}</strong>`;
+      banner.classList.add('show');
+      return;
+    }
+
+    // Không tìm thấy tòa → thông báo rõ
+    bannerText.innerHTML = `
+      ❌ Không tìm thấy tòa nhà mã <strong>${bldCode}</strong>`;
+    banner.classList.add('show');
+    banner.style.background = '#fff5f5';
+    banner.style.borderColor = '#c0392b';
+    setTimeout(() => {
+      banner.style.background = '';
+      banner.style.borderColor = '';
+    }, 2000);
+    return;
+  }
+
+  // ══════════════════════════════════════════════════════
+  //  TÌM KIẾM THEO TÊN TÒA (giữ nguyên logic cũ)
+  // ══════════════════════════════════════════════════════
+  const normalizedLower = query.trim().toLowerCase();
+
+  let foundBuilding = BUILDINGS.find(b =>
+    b.code.toLowerCase().includes(normalizedLower) ||
+    b.name.toLowerCase().includes(normalizedLower)
   );
-  
+
   if (foundBuilding) {
     selBuilding.value = foundBuilding.code;
     onBuildingChange(false);
-    
+
     if (polygonLayers[foundBuilding.code]) {
       if (selectedPolygon) selectedPolygon.setStyle(defaultPolyStyle);
       selectedPolygon = polygonLayers[foundBuilding.code];
       selectedPolygon.setStyle(highlightPolyStyle);
       lMap.flyToBounds(selectedPolygon.getBounds(), { padding:[50,50], duration:0.5 });
     }
-    
-    const roomMatch = foundBuilding.rooms.find(r => r.toLowerCase().includes(normalizedQuery));
-    if (roomMatch) {
-      const floorNum = roomMatch.charAt(0);
-      const floorOpt = Array.from(selFloor.options).find(o => o.value === floorNum);
-      if (floorOpt) {
-        selFloor.value = floorNum;
-        onFloorChange();
-        const roomOpt = Array.from(selRoom.options).find(o => o.value === roomMatch);
-        if (roomOpt) {
-          selRoom.value = roomMatch;
-          doSearch();
-        }
-      }
-    } else {
-      bannerText.innerHTML = `📍 Đã tìm thấy: <strong>${foundBuilding.name}</strong>`;
-      banner.classList.add('show');
-      if (foundBuilding.code === 'AD') btnViewFloor.style.display = 'block';
-    }
+
+    bannerText.innerHTML = `📍 Đã tìm thấy: <strong>${foundBuilding.name}</strong>`;
+    banner.classList.add('show');
+    if (foundBuilding.code === 'AD') btnViewFloor.style.display = 'block';
     return;
   }
-  
-  let matchedRoom = null;
-  if (sheetRoomData && Object.keys(sheetRoomData).length > 0) {
-    for (const roomId of Object.keys(sheetRoomData)) {
-      if (roomId.toLowerCase() === normalizedQuery || roomId.toLowerCase().includes(normalizedQuery)) {
-        matchedRoom = roomId;
-        break;
-      }
-    }
-  }
 
-  if (matchedRoom) {
-    let buildingCode = null, floorNumber = null;
-    const roomUpper = matchedRoom.toUpperCase();
-    const bldMatch = roomUpper.match(/^([A-Z]+)-/);
-    if (bldMatch) {
-      buildingCode = bldMatch[1];
-      const numPart = roomUpper.replace(/^[A-Z]+-/, '');
-      const floorMatch = numPart.match(/^(\d+)/);
-      if (floorMatch) floorNumber = floorMatch[1];
-    }
-    
-    const targetBuilding = BUILDINGS.find(b => b.code === buildingCode);
-    if (targetBuilding) {
-      selBuilding.value = targetBuilding.code;
-      onBuildingChange(false);
-      
-      if (floorNumber) {
-        const floorOpt = Array.from(selFloor.options).find(o => o.value === floorNumber);
-        if (floorOpt) {
-          selFloor.value = floorNumber;
-          onFloorChange();
-          const roomOpt = Array.from(selRoom.options).find(o => o.value === matchedRoom);
-          if (roomOpt) {
-            selRoom.value = matchedRoom;
-            doSearch();
-            return;
-          }
-        }
-      }
-      bannerText.innerHTML = `🔍 Tìm thấy phòng: <strong>${matchedRoom}</strong> tại <strong>${targetBuilding.name}</strong>`;
-      banner.classList.add('show');
-      if (targetBuilding.code === 'AD') btnViewFloor.style.display = 'block';
-      return;
-    }
-  }
-
-  bannerText.innerHTML = `❌ Không tìm thấy kết quả cho "<strong>${searchInput.value}</strong>"`;
+  // ══════════════════════════════════════════════════════
+  //  KHÔNG TÌM THẤY GÌ
+  // ══════════════════════════════════════════════════════
+  bannerText.innerHTML = `
+    ❌ Không tìm thấy "<strong>${query}</strong>" — 
+    thử cú pháp <strong>AD-204</strong>`;
   banner.classList.add('show');
   banner.style.background = '#fff5f5';
   banner.style.borderColor = '#c0392b';
