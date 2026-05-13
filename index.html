@@ -320,6 +320,17 @@ g[onclick]{cursor:pointer}
 g[onclick]:hover polygon,g[onclick]:hover polyline{ filter:brightness(.88) contrast(1.1); stroke:#002554!important;stroke-width:2px!important }
 polygon,polyline{transition:all .18s cubic-bezier(.4,0,.2,1)}
 @media(max-width:680px){.phi{height:auto;padding:10px 16px;gap:8px}}
+
+/* Added loading / error UX surfaces */
+.status-banner{display:none;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-radius:6px;margin:10px 24px;font-size:13px}
+.status-banner.show{display:flex}
+.status-banner.loading{background:#eef5ff;color:#1f4f8d;border:1px solid #bdd4f5}
+.status-banner.error{background:#fff1f0;color:#8b2d2b;border:1px solid #f4b7b3}
+.spinner{width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite;display:inline-block}
+:focus-visible{outline:3px solid rgba(245,130,32,.5);outline-offset:2px}
+@media (max-width: 375px){.header{padding:0 12px;gap:10px}.page-title{font-size:14px}.control-bar{padding:10px}.input-wrapper input.c1-select,select.c1-select,.btn-search{height:44px}}
+@media (min-width: 1440px){.map-wrap-c1{padding:24px}#map{max-width:min(1600px,92vw)}}
+
 </style>
 </head>
 <body>
@@ -397,6 +408,7 @@ polygon,polyline{transition:all .18s cubic-bezier(.4,0,.2,1)}
 </div>
 <button class="btn-view" id="btnViewFloor" onclick="goToFloorMap()">Xem mặt bằng tầng</button>
 </div>
+<div id="statusBanner" class="status-banner loading" role="status" aria-live="polite"></div>
 <div class="map-wrap-c1" id="mapWrap">
 <div id="map"></div>
 </div>
@@ -1235,6 +1247,28 @@ function setupMapResizeHandler() {
   };
 }
 
+
+function safeFlyToBounds(bounds, options = {}) {
+  if (!lMap || !bounds) return;
+  const isValid = typeof bounds.isValid === 'function' ? bounds.isValid() : true;
+  if (!isValid) return;
+
+  const execFly = () => {
+    if (!lMap) return;
+    try {
+      lMap.flyToBounds(bounds, { padding:[50,50], duration:0.5, ...options });
+    } catch (_) {
+      lMap.fitBounds(bounds, { animate: true, ...options });
+    }
+  };
+
+  if (lMap._loaded) {
+    execFly();
+  } else {
+    lMap.whenReady(execFly);
+  }
+}
+
 // ═══════════════════════════════════════════════════════════════
 //  🖱️  UI: Dropdowns & Banner
 // ═══════════════════════════════════════════════════════════════
@@ -1247,6 +1281,7 @@ const btnViewFloor = document.getElementById('btnViewFloor');
 const mapWrap      = document.getElementById('mapWrap');
 const searchInput  = document.getElementById('searchInput');
 const searchHint   = document.getElementById('searchHint');
+const statusBanner = document.getElementById('statusBanner');
 
 function initBuildingDropdown() {
   selBuilding.innerHTML = '<option value="">— Chọn Tòa nhà —</option>';
@@ -1294,7 +1329,10 @@ const API_MAP = "./map_data.json";
 const API_INFO = "./info_data.json";
 const API_DRIVE_JSON = './drive_data.json';
 const API_DRIVE_LIST = "https://script.google.com/macros/s/AKfycbw4PtDoCILXSiIn1AAYzJhUhSvmJ6ufKD-5R-QKZGzbBy-yQTfC_bPTKJEErwt1d_iS/exec";
-const DATA_VERSION = '2026-05-13';
+const DATA_REFRESH_INTERVAL_MS = 5 * 60 * 1000;
+let dataVersion = Date.now();
+let dataAutoRefreshTimer = null;
+let lastDataHash = '';
 
 let sheetRoomData = {};
 let driveImages = {};
@@ -1308,7 +1346,7 @@ function safeExtractArray(payload) {
 }
 
 async function fetchJsonSafe(url) {
-  const normalizedUrl = `${url}?v=${DATA_VERSION}`;
+  const normalizedUrl = `${url}?v=${dataVersion}`;
   if (dataRequestCache.has(normalizedUrl)) return dataRequestCache.get(normalizedUrl);
 
   const req = (async () => {
@@ -1341,7 +1379,7 @@ async function loadDriveImages() {
   }
   // Fallback: live API (slower, used only when static file is missing)
   try {
-    const res = await fetch(`${API_DRIVE_LIST}?v=${DATA_VERSION}`, { cache: 'no-store' });
+    const res = await fetch(`${API_DRIVE_LIST}?v=${dataVersion}`, { cache: 'no-store' });
     if (!res.ok) throw new Error(`API HTTP ${res.status}`);
     driveImages = await res.json();
     console.log('✅ Drive images loaded from live API (fallback)');
@@ -1352,7 +1390,8 @@ async function loadDriveImages() {
 
 (async function initializeData() {
   try {
-    await Promise.all([loadDriveImages(), fetchRoomInfo()]);
+    await refreshDataAndRerender();
+    dataAutoRefreshTimer = setInterval(refreshDataAndRerender, DATA_REFRESH_INTERVAL_MS);
     console.log("✅ Hệ thống tải dữ liệu API hoàn tất!");
   } catch (e) {
     console.error("❌ Lỗi khởi tạo hệ thống:", e);
@@ -1362,6 +1401,9 @@ async function loadDriveImages() {
 async function fetchRoomInfo() {
   if (isInfoLoaded) return; 
   try {
+    sheetRoomData = {};
+    BUILDINGS.forEach((bld) => { bld.rooms = []; });
+
     const [rawMapData, rawInfoData] = await Promise.all([
       fetchJsonSafe(API_MAP),
       fetchJsonSafe(API_INFO)
@@ -1424,6 +1466,40 @@ async function fetchRoomInfo() {
 // ═══════════════════════════════════════════════════════════════
 //  🔍 TÌM KIẾM & HỆ THỐNG XỬ LÝ SỰ KIẾN
 // ═══════════════════════════════════════════════════════════════
+
+function setStatus(type, message = '') {
+  if (!message) { statusBanner.className = 'status-banner'; statusBanner.textContent = ''; return; }
+  statusBanner.className = `status-banner show ${type}`;
+  statusBanner.innerHTML = `${type === 'loading' ? '<span class="spinner" aria-hidden="true"></span>' : '⚠️'} <span>${message}</span>`;
+}
+
+function stableHash(value) {
+  const str = JSON.stringify(value);
+  let hash = 0;
+  for (let i = 0; i < str.length; i += 1) hash = ((hash << 5) - hash) + str.charCodeAt(i);
+  return String(hash >>> 0);
+}
+
+async function refreshDataAndRerender() {
+  dataVersion = Date.now();
+  dataRequestCache.clear();
+  setStatus('loading', 'Đang đồng bộ dữ liệu mới nhất...');
+  try {
+    isInfoLoaded = false;
+    await Promise.all([loadDriveImages(), fetchRoomInfo()]);
+    const hash = stableHash({ b: BUILDINGS.map(x => [x.code, x.rooms.length]), i: Object.keys(sheetRoomData).length, d: Object.keys(driveImages).length });
+    const changed = hash !== lastDataHash;
+    lastDataHash = hash;
+    setStatus('', '');
+    if (changed && ST.fKey) {
+      await renderMap(ST.bid, ST.fid, ST.flN);
+    }
+    if (navigator.serviceWorker?.controller) navigator.serviceWorker.controller.postMessage({ type: 'REFRESH_DATA_CACHE' });
+  } catch (e) {
+    setStatus('error', `Không thể đồng bộ dữ liệu: ${e.message}`);
+  }
+}
+
 let searchDebounceTimer = null;
 
 function onSearchInput() {
@@ -1480,7 +1556,7 @@ async function performSearch(query) {
         if (selectedPolygon) selectedPolygon.setStyle(defaultPolyStyle);
         selectedPolygon = polygonLayers[bldCode];
         selectedPolygon.setStyle(highlightPolyStyle);
-        lMap.flyToBounds(selectedPolygon.getBounds(), { padding:[50,50], duration:0.5 });
+        safeFlyToBounds(selectedPolygon.getBounds());
       }
 
       // 2. Xác định tầng từ ký tự đầu của roomCode
@@ -1565,7 +1641,7 @@ async function performSearch(query) {
       if (selectedPolygon) selectedPolygon.setStyle(defaultPolyStyle);
       selectedPolygon = polygonLayers[foundBuilding.code];
       selectedPolygon.setStyle(highlightPolyStyle);
-      lMap.flyToBounds(selectedPolygon.getBounds(), { padding:[50,50], duration:0.5 });
+      safeFlyToBounds(selectedPolygon.getBounds());
     }
 
     bannerText.innerHTML = `📍 Đã tìm thấy: <strong>${foundBuilding.name}</strong>`;
@@ -1614,7 +1690,7 @@ function onBuildingChange(fromMapClick = false) {
   if (code && polygonLayers[code]) {
     selectedPolygon = polygonLayers[code];
     selectedPolygon.setStyle(highlightPolyStyle);
-    if (!fromMapClick) lMap.flyToBounds(selectedPolygon.getBounds(), { padding:[50,50], duration:0.5 });
+    if (!fromMapClick) safeFlyToBounds(selectedPolygon.getBounds());
   }
 
   banner.classList.remove('show');
@@ -2173,7 +2249,10 @@ function onIframeError(fileId, rid) {
 // ═══════════════════════════════════════════════════════════════
 //  SERVICE WORKER REGISTRATION FOR PWA
 // ═══════════════════════════════════════════════════════════════
-window.addEventListener('beforeunload', destroyLeafletMap);
+window.addEventListener('beforeunload', () => {
+  if (dataAutoRefreshTimer) clearInterval(dataAutoRefreshTimer);
+  destroyLeafletMap();
+});
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
