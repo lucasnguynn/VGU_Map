@@ -270,7 +270,7 @@ function doGet(e) {
       }
     }
     
-    // Build response
+    // Build response with no-cache headers to prevent Google Apps Script caching
     var response = {
       status: 'success',
       total_rooms: allRooms.length,

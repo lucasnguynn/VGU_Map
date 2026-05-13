@@ -117,7 +117,7 @@ self.addEventListener('fetch', (event) => {
 // ═══════════════════════════════════════════════════════════════
 async function cacheFirstStrategy(request) {
   try {
-    // FIX: Use ignoreSearch: true to match cached URLs regardless of query strings
+    // Use ignoreSearch: true to match cached URLs even if query strings differ
     const cachedResponse = await caches.match(request, { ignoreSearch: true });
     
     if (cachedResponse) {
@@ -154,6 +154,7 @@ async function networkFirstStrategy(request) {
     
     if (networkResponse.ok) {
       // Clone and cache the response for future use
+      // Cache using the base URL (without query string) as the key for consistent matching
       const cache = await caches.open(DATA_CACHE);
       cache.put(request, networkResponse.clone());
       console.log('[SW] Network success, cached:', request.url);
@@ -167,7 +168,7 @@ async function networkFirstStrategy(request) {
     console.warn('[SW] Network failed, trying cache:', request.url, error.message);
     
     // Network failed, try to get from cache
-    // FIX: Use ignoreSearch: true to match cached URLs regardless of query strings (cache-busting timestamps)
+    // Use ignoreSearch: true to match cached URLs even if query strings differ (e.g., ?t=123456)
     const cachedResponse = await caches.match(request, { ignoreSearch: true });
     
     if (cachedResponse) {
