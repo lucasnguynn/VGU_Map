@@ -1,3 +1,8 @@
+/**
+ * VGUMap Room Data API - doGet Function
+ *
+ * Refactored for production resilience and JSON compatibility with the PWA.
+ */
 function doGet(e) {
   try {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -8,11 +13,18 @@ function doGet(e) {
       const sheetName = sheet.getName();
       const normalizedSheetName = normalizeHeader(sheetName);
 
-      // Always skip employee list sheets.
-      if (normalizedSheetName.includes("danh_sach_nhan_vien")) return;
+      // Skip common employee/staff directory sheets.
+      if (
+        normalizedSheetName.includes("danh_sach_nhan_vien") ||
+        normalizedSheetName.includes("nhan_vien") ||
+        normalizedSheetName.includes("staff") ||
+        normalizedSheetName.includes("employee")
+      ) {
+        return;
+      }
 
       const data = sheet.getDataRange().getValues();
-      if (!data || data.length === 0) return;
+      if (!data || data.length < 2) return;
 
       const headerRowIndex = detectHeaderRowIndex(data);
       if (headerRowIndex < 0 || headerRowIndex >= data.length - 1) return;
@@ -28,9 +40,10 @@ function doGet(e) {
         const roomNumber = getFirstString(rowData, [
           "number",
           "room_number",
-          "room_number_",
           "ma_phong",
-          "so_phong"
+          "so_phong",
+          "room_code",
+          "room"
         ]);
 
         if (!roomNumber || roomNumber.toLowerCase().includes("total")) continue;
@@ -43,17 +56,18 @@ function doGet(e) {
             heading_2: getFirstString(rowData, ["ten_phong", "heading_2", "name"], "___"),
             department: getFirstString(rowData, ["department", "phong_ban", "bo_phan"], "___"),
             occupants_list: [],
+            occupant_display: "",
             fm_room_function: getFirstString(rowData, ["fm_room_function", "function", "chuc_nang"], "___"),
-            fm_room_type: getFirstString(rowData, ["fm_room_type", "type", "loai"], "___"),
-            fm_building_code: getFirstString(rowData, ["fm_room_buildingcode", "building_code", "toa_nha"], ""),
-            area: getSafeNumberText(rowData, ["area", "room_area"], "--"),
-            unbounded_height: getSafeNumberText(rowData, ["unbounded_height", "height"], "--"),
-            capacity: getSafeNumberText(rowData, ["capacity", "suc_chua"], "0"),
+            fm_room_type: getFirstString(rowData, ["fm_room_type", "type", "loai_phong", "loai"], "___"),
+            fm_building_code: getFirstString(rowData, ["fm_room_buildingcode", "fm_building_code", "building_code", "toa_nha"], ""),
+            area: getSafeNumberText(rowData, ["area", "room_area", "dien_tich"], "--"),
+            unbounded_height: getSafeNumberText(rowData, ["unbounded_height", "height", "chieu_cao"], "--"),
+            capacity: getSafeNumberText(rowData, ["capacity", "suc_chua"], "--"),
             raw_status: getFirstString(rowData, ["status", "trang_thai"], "")
           };
         }
 
-        const occupant = getFirstString(rowData, ["occupant", "nhan_su", "nguoi_su_dung"], "");
+        const occupant = getFirstString(rowData, ["occupant", "nguoi_su_dung", "staff_name", "fm_staff_name", "nhan_su"], "");
         if (occupant && roomsMap[roomNumber].occupants_list.indexOf(occupant) === -1) {
           roomsMap[roomNumber].occupants_list.push(occupant);
         }
@@ -70,27 +84,31 @@ function doGet(e) {
       const roomFunc = String(room.fm_room_function || "").toLowerCase();
 
       let statusText = "Hoạt động";
-      if (rawStatus.includes("operational")) {
+      if (rawStatus.includes("operational") || rawStatus.includes("hoat dong") || rawStatus.includes("hoạt động")) {
         statusText = "Hoạt động";
       } else if (
         rawStatus.includes("at-rest") ||
         rawStatus.includes("maintenance") ||
+        rawStatus.includes("bao tri") ||
+        rawStatus.includes("bảo trì") ||
         roomType.includes("repair") ||
+        roomFunc.includes("sua chua") ||
         roomFunc.includes("sửa chữa")
       ) {
         statusText = "Bảo trì";
       } else if (
         rawStatus.includes("out of order") ||
+        rawStatus.includes("khong hoat dong") ||
+        rawStatus.includes("không hoạt động") ||
         roomType.includes("vacant") ||
         roomFunc.includes("unassigned")
       ) {
-        statusText = "Không hoạt động";
-      } else if (roomType.includes("vacant") || roomFunc.includes("unassigned")) {
         statusText = "Không hoạt động";
       }
 
       room.status = statusText;
       room.is_active = statusText !== "Không hoạt động";
+      room.occupant_display = room.occupants_list.join(", ");
 
       if (!room.fm_building_code && room.room_number.indexOf("-") > -1) {
         room.fm_building_code = room.room_number.split("-")[0].toUpperCase();
@@ -116,7 +134,6 @@ function doGet(e) {
   }
 }
 
-// Normalize headers: lowercase, trim, remove accents, replace non-alnum with underscores.
 function normalizeHeader(header) {
   const text = (header === null || header === undefined) ? "" : String(header);
   return text
@@ -174,8 +191,10 @@ function isBlankRow(row) {
 }
 
 function detectHeaderRowIndex(data) {
-  // Prefer a row containing known header signals; fallback to first non-blank row.
-  const signals = ["number", "room_number", "name", "department", "status", "area", "capacity"];
+  const signals = [
+    "number", "room_number", "name", "department", "status", "area", "capacity",
+    "phong", "ma_phong", "so_phong", "ten_phong", "trang_thai"
+  ];
   const scanLimit = Math.min(data.length, 10);
 
   for (let i = 0; i < scanLimit; i++) {
