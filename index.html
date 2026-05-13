@@ -1932,25 +1932,28 @@ function sT(tab, rd) {
   document.getElementById('t3d').classList.toggle('on', tab === '3D');
   const f = document.getElementById('ifr');
 
-  const sanitizedRid = ST.rid.trim().toUpperCase();
-  let imageId = driveImages[sanitizedRid];
-  if (!imageId) {
+  const sanitizedRid = String(ST.rid).trim().toUpperCase();
+  let fileId = driveImages[sanitizedRid];
+  
+  // Quét dự phòng nếu key bị lệch khoảng trắng
+  if (!fileId) {
     for (const [key, value] of Object.entries(driveImages)) {
-      if (key.trim().toUpperCase() === sanitizedRid) { imageId = value; break; }
+      if (String(key).trim().toUpperCase() === sanitizedRid) { fileId = value; break; }
     }
   }
 
   if (tab === '2D') {
-    if (imageId) {
+    if (fileId) {
       f.style.background = '#fff';
       
-      // SỬ DỤNG LINK EMBED/PREVIEW ĐỂ ĐỌC TRỰC TIẾP FILE PDF TRÊN DRIVE
-      const pdfPreviewUrl = `https://drive.google.com/file/d/${imageId}/preview`;
+      // TRƯỜNG HỢP 1: Render trực tiếp bằng khung Preview của Google Drive
+      // Thích hợp cho cả file PDF lẫn file Ảnh
+      const previewUrl = `https://drive.google.com/file/d/${fileId}/preview`;
 
-      // Render bằng thẻ iframe thay vì img để tương thích tuyệt đối với file PDF
-      f.innerHTML = `<iframe src="${pdfPreviewUrl}" 
+      f.innerHTML = `<iframe src="${previewUrl}" 
                              style="width:100%; height:100%; border:none; display:block;" 
                              loading="lazy" 
+                             allow="autoplay"
                              title="Sơ đồ ${ST.rid}">
                      </iframe>`;
     } else {
@@ -1960,8 +1963,8 @@ function sT(tab, rd) {
   } else {
     f.style.background = '#fff3e6';
     f.innerHTML = `<div style="text-align:center;padding:22px 14px"><div style="font-size:42px;margin-bottom:10px">🏛</div><div style="font-size:13px;font-weight:700;color:#002554;margin-bottom:3px">Phối cảnh 3D</div><div style="font-size:11px;color:#8896a8">${ST.rid} — ${rd.name_en}</div></div>`;
-  } // <--- BỔ SUNG DẤU } NÀY ĐỂ ĐỐNG KHỐI ELSE
-} // <--- BỔ SUNG DẤU } NÀY ĐỂ ĐỐNG HÀM sT
+  }
+}
 </script>
 </body>
 </html>
