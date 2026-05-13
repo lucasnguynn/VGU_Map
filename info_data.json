@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 452,
-  "last_updated": "2026-05-13T14:10:45.153Z",
+  "last_updated": "2026-05-13T16:35:00.675Z",
   "data": [
     {
       "sheet_source": "B3",
@@ -3053,8 +3053,8 @@
     {
       "sheet_source": "AD",
       "room_number": "AD-220",
-      "heading_1": "IT Storage",
-      "heading_2": "Kho Thiết bị CNTT",
+      "heading_1": "MSR",
+      "heading_2": "Phòng Marketing và Tuyển sinh",
       "department": "___",
       "occupants_list": [
         "Phạm Chi Mai"
@@ -4871,7 +4871,7 @@
       "area": "985",
       "unbounded_height": "51.9",
       "capacity": "--",
-      "status": "Kh��ng hoạt động",
+      "status": "Không hoạt động",
       "is_active": false,
       "occupants_flat": "Dr. Lê Lam Sơn",
       "occupant_display": "Dr. Lê Lam Sơn"
@@ -6441,7 +6441,7 @@
       "area": "565",
       "unbounded_height": "21.2",
       "capacity": "--",
-      "status": "Ho��t động",
+      "status": "Hoạt động",
       "is_active": true,
       "occupants_flat": "Lâm Thị Hồng Gấm",
       "occupant_display": "Lâm Thị Hồng Gấm"
@@ -6706,7 +6706,8 @@
       "heading_2": "___",
       "department": "___",
       "occupants_list": [
-        "Nguyễn Thị Thanh Hiền"
+        "Nguyễn Thị Thanh Hiền",
+        "Nguyễn Thị Thùy Trang"
       ],
       "fm_room_function": "___",
       "fm_room_type": "___",
@@ -6716,8 +6717,8 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Nguyễn Thị Thanh Hiền",
-      "occupant_display": "Nguyễn Thị Thanh Hiền"
+      "occupants_flat": "Nguyễn Thị Thanh Hiền, Nguyễn Thị Thùy Trang",
+      "occupant_display": "Nguyễn Thị Thanh Hiền, Nguyễn Thị Thùy Trang"
     },
     {
       "sheet_source": "AD",
@@ -6734,7 +6735,7 @@
       "area": "1140",
       "unbounded_height": "64.5",
       "capacity": "--",
-      "status": "Hoạt đ���ng",
+      "status": "Hoạt động",
       "is_active": true,
       "occupants_flat": "Dr. Hà Thúc Viên",
       "occupant_display": "Dr. Hà Thúc Viên"
@@ -7874,7 +7875,7 @@
       "area": "13.33 m²",
       "unbounded_height": "--",
       "capacity": "--",
-      "status": "Hoạt động",
+      "status": "Hoạt ��ộng",
       "is_active": true,
       "occupants_flat": ""
     },
