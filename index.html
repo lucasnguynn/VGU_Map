@@ -1268,6 +1268,7 @@ selRoom.disabled  = true;
 // ═══════════════════════════════════════════════════════════════
 const API_MAP = "./map_data.json";
 const API_INFO = "./info_data.json";
+const API_DRIVE_JSON = './drive_data.json';
 const API_DRIVE_LIST = "https://script.google.com/macros/s/AKfycbw4PtDoCILXSiIn1AAYzJhUhSvmJ6ufKD-5R-QKZGzbBy-yQTfC_bPTKJEErwt1d_iS/exec";
 
 let sheetRoomData = {};
@@ -1275,12 +1276,24 @@ let driveImages = {};
 let isInfoLoaded = false;
 
 async function loadDriveImages() {
+  // Primary: read from static file (fast, cached by browser)
   try {
-    const response = await fetch(API_DRIVE_LIST);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    driveImages = await response.json();
-  } catch (e) { 
-    console.error("❌ Lỗi tải ảnh Drive:", e.message);
+    const res = await fetch(API_DRIVE_JSON, { cache: 'default' });
+    if (!res.ok) throw new Error(`Static file HTTP ${res.status}`);
+    driveImages = await res.json();
+    console.log('✅ Drive images loaded from static JSON');
+    return;
+  } catch (e) {
+    console.warn('⚠️ drive_data.json not available, falling back to live API...');
+  }
+  // Fallback: live API (slower, used only when static file is missing)
+  try {
+    const res = await fetch(API_DRIVE_LIST);
+    if (!res.ok) throw new Error(`API HTTP ${res.status}`);
+    driveImages = await res.json();
+    console.log('✅ Drive images loaded from live API (fallback)');
+  } catch (e) {
+    console.error('❌ Failed to load drive images:', e.message);
   }
 }
 
@@ -1296,13 +1309,9 @@ async function loadDriveImages() {
 async function fetchRoomInfo() {
   if (isInfoLoaded) return; 
   try {
-    // TẠO CHUỖI RANDOM HOẶC TIMESTAMP ĐỂ PHÁ CACHE
-    const noCacheParam = '?t=' + new Date().getTime();
-
-    // Thêm noCacheParam vào sau đuôi link API_INFO
     const [mapRes, infoRes] = await Promise.all([
       fetch(API_MAP),
-      fetch(API_INFO + noCacheParam) // <--- SỬA DÒNG NÀY
+      fetch(API_INFO, { cache: 'default' })
     ]);
 
     if (!mapRes.ok) throw new Error(`HTTP Map ${mapRes.status}`);
