@@ -450,16 +450,16 @@ Bản đồ tự động điều chỉnh theo màn hình. Nhấn vào phòng đ�
         </div>
         <div class="ifrm" id="ifr"></div>
         <div class="mrow">
-          <div class="mv"><div class="mvn" id="rar">—</div><div class="mvl">Area (m²)</div></div>
-          <div class="mv"><div class="mvn" id="rhgt">—</div><div class="mvl">Abound Height (m)</div></div>
-          <div class="mv"><div class="mvn" id="rcp">—</div><div class="mvl">Sức chứa</div></div>
+          <div class="mv"><div class="mvn" id="rar">—</div><div class="mvl">Area</div></div>
+          <div class="mv"><div class="mvn" id="rhgt">—</div><div class="mvl">Abound Height</div></div>
+          <div class="mv"><div class="mvn" id="rcp">—</div><div class="mvl">Capacity</div></div>
         </div>
       </div>
       <div>
         <div id="rbdg" class="rbdg"></div>
         <div class="rnum" id="rnum"></div>
         <div class="rnm" id="rnm"></div>
-        <div class="ib"><div class="il">Occupancy</div><div class="iv" id="rocc"></div></div>
+        <div class="ib"><div class="il">Occupant</div><div class="iv" id="rocc"></div></div>
         <div class="ib"><div class="il">Department</div><div class="iv" id="rdep"></div></div>
         <div class="ib"><div class="il">Room Type</div><div class="iv" id="rtype"></div></div>
         <div class="ib"><div class="il">Room Function</div><div class="iv" id="rfunc"></div></div>
@@ -2025,10 +2025,10 @@ function getRD(rid) {
   }
   
   if (roomInfo) {
-    let occupancy = '__';
+    let occupant = '__';
     // Đảm bảo gộp danh sách người sử dụng bằng ký tự ngắt dòng (\n)
     if (roomInfo.occupants_list && Array.isArray(roomInfo.occupants_list) && roomInfo.occupants_list.length > 0) {
-      occupancy = roomInfo.occupants_list.join('\n'); 
+      occupant = roomInfo.occupants_list.join('\n'); 
     }
 
     return {
@@ -2036,7 +2036,7 @@ function getRD(rid) {
       name_en: roomInfo.heading_1 && roomInfo.heading_1 !== "___" ? roomInfo.heading_1 : `Room ${trimmedRid}`,
       name_vn: roomInfo.heading_2 && roomInfo.heading_2 !== "___" ? roomInfo.heading_2 : `Phòng ${trimmedRid}`,
       department: roomInfo.department || '__', 
-      occupancy: occupancy, 
+      occupant: occupant, 
       area: roomInfo.area || '--', 
       height: roomInfo.unbounded_height || roomInfo.height || '--',
       type: roomInfo.fm_room_type || '--',
@@ -2048,7 +2048,7 @@ function getRD(rid) {
   
   return {
     name_en: `Room ${trimmedRid}`, name_vn: `Phòng ${trimmedRid}`, 
-    department: '--', occupancy: '--', area: '--', height: '--', type: '--', cap: '--', func: '--', status: 'Hoạt động'
+    department: '--', occupant: '--', area: '--', height: '--', type: '--', cap: '--', func: '--', status: 'Hoạt động'
   };
 }
 
@@ -2065,7 +2065,7 @@ function rC(rid) {
   document.getElementById('rhgt').textContent = rd.height;
   document.getElementById('rcp').textContent = rd.cap;
   
-  document.getElementById('rocc').textContent = rd.occupancy; 
+  document.getElementById('rocc').textContent = rd.occupant; 
   document.getElementById('rdep').textContent = rd.department; 
   document.getElementById('rtype').textContent = rd.type; 
   document.getElementById('rfunc').textContent = rd.func;
