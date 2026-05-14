@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 467,
-  "last_updated": "2026-05-14T06:56:38.840Z",
+  "last_updated": "2026-05-14T07:26:39.282Z",
   "data": [
     {
       "sheet_source": "B3",
@@ -596,7 +596,7 @@
       "area": "10.68",
       "unbounded_height": "4000",
       "capacity": "--",
-      "status": "Hoạt ��ộng",
+      "status": "Hoạt động",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -8322,7 +8322,7 @@
       "sheet_source": "AD",
       "room_number": "AD-523",
       "heading_1": "OFFICE",
-      "heading_2": "P. NHÂN VIÊN / KHU VỰC BẾP",
+      "heading_2": "P. NHÂN VIÊN / KHU VỰC B���P",
       "department": "___",
       "occupants_list": [],
       "occupant_display": "",
