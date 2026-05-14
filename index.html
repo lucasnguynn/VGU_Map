@@ -2221,9 +2221,43 @@ function sT(tab, rd) {
               style="width:100%;height:100%;background:linear-gradient(135deg,#0d1117 0%,#0f1f3d 50%,#0d1117 100%);--poster-color:transparent;"
               loading="eager"
             >
-              <div slot="poster" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#0d1117,#0f1f3d);gap:12px;">
-                <div style="width:36px;height:36px;border:3px solid rgba(245,130,32,0.2);border-top-color:#F58220;border-radius:50%;animation:spin .8s linear infinite;"></div>
-                <span style="font-size:12px;color:rgba(255,255,255,0.5);font-family:IBM Plex Sans,sans-serif;">Loading 3D model...</span>
+              <div slot="poster" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#0d1117,#0f1f3d);gap:16px;padding:20px;">
+                
+                <!-- Animated 3D icon -->
+                <div style="position:relative;width:52px;height:52px;margin-bottom:4px;">
+                  <div style="position:absolute;inset:0;border:3px solid rgba(245,130,32,0.15);border-radius:50%;"></div>
+                  <div style="position:absolute;inset:0;border:3px solid transparent;border-top-color:#F58220;border-radius:50%;animation:spin .9s linear infinite;"></div>
+                  <div style="position:absolute;inset:8px;border:2px solid transparent;border-top-color:rgba(245,130,32,0.5);border-radius:50%;animation:spin .6s linear infinite reverse;"></div>
+                  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px;">🏛</div>
+                </div>
+
+                <!-- Label -->
+                <div style="text-align:center;">
+                  <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.85);font-family:IBM Plex Sans,sans-serif;letter-spacing:.04em;">
+                    Loading 3D Model
+                  </div>
+                  <div style="font-size:10px;color:rgba(255,255,255,0.35);font-family:IBM Plex Sans,sans-serif;margin-top:3px;">
+                    ${sanitizedRid3d}
+                  </div>
+                </div>
+
+                <!-- Progress bar track -->
+                <div style="width:180px;display:flex;flex-direction:column;gap:6px;">
+                  <div style="width:100%;height:4px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden;">
+                    <div id="mv-bar-${sanitizedRid3d}" style="height:100%;width:0%;background:linear-gradient(90deg,#F58220,#ff9a40);border-radius:4px;transition:width .3s ease;"></div>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span id="mv-pct-${sanitizedRid3d}" style="font-size:10px;font-weight:700;color:#F58220;font-family:IBM Plex Sans,sans-serif;">0%</span>
+                    <span style="font-size:9px;color:rgba(255,255,255,0.25);font-family:IBM Plex Sans,sans-serif;">via Cloudflare CDN</span>
+                  </div>
+                </div>
+
+                <!-- Size hint -->
+                <div style="font-size:9px;color:rgba(255,255,255,0.2);font-family:IBM Plex Sans,sans-serif;text-align:center;line-height:1.5;">
+                  Large files may take 10–30s on first load<br>
+                  <span style="color:rgba(245,130,32,0.4);">Cached automatically after first load ⚡</span>
+                </div>
+
               </div>
             </model-viewer>
 
@@ -2244,10 +2278,28 @@ function sT(tab, rd) {
       // Attach model-viewer event listeners
       const mv = document.getElementById(`mv-${sanitizedRid3d}`);
       if (mv) {
+
+        // ── PROGRESS: update bar and percentage while downloading ──
+        mv.addEventListener('progress', (e) => {
+          const pct = Math.round((e.detail.totalProgress || 0) * 100);
+          const bar = document.getElementById(`mv-bar-${sanitizedRid3d}`);
+          const label = document.getElementById(`mv-pct-${sanitizedRid3d}`);
+          if (bar)   bar.style.width   = `${pct}%`;
+          if (label) label.textContent = `${pct}%`;
+        });
+
+        // ── LOAD: model fully ready ──
         mv.addEventListener('load', () => {
+          // Ensure bar shows 100% briefly before poster disappears
+          const bar   = document.getElementById(`mv-bar-${sanitizedRid3d}`);
+          const label = document.getElementById(`mv-pct-${sanitizedRid3d}`);
+          if (bar)   bar.style.width   = '100%';
+          if (label) label.textContent = '100%';
+
           // Stop auto-rotate as soon as the user interacts
           mv.addEventListener('camera-change', () => mv.removeAttribute('auto-rotate'), { once: true });
         });
+
         mv.addEventListener('error', () => {
           f.innerHTML = `
             <div style="text-align:center;padding:22px 14px;background:#0d1117;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;">
