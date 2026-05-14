@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 467,
-  "last_updated": "2026-05-14T12:00:55.555Z",
+  "last_updated": "2026-05-14T14:36:17.996Z",
   "data": [
     {
       "sheet_source": "B3",
@@ -4571,9 +4571,9 @@
       "heading_2": "VP LÀM VIỆC BP IT",
       "department": "MSR",
       "occupants_list": [
-        "Phạm Chi Mai\nNguyễn Hoàng Thiên Thư\nTrần Thị Ngọc Thủy\nTô Di��m Huỳnh\nNguyễn Thị Mỹ Hường\nNguyễn Ngọc Anh Thư\nHuỳnh Anh Hậu\nNguyễn Ngọc Thiên Thanh"
+        "Phạm Chi Mai\nNguyễn Hoàng Thiên Thư\nTrần Thị Ngọc Thủy\nTô Diễm Huỳnh\nNguyễn Thị Mỹ Hường\nNguyễn Ngọc Anh Thư\nHuỳnh Anh Hậu\nNguyễn Ngọc Thiên Thanh"
       ],
-      "occupant_display": "Phạm Chi Mai\nNguyễn Hoàng Thiên Thư\nTrần Thị Ngọc Thủy\nTô Di��m Huỳnh\nNguyễn Thị Mỹ Hường\nNguyễn Ngọc Anh Thư\nHuỳnh Anh Hậu\nNguyễn Ngọc Thiên Thanh",
+      "occupant_display": "Phạm Chi Mai\nNguyễn Hoàng Thiên Thư\nTrần Thị Ngọc Thủy\nTô Diễm Huỳnh\nNguyễn Thị Mỹ Hường\nNguyễn Ngọc Anh Thư\nHuỳnh Anh Hậu\nNguyễn Ngọc Thiên Thanh",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE",
       "fm_building_code": "AD",
@@ -4582,7 +4582,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Phạm Chi Mai\nNguyễn Hoàng Thiên Thư\nTrần Thị Ngọc Thủy\nTô Di��m Huỳnh\nNguyễn Thị Mỹ Hường\nNguyễn Ngọc Anh Thư\nHuỳnh Anh Hậu\nNguyễn Ngọc Thiên Thanh"
+      "occupants_flat": "Phạm Chi Mai\nNguyễn Hoàng Thiên Thư\nTrần Thị Ngọc Thủy\nTô Diễm Huỳnh\nNguyễn Thị Mỹ Hường\nNguyễn Ngọc Anh Thư\nHuỳnh Anh Hậu\nNguyễn Ngọc Thiên Thanh"
     },
     {
       "sheet_source": "AD",
@@ -7058,7 +7058,7 @@
       "area": "32",
       "unbounded_height": "4000",
       "capacity": "--",
-      "status": "Ho���t động",
+      "status": "Hoạt động",
       "is_active": true,
       "occupants_flat": "Ms. Nguyễn Thị Khánh Giao\nTrần Hồng Sự\nPhạm Hoàng Sơn"
     },
@@ -7194,7 +7194,7 @@
       "area": "15",
       "unbounded_height": "4000",
       "capacity": "--",
-      "status": "Hoạt động",
+      "status": "Hoạt ��ộng",
       "is_active": true,
       "occupants_flat": "Ms. Tạ Thị Thu Hiền"
     },
