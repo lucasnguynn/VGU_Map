@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 467,
-  "last_updated": "2026-05-14T09:57:35.812Z",
+  "last_updated": "2026-05-14T12:00:55.555Z",
   "data": [
     {
       "sheet_source": "B3",
@@ -2518,7 +2518,7 @@
       "area": "15.45",
       "unbounded_height": "4000",
       "capacity": "--",
-      "status": "Hoạt đ��ng",
+      "status": "Hoạt động",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3490,7 +3490,7 @@
       "area": "11",
       "unbounded_height": "4000",
       "capacity": "--",
-      "status": "Hoạt động",
+      "status": "Hoạt đ���ng",
       "is_active": true,
       "occupants_flat": ""
     },
@@ -3642,7 +3642,7 @@
       "sheet_source": "AD",
       "room_number": "AD-2.LB2",
       "heading_1": "SECURITY LOBBY",
-      "heading_2": "S���NH PHÍA ĐÔNG",
+      "heading_2": "SẢNH PHÍA ĐÔNG",
       "department": "___",
       "occupants_list": [],
       "occupant_display": "",
@@ -4571,9 +4571,9 @@
       "heading_2": "VP LÀM VIỆC BP IT",
       "department": "MSR",
       "occupants_list": [
-        "Phạm Chi Mai\nNguyễn Hoàng Thiên Thư\nTrần Thị Ngọc Thủy\nTô Diễm Huỳnh\nNguyễn Thị Mỹ Hường\nNguyễn Ngọc Anh Thư\nHuỳnh Anh Hậu\nNguyễn Ngọc Thiên Thanh"
+        "Phạm Chi Mai\nNguyễn Hoàng Thiên Thư\nTrần Thị Ngọc Thủy\nTô Di��m Huỳnh\nNguyễn Thị Mỹ Hường\nNguyễn Ngọc Anh Thư\nHuỳnh Anh Hậu\nNguyễn Ngọc Thiên Thanh"
       ],
-      "occupant_display": "Phạm Chi Mai\nNguyễn Hoàng Thiên Thư\nTrần Thị Ngọc Thủy\nTô Diễm Huỳnh\nNguyễn Thị Mỹ Hường\nNguyễn Ngọc Anh Thư\nHuỳnh Anh Hậu\nNguyễn Ngọc Thiên Thanh",
+      "occupant_display": "Phạm Chi Mai\nNguyễn Hoàng Thiên Thư\nTrần Thị Ngọc Thủy\nTô Di��m Huỳnh\nNguyễn Thị Mỹ Hường\nNguyễn Ngọc Anh Thư\nHuỳnh Anh Hậu\nNguyễn Ngọc Thiên Thanh",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE",
       "fm_building_code": "AD",
@@ -4582,7 +4582,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": "Phạm Chi Mai\nNguyễn Hoàng Thiên Thư\nTrần Thị Ngọc Thủy\nTô Diễm Huỳnh\nNguyễn Thị Mỹ Hường\nNguyễn Ngọc Anh Thư\nHuỳnh Anh Hậu\nNguyễn Ngọc Thiên Thanh"
+      "occupants_flat": "Phạm Chi Mai\nNguyễn Hoàng Thiên Thư\nTrần Thị Ngọc Thủy\nTô Di��m Huỳnh\nNguyễn Thị Mỹ Hường\nNguyễn Ngọc Anh Thư\nHuỳnh Anh Hậu\nNguyễn Ngọc Thiên Thanh"
     },
     {
       "sheet_source": "AD",
