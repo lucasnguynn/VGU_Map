@@ -472,7 +472,6 @@ Bản đồ tự động điều chỉnh theo màn hình. Nhấn vào phòng đ�
   </div>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<!-- VGUMap Application Modules -->
 <script type="module" src="./js/config.js"></script>
 <script type="module" src="./js/data-service.js"></script>
 <script type="module" src="./js/room-service.js"></script>
@@ -2025,14 +2024,13 @@ function getRD(rid) {
   }
   
   if (roomInfo) {
-    let occupant = '__';
-    // Đảm bảo gộp danh sách người sử dụng bằng ký tự ngắt dòng (\n)
-    if (roomInfo.occupants_list && Array.isArray(roomInfo.occupants_list) && roomInfo.occupants_list.length > 0) {
+    // Ưu tiên xài trường gộp sẵn từ GS API, fallback sang list hoặc chuỗi đơn
+    let occupant = roomInfo.occupant_display || roomInfo.occupant || '__';
+    if (occupant === '__' && roomInfo.occupants_list && Array.isArray(roomInfo.occupants_list) && roomInfo.occupants_list.length > 0) {
       occupant = roomInfo.occupants_list.join('\n'); 
     }
 
     return {
-      // Bóc tách bạch 2 trường tên: name_en (tiêu đề lớn) và name_vn (tiêu đề nhỏ)
       name_en: roomInfo.heading_1 && roomInfo.heading_1 !== "___" ? roomInfo.heading_1 : `Room ${trimmedRid}`,
       name_vn: roomInfo.heading_2 && roomInfo.heading_2 !== "___" ? roomInfo.heading_2 : `Phòng ${trimmedRid}`,
       department: roomInfo.department || '__', 
@@ -2042,13 +2040,13 @@ function getRD(rid) {
       type: roomInfo.fm_room_type || '--',
       cap: roomInfo.capacity || '--', 
       func: roomInfo.fm_room_function || '--',
-      status: roomInfo.status || 'Hoạt động'
+      status: (roomInfo.status !== undefined && roomInfo.status !== null) ? roomInfo.status : ''
     };
   }
   
   return {
     name_en: `Room ${trimmedRid}`, name_vn: `Phòng ${trimmedRid}`, 
-    department: '--', occupant: '--', area: '--', height: '--', type: '--', cap: '--', func: '--', status: 'Hoạt động'
+    department: '--', occupant: '--', area: '--', height: '--', type: '--', cap: '--', func: '--', status: ''
   };
 }
 
@@ -2075,13 +2073,15 @@ function rC(rid) {
   document.getElementById('rnm').textContent = rd.name_en || "___";
   
   const badge = document.getElementById('rbdg');
-  badge.textContent = rd.status.toUpperCase();
+  // Xử lý linh hoạt trạng thái rỗng từ Sheets API để tô màu hợp lý
+  const currentStatus = rd.status ? rd.status.trim().toUpperCase() : 'AVAILABLE';
+  badge.textContent = currentStatus;
   
-  if (rd.status === 'Hoạt động') {
+  if (currentStatus === 'AVAILABLE' || currentStatus === 'HOẠT ĐỘNG' || currentStatus === 'ĐANG SỬ DỤNG') {
     badge.style.background = '#e6f5ec';
     badge.style.color = '#083a18';
     badge.style.border = '1px solid #408060';
-  } else if (rd.status === 'Bảo trì' || rd.status === 'Sửa chữa') {
+  } else if (currentStatus.includes('BẢO TRÌ') || currentStatus.includes('SỬA CHỮA')) {
     badge.style.background = '#fffbf0';
     badge.style.color = '#c9661a';
     badge.style.border = '1px solid #f58220';
@@ -2131,7 +2131,6 @@ function sT(tab, rd) {
       f.innerHTML = `
         <div style="width:100%;height:100%;position:relative;display:flex;flex-direction:column;">
           
-          <!-- Thanh toolbar nhỏ -->
           <div style="
             display:flex;align-items:center;justify-content:space-between;
             padding:6px 10px;background:#f0f3fa;border-bottom:1px solid #dde2ec;
@@ -2152,7 +2151,6 @@ function sT(tab, rd) {
             </div>
           </div>
 
-          <!-- iframe viewer -->
           <div style="flex:1;position:relative;">
             <iframe 
               id="pdf-iframe-${sanitizedRid}"
@@ -2163,7 +2161,6 @@ function sT(tab, rd) {
               onload="onIframeLoad(this)"
               onerror="onIframeError('${fileId}','${sanitizedRid}')">
             </iframe>
-            <!-- Loading spinner -->
             <div id="pdf-loading-${sanitizedRid}" style="
               position:absolute;inset:0;display:flex;flex-direction:column;
               align-items:center;justify-content:center;background:#f8f9fc;
