@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 399,
-  "last_updated": "2026-05-14T00:12:18.206Z",
+  "last_updated": "2026-05-14T03:30:39.433Z",
   "data": [
     {
       "sheet_source": "B3",
@@ -2951,8 +2951,10 @@
       "heading_1": "Reception Desk",
       "heading_2": "Quầy Lễ tân",
       "department": "___",
-      "occupants_list": [],
-      "occupant_display": "",
+      "occupants_list": [
+        "Trần B"
+      ],
+      "occupant_display": "Trần B",
       "fm_room_function": "Data Control",
       "fm_room_type": "Operations",
       "fm_building_code": "AD",
@@ -2961,7 +2963,7 @@
       "capacity": "--",
       "status": "Hoạt động",
       "is_active": true,
-      "occupants_flat": ""
+      "occupants_flat": "Trần B"
     },
     {
       "sheet_source": "AD",
@@ -6250,7 +6252,7 @@
       "area": "1455",
       "unbounded_height": "83.2",
       "capacity": "--",
-      "status": "Hoạt ��ộng",
+      "status": "Hoạt động",
       "is_active": true,
       "occupants_flat": ""
     },
