@@ -1343,18 +1343,30 @@ selRoom.disabled  = true;
 const API_MAP = "./map_data.json";
 const API_INFO = "./info_data.json";
 const API_DRIVE_JSON = './drive_data.json';
-const WORKER_3D_BASE    = "https://vgumap-3d-proxy.106240409.workers.dev/";
+const WORKER_3D_BASE    = "https://vgumap-3d-proxy.106240409.workers.dev/ ";
 const API_DRIVE_3D_JSON = './drive_3d.json';
+const API_DRIVE_3D_LIVE = "https://script.google.com/macros/s/AKfycbzCwPiO80CZbpa1VzMwoqLDGDx7m1iA91TT1YciQnA0nMmpXvh7X7a1Jr9xhi9OB4OGSA/exec ";
 let drive3dData = {};
 
 async function loadDrive3dData() {
+  // Primary: load from static file (fast, cached)
   try {
     const res = await fetch(`${API_DRIVE_3D_JSON}?v=${dataVersion}`, { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     drive3dData = await res.json();
-    console.log('✅ 3D Drive data loaded:', Object.keys(drive3dData).length, 'rooms');
+    console.log('✅ 3D Drive data loaded from drive_3d.json:', Object.keys(drive3dData).length, 'rooms');
+    return;
   } catch (e) {
-    console.warn('⚠️ drive_3d.json not available:', e.message);
+    console.warn('⚠️ drive_3d.json not available, falling back to live API...');
+  }
+  // Fallback: live Google Apps Script API
+  try {
+    const res = await fetch(`${API_DRIVE_3D_LIVE}?v=${dataVersion}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    drive3dData = await res.json();
+    console.log('✅ 3D Drive data loaded from live API:', Object.keys(drive3dData).length, 'rooms');
+  } catch (e) {
+    console.error('❌ Failed to load 3D drive data:', e.message);
   }
 }
 const API_DRIVE_LIST = "https://script.google.com/macros/s/AKfycbw4PtDoCILXSiIn1AAYzJhUhSvmJ6ufKD-5R-QKZGzbBy-yQTfC_bPTKJEErwt1d_iS/exec";
