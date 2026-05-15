@@ -1,0 +1,6 @@
+name = "vgumap-3d-proxy"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+[vars]
+VGUMAP_3D_VIEW = "your-api-key-here"

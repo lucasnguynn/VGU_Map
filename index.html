@@ -2190,7 +2190,9 @@ function sT(tab, rd) {
     }
 
     if (glbFileId) {
-      const proxyUrl = `${WORKER_3D_BASE}?id=${glbFileId}`;
+      // Add cache-busting timestamp to force fresh fetch on first load
+      // Dividing by 86400000 (ms per day) means cache busts once per day, not every load
+      const proxyUrl = `${WORKER_3D_BASE}?id=${glbFileId}&t=${Math.floor(Date.now() / 86400000)}`;
 
       f.style.background = '#0d1117';
       f.innerHTML = `
