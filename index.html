@@ -1343,32 +1343,7 @@ selRoom.disabled  = true;
 const API_MAP = "./map_data.json";
 const API_INFO = "./info_data.json";
 const API_DRIVE_JSON = './drive_data.json';
-const WORKER_3D_BASE    = "https://vgumap-3d-proxy.106240409.workers.dev/";
-const API_DRIVE_3D_JSON = './drive_3d.json';
-const API_DRIVE_3D_LIVE = "https://script.google.com/macros/s/AKfycbzCwPiO80CZbpa1VzMwoqLDGDx7m1iA91TT1YciQnA0nMmpXvh7X7a1Jr9xhi9OB4OGSA/exec";
-let drive3dData = {};
 
-async function loadDrive3dData() {
-  // Primary: load from static file (fast, cached)
-  try {
-    const res = await fetch(`${API_DRIVE_3D_JSON}?v=${dataVersion}`, { cache: 'no-store' });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    drive3dData = await res.json();
-    console.log('✅ 3D Drive data loaded from drive_3d.json:', Object.keys(drive3dData).length, 'rooms');
-    return;
-  } catch (e) {
-    console.warn('⚠️ drive_3d.json not available, falling back to live API...');
-  }
-  // Fallback: live Google Apps Script API
-  try {
-    const res = await fetch(`${API_DRIVE_3D_LIVE}?v=${dataVersion}`, { cache: 'no-store' });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    drive3dData = await res.json();
-    console.log('✅ 3D Drive data loaded from live API:', Object.keys(drive3dData).length, 'rooms');
-  } catch (e) {
-    console.error('❌ Failed to load 3D drive data:', e.message);
-  }
-}
 const API_DRIVE_LIST = "https://script.google.com/macros/s/AKfycbw4PtDoCILXSiIn1AAYzJhUhSvmJ6ufKD-5R-QKZGzbBy-yQTfC_bPTKJEErwt1d_iS/exec";
 const DATA_REFRESH_INTERVAL_MS = 5 * 60 * 1000;
 let dataVersion = Date.now();
@@ -1527,7 +1502,7 @@ async function refreshDataAndRerender() {
   setStatus('loading', 'Đang đồng bộ dữ liệu mới nhất...');
   try {
     isInfoLoaded = false;
-    await Promise.all([loadDriveImages(), loadDrive3dData(), fetchRoomInfo()]);
+    await Promise.all([loadDriveImages(), fetchRoomInfo()]);
     const hash = stableHash({ b: BUILDINGS.map(x => [x.code, x.rooms.length]), i: Object.keys(sheetRoomData).length, d: Object.keys(driveImages).length });
     const changed = hash !== lastDataHash;
     lastDataHash = hash;
@@ -2175,155 +2150,62 @@ function sT(tab, rd) {
       f.innerHTML = `<div style="text-align:center;padding:22px 14px"><div style="font-size:42px;margin-bottom:10px">📐</div><div style="font-size:13px;font-weight:700;color:#002554;">Chưa có sơ đồ 2D cho phòng <b>${sanitizedRid}</b></div></div>`;
     }
 
-  // ─── TAB 2: PHỐI CẢNH 3D ───
+ // ─── TAB 2: PHỐI CẢNH 3D ───
   } else if (tab === '3D') {
 
+    // 1. Lấy mã phòng hiện tại từ hệ thống (Ví dụ: "AD-431")
     const sanitizedRid3d = String(ST.rid).trim().toUpperCase();
 
-    // Look up the File ID from drive3dData
-    let glbFileId = null;
-    for (const [key, value] of Object.entries(drive3dData)) {
-      if (String(key).trim().toUpperCase() === sanitizedRid3d) {
-        glbFileId = value;
-        break;
-      }
-    }
+    // 2. Tự động tạo đường dẫn dựa trên mã phòng
+    // Dấu ./ nghĩa là tìm thư mục models nằm ngay cạnh file index.html
+    const modelPath = `./models/${sanitizedRid3d}.glb`;
 
-    if (glbFileId) {
-      // Add cache-busting timestamp to force fresh fetch on first load
-      // Dividing by 86400000 (ms per day) means cache busts once per day, not every load
-      const proxyUrl = `${WORKER_3D_BASE}?id=${glbFileId}&t=${Math.floor(Date.now() / 86400000)}`;
+    const f = document.getElementById('ifr');
+    f.style.background = '#0d1117';
+    
+    f.innerHTML = `
+      <div style="width:100%;height:100%;position:relative;display:flex;flex-direction:column;background:#0d1117;border-radius:6px;overflow:hidden;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:rgba(0,37,84,0.95);border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:13px;">🏛</span>
+            <span style="font-size:11px;font-weight:700;color:#fff;letter-spacing:.04em;">${sanitizedRid3d}</span>
+            <span style="font-size:10px;color:rgba(255,255,255,0.45);">— 3D View</span>
+          </div>
+        </div>
 
-      f.style.background = '#0d1117';
-      f.innerHTML = `
-        <div style="width:100%;height:100%;position:relative;display:flex;flex-direction:column;background:#0d1117;border-radius:6px;overflow:hidden;">
-
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:rgba(0,37,84,0.95);border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span style="font-size:13px;">🏛</span>
-              <span style="font-size:11px;font-weight:700;color:#fff;letter-spacing:.04em;">${sanitizedRid3d}</span>
-              <span style="font-size:10px;color:rgba(255,255,255,0.45);">— 3D View</span>
+        <div style="flex:1;position:relative;min-height:0;">
+          <model-viewer
+            id="mv-${sanitizedRid3d}"
+            src="${modelPath}" 
+            alt="3D model of room ${sanitizedRid3d}"
+            camera-controls
+            auto-rotate
+            shadow-intensity="1"
+            environment-image="neutral"
+            style="width:100%;height:100%;background:linear-gradient(135deg,#0d1117,#0f1f3d);"
+            loading="eager"
+          >
+            <div slot="poster" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0d1117;color:#fff;">
+                <div class="spinner" style="margin-bottom:10px;"></div>
+                <div style="font-size:12px;">Đang tải mô hình ${sanitizedRid3d}...</div>
             </div>
-          </div>
+          </model-viewer>
+        </div>
+      </div>`;
 
-          <div style="flex:1;position:relative;min-height:0;">
-            <model-viewer
-              id="mv-${sanitizedRid3d}"
-              src="${proxyUrl}"
-              alt="3D model of room ${sanitizedRid3d}"
-              camera-controls
-              auto-rotate
-              auto-rotate-delay="2000"
-              rotation-per-second="20deg"
-              shadow-intensity="1.2"
-              shadow-softness="0.8"
-              exposure="1.1"
-              environment-image="neutral"
-              tone-mapping="commerce"
-              style="width:100%;height:100%;background:linear-gradient(135deg,#0d1117 0%,#0f1f3d 50%,#0d1117 100%);--poster-color:transparent;"
-              loading="eager"
-            >
-              <div slot="poster" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#0d1117,#0f1f3d);gap:16px;padding:20px;">
-                
-                <!-- Animated 3D icon -->
-                <div style="position:relative;width:52px;height:52px;margin-bottom:4px;">
-                  <div style="position:absolute;inset:0;border:3px solid rgba(245,130,32,0.15);border-radius:50%;"></div>
-                  <div style="position:absolute;inset:0;border:3px solid transparent;border-top-color:#F58220;border-radius:50%;animation:spin .9s linear infinite;"></div>
-                  <div style="position:absolute;inset:8px;border:2px solid transparent;border-top-color:rgba(245,130,32,0.5);border-radius:50%;animation:spin .6s linear infinite reverse;"></div>
-                  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px;">🏛</div>
-                </div>
-
-                <!-- Label -->
-                <div style="text-align:center;">
-                  <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.85);font-family:IBM Plex Sans,sans-serif;letter-spacing:.04em;">
-                    Loading 3D Model
-                  </div>
-                  <div style="font-size:10px;color:rgba(255,255,255,0.35);font-family:IBM Plex Sans,sans-serif;margin-top:3px;">
-                    ${sanitizedRid3d}
-                  </div>
-                </div>
-
-                <!-- Progress bar track -->
-                <div style="width:180px;display:flex;flex-direction:column;gap:6px;">
-                  <div style="width:100%;height:4px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden;">
-                    <div id="mv-bar-${sanitizedRid3d}" style="height:100%;width:0%;background:linear-gradient(90deg,#F58220,#ff9a40);border-radius:4px;transition:width .3s ease;"></div>
-                  </div>
-                  <div style="display:flex;justify-content:space-between;align-items:center;">
-                    <span id="mv-pct-${sanitizedRid3d}" style="font-size:10px;font-weight:700;color:#F58220;font-family:IBM Plex Sans,sans-serif;">0%</span>
-                    <span style="font-size:9px;color:rgba(255,255,255,0.25);font-family:IBM Plex Sans,sans-serif;">via Cloudflare CDN</span>
-                  </div>
-                </div>
-
-                <!-- Size hint -->
-                <div style="font-size:9px;color:rgba(255,255,255,0.2);font-family:IBM Plex Sans,sans-serif;text-align:center;line-height:1.5;">
-                  Large files may take 10–30s on first load<br>
-                  <span style="color:rgba(245,130,32,0.4);">Cached automatically after first load ⚡</span>
-                </div>
-
-              </div>
-            </model-viewer>
-
-            <div id="mv-hint-${sanitizedRid3d}" style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:5px 14px;font-size:10px;color:rgba(255,255,255,0.7);font-family:IBM Plex Sans,sans-serif;display:flex;align-items:center;gap:8px;pointer-events:none;z-index:5;transition:opacity .5s;">
-              <span>🖱 Drag to rotate</span><span style="opacity:.4">|</span>
-              <span>⚲ Scroll to zoom</span><span style="opacity:.4">|</span>
-              <span>2-finger pan</span>
+    const mv = document.getElementById(`mv-${sanitizedRid3d}`);
+    if (mv) {
+      // Nếu file .glb không tồn tại trong thư mục models, hiện thông báo lỗi
+      mv.addEventListener('error', () => {
+        f.innerHTML = `
+          <div style="text-align:center;padding:22px 14px;background:#0d1117;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;">
+            <div style="font-size:38px;">⚠️</div>
+            <div style="font-size:13px;font-weight:700;color:#fff;">Chưa có dữ liệu 3D</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.45);max-width:240px;line-height:1.5;">
+                Hệ thống không tìm thấy file <code style="color:#F58220;">models/${sanitizedRid3d}.glb</code> trên GitHub.
             </div>
-          </div>
-        </div>`;
-
-      // Auto-hide the hint overlay after 4 seconds
-      setTimeout(() => {
-        const hint = document.getElementById(`mv-hint-${sanitizedRid3d}`);
-        if (hint) hint.style.opacity = '0';
-      }, 4000);
-
-      // Attach model-viewer event listeners
-      const mv = document.getElementById(`mv-${sanitizedRid3d}`);
-      if (mv) {
-
-        // ── PROGRESS: update bar and percentage while downloading ──
-        mv.addEventListener('progress', (e) => {
-          const pct = Math.round((e.detail.totalProgress || 0) * 100);
-          const bar = document.getElementById(`mv-bar-${sanitizedRid3d}`);
-          const label = document.getElementById(`mv-pct-${sanitizedRid3d}`);
-          if (bar)   bar.style.width   = `${pct}%`;
-          if (label) label.textContent = `${pct}%`;
-        });
-
-        // ── LOAD: model fully ready ──
-        mv.addEventListener('load', () => {
-          // Ensure bar shows 100% briefly before poster disappears
-          const bar   = document.getElementById(`mv-bar-${sanitizedRid3d}`);
-          const label = document.getElementById(`mv-pct-${sanitizedRid3d}`);
-          if (bar)   bar.style.width   = '100%';
-          if (label) label.textContent = '100%';
-
-          // Stop auto-rotate as soon as the user interacts
-          mv.addEventListener('camera-change', () => mv.removeAttribute('auto-rotate'), { once: true });
-        });
-
-        mv.addEventListener('error', () => {
-          f.innerHTML = `
-            <div style="text-align:center;padding:22px 14px;background:#0d1117;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;">
-              <div style="font-size:38px;">⚠️</div>
-              <div style="font-size:13px;font-weight:700;color:#fff;">Failed to load 3D model</div>
-              <div style="font-size:11px;color:rgba(255,255,255,0.45);max-width:200px;line-height:1.5;">The .glb file may not be publicly shared or the URL is invalid.</div>
-              <button onclick="sT('3D')" style="margin-top:6px;padding:6px 16px;background:#F58220;color:#fff;border:none;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;font-family:IBM Plex Sans,sans-serif;">Retry</button>
-            </div>`;
-        });
-      }
-
-    } else {
-      // No .glb file found for this room
-      f.style.background = '#0d1117';
-      f.innerHTML = `
-        <div style="text-align:center;padding:22px 14px;background:linear-gradient(135deg,#0d1117,#0f1f3d);height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border-radius:6px;">
-          <div style="font-size:42px;margin-bottom:4px;">🏛</div>
-          <div style="font-size:13px;font-weight:700;color:#fff;">No 3D model available</div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.4);line-height:1.6;max-width:200px;">
-            Room <b style="color:rgba(255,255,255,0.7)">${sanitizedRid3d}</b><br>does not have a .glb file in the system yet.
-          </div>
-        </div>`;
+          </div>`;
+      });
     }
 
   // ─── TAB 3: ẢNH THỰC TẾ (MỚI) ───
