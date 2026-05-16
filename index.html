@@ -14,6 +14,10 @@
 body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--bl)}
 .page{display:none}
 .page.active{display:block;animation:fu .35s cubic-bezier(.2,.8,.2,1) forwards}
+#pg-m.active{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+#pg-m .pc{flex:1;min-height:0;display:flex;flex-direction:column;padding:10px 20px 10px;overflow:hidden}
+#pg-m .mleg{flex-shrink:0;margin-bottom:8px}
+#pg-m .mtip{flex-shrink:0;margin-top:8px}
 @keyframes fu{from{opacity:0;transform:translateY(12px) scale(.99)}to{opacity:1;transform:none}}
 @keyframes spin {
   from { transform: rotate(0deg); }
@@ -220,33 +224,34 @@ input.c1-select::-webkit-search-cancel-button { display: none; }
    PREMIUM MAP CONTAINER — Interactive Viewport with Blueprint Grid
    ═══════════════════════════════════════════════════════════════ */
 .map-wrap {
+  flex: 1;
+  min-height: 0;
   width: 100%;
-  height: calc(100vh - 250px);
-  min-height: 400px;
   background-color: #eef2f9;
-  /* Premium blueprint grid pattern */
-  background-image: 
+  background-image:
     linear-gradient(rgba(0, 37, 84, 0.04) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0, 37, 84, 0.04) 1px, transparent 1px);
   background-size: 24px 24px;
   border: 1.5px solid var(--gl);
   border-radius: 10px;
-  overflow: auto;
+  overflow: hidden;
   touch-action: pan-x pan-y;
   position: relative;
   z-index: 1;
   box-shadow: inset 0 2px 8px rgba(0, 37, 84, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Kích hoạt kích thước hiển thị lớn cho bản đồ SVG bên trong container */
+/* SVG scales to fill container while preserving aspect ratio */
 .map-wrap svg {
-  width: 100%;
-  min-width: 1300px; /* Ép sơ đồ rộng tối thiểu 1300px để cụm phòng ở giữa to và rõ chữ */
-  height: auto;
   display: block;
-  margin: 20px auto;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
 }
-
 
 /* Room path styling with modern aesthetics */
 .map-wrap path {
@@ -1930,7 +1935,7 @@ async function loadMapFromSheets(fid) {
       rooms[rNum].maxY = Math.max(rooms[rNum].maxY, sy, ey);
     });
 
-    let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${vbW} ${vbH}" style="width:100%;height:auto;display:block">
+    let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${vbW} ${vbH.toFixed(2)}" width="${vbW}" height="${vbH.toFixed(2)}" style="display:block">
       <rect x="0" y="0" width="${vbW}" height="${vbH}" fill="#eef2f9"/>`;
       
     const backgroundLayer = [];
@@ -2046,31 +2051,6 @@ async function renderMap(bid, fid, n) {
     const sheetSvg = await loadMapFromSheets(fid);
     if (sheetSvg) {
       out.innerHTML = sheetSvg;
-      
-      // ── AD BUILDING ONLY: Dynamic bounds fitting for proper zoom level ──
-      // Only applies to Administration building floors, never touches other buildings
-      if (bid === 'bld_ad') {
-        setTimeout(() => {
-          if (lMap) {
-            lMap.invalidateSize();
-            
-            // Calculate bounds from the rendered SVG content
-            const svgEl = out.querySelector('svg');
-            if (svgEl && lMap) {
-              // For AD floors, use a tighter fit with dynamic maxZoom based on floor
-              // Floors 5-6 have smaller footprints so they need higher maxZoom
-              const adMaxZoom = (n === 5 || n === 6) ? 3 : 2;
-              
-              // Use the existing globalBounds but apply AD-specific fitBounds settings
-              lMap.fitBounds(globalBounds, { 
-                maxZoom: adMaxZoom, 
-                animate: true,
-                padding: [50, 50]
-              });
-            }
-          }
-        }, 150);
-      }
     } else {
       out.innerHTML = `<svg viewBox="0 0 800 280" style="width:100%;height:auto;display:block">
         <rect width="800" height="280" fill="#edf0f8"/>
