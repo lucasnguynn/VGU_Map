@@ -7,7 +7,7 @@
  * - Query-string-safe matching for cache-busted URLs (?v=timestamp).
  */
 
-const SW_VERSION = 'v4.1.0';
+const SW_VERSION = '__AUTO_SW_VERSION__';
 const STATIC_CACHE = `vgumap-static-${SW_VERSION}`;
 const DATA_CACHE = `vgumap-data-${SW_VERSION}`;
 
@@ -71,10 +71,35 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  event.respondWith(staleWhileRevalidateShell(request));
+  if (isAppShellEntry(url.pathname)) {
+    event.respondWith(networkFirstShell(request));
+    return;
+  }
+
+  event.respondWith(staleWhileRevalidateStatic(request));
 });
 
-async function staleWhileRevalidateShell(request) {
+function isAppShellEntry(pathname) {
+  return pathname === '/' || pathname === '/index.html';
+}
+
+async function networkFirstShell(request) {
+  const cacheKey = normalizedRequest(request);
+  const cache = await caches.open(STATIC_CACHE);
+  const cached = await cache.match(cacheKey, { ignoreSearch: true });
+
+  try {
+    const networkRes = await fetch(request, { cache: 'no-store' });
+    if (networkRes && networkRes.ok) await putIfOk(STATIC_CACHE, request, networkRes);
+    return networkRes;
+  } catch (_) {
+    if (cached) return cached;
+
+    return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
+  }
+}
+
+async function staleWhileRevalidateStatic(request) {
   const cacheKey = normalizedRequest(request);
   const cache = await caches.open(STATIC_CACHE);
   const cached = await cache.match(cacheKey, { ignoreSearch: true });
