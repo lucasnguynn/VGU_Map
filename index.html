@@ -1836,7 +1836,11 @@ async function loadMapFromSheets(fid) {
     if (bldObj) {
       targetBldCode = bldInternalId.split('_')[1].toUpperCase();
     }
-    const floorPrefix = `${targetBldCode}-${fNum}`; 
+    const floorPrefix = `${targetBldCode}-${fNum}`;
+    
+    // ── AD BUILDING ONLY: Coordinate outlier filter for Floors 5-6 ──
+    const isADBuilding = (bldInternalId === 'bld_ad');
+    const isADFloor5or6 = isADBuilding && (parseInt(fNum) === 5 || parseInt(fNum) === 6);
 
     let globalMinX = Infinity, globalMinY = Infinity;
     let globalMaxX = -Infinity, globalMaxY = -Infinity;
@@ -1849,6 +1853,18 @@ async function loadMapFromSheets(fid) {
       if (rn.startsWith(`${targetBldCode}-`) || rn.includes(`-${targetBldCode}-`) || rn.startsWith(targetBldCode)) {
         let sx = parseFloat(d.StartX) || 0, sy = parseFloat(d.StartY) || 0;
         let ex = parseFloat(d.EndX) || 0, ey = parseFloat(d.EndY) || 0;
+
+        // ── AD Floors 5-6 ONLY: Filter out erroneous outlier coordinates ──
+        // These floors have bad data with coords far outside the true cluster bounding box
+        if (isADFloor5or6) {
+          // For AD-5/6, valid X range is roughly -60000 to -25000, Y range is ~234000 to ~277000
+          // Skip segments that are vastly outside this expected cluster
+          const ad56ValidMinX = -70000, ad56ValidMaxX = -20000;
+          const ad56ValidMinY = 230000, ad56ValidMaxY = 280000;
+          
+          if (sx < ad56ValidMinX || sx > ad56ValidMaxX || ex < ad56ValidMinX || ex > ad56ValidMaxX) return;
+          if (sy < ad56ValidMinY || sy > ad56ValidMaxY || ey < ad56ValidMinY || ey > ad56ValidMaxY) return;
+        }
 
         globalMinX = Math.min(globalMinX, sx, ex);
         globalMaxX = Math.max(globalMaxX, sx, ex);
@@ -1904,6 +1920,15 @@ async function loadMapFromSheets(fid) {
       }
       let sx = parseFloat(d.StartX) || 0, sy = parseFloat(d.StartY) || 0;
       let ex = parseFloat(d.EndX) || 0, ey = parseFloat(d.EndY) || 0;
+
+      // ── AD Floors 5-6 ONLY: Apply same coordinate filter when building room paths ──
+      if (isADFloor5or6) {
+        const ad56ValidMinX = -70000, ad56ValidMaxX = -20000;
+        const ad56ValidMinY = 230000, ad56ValidMaxY = 280000;
+        
+        if (sx < ad56ValidMinX || sx > ad56ValidMaxX || ex < ad56ValidMinX || ex > ad56ValidMaxX) return;
+        if (sy < ad56ValidMinY || sy > ad56ValidMaxY || ey < ad56ValidMinY || ey > ad56ValidMaxY) return;
+      }
 
       rooms[rNum].paths.push({sx, sy, ex, ey});
       rooms[rNum].minX = Math.min(rooms[rNum].minX, sx, ex);
@@ -2029,6 +2054,31 @@ async function renderMap(bid, fid, n) {
     const sheetSvg = await loadMapFromSheets(fid);
     if (sheetSvg) {
       out.innerHTML = sheetSvg;
+      
+      // ── AD BUILDING ONLY: Dynamic bounds fitting for proper zoom level ──
+      // Only applies to Administration building floors, never touches other buildings
+      if (bid === 'bld_ad') {
+        setTimeout(() => {
+          if (lMap) {
+            lMap.invalidateSize();
+            
+            // Calculate bounds from the rendered SVG content
+            const svgEl = out.querySelector('svg');
+            if (svgEl && lMap) {
+              // For AD floors, use a tighter fit with dynamic maxZoom based on floor
+              // Floors 5-6 have smaller footprints so they need higher maxZoom
+              const adMaxZoom = (n === 5 || n === 6) ? 3 : 2;
+              
+              // Use the existing globalBounds but apply AD-specific fitBounds settings
+              lMap.fitBounds(globalBounds, { 
+                maxZoom: adMaxZoom, 
+                animate: true,
+                padding: [50, 50]
+              });
+            }
+          }
+        }, 150);
+      }
     } else {
       out.innerHTML = `<svg viewBox="0 0 800 280" style="width:100%;height:auto;display:block">
         <rect width="800" height="280" fill="#edf0f8"/>
