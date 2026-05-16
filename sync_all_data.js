@@ -60,7 +60,7 @@ async function run() {
   extractArray(mapPayload, 'MAP');
   writeJsonAtomic(OUTPUT.MAP, mapPayload);
 
-  const infoPayload = await fetchJson(`${API_ENDPOINTS.INFO}?v=${Date.now()}`);
+  const infoPayload = await fetchJson(`${API_ENDPOINTS.INFO}?nocache=true&v=${Date.now()}`);
   writeJsonAtomic(OUTPUT.INFO, normalizeInfo(infoPayload));
 
   const drivePayload = await fetchJson(`${API_ENDPOINTS.DRIVE}?v=${Date.now()}`);
