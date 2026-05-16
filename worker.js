@@ -22,17 +22,17 @@ export default {
     // ============================================================
     const noCachePaths = ["/", "/index.html", "/sw.js"];
     if (noCachePaths.includes(pathname)) {
-      // Fetch from origin (R2, KV, or upstream) - adjust based on your hosting setup
-      // For this example, we assume assets are in a bucket or can be fetched from origin
-      const originResponse = await fetch(request);
-      
+      const originResponse = await fetch(request, {
+        cf: { cacheTtl: 0, cacheEverything: false },
+      });
+
       const headers = new Headers(originResponse.headers);
       // Strict no-cache headers to disable ALL caching
       headers.set("Cache-Control", "no-cache, no-store, must-revalidate");
       headers.set("Pragma", "no-cache");
       headers.set("Expires", "0");
       headers.set("Access-Control-Allow-Origin", "*");
-      
+
       return new Response(originResponse.body, {
         status: originResponse.status,
         headers,
@@ -40,38 +40,24 @@ export default {
     }
 
     // ============================================================
-    // JSON DATA PROXY: Bypass Cloudflare Cache for Fresh Data
-    // Proxies map_data.json, info_data.json, drive_data.json from Google Apps Script
-    // Uses cf: { cacheTtl: 0 } to force fresh fetch from origin every time
+    // JSON DATA FILES: Serve static JSON with no-cache headers
+    // These are static files committed to the repo — serve directly
+    // from origin with headers that prevent stale caching.
     // ============================================================
     const jsonPaths = ["/map_data.json", "/info_data.json", "/drive_data.json"];
     if (jsonPaths.includes(pathname)) {
-      // Assuming these are hosted on Google Apps Script or similar
-      // Replace with your actual Google Apps Script URLs
-      const googleScriptBaseUrl = env.GOOGLE_SCRIPT_BASE_URL || "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec";
-      const dataType = pathname.replace("/", "").replace(".json", "");
-      const targetUrl = `${googleScriptBaseUrl}?type=${dataType}`;
-      
-      // Fetch with cache bypass using cf options
-      const response = await fetch(targetUrl, {
-        method: "GET",
-        headers: {
-          "Accept": "application/json",
-        },
-        cf: {
-          cacheTtl: 0, // Disable Cloudflare edge caching
-          cacheEverything: false,
-        },
+      const originResponse = await fetch(request, {
+        cf: { cacheTtl: 0, cacheEverything: false },
       });
-      
-      const headers = new Headers(response.headers);
-      headers.set("Access-Control-Allow-Origin", "*");
+
+      const headers = new Headers(originResponse.headers);
       headers.set("Cache-Control", "no-cache, no-store, must-revalidate");
       headers.set("Pragma", "no-cache");
       headers.set("Expires", "0");
-      
-      return new Response(response.body, {
-        status: response.status,
+      headers.set("Access-Control-Allow-Origin", "*");
+
+      return new Response(originResponse.body, {
+        status: originResponse.status,
         headers,
       });
     }

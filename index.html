@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi" data-app-version="__APP_VERSION__">
+<html lang="vi" data-app-version="20260516150747">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -2346,6 +2346,11 @@ if ('serviceWorker' in navigator) {
             if (doRefresh) newWorker.postMessage({ type: 'SKIP_WAITING' });
           });
         };
+
+        // Handle already-waiting worker (user reopened tab after partial update)
+        if (registration.waiting) {
+          promptAndActivateUpdate(registration.waiting);
+        }
 
         promptAndActivateUpdate(registration.installing);
         registration.addEventListener('updatefound', () => {

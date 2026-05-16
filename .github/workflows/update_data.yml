@@ -31,13 +31,16 @@ jobs:
       - name: Run unified data sync script
         run: node sync_all_data.js
 
-      - name: Commit and push changes (only if info_data.json changed)
+      - name: Stamp PWA build version into sw.js and index.html
+        run: node build_pwa.js
+
+      - name: Commit and push changes
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add info_data.json drive_data.json
+          git add info_data.json drive_data.json map_data.json sw.js index.html
           if ! git diff --staged --quiet; then
-            git commit -m "chore: auto-update info_data.json [skip ci]"
+            git commit -m "chore: auto-update data and stamp PWA version [skip ci]"
             git pull --rebase origin main
             git push
           else
