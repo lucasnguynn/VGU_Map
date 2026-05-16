@@ -40,18 +40,29 @@ export default {
     }
 
     // ============================================================
-    // JSON DATA FILES: Serve static JSON with no-cache headers
-    // These are static files committed to the repo — serve directly
-    // from origin with headers that prevent stale caching.
+    // JSON DATA FILES: Network-First with strict no-cache headers
+    // - Forces Cloudflare CDN and browsers to always fetch fresh data
+    // - Appends cache-busting timestamp to prevent any stale responses
     // ============================================================
     const jsonPaths = ["/map_data.json", "/info_data.json", "/drive_data.json"];
-    if (jsonPaths.includes(pathname)) {
-      const originResponse = await fetch(request, {
+    if (jsonPaths.some(p => pathname.startsWith(p))) {
+      // Parse the request URL and append a cache-busting timestamp
+      const url = new URL(request.url);
+      url.searchParams.set('_cb', Date.now().toString());
+      const cacheBustedRequest = new Request(url.toString(), {
+        method: request.method,
+        headers: request.headers,
+        redirect: request.redirect,
+        mode: request.mode
+      });
+      
+      const originResponse = await fetch(cacheBustedRequest, {
         cf: { cacheTtl: 0, cacheEverything: false },
       });
 
       const headers = new Headers(originResponse.headers);
-      headers.set("Cache-Control", "no-cache, no-store, must-revalidate");
+      // Strict no-store headers to disable ALL caching at CDN and browser level
+      headers.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
       headers.set("Pragma", "no-cache");
       headers.set("Expires", "0");
       headers.set("Access-Control-Allow-Origin", "*");
