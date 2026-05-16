@@ -1838,40 +1838,55 @@ async function loadMapFromSheets(fid) {
     }
     const floorPrefix = `${targetBldCode}-${fNum}`;
     
+    // ── STEP 1: Filter to floor-specific data FIRST (before bounds calculation) ──
+    const floorData = dataArray.filter(item => {
+      const rnStr = item.Room_Number || item.room_number || item['Room_Number'] || item['room_number'] || "";
+      let rn = String(rnStr).trim();
+      if (!rn) return false;
+      
+      if (rn.startsWith(floorPrefix)) return true;
+      if (/^(LB|CR|WC)/i.test(rn)) {
+        if (rn.includes(floorPrefix)) return true;
+        if (rn.includes(`-${targetBldCode}-${fNum}`) || rn.endsWith(fNum)) return true; 
+      }
+      return false;
+    });
+    
+    if (floorData.length === 0) return null;
+
     // ── AD BUILDING ONLY: Coordinate outlier filter for Floors 5-6 ──
     const isADBuilding = (bldInternalId === 'bld_ad');
     const isADFloor5or6 = isADBuilding && (parseInt(fNum) === 5 || parseInt(fNum) === 6);
 
+    // ── STEP 2: Calculate bounding box EXCLUSIVELY from floorData (per-floor bounds) ──
     let globalMinX = Infinity, globalMinY = Infinity;
     let globalMaxX = -Infinity, globalMaxY = -Infinity;
     let hasBuildingData = false;
 
-    dataArray.forEach(d => {
-      const rnStr = d.Room_Number || d.room_number || d['Room_Number'] || d['room_number'] || "";
-      const rn = String(rnStr).trim();
-      
-      if (rn.startsWith(`${targetBldCode}-`) || rn.includes(`-${targetBldCode}-`) || rn.startsWith(targetBldCode)) {
-        let sx = parseFloat(d.StartX) || 0, sy = parseFloat(d.StartY) || 0;
-        let ex = parseFloat(d.EndX) || 0, ey = parseFloat(d.EndY) || 0;
+    floorData.forEach(d => {
+      let sx = parseFloat(d.StartX) || 0, sy = parseFloat(d.StartY) || 0;
+      let ex = parseFloat(d.EndX) || 0, ey = parseFloat(d.EndY) || 0;
 
-        // ── AD Floors 5-6 ONLY: Filter out erroneous outlier coordinates ──
-        // These floors have bad data with coords far outside the true cluster bounding box
-        if (isADFloor5or6) {
-          // For AD-5/6, valid X range is roughly -60000 to -25000, Y range is ~234000 to ~277000
-          // Skip segments that are vastly outside this expected cluster
-          const ad56ValidMinX = -70000, ad56ValidMaxX = -20000;
-          const ad56ValidMinY = 230000, ad56ValidMaxY = 280000;
-          
-          if (sx < ad56ValidMinX || sx > ad56ValidMaxX || ex < ad56ValidMinX || ex > ad56ValidMaxX) return;
-          if (sy < ad56ValidMinY || sy > ad56ValidMaxY || ey < ad56ValidMinY || ey > ad56ValidMaxY) return;
-        }
+      // Filter out rogue/outlier coordinates (skip segments where both start coords are 0)
+      if (sx === 0 && sy === 0) return;
 
-        globalMinX = Math.min(globalMinX, sx, ex);
-        globalMaxX = Math.max(globalMaxX, sx, ex);
-        globalMinY = Math.min(globalMinY, sy, ey);
-        globalMaxY = Math.max(globalMaxY, sy, ey);
-        hasBuildingData = true;
+      // ── AD Floors 5-6 ONLY: Filter out erroneous outlier coordinates ──
+      // These floors have bad data with coords far outside the true cluster bounding box
+      if (isADFloor5or6) {
+        // For AD-5/6, valid X range is roughly -60000 to -25000, Y range is ~234000 to ~277000
+        // Skip segments that are vastly outside this expected cluster
+        const ad56ValidMinX = -70000, ad56ValidMaxX = -20000;
+        const ad56ValidMinY = 230000, ad56ValidMaxY = 280000;
+        
+        if (sx < ad56ValidMinX || sx > ad56ValidMaxX || ex < ad56ValidMinX || ex > ad56ValidMaxX) return;
+        if (sy < ad56ValidMinY || sy > ad56ValidMaxY || ey < ad56ValidMinY || ey > ad56ValidMaxY) return;
       }
+
+      globalMinX = Math.min(globalMinX, sx, ex);
+      globalMaxX = Math.max(globalMaxX, sx, ex);
+      globalMinY = Math.min(globalMinY, sy, ey);
+      globalMaxY = Math.max(globalMaxY, sy, ey);
+      hasBuildingData = true;
     });
 
     if (!hasBuildingData) return null;
@@ -1895,21 +1910,6 @@ async function loadMapFromSheets(fid) {
     function mapY(realY) { 
       return (globalMaxY - realY + padY) * uniformScale; 
     }
-
-    const floorData = dataArray.filter(item => {
-      const rnStr = item.Room_Number || item.room_number || item['Room_Number'] || item['room_number'] || "";
-      let rn = String(rnStr).trim();
-      if (!rn) return false;
-      
-      if (rn.startsWith(floorPrefix)) return true;
-      if (/^(LB|CR|WC)/i.test(rn)) {
-        if (rn.includes(floorPrefix)) return true;
-        if (rn.includes(`-${targetBldCode}-${fNum}`) || rn.endsWith(fNum)) return true; 
-      }
-      return false;
-    });
-    
-    if (floorData.length === 0) return null;
 
     const rooms = {};
     floorData.forEach(d => {
@@ -2046,7 +2046,9 @@ async function renderMap(bid, fid, n) {
     document.getElementById('mpbc').innerHTML = `<b>${b.name}</b> › ${fn}`;
     const out = document.getElementById('mout');
     
-    const isPortrait = (n === 5 || n === 6) && bid === 'bld_ad';
+    // ── REMOVE hardcoded diminishing scale for AD Floors 5 & 6 ──
+    // Force isPortrait = false so Floors 5-6 use standard sizing (min-width: 1300px) like Floor 1
+    const isPortrait = false;
     out.className = 'map-wrap' + (isPortrait ? ' portrait' : '');
     out.innerHTML = `<div style="padding:40px;text-align:center;color:var(--mt);font-size:14px;">Đang tải dữ liệu và dựng bản đồ...</div>`;
     show('pg-m');
