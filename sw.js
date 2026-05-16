@@ -36,6 +36,13 @@ function normalizedRequest(input) {
 
 async function putIfOk(cacheName, request, response) {
   if (!response || !response.ok) return;
+  
+  // Guard: Only cache http/https requests, ignore chrome-extension:// and other schemes
+  const requestUrl = request.url;
+  if (!requestUrl.startsWith('http://') && !requestUrl.startsWith('https://')) {
+    return;
+  }
+  
   const cache = await caches.open(cacheName);
   await cache.put(normalizedRequest(request), response.clone());
 }
