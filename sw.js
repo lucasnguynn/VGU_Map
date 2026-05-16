@@ -7,7 +7,7 @@
  * - Query-string-safe matching for cache-busted URLs (?v=timestamp).
  */
 
-const SW_VERSION = '__AUTO_SW_VERSION__';
+const SW_VERSION = '20260516150747';
 const STATIC_CACHE = `vgumap-static-${SW_VERSION}`;
 const DATA_CACHE = `vgumap-data-${SW_VERSION}`;
 
@@ -50,7 +50,14 @@ async function putIfOk(cacheName, request, response) {
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(STATIC_CACHE);
-    await cache.addAll(APP_SHELL);
+    // Use individual puts instead of addAll to avoid one missing file killing the install
+    await Promise.allSettled(
+      APP_SHELL.map(url =>
+        fetch(url, { cache: 'no-store' })
+          .then(res => { if (res.ok) return cache.put(url, res); })
+          .catch(err => console.warn(`[SW] Pre-cache failed for ${url}:`, err))
+      )
+    );
     await self.skipWaiting();
   })());
 });
