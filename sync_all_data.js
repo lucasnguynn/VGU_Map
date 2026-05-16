@@ -1,13 +1,7 @@
 #!/usr/bin/env node
-/**
- * VGUMap Data Sync Script
- * 
- * Fetches data from Google Apps Script endpoints and saves to local JSON files.
- * Uses Node 18+ native fetch API with robust error handling.
- */
-
-import { readFileSync, writeFileSync, renameSync } from 'fs';
-import { join } from 'path';
+const https = require('https');
+const fs = require('fs');
+const path = require('path');
 
 const API_ENDPOINTS = {
   MAP: 'https://script.google.com/macros/s/AKfycbxFmunolmZ5LSC6exu6OnGE0dZi9VYrf6gWBqMJQOrFUe8MdRQAiz0XT825JwkGd-O0/exec',
@@ -17,71 +11,26 @@ const API_ENDPOINTS = {
 
 const OUTPUT = { MAP: 'map_data.json', INFO: 'info_data.json', DRIVE: 'drive_data.json' };
 
-/**
- * Fetch JSON from URL with retry logic and timeout.
- * @param {string} url - The URL to fetch.
- * @param {number} timeoutMs - Timeout in milliseconds.
- * @param {number} retries - Number of retry attempts.
- * @returns {Promise<object>} Parsed JSON response.
- */
-async function fetchJson(url, timeoutMs = 30000, retries = 3) {
-  let lastError;
-  
-  for (let attempt = 1; attempt <= retries; attempt++) {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-    
-    try {
-      const response = await fetch(url, {
-        headers: { 
-          'Accept': 'application/json', 
-          'User-Agent': 'VGUMap-Sync/3.0 (Node.js)' 
-        },
-        signal: controller.signal,
-        redirect: 'follow'
-      });
-      
-      clearTimeout(timeoutId);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status} for ${url}`);
-      }
-      
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      clearTimeout(timeoutId);
-      lastError = error;
-      
-      if (attempt < retries) {
-        console.warn(`⚠️ Attempt ${attempt}/${retries} failed for ${url}: ${error.message}. Retrying...`);
-        await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
-      }
-    }
-  }
-  
-  throw lastError;
+function fetchJson(url, timeoutMs = 30000) {
+  return new Promise((resolve, reject) => {
+    const req = https.get(url, { headers: { Accept: 'application/json', 'User-Agent': 'VGUMap-Sync/2.0' } }, (res) => {
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) return resolve(fetchJson(res.headers.location, timeoutMs));
+      if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode} for ${url}`));
+      let raw = '';
+      res.on('data', (d) => raw += d);
+      res.on('end', () => { try { resolve(JSON.parse(raw)); } catch (e) { reject(new Error(`Invalid JSON from ${url}: ${e.message}`)); } });
+    });
+    req.setTimeout(timeoutMs, () => req.destroy(new Error(`Timeout ${timeoutMs}ms for ${url}`)));
+    req.on('error', reject);
+  });
 }
 
-/**
- * Extract array from payload (handles wrapped or direct arrays).
- * @param {object} payload - The response payload.
- * @param {string} name - Name for error messages.
- * @returns {Array} Extracted array.
- */
 function extractArray(payload, name) {
-  const arr = Array.isArray(payload) ? payload : payload?.data;
-  if (!Array.isArray(arr) || !arr.length) {
-    throw new Error(`${name}: empty dataset`);
-  }
+  const arr = Array.isArray(payload) ? payload : payload && payload.data;
+  if (!Array.isArray(arr) || !arr.length) throw new Error(`${name}: empty dataset`);
   return arr;
 }
 
-/**
- * Normalize info data with proper occupant list handling.
- * @param {object} payload - Raw info payload.
- * @returns {object} Normalized info data structure.
- */
 function normalizeInfo(payload) {
   const rows = extractArray(payload, 'INFO');
   const data = rows.map((room) => {
@@ -94,126 +43,68 @@ function normalizeInfo(payload) {
     if (flat.occupants_flat) flat.occupant_display = flat.occupants_flat;
     return flat;
   });
-  return { 
-    status: 'success', 
-    total_rooms: data.length, 
-    last_updated: new Date().toISOString(), 
-    data 
-  };
+  return { status: 'success', total_rooms: data.length, last_updated: new Date().toISOString(), data };
 }
 
-/**
- * Write JSON atomically using temp file + rename.
- * @param {string} filename - Target filename.
- * @param {object} data - Data to serialize.
- */
 function writeJsonAtomic(filename, data) {
-  const finalPath = join(process.cwd(), filename);
+  const finalPath = path.join(__dirname, filename);
   const tempPath = `${finalPath}.tmp`;
-  writeFileSync(tempPath, JSON.stringify(data, null, 2), 'utf8');
-  renameSync(tempPath, finalPath);
+  fs.writeFileSync(tempPath, JSON.stringify(data, null, 2));
+  fs.renameSync(tempPath, finalPath);
   console.log(`💾 ${filename} updated`);
-}
-
-/**
- * Update file content using marker-based replacement.
- * Looks for <!-- VERSION_MARKER --> or // VERSION_MARKER patterns.
- * @param {string} filePath - Path to file.
- * @param {string} markerName - Marker identifier.
- * @param {string} newValue - New value to insert.
- * @returns {boolean} True if replacement was made.
- */
-function updateWithMarker(filePath, markerName, newValue) {
-  const original = readFileSync(filePath, 'utf8');
-  
-  // Pattern 1: HTML/XML comment markers <!-- MARKER_NAME: value -->
-  const htmlPattern = new RegExp(`(<!--\\s*${markerName}:\\s*)[^>]*?(-->)`, 'g');
-  if (htmlPattern.test(original)) {
-    const updated = original.replace(htmlPattern, `$1${newValue}$2`);
-    if (original !== updated) {
-      writeFileSync(filePath, updated, 'utf8');
-      return true;
-    }
-  }
-  
-  // Pattern 2: JS comment markers // MARKER_NAME: value
-  const jsPattern = new RegExp(`(//\\s*${markerName}:\\s*).*$`, 'gm');
-  if (jsPattern.test(original)) {
-    const updated = original.replace(jsPattern, `$1${newValue}`);
-    if (original !== updated) {
-      writeFileSync(filePath, updated, 'utf8');
-      return true;
-    }
-  }
-  
-  // Pattern 3: const declaration markers const NAME = 'value';
-  const constPattern = new RegExp(`(const\\s+${markerName}\\s*=\\s*['\"])[^'\"]*?(['\"];?)`, 'g');
-  if (constPattern.test(original)) {
-    const updated = original.replace(constPattern, `$1${newValue}$2`);
-    if (original !== updated) {
-      writeFileSync(filePath, updated, 'utf8');
-      return true;
-    }
-  }
-  
-  return false;
 }
 
 async function run() {
   console.log(`🕐 Sync started ${new Date().toISOString()}`);
+  const mapPayload = await fetchJson(`${API_ENDPOINTS.MAP}?v=${Date.now()}`);
+  extractArray(mapPayload, 'MAP');
+  writeJsonAtomic(OUTPUT.MAP, mapPayload);
+
+  const infoPayload = await fetchJson(`${API_ENDPOINTS.INFO}?nocache=true&v=${Date.now()}`);
+  writeJsonAtomic(OUTPUT.INFO, normalizeInfo(infoPayload));
+
+  const drivePayload = await fetchJson(`${API_ENDPOINTS.DRIVE}?v=${Date.now()}`);
+  if (!drivePayload || typeof drivePayload !== 'object') throw new Error('DRIVE: invalid payload');
+  writeJsonAtomic(OUTPUT.DRIVE, drivePayload);
   
-  try {
-    // Fetch and save MAP data
-    const mapPayload = await fetchJson(`${API_ENDPOINTS.MAP}?nocache=${Date.now()}`);
-    extractArray(mapPayload, 'MAP');
-    writeJsonAtomic(OUTPUT.MAP, mapPayload);
-
-    // Fetch and save INFO data
-    const infoPayload = await fetchJson(`${API_ENDPOINTS.INFO}?nocache=${Date.now()}`);
-    writeJsonAtomic(OUTPUT.INFO, normalizeInfo(infoPayload));
-
-    // Fetch and save DRIVE data
-    const drivePayload = await fetchJson(`${API_ENDPOINTS.DRIVE}?nocache=${Date.now()}`);
-    if (!drivePayload || typeof drivePayload !== 'object') {
-      throw new Error('DRIVE: invalid payload');
-    }
-    writeJsonAtomic(OUTPUT.DRIVE, drivePayload);
-    
-    // ============================================================
-    // TASK 3: Generate version token for cache invalidation
-    // Uses marker-based replacement instead of fragile regex
-    // ============================================================
-    const buildVersion = new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 14);
-    
-    // Update sw.js with new version using marker
-    const swPath = join(process.cwd(), 'sw.js');
-    const swUpdated = updateWithMarker(swPath, 'SW_VERSION', buildVersion);
-    if (swUpdated) {
-      console.log(`✅ sw.js version stamped: ${buildVersion}`);
-    } else {
-      console.warn('⚠️ Could not find SW_VERSION marker in sw.js');
-    }
-    
-    // Update index.html with new version using data attribute marker
-    const htmlPath = join(process.cwd(), 'index.html');
-    const htmlOriginal = readFileSync(htmlPath, 'utf8');
-    const htmlAttrPattern = /(data-app-version=")[^"]*(")/;
-    if (htmlAttrPattern.test(htmlOriginal)) {
-      const htmlUpdated = htmlOriginal.replace(htmlAttrPattern, `$1${buildVersion}$2`);
-      writeFileSync(htmlPath, htmlUpdated, 'utf8');
-      console.log(`✅ index.html version stamped: ${buildVersion}`);
-    } else {
-      console.warn('⚠️ Could not find data-app-version attribute in index.html');
-    }
-    
-    // DO NOT mutate manifest.json with non-standard version key
-    // The version is now tracked via HTML data attribute and SW constant only
-    
-    console.log('✅ Sync completed');
-  } catch (error) {
-    console.error('❌ Sync failed:', error.message);
-    process.exit(1);
+  // ============================================================
+  // TASK 3: Generate version token for cache invalidation
+  // This ensures the Service Worker and HTML get a new version
+  // every time sync completes successfully, forcing cache refresh.
+  // ============================================================
+  const buildVersion = new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 14);
+  
+  // Update sw.js with new version
+  const swPath = path.join(__dirname, 'sw.js');
+  const swOriginal = fs.readFileSync(swPath, 'utf8');
+  const swUpdated = swOriginal.replace(/const SW_VERSION = '.*?';/, `const SW_VERSION = '${buildVersion}';`);
+  if (swOriginal !== swUpdated) {
+    fs.writeFileSync(swPath, swUpdated, 'utf8');
+    console.log(`✅ sw.js version stamped: ${buildVersion}`);
   }
+  
+  // Update index.html with new version
+  const htmlPath = path.join(__dirname, 'index.html');
+  const htmlOriginal = fs.readFileSync(htmlPath, 'utf8');
+  const htmlUpdated = htmlOriginal.replace(/data-app-version=".*?"/, `data-app-version="${buildVersion}"`);
+  if (htmlOriginal !== htmlUpdated) {
+    fs.writeFileSync(htmlPath, htmlUpdated, 'utf8');
+    console.log(`✅ index.html version stamped: ${buildVersion}`);
+  }
+  
+  // Update manifest.json with new version
+  const manifestPath = path.join(__dirname, 'manifest.json');
+  try {
+    const manifestOriginal = fs.readFileSync(manifestPath, 'utf8');
+    const manifestObj = JSON.parse(manifestOriginal);
+    manifestObj.version = buildVersion;
+    fs.writeFileSync(manifestPath, JSON.stringify(manifestObj, null, 2), 'utf8');
+    console.log(`✅ manifest.json version stamped: ${buildVersion}`);
+  } catch (e) {
+    console.warn('⚠️ Could not update manifest.json:', e.message);
+  }
+  
+  console.log('✅ Sync completed');
 }
 
-run();
+run().catch((e) => { console.error('❌ Sync failed:', e.message); process.exit(1); });

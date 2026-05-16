@@ -21,11 +21,6 @@ const APP_SHELL = [
 
 const DATA_PATHS = new Set(['/map_data.json', '/info_data.json', '/drive_data.json']);
 
-/**
- * Normalize request URL by stripping query parameters for cache matching.
- * @param {Request|string} input - The request or URL string.
- * @returns {Request} Normalized request object.
- */
 function normalizedRequest(input) {
   const req = input instanceof Request ? input : new Request(input);
   const url = new URL(req.url);
@@ -39,21 +34,15 @@ function normalizedRequest(input) {
   });
 }
 
-/**
- * Cache response only if it's OK and from http/https origin.
- * @param {string} cacheName - Target cache name.
- * @param {Request} request - Original request.
- * @param {Response} response - Response to cache.
- */
 async function putIfOk(cacheName, request, response) {
   if (!response || !response.ok) return;
-
+  
   // Guard: Only cache http/https requests, ignore chrome-extension:// and other schemes
   const requestUrl = request.url;
   if (!requestUrl.startsWith('http://') && !requestUrl.startsWith('https://')) {
     return;
   }
-
+  
   const cache = await caches.open(cacheName);
   await cache.put(normalizedRequest(request), response.clone());
 }
@@ -61,24 +50,15 @@ async function putIfOk(cacheName, request, response) {
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(STATIC_CACHE);
-    // STRICT: Use Promise.all — if ANY core file fails, SW install fails.
-    // This ensures the app shell is always complete and consistent.
-    try {
-      await Promise.all(
-        APP_SHELL.map(async (url) => {
-          const response = await fetch(url, { cache: 'no-store' });
-          if (!response.ok) {
-            throw new Error(`Pre-cache failed for ${url}: HTTP ${response.status}`);
-          }
-          await cache.put(url, response);
-        })
-      );
-      console.log('[SW] App shell cached successfully');
-      await self.skipWaiting();
-    } catch (error) {
-      console.error('[SW] Install failed:', error.message);
-      throw error;
-    }
+    // Use individual puts instead of addAll to avoid one missing file killing the install
+    await Promise.allSettled(
+      APP_SHELL.map(url =>
+        fetch(url, { cache: 'no-store' })
+          .then(res => { if (res.ok) return cache.put(url, res); })
+          .catch(err => console.warn(`[SW] Pre-cache failed for ${url}:`, err))
+      )
+    );
+    await self.skipWaiting();
   })());
 });
 
@@ -215,8 +195,8 @@ self.addEventListener('message', (event) => {
       // Step 4: Immediately claim all clients so they use the updated cache
       await self.clients.claim();
       
-      // Step 5: Notify ALL active browser tabs including uncontrolled ones
-      const clients = await self.clients.matchAll({ includeUncontrolled: true });
+      // Step 5: Notify all clients that data refresh is complete
+      const clients = await self.clients.matchAll();
       clients.forEach(client => {
         client.postMessage({ type: 'DATA_CACHE_REFRESHED', timestamp: Date.now() });
       });
