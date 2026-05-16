@@ -305,8 +305,7 @@ input.c1-select::-webkit-search-cancel-button { display: none; }
 .mv:last-child{border-right:none}
 .mvn{font-size:20px;font-weight:700;color:var(--bl)}
 .mvl{font-size:9px;color:var(--ht);margin-top:2px}
-.rbdg{display:inline-block;padding:3px 12px;border-radius:2px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:8px}
-.rnum{font-size:12px;color:var(--mt);font-weight:500;margin-bottom:4px}
+.rbdg{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:.02em;margin-bottom:10px;transition:all .2s ease}.rnum{font-size:12px;color:var(--mt);font-weight:500;margin-bottom:4px}
 .rnm{font-size:clamp(15px,2vw,22px);font-weight:700;color:var(--bl);line-height:1.2;margin-bottom:14px}
 .ib{margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--gl)}
 .ib:last-child{border-bottom:none;margin-bottom:0}
@@ -2089,22 +2088,32 @@ function rC(rid) {
   
   const badge = document.getElementById('rbdg');
   // Xử lý linh hoạt trạng thái rỗng từ Sheets API để tô màu hợp lý
-  const currentStatus = rd.status ? rd.status.trim().toUpperCase() : 'AVAILABLE';
-  badge.textContent = currentStatus;
-  
-  if (currentStatus === 'AVAILABLE' || currentStatus === 'HOẠT ĐỘNG' || currentStatus === 'ĐANG SỬ DỤNG') {
-    badge.style.background = '#e6f5ec';
-    badge.style.color = '#083a18';
-    badge.style.border = '1px solid #408060';
-  } else if (currentStatus.includes('BẢO TRÌ') || currentStatus.includes('SỬA CHỮA')) {
-    badge.style.background = '#fffbf0';
-    badge.style.color = '#c9661a';
-    badge.style.border = '1px solid #f58220';
-  } else {
-    badge.style.background = '#fdeded';
-    badge.style.color = '#5f2120';
-    badge.style.border = '1px solid #ef5350';
-  }
+  const rawStatus = rd.status ? rd.status.trim() : '';
+const statusUpper = rawStatus.toUpperCase();
+// Hiển thị đúng chữ từ Sheet, không uppercase
+badge.textContent = rawStatus || 'Không rõ';
+
+if (!rawStatus || statusUpper.includes('ĐANG') || statusUpper.includes('HOẠT ĐỘNG') || statusUpper === 'AVAILABLE') {
+  // 🟢 Xanh lá — đang sử dụng / hoạt động
+  badge.style.background = '#e6f5ec';
+  badge.style.color = '#1a6b3a';
+  badge.style.border = '1.5px solid #2e9e5b';
+} else if (statusUpper.includes('CHƯA') || statusUpper.includes('KHÔNG') || statusUpper.includes('TRỐNG')) {
+  // 🔴 Đỏ — chưa sử dụng / không hoạt động
+  badge.style.background = '#fdeded';
+  badge.style.color = '#b71c1c';
+  badge.style.border = '1.5px solid #e53935';
+} else if (statusUpper.includes('BẢO TRÌ') || statusUpper.includes('SỬA CHỮA')) {
+  // 🟡 Cam — bảo trì
+  badge.style.background = '#fffbf0';
+  badge.style.color = '#c9661a';
+  badge.style.border = '1.5px solid #f58220';
+} else {
+  // ⚪ Xám — trạng thái khác / không xác định
+  badge.style.background = '#f0f2f7';
+  badge.style.color = '#4a5568';
+  badge.style.border = '1.5px solid #a0aec0';
+}
   
   sT('2D', rd);
   show('pg-r');
