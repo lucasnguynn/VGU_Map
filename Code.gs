@@ -1,9 +1,12 @@
+// ==========================================
+// 1. HÀM CHÍNH: ĐÓN NHẬN REQUEST VÀ TRẢ DỮ LIỆU
+// ==========================================
 function doGet(e) {
   const cache = CacheService.getScriptCache();
   // Đổi cacheKey để ép Google vứt bỏ bản cache lỗi đang bị kẹt
   const cacheKey = "vgu_rooms_api_data_v2"; 
   
-  // Sửa lại: Chấp nhận cả tham số nocache hoặc nếu sync truyền v thì cũng cân nhắc bỏ qua cache
+  // Chấp nhận cả tham số nocache hoặc nếu sync truyền v thì cũng cân nhắc bỏ qua cache
   const forceRefresh = e && e.parameter && (e.parameter.nocache === "true" || e.parameter.force === "1");
   
   if (!forceRefresh) {
@@ -94,9 +97,76 @@ function doGet(e) {
     return ContentService.createTextOutput(responsePayload).setMimeType(ContentService.MimeType.JSON);
 
   } catch (error) {
-    // Trả về JSON lỗi (Không lưu cache cái này)
     return ContentService.createTextOutput(JSON.stringify({
         status: "error", message: String(error), data: []
     })).setMimeType(ContentService.MimeType.JSON);
   }
+}
+
+// ==========================================
+// 2. CÁC HÀM BỔ TRỢ (HELPER FUNCTIONS) KÈM THEO
+// ==========================================
+
+function normalizeHeader(str) {
+  if (!str) return "";
+  return str.toString().toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Khử dấu tiếng Việt
+    .replace(/[đĐ]/g, "d")
+    .replace(/[^a-z0-9]/g, "_")                    // Thay ký tự đặc biệt bằng "_"
+    .replace(/_+/g, "_")                           // Gom nhiều dấu "_" liên tiếp
+    .replace(/^_+|_+$/g, "");                      // Cắt dấu "_" ở đầu/cuối
+}
+
+function detectHeaderRowIndex(data) {
+  for (let i = 0; i < data.length; i++) {
+    const row = data[i];
+    for (let j = 0; j < row.length; j++) {
+      const cellClean = normalizeHeader(row[j]);
+      // Kiểm tra nếu hàng chứa một trong các từ khóa cột phòng phổ biến
+      if (["number", "room_number", "ma_phong", "so_phong", "room"].indexOf(cellClean) !== -1) {
+        return i;
+      }
+    }
+  }
+  return 0; // Mặc định dòng đầu tiên nếu không tự nhận diện được
+}
+
+function buildNormalizedHeaders(headerRow) {
+  return headerRow.map(cell => normalizeHeader(cell));
+}
+
+function isBlankRow(row) {
+  return row.every(cell => cell === "" || cell === null || cell === undefined);
+}
+
+function toRowObject(row, normalizedHeaders) {
+  const obj = {};
+  normalizedHeaders.forEach((header, index) => {
+    if (header) {
+      obj[header] = row[index];
+    }
+  });
+  return obj;
+}
+
+function getFirstString(rowData, keys, defaultValue) {
+  const fallback = defaultValue !== undefined ? defaultValue : "";
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
+    if (rowData[key] !== undefined && rowData[key] !== null && rowData[key] !== "") {
+      return rowData[key].toString().trim();
+    }
+  }
+  return fallback;
+}
+
+function getSafeNumberText(rowData, keys, defaultValue) {
+  const fallback = defaultValue !== undefined ? defaultValue : "--";
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
+    if (rowData[key] !== undefined && rowData[key] !== null && rowData[key] !== "") {
+      return rowData[key].toString().trim();
+    }
+  }
+  return fallback;
 }
