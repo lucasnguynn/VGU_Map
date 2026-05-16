@@ -92,7 +92,13 @@ function doGet(e) {
       data: resultData
     });
 
-    cache.put(cacheKey, responsePayload, 900);
+    // 🚀 BỌC BẢO VỆ: Chống sập API khi dữ liệu vượt quá 100KB của CacheService
+    try {
+      cache.put(cacheKey, responsePayload, 900);
+    } catch (cacheError) {
+      // Nếu Google chê data quá bự ("Argument too large"), ta lờ đi và bỏ qua việc lưu cache.
+      // API vẫn tiếp tục chạy và trả về dữ liệu thành công!
+    }
 
     return ContentService.createTextOutput(responsePayload).setMimeType(ContentService.MimeType.JSON);
 
