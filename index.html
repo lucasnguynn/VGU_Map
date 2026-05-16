@@ -335,18 +335,16 @@ polygon,polyline{transition:all .18s cubic-bezier(.4,0,.2,1)}
 @media (max-width: 375px){.header{padding:0 12px;gap:10px}.page-title{font-size:14px}.control-bar{padding:10px}.input-wrapper input.c1-select,select.c1-select,.btn-search{height:44px}}
 @media (min-width: 1440px){.map-wrap-c1{padding:24px}#map{max-width:min(1600px,92vw)}}
 
-<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 <style>
-  model-viewer {
-    width: 100%;
-    height: 100%;
-    --poster-color: transparent;
-  }
+  model-viewer { width: 100%; height: 100%; --poster-color: transparent;}
   model-viewer::part(default-progress-bar) {
     background: #F58220;
     height: 3px;
   }
 </style>
+
+<!-- Đặt script ở đây, sau thẻ </style> -->
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 </head>
 <body>
 <h2 class="sr-only">VGUMap — Hệ thống tra cứu Kiến trúc & Phòng ốc VGU</h2>
@@ -2186,32 +2184,39 @@ function sT(tab, rd) {
           </model-viewer>
         </div>
       </div>`;
+// 1. Lấy phần tử DOM
+      const statusText = document.getElementById(`status-text-${sanitizedRid3d}`);
+      const mv = document.getElementById(`mv-${sanitizedRid3d}`);
 
-    const mv = document.getElementById(`mv-${sanitizedRid3d}`);
-    const statusText = document.getElementById(`status-text-${sanitizedRid3d}`);
-    
-    if (mv) {
-      let triedFallback = false;
+      // 2. Gắn sự kiện (vì element đã được tạo qua innerHTML trước đó nên có thể lấy ngay)
+      if (mv) {
+        // Sự kiện khi load thành công
+        mv.addEventListener('load', () => {
+          const poster = document.getElementById(`poster-${sanitizedRid3d}`);
+          if (poster) poster.style.display = 'none';
+        });
 
-      mv.addEventListener('error', (e) => {
-        if (!triedFallback) {
-          console.warn("Primary path failed, trying fallback...");
-          triedFallback = true;
-          statusText.textContent = "Đang thử lại đường dẫn phụ...";
-          mv.src = fallbackPath; // Switch to nested path
-        } else {
-          // Both failed - Stop spinner and show Error UI
-          f.innerHTML = `
-            <div style="text-align:center;padding:22px 14px;background:#0d1117;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;">
-              <div style="font-size:38px;">⚠️</div>
-              <div style="font-size:13px;font-weight:700;color:#fff;">Chưa có dữ liệu 3D</div>
-              <div style="font-size:11px;color:rgba(255,255,255,0.45);max-width:240px;">
-                  Không tìm thấy file <br><b>${sanitizedRid3d}.glb</b><br> trong thư mục models.
-              </div>
-            </div>`;
-        }
-      });
-    }
+        // Sự kiện khi lỗi (load fallback)
+        let triedFallback = false;
+        mv.addEventListener('error', (e) => {
+          if (!triedFallback) {
+            console.warn("Primary path failed, trying fallback...");
+            triedFallback = true;
+            if (statusText) statusText.textContent = "Đang thử lại đường dẫn phụ...";
+            mv.src = fallbackPath; // Đổi sang đường dẫn phụ
+          } else {
+            // Cả 2 đều lỗi - Hiện giao diện Error
+            f.innerHTML = `
+              <div style="text-align:center;padding:22px 14px;background:#0d1117;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;">
+                <div style="font-size:38px;">⚠️</div>
+                <div style="font-size:13px;font-weight:700;color:#fff;">Chưa có dữ liệu 3D</div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.45);max-width:240px;">
+                    Không tìm thấy file <br><b>${sanitizedRid3d}.glb</b><br> trong thư mục models.
+                </div>
+              </div>`;
+          }
+        });
+      }
 
   // ─── TAB 3: ẢNH THỰC TẾ (MỚI) ───
   } else if (tab === 'REAL') {
