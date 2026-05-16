@@ -1,1 +1,1 @@
-Nothing should be ignored based on the provided file changes. The deleted files (`worker.js` and `wrangler.toml`) are source/config files that shouldn't be added to .gitignore, and there are no build artifacts, dependencies, or temporary files in the changes that warrant adding ignore rules.
+Nothing should be ignored based on the provided file changes. The modified files (`sw.js` and `sync_all_data.js`) are JavaScript source files that should not be added to .gitignore.
