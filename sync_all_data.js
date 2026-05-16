@@ -26,6 +26,13 @@ function fetchJson(url, timeoutMs = 30000) {
 }
 
 function extractArray(payload, name) {
+  // Validate new backend structure: { status: "success", data: [...] } or { status: "error", message: "..." }
+  if (payload && payload.status === 'error') {
+    throw new Error(`${name}: ${payload.message || 'Backend returned error status'}`);
+  }
+  if (payload && payload.status !== 'success') {
+    throw new Error(`${name}: unexpected status "${payload.status}"`);
+  }
   const arr = Array.isArray(payload) ? payload : payload && payload.data;
   if (!Array.isArray(arr) || !arr.length) throw new Error(`${name}: empty dataset`);
   return arr;
@@ -56,14 +63,14 @@ function writeJsonAtomic(filename, data) {
 
 async function run() {
   console.log(`🕐 Sync started ${new Date().toISOString()}`);
-  const mapPayload = await fetchJson(`${API_ENDPOINTS.MAP}?v=${Date.now()}`);
+  const mapPayload = await fetchJson(`${API_ENDPOINTS.MAP}?nocache=true&v=${Date.now()}`);
   extractArray(mapPayload, 'MAP');
   writeJsonAtomic(OUTPUT.MAP, mapPayload);
 
-  const infoPayload = await fetchJson(`${API_ENDPOINTS.INFO}?v=${Date.now()}`);
+  const infoPayload = await fetchJson(`${API_ENDPOINTS.INFO}?nocache=true&v=${Date.now()}`);
   writeJsonAtomic(OUTPUT.INFO, normalizeInfo(infoPayload));
 
-  const drivePayload = await fetchJson(`${API_ENDPOINTS.DRIVE}?v=${Date.now()}`);
+  const drivePayload = await fetchJson(`${API_ENDPOINTS.DRIVE}?nocache=true&v=${Date.now()}`);
   if (!drivePayload || typeof drivePayload !== 'object') throw new Error('DRIVE: invalid payload');
   writeJsonAtomic(OUTPUT.DRIVE, drivePayload);
   console.log('✅ Sync completed');
