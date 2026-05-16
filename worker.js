@@ -40,37 +40,72 @@ export default {
     }
 
     // ============================================================
-    // JSON DATA FILES: Network-First with strict no-cache headers
-    // - Forces Cloudflare CDN and browsers to always fetch fresh data
-    // - Appends cache-busting timestamp to prevent any stale responses
+    // JSON DATA FILES: Short-lived Cache (TTL: 60s) for Rate Limit Protection
+    // - Protects Google Apps Script origin from rate-limiting spikes
+    // - Uses Cloudflare Cache API with 60-second TTL
+    // - Falls back to network on cache miss or error
     // ============================================================
     const jsonPaths = ["/map_data.json", "/info_data.json", "/drive_data.json"];
     if (jsonPaths.some(p => pathname.startsWith(p))) {
-      // Parse the request URL and append a cache-busting timestamp
-      const url = new URL(request.url);
-      url.searchParams.set('_cb', Date.now().toString());
-      const cacheBustedRequest = new Request(url.toString(), {
-        method: request.method,
-        headers: request.headers,
-        redirect: request.redirect,
-        mode: request.mode
-      });
-      
-      const originResponse = await fetch(cacheBustedRequest, {
-        cf: { cacheTtl: 0, cacheEverything: false },
-      });
+      const CACHE_TTL_SECONDS = 60;
+      const cacheKey = new Request(`https://vgumap-json-cache${pathname}`, { method: "GET" });
+      const cache = caches.default;
 
-      const headers = new Headers(originResponse.headers);
-      // Strict no-store headers to disable ALL caching at CDN and browser level
-      headers.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
-      headers.set("Pragma", "no-cache");
-      headers.set("Expires", "0");
-      headers.set("Access-Control-Allow-Origin", "*");
+      // Try to serve from cache first
+      const cachedResponse = await cache.match(cacheKey);
+      if (cachedResponse) {
+        const headers = new Headers(cachedResponse.headers);
+        headers.set("Access-Control-Allow-Origin", "*");
+        headers.set("X-Cache", "HIT");
+        headers.set("Age", String(Math.floor((Date.now() - cachedResponse.headers.get('X-Cache-Timestamp')) / 1000)));
+        return new Response(cachedResponse.body, {
+          status: cachedResponse.status,
+          headers,
+        });
+      }
 
-      return new Response(originResponse.body, {
-        status: originResponse.status,
-        headers,
-      });
+      // Cache miss - fetch from origin
+      try {
+        const originResponse = await fetch(request, {
+          cf: { cacheTtl: 0, cacheEverything: false },
+        });
+
+        if (!originResponse.ok) {
+          throw new Error(`HTTP ${originResponse.status}`);
+        }
+
+        // Clone response for caching
+        const responseToCache = await originResponse.clone();
+        const headers = new Headers(responseToCache.headers);
+        headers.set("Access-Control-Allow-Origin", "*");
+        headers.set("Cache-Control", `public, max-age=${CACHE_TTL_SECONDS}, stale-while-revalidate=30`);
+        headers.set("X-Cache", "MISS");
+        headers.set("X-Cache-Timestamp", String(Date.now()));
+
+        const finalResponse = new Response(responseToCache.body, {
+          status: responseToCache.status,
+          headers,
+        });
+
+        // Store in cache asynchronously
+        ctx.waitUntil(cache.put(cacheKey, finalResponse.clone()));
+
+        return finalResponse;
+      } catch (error) {
+        console.error(`[Worker] JSON fetch error for ${pathname}:`, error.message);
+        
+        // Return error response with CORS headers
+        return new Response(JSON.stringify({
+          error: 'fetch_failed',
+          message: error.message
+        }), {
+          status: 502,
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*"
+          }
+        });
+      }
     }
 
     // ============================================================
