@@ -2079,6 +2079,7 @@ function getRD(rid) {
 }
 
 // ─── HÀM MAP DỮ LIỆU VÀO GIAO DIỆN CHI TIẾT ───
+// ─── HÀM MAP DỮ LIỆU VÀO GIAO DIỆN CHI TIẾT ───
 function rC(rid) {
   ST.rid = rid; ST.tab = '2D';
   const rd = getRD(rid); ST.rd = rd;
@@ -2096,38 +2097,40 @@ function rC(rid) {
   document.getElementById('rtype').textContent = rd.type; 
   document.getElementById('rfunc').textContent = rd.func;
   
-  // Áp dụng gán nhãn: Nhãn phụ phía trên đổ name_vn, Tiêu đề chính đổ name_en
   document.getElementById('rnum').textContent = rd.name_vn || "___";
   document.getElementById('rnm').textContent = rd.name_en || "___";
   
   const badge = document.getElementById('rbdg');
-  // Xử lý linh hoạt trạng thái rỗng từ Sheets API để tô màu hợp lý
-  const rawStatus = rd.status ? rd.status.trim() : '';
-const statusUpper = rawStatus.toUpperCase();
-// Hiển thị đúng chữ từ Sheet, không uppercase
-badge.textContent = rawStatus || 'Không rõ';
+  
+  // Xử lý trạng thái (Nếu rỗng thì gán mặc định là "Chưa cập nhật")
+  const rawStatus = rd.status ? rd.status.trim() : 'Chưa cập nhật';
+  const statusUpper = rawStatus.toUpperCase();
+  
+  // Hiển thị đúng chữ từ Sheet
+  badge.textContent = rawStatus;
 
-if (!rawStatus || statusUpper.includes('ĐANG') || statusUpper.includes('HOẠT ĐỘNG') || statusUpper === 'AVAILABLE') {
-  // 🟢 Xanh lá — đang sử dụng / hoạt động
-  badge.style.background = '#e6f5ec';
-  badge.style.color = '#1a6b3a';
-  badge.style.border = '1.5px solid #2e9e5b';
-} else if (statusUpper.includes('CHƯA') || statusUpper.includes('KHÔNG') || statusUpper.includes('TRỐNG')) {
-  // 🔴 Đỏ — chưa sử dụng / không hoạt động
-  badge.style.background = '#fdeded';
-  badge.style.color = '#b71c1c';
-  badge.style.border = '1.5px solid #e53935';
-} else if (statusUpper.includes('BẢO TRÌ') || statusUpper.includes('SỬA CHỮA')) {
-  // 🟡 Cam — bảo trì
-  badge.style.background = '#fffbf0';
-  badge.style.color = '#c9661a';
-  badge.style.border = '1.5px solid #f58220';
-} else {
-  // ⚪ Xám — trạng thái khác / không xác định
-  badge.style.background = '#f0f2f7';
-  badge.style.color = '#4a5568';
-  badge.style.border = '1.5px solid #a0aec0';
-}
+  // Xóa bỏ "!rawStatus" để ép nó phải có chữ "ĐANG" hoặc "HOẠT ĐỘNG" mới tô màu xanh
+  if (statusUpper.includes('ĐANG') || statusUpper.includes('HOẠT ĐỘNG') || statusUpper === 'AVAILABLE') {
+    // 🟢 Xanh lá
+    badge.style.background = '#e6f5ec';
+    badge.style.color = '#1a6b3a';
+    badge.style.border = '1.5px solid #2e9e5b';
+  } else if (statusUpper.includes('CHƯA') || statusUpper.includes('KHÔNG') || statusUpper.includes('TRỐNG')) {
+    // 🔴 Đỏ
+    badge.style.background = '#fdeded';
+    badge.style.color = '#b71c1c';
+    badge.style.border = '1.5px solid #e53935';
+  } else if (statusUpper.includes('BẢO TRÌ') || statusUpper.includes('SỬA CHỮA')) {
+    // 🟡 Cam
+    badge.style.background = '#fffbf0';
+    badge.style.color = '#c9661a';
+    badge.style.border = '1.5px solid #f58220';
+  } else {
+    // ⚪ Xám (Bao gồm cả chữ "Chưa cập nhật")
+    badge.style.background = '#f0f2f7';
+    badge.style.color = '#4a5568';
+    badge.style.border = '1.5px solid #a0aec0';
+  }
   
   sT('2D', rd);
   show('pg-r');
