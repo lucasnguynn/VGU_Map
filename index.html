@@ -2173,7 +2173,13 @@ function sT(tab, rd) {
             id="mv-${sanitizedRid3d}"
             src="${primaryPath}" 
             alt="3D model of room ${sanitizedRid3d}"
-            camera-controls auto-rotate shadow-intensity="1" environment-image="neutral"
+            camera-controls 
+            auto-rotate 
+            shadow-intensity="2" 
+            shadow-softness="0.8"
+            exposure="0.85"
+            tone-mapping="aces"
+            environment-image="legacy"
             style="width:100%;height:100%;background:linear-gradient(135deg,#0d1117,#0f1f3d);"
             loading="eager"
           >
