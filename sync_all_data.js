@@ -64,8 +64,10 @@ function writeJsonAtomic(filename, data) {
 async function run() {
   console.log(`🕐 Sync started ${new Date().toISOString()}`);
   const mapPayload = await fetchJson(`${API_ENDPOINTS.MAP}?nocache=true&v=${Date.now()}`);
-  extractArray(mapPayload, 'MAP');
-  writeJsonAtomic(OUTPUT.MAP, mapPayload);
+  // MAP API returns raw array or object without status field - use relaxed validation
+  const mapData = Array.isArray(mapPayload) ? mapPayload : (mapPayload && typeof mapPayload === 'object' ? mapPayload : null);
+  if (!mapData || (Array.isArray(mapData) && !mapData.length)) throw new Error('MAP: empty dataset');
+  writeJsonAtomic(OUTPUT.MAP, mapData);
 
   const infoPayload = await fetchJson(`${API_ENDPOINTS.INFO}?nocache=true&v=${Date.now()}`);
   writeJsonAtomic(OUTPUT.INFO, normalizeInfo(infoPayload));
