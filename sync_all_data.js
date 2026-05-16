@@ -66,6 +66,44 @@ async function run() {
   const drivePayload = await fetchJson(`${API_ENDPOINTS.DRIVE}?v=${Date.now()}`);
   if (!drivePayload || typeof drivePayload !== 'object') throw new Error('DRIVE: invalid payload');
   writeJsonAtomic(OUTPUT.DRIVE, drivePayload);
+  
+  // ============================================================
+  // TASK 3: Generate version token for cache invalidation
+  // This ensures the Service Worker and HTML get a new version
+  // every time sync completes successfully, forcing cache refresh.
+  // ============================================================
+  const buildVersion = new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 14);
+  
+  // Update sw.js with new version
+  const swPath = path.join(__dirname, 'sw.js');
+  const swOriginal = fs.readFileSync(swPath, 'utf8');
+  const swUpdated = swOriginal.replace(/const SW_VERSION = '.*?';/, `const SW_VERSION = '${buildVersion}';`);
+  if (swOriginal !== swUpdated) {
+    fs.writeFileSync(swPath, swUpdated, 'utf8');
+    console.log(`✅ sw.js version stamped: ${buildVersion}`);
+  }
+  
+  // Update index.html with new version
+  const htmlPath = path.join(__dirname, 'index.html');
+  const htmlOriginal = fs.readFileSync(htmlPath, 'utf8');
+  const htmlUpdated = htmlOriginal.replace(/data-app-version=".*?"/, `data-app-version="${buildVersion}"`);
+  if (htmlOriginal !== htmlUpdated) {
+    fs.writeFileSync(htmlPath, htmlUpdated, 'utf8');
+    console.log(`✅ index.html version stamped: ${buildVersion}`);
+  }
+  
+  // Update manifest.json with new version
+  const manifestPath = path.join(__dirname, 'manifest.json');
+  try {
+    const manifestOriginal = fs.readFileSync(manifestPath, 'utf8');
+    const manifestObj = JSON.parse(manifestOriginal);
+    manifestObj.version = buildVersion;
+    fs.writeFileSync(manifestPath, JSON.stringify(manifestObj, null, 2), 'utf8');
+    console.log(`✅ manifest.json version stamped: ${buildVersion}`);
+  } catch (e) {
+    console.warn('⚠️ Could not update manifest.json:', e.message);
+  }
+  
   console.log('✅ Sync completed');
 }
 

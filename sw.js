@@ -168,15 +168,38 @@ self.addEventListener('message', (event) => {
 
   if (event.data.type === 'REFRESH_DATA_CACHE') {
     event.waitUntil((async () => {
+      // Step 1: Delete ALL existing data caches to force fresh fetch
+      const keys = await caches.keys();
+      await Promise.all(
+        keys.filter(name => name.startsWith('vgumap-data-')).map(name => caches.delete(name))
+      );
+      
+      // Step 2: Open a fresh data cache with current version
       const cache = await caches.open(DATA_CACHE);
+      
+      // Step 3: Fetch fresh data from network (bypassing all caches)
       await Promise.all([...DATA_PATHS].map(async (path) => {
         try {
-          const response = await fetch(`${self.location.origin}${path}`, { cache: 'no-store' });
-          if (response.ok) await cache.put(normalizedRequest(`${self.location.origin}${path}`), response.clone());
+          const response = await fetch(`${self.location.origin}${path}?v=${Date.now()}`, { 
+            cache: 'no-store',
+            headers: { 'Pragma': 'no-cache' }
+          });
+          if (response.ok) {
+            await cache.put(normalizedRequest(`${self.location.origin}${path}`), response.clone());
+          }
         } catch (_) {
           // Ignore transient offline failures.
         }
       }));
+      
+      // Step 4: Immediately claim all clients so they use the updated cache
+      await self.clients.claim();
+      
+      // Step 5: Notify all clients that data refresh is complete
+      const clients = await self.clients.matchAll();
+      clients.forEach(client => {
+        client.postMessage({ type: 'DATA_CACHE_REFRESHED', timestamp: Date.now() });
+      });
     })());
   }
 });
