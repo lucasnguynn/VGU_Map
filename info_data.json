@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 467,
-  "last_updated": "2026-05-17T20:27:23.346Z",
+  "last_updated": "2026-05-17T21:25:46.894Z",
   "data": [
     {
       "sheet_source": "AD",
@@ -350,7 +350,7 @@
       "area": "34",
       "unbounded_height": "4000",
       "capacity": "--",
-      "status": "Chưa c��p nhật",
+      "status": "Chưa cập nhật",
       "occupant_display": "",
       "occupants_list": [],
       "occupants_flat": ""
@@ -1230,7 +1230,7 @@
       "area": "19",
       "unbounded_height": "4000",
       "capacity": "NA",
-      "status": "Đang s��� dụng",
+      "status": "Đang sử dụng",
       "occupant_display": "",
       "occupants_list": [],
       "occupants_flat": ""
