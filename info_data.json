@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 467,
-  "last_updated": "2026-05-21T13:41:09.401Z",
+  "last_updated": "2026-05-21T16:29:04.084Z",
   "data": [
     {
       "sheet_source": "AD",
@@ -6551,7 +6551,7 @@
       "sheet_source": "B3",
       "room_number": "B3-315",
       "heading_1": "SELF STUDY",
-      "heading_2": "PHÒNG TỰ HỌC",
+      "heading_2": "PHÒNG TỰ H��C",
       "department": "___",
       "fm_room_function": "Other functions",
       "fm_room_type": "OTHER - SelfStudy",
