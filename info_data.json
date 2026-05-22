@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 467,
-  "last_updated": "2026-05-22T20:06:35.257Z",
+  "last_updated": "2026-05-22T21:21:10.057Z",
   "data": [
     {
       "sheet_source": "AD",
@@ -6830,7 +6830,7 @@
       "area": "89.07",
       "unbounded_height": "4000",
       "capacity": "Mr. Nguyễn Hoàng Vĩnh Khang",
-      "status": "Chưa cập nh��t",
+      "status": "Chưa cập nhật",
       "occupant_display": "",
       "occupants_list": [],
       "occupants_flat": ""
