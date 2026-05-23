@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 467,
-  "last_updated": "2026-05-23T01:26:02.496Z",
+  "last_updated": "2026-05-23T04:57:46.962Z",
   "data": [
     {
       "sheet_source": "AD",
@@ -1527,7 +1527,7 @@
       "sheet_source": "AD",
       "room_number": "AD-219",
       "heading_1": "ELV EQUIP/CONTROL",
-      "heading_2": "P. ĐIỀU KHIỂN, THIẾT BỊ ELV",
+      "heading_2": "P. ĐI��U KHIỂN, THIẾT BỊ ELV",
       "department": "___",
       "fm_room_function": "___",
       "fm_room_type": "___",
@@ -6830,7 +6830,7 @@
       "area": "89.07",
       "unbounded_height": "4000",
       "capacity": "Mr. Nguyễn Hoàng Vĩnh Khang",
-      "status": "Chưa cập nhật",
+      "status": "Chưa cập nh��t",
       "occupant_display": "",
       "occupants_list": [],
       "occupants_flat": ""
