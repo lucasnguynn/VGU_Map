@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 467,
-  "last_updated": "2026-05-23T21:30:27.712Z",
+  "last_updated": "2026-05-23T22:26:33.224Z",
   "data": [
     {
       "sheet_source": "AD",
@@ -1527,7 +1527,7 @@
       "sheet_source": "AD",
       "room_number": "AD-219",
       "heading_1": "ELV EQUIP/CONTROL",
-      "heading_2": "P. ĐIỀU KHIỂN, THIẾT BỊ ELV",
+      "heading_2": "P. ĐI��U KHIỂN, THIẾT BỊ ELV",
       "department": "___",
       "fm_room_function": "___",
       "fm_room_type": "___",
