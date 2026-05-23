@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 467,
-  "last_updated": "2026-05-23T09:21:36.646Z",
+  "last_updated": "2026-05-23T10:47:09.997Z",
   "data": [
     {
       "sheet_source": "AD",
@@ -1519,7 +1519,7 @@
       "unbounded_height": "4000",
       "capacity": "4",
       "status": "Đang sử dụng",
-      "occupant_display": "Bùi Tố Nguyên\nNguyễn Ngọc Khánh Linh\nNguyễn Bình Hải Đ��ng\nPhạm Thị Cẩm My\nBùi Thanh Tịnh\nHuỳnh Ngọc Thành",
+      "occupant_display": "Bùi Tố Nguyên\nNguyễn Ngọc Khánh Linh\nNguyễn Bình Hải Đăng\nPhạm Thị Cẩm My\nBùi Thanh Tịnh\nHuỳnh Ngọc Thành",
       "occupants_list": [],
       "occupants_flat": ""
     },
