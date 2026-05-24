@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 467,
-  "last_updated": "2026-05-24T08:04:38.798Z",
+  "last_updated": "2026-05-24T10:03:44.854Z",
   "data": [
     {
       "sheet_source": "AD",
@@ -1527,7 +1527,7 @@
       "sheet_source": "AD",
       "room_number": "AD-219",
       "heading_1": "ELV EQUIP/CONTROL",
-      "heading_2": "P. ĐI��U KHIỂN, THIẾT BỊ ELV",
+      "heading_2": "P. ĐIỀU KHIỂN, THIẾT BỊ ELV",
       "department": "___",
       "fm_room_function": "___",
       "fm_room_type": "___",
@@ -1646,7 +1646,7 @@
       "area": "18",
       "unbounded_height": "4000",
       "capacity": "2",
-      "status": "Đang sử dụng",
+      "status": "Đang sử d���ng",
       "occupant_display": "Lê Văn Thành\nNguyễn Đồng Ngân\nPhạm Minh Vương",
       "occupants_list": [],
       "occupants_flat": ""
