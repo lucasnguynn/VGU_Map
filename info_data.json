@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 467,
-  "last_updated": "2026-05-24T10:03:44.854Z",
+  "last_updated": "2026-05-24T11:24:09.403Z",
   "data": [
     {
       "sheet_source": "AD",
@@ -1646,7 +1646,7 @@
       "area": "18",
       "unbounded_height": "4000",
       "capacity": "2",
-      "status": "Đang sử d���ng",
+      "status": "Đang sử dụng",
       "occupant_display": "Lê Văn Thành\nNguyễn Đồng Ngân\nPhạm Minh Vương",
       "occupants_list": [],
       "occupants_flat": ""
