@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 467,
-  "last_updated": "2026-05-23T23:28:11.743Z",
+  "last_updated": "2026-05-24T01:28:49.772Z",
   "data": [
     {
       "sheet_source": "AD",
@@ -1807,7 +1807,7 @@
       "unbounded_height": "4000",
       "capacity": "1",
       "status": "Đang sử dụng",
-      "occupant_display": "Đồng V��n Tín",
+      "occupant_display": "Đồng Văn Tín",
       "occupants_list": [],
       "occupants_flat": ""
     },
