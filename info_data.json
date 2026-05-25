@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 467,
-  "last_updated": "2026-05-25T10:44:49.626Z",
+  "last_updated": "2026-05-25T13:50:18.443Z",
   "data": [
     {
       "sheet_source": "AD",
@@ -695,7 +695,7 @@
       "sheet_source": "AD",
       "room_number": "AD-2.CR10",
       "heading_1": "CORRIDOR",
-      "heading_2": "HÀNH LANG",
+      "heading_2": "H��NH LANG",
       "department": "___",
       "fm_room_function": "___",
       "fm_room_type": "___",
