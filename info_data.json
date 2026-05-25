@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 467,
-  "last_updated": "2026-05-25T22:47:35.523Z",
+  "last_updated": "2026-05-25T23:48:49.271Z",
   "data": [
     {
       "sheet_source": "AD",
@@ -6893,7 +6893,7 @@
       "fm_room_type": "LABORATORY",
       "area": "84.17",
       "unbounded_height": "4000",
-      "capacity": "Mr. Nguyễn Duy H��ng",
+      "capacity": "Mr. Nguyễn Duy Hưng",
       "status": "Chưa cập nhật",
       "occupant_display": "",
       "occupants_list": [],
