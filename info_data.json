@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 467,
-  "last_updated": "2026-05-29T19:43:51.645Z",
+  "last_updated": "2026-05-29T21:27:33.445Z",
   "data": [
     {
       "sheet_source": "AD",
@@ -1815,7 +1815,7 @@
       "sheet_source": "AD",
       "room_number": "AD-245",
       "heading_1": "OFFICE - DIRECTOR",
-      "heading_2": "VP GIÁM ĐỐC TT MÁY TÍNH",
+      "heading_2": "VP GIÁM ��ỐC TT MÁY TÍNH",
       "department": "___",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE",
