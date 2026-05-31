@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 467,
-  "last_updated": "2026-05-31T18:53:26.266Z",
+  "last_updated": "2026-05-31T19:59:09.658Z",
   "data": [
     {
       "sheet_source": "AD",
@@ -878,7 +878,7 @@
       "area": "5",
       "unbounded_height": "4000",
       "capacity": "NA",
-      "status": "Đang sử dụng",
+      "status": "��ang sử dụng",
       "occupant_display": "",
       "occupants_list": [],
       "occupants_flat": ""
