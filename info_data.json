@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 467,
-  "last_updated": "2026-06-04T02:01:04.836Z",
+  "last_updated": "2026-06-04T06:49:28.978Z",
   "data": [
     {
       "sheet_source": "AD",
@@ -5463,7 +5463,7 @@
       "sheet_source": "B3",
       "room_number": "3.WC2",
       "heading_1": "FEMALE TOILET",
-      "heading_2": "NHÀ VỆ SINH N��",
+      "heading_2": "NHÀ VỆ SINH NỮ",
       "department": "___",
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
@@ -5678,7 +5678,7 @@
       "area": "3.71",
       "unbounded_height": "4000",
       "capacity": "--",
-      "status": "Chưa cập nhật",
+      "status": "Chưa c���p nhật",
       "occupant_display": "",
       "occupants_list": [],
       "occupants_flat": ""
