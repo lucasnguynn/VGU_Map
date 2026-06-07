@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 467,
-  "last_updated": "2026-06-07T16:00:37.496Z",
+  "last_updated": "2026-06-07T17:23:43.199Z",
   "data": [
     {
       "sheet_source": "AD",
@@ -4575,7 +4575,7 @@
       "unbounded_height": "4000",
       "capacity": "3",
       "status": "Đang sử dụng",
-      "occupant_display": "Nguyễn Thị Phương Lan",
+      "occupant_display": "Nguyễn Thị Phương��Lan",
       "occupants_list": [],
       "occupants_flat": ""
     },
