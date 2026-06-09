@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 467,
-  "last_updated": "2026-06-09T13:58:39.265Z",
+  "last_updated": "2026-06-09T16:31:39.045Z",
   "data": [
     {
       "sheet_source": "AD",
@@ -6343,7 +6343,7 @@
       "sheet_source": "B3",
       "room_number": "B3-304A",
       "heading_1": "ROBOTICS",
-      "heading_2": "PHÒNG GIẢNG D���Y NGHIÊN CỨU THÍ NGHIỆM",
+      "heading_2": "PHÒNG GIẢNG DẠY NGHIÊN CỨU THÍ NGHIỆM",
       "department": "ECE",
       "fm_room_function": "Laboratory",
       "fm_room_type": "LABORATORY",
@@ -6893,7 +6893,7 @@
       "fm_room_type": "LABORATORY",
       "area": "84.17",
       "unbounded_height": "4000",
-      "capacity": "Mr. Nguyễn Duy Hưng",
+      "capacity": "Mr. Nguyễn Duy H��ng",
       "status": "Chưa cập nhật",
       "occupant_display": "",
       "occupants_list": [],
