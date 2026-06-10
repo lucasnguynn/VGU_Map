@@ -490,6 +490,21 @@ Bản đồ tự động điều chỉnh theo màn hình. Nhấn vào phòng đ�
 //  to work after refactoring into ES6 modules
 //  Placed at top level to ensure availability even during async delays
 // ═══════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════
+//  🔒 XSS MITIGATION: HTML Entity Escape Utility
+//  Replaces dangerous characters with their HTML entity equivalents
+//  to prevent Cross-Site Scripting (XSS) attacks
+// ═══════════════════════════════════════════════════════════════
+function escapeHtml(str) {
+  if (typeof str !== 'string') return str;
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 window.gM = function() {};
 window.doSearch = function() {};
 window.onBuildingChange = function() {};
@@ -2060,7 +2075,7 @@ function sT(tab, rd) {
       f.innerHTML = `
         <div style="width:100%;height:100%;position:relative;display:flex;flex-direction:column;">
           <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:#f0f3fa;border-bottom:1px solid #dde2ec;flex-shrink:0;">
-            <span style="font-size:11px;font-weight:600;color:#002554;">📄 ${sanitizedRid} — Sơ đồ 2D</span>
+            <span style="font-size:11px;font-weight:600;color:#002554;">📄 ${escapeHtml(sanitizedRid)} — Sơ đồ 2D</span>
             <a href="https://drive.google.com/file/d/${fileId}/view" target="_blank" style="font-size:10px;font-weight:600;color:#fff;background:#F58220;padding:3px 8px;border-radius:3px;text-decoration:none;">↗ Mở Drive</a>
           </div>
           <div style="flex:1;position:relative;">
@@ -2069,7 +2084,7 @@ function sT(tab, rd) {
         </div>`;
     } else {
       f.style.background = '#e8eef9';
-      f.innerHTML = `<div style="text-align:center;padding:22px 14px"><div style="font-size:42px;margin-bottom:10px">📐</div><div style="font-size:13px;font-weight:700;color:#002554;">Chưa có sơ đồ 2D cho phòng <b>${sanitizedRid}</b></div></div>`;
+      f.innerHTML = `<div style="text-align:center;padding:22px 14px"><div style="font-size:42px;margin-bottom:10px">📐</div><div style="font-size:13px;font-weight:700;color:#002554;">Chưa có sơ đồ 2D cho phòng <b>${escapeHtml(sanitizedRid)}</b></div></div>`;
     }
 
  // ─── TAB 2: PHỐI CẢNH 3D ───
@@ -2087,7 +2102,7 @@ function sT(tab, rd) {
         <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:rgba(0,37,84,0.95);border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;">
           <div style="display:flex;align-items:center;gap:8px;">
             <span style="font-size:13px;">🏛</span>
-            <span style="font-size:11px;font-weight:700;color:#fff;letter-spacing:.04em;">${sanitizedRid3d}</span>
+            <span style="font-size:11px;font-weight:700;color:#fff;letter-spacing:.04em;">${escapeHtml(sanitizedRid3d)}</span>
             <span style="font-size:10px;color:rgba(255,255,255,0.45);">— 3D View</span>
           </div>
         </div>
@@ -2096,7 +2111,7 @@ function sT(tab, rd) {
           <model-viewer
             id="mv-${sanitizedRid3d}"
             src="${primaryPath}" 
-            alt="3D model of room ${sanitizedRid3d}"
+            alt="3D model of room ${escapeHtml(sanitizedRid3d)}"
             camera-controls 
             auto-rotate 
             shadow-intensity="2" 
@@ -2109,7 +2124,7 @@ function sT(tab, rd) {
           >
             <div slot="poster" id="poster-${sanitizedRid3d}" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0d1117;color:#fff;">
                 <div class="spinner" style="margin-bottom:10px;"></div>
-                <div id="status-text-${sanitizedRid3d}" style="font-size:12px;">Đang tìm mô hình ${sanitizedRid3d}...</div>
+                <div id="status-text-${sanitizedRid3d}" style="font-size:12px;">Đang tìm mô hình ${escapeHtml(sanitizedRid3d)}...</div>
             </div>
           </model-viewer>
         </div>
@@ -2141,7 +2156,7 @@ function sT(tab, rd) {
                 <div style="font-size:38px;">⚠️</div>
                 <div style="font-size:13px;font-weight:700;color:#fff;">Chưa có dữ liệu 3D</div>
                 <div style="font-size:11px;color:rgba(255,255,255,0.45);max-width:240px;">
-                    Không tìm thấy file <br><b>${sanitizedRid3d}.glb</b><br> trong thư mục models.
+                    Không tìm thấy file <br><b>${escapeHtml(sanitizedRid3d)}.glb</b><br> trong thư mục models.
                 </div>
               </div>`;
           }
@@ -2169,11 +2184,11 @@ function sT(tab, rd) {
       f.innerHTML = `
         <div style="width:100%;height:100%;position:relative;display:flex;flex-direction:column;">
           <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:#f0f3fa;border-bottom:1px solid #dde2ec;flex-shrink:0;">
-            <span style="font-size:11px;font-weight:600;color:#002554;">📸 ${sanitizedRid} — Ảnh thực tế</span>
+            <span style="font-size:11px;font-weight:600;color:#002554;">📸 ${escapeHtml(sanitizedRid)} — Ảnh thực tế</span>
             <a href="https://drive.google.com/file/d/${customDriveImageId}/view" target="_blank" style="font-size:10px;font-weight:600;color:#fff;background:#F58220;padding:3px 8px;border-radius:3px;text-decoration:none;">↗ Mở ảnh gốc</a>
           </div>
           <div style="flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;">
-            <img src="${directImageUrl}" alt="Ảnh thực tế ${sanitizedRid}" style="max-width:100%;max-height:100%;object-fit:contain;display:block;" onerror="this.parentElement.innerHTML='<div style=\\'color:#8896a8;font-size:12px;\\'>⚠️ Lỗi hoặc link ảnh Drive chưa mở quyền truy cập công khai</div>'"/>
+            <img src="${directImageUrl}" alt="Ảnh thực tế ${escapeHtml(sanitizedRid)}" style="max-width:100%;max-height:100%;object-fit:contain;display:block;" onerror="this.parentElement.innerHTML='<div style=\\'color:#8896a8;font-size:12px;\\'>⚠️ Lỗi hoặc link ảnh Drive chưa mở quyền truy cập công khai</div>'"/>
           </div>
         </div>`;
     } else {
@@ -2182,7 +2197,7 @@ function sT(tab, rd) {
         <div style="text-align:center;padding:22px 14px">
           <div style="font-size:42px;margin-bottom:10px">📷</div>
           <div style="font-size:13px;font-weight:700;color:#002554;margin-bottom:3px">Chưa có ảnh thực tế</div>
-          <div style="font-size:11px;color:#8896a8;">Hệ thống chưa tìm thấy dữ liệu ảnh cho phòng <b>${sanitizedRid}</b></div>
+          <div style="font-size:11px;color:#8896a8;">Hệ thống chưa tìm thấy dữ liệu ảnh cho phòng <b>${escapeHtml(sanitizedRid)}</b></div>
         </div>`;
     }
   }
