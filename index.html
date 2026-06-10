@@ -485,6 +485,21 @@ Bản đồ tự động điều chỉnh theo màn hình. Nhấn vào phòng đ�
   </div>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script type="module">
+  import { fetchBoundaries } from './js/data-service.js';
+  import { store } from './js/store.js';
+
+  // Load boundaries CSV on startup
+  (async function initApp() {
+    try {
+      const csvText = await fetchBoundaries();
+      window.BOUNDARIES_CSV = csvText;
+      console.log('Boundaries CSV loaded successfully');
+    } catch (error) {
+      console.error('Failed to initialize app:', error);
+    }
+  })();
+</script>
 <script>
 (function injectVersionedModules() {
   const appVersion = document.documentElement.dataset.appVersion || Date.now().toString();
@@ -505,10 +520,9 @@ Bản đồ tự động điều chỉnh theo màn hình. Nhấn vào phòng đ�
 </script>
 <script>
 // ═══════════════════════════════════════════════════════════════
-//  📄 DỮ LIỆU CSV ĐƯỢC EMBED SẴN (Building location- Boundary.csv)
+//  📄 DỮ LIỆU CSV (Loaded externally via fetch)
 //  ── Định dạng: Room_Number;Loop_Index;Segment_Type;StartX;StartY;EndX;EndY;Length
 // ═══════════════════════════════════════════════════════════════
-const BUILDING_BOUNDARY_CSV = `Room_Number;Loop_Index;Segment_Type;StartX;StartY;EndX;EndY;Length
 D1;0;Line;-11693.99;10093.86;-11693.99;10092.29;1.57
 D1;0;Line;-11693.99;10092.29;-7560.11;10092.29;4133.88
 D1;0;Line;-7560.11;10092.29;-7560.11;11431.65;1339.35
