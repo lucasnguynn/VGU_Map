@@ -16,7 +16,8 @@ const APP_SHELL = [
   './index.html',
   './manifest.json',
   './VGU MAP ALL.png',
-  './VGU-Full-Color-logo-05-_1_.svg'
+  './VGU-Full-Color-logo-05-_1_.svg',
+  './boundaries.csv'
 ];
 
 const DATA_PATHS = new Set(['/map_data.json', '/info_data.json', '/drive_data.json']);
