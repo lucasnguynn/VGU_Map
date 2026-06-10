@@ -65,11 +65,30 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.map((name) => {
-      if (name !== STATIC_CACHE && name !== DATA_CACHE) return caches.delete(name);
+    let cacheDeleted = false;
+    
+    await Promise.all(keys.map(async (name) => {
+      // Scope restriction: Only delete caches that belong to this application
+      // by checking if they start with our expected prefixes
+      if (name !== STATIC_CACHE && name !== DATA_CACHE) {
+        // Additional safety: only delete caches with our app's naming pattern
+        if (name.startsWith('vgumap-static-') || name.startsWith('vgumap-data-')) {
+          await caches.delete(name);
+          cacheDeleted = true;
+        }
+      }
       return Promise.resolve();
     }));
+    
     await self.clients.claim();
+    
+    // Notify all clients that cache cleanup is complete
+    if (cacheDeleted) {
+      const clientsList = await self.clients.matchAll({ type: 'window' });
+      for (const client of clientsList) {
+        client.postMessage({ type: 'CACHE_CLEANUP_COMPLETE' });
+      }
+    }
   })());
 });
 
