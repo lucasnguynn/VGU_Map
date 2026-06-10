@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi" data-app-version="20260610070000">
+<html lang="vi" data-app-version="20260610072505">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1241,7 +1241,9 @@ function initLeafletMap() {
   L.imageOverlay('VGU MAP ALL.png', globalBounds).addTo(lMap);
   lMap.fitBounds(globalBounds, { animate: false });
 
-  const csvData = parseBuildingCSV(window.BOUNDARIES_CSV || window.BUILDING_BOUNDARY_CSV);
+  // Safely check for boundary data with fallback to prevent ReferenceError
+  const boundaryData = typeof window.BOUNDARIES_CSV !== 'undefined' ? window.BOUNDARIES_CSV : (typeof window.BUILDING_BOUNDARY_CSV !== 'undefined' ? window.BUILDING_BOUNDARY_CSV : null);
+  const csvData = boundaryData ? parseBuildingCSV(boundaryData) : null;
   if (!csvData) {
     console.warn('Boundary data not yet loaded, retrying shortly...');
     setTimeout(() => initLeafletMap(), 200);
