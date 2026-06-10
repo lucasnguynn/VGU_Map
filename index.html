@@ -414,7 +414,7 @@ Bản đồ tự động điều chỉnh theo màn hình. Nhấn vào phòng đ�
   <div class="ph">
     <div class="phi">
       <button class="pb" onclick="show('pg-h')">← Trang chủ</button>
-      <button class="pb" onclick="gM()">Bản đồ tầng</button>
+      <button class="pb" onclick="MapsToMap()">Bản đồ tầng</button>
       <div class="pbc" id="rbc"></div>
     </div>
   </div>
@@ -422,9 +422,9 @@ Bản đồ tự động điều chỉnh theo màn hình. Nhấn vào phòng đ�
     <div class="rg">
       <div>
         <div class="itab">
-          <button class="it on" id="t2d" onclick="sT('2D')">Sơ đồ 2D</button>
-          <button class="it" id="t3d" onclick="sT('3D')">Phối cảnh 3D</button>
-          <button class="it" id="treal" onclick="sT('REAL')">Ảnh thực tế</button>
+          <button class="it on" id="t2d" onclick="setTab('2D')">Sơ đồ 2D</button>
+          <button class="it" id="t3d" onclick="setTab('3D')">Phối cảnh 3D</button>
+          <button class="it" id="treal" onclick="setTab('REAL')">Ảnh thực tế</button>
         </div>
         <div class="ifrm" id="ifr"></div>
         <div class="mrow">
@@ -443,7 +443,7 @@ Bản đồ tự động điều chỉnh theo màn hình. Nhấn vào phòng đ�
         <div class="ib"><div class="il">Room Function</div><div class="iv" id="rfunc"></div></div>
         <div class="nb">
           <button class="bno" onclick="show('pg-h')">Trang chủ</button>
-          <button class="bnp" onclick="gM()">Bản đồ tầng</button>
+          <button class="bnp" onclick="MapsToMap()">Bản đồ tầng</button>
         </div>
       </div>
     </div>
@@ -1950,7 +1950,7 @@ function show(id) {
   window.scrollTo({ top:0, behavior:'smooth' });
 }
 
-function gM() {
+function MapsToMap() {
   if (ST.fKey) renderMap(ST.bid, ST.fid, ST.flN);
 }
 
@@ -2079,11 +2079,11 @@ function rC(rid) {
     badge.style.border = '1.5px solid #a0aec0';
   }
   
-  sT('2D', rd);
+  setTab('2D', rd);
   show('pg-r');
 }
 
-async function sT(tab, rd) {
+async function setTab(tab, rd) {
   rd = rd || ST.rd;
   if (!rd) return;
   ST.tab = tab;
