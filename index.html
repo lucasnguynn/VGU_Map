@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi" data-app-version="20260610060939">
+<html lang="vi" data-app-version="20260610070000">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -519,6 +519,25 @@ Bản đồ tự động điều chỉnh theo màn hình. Nhấn vào phòng đ�
 })();
 </script>
 <script>
+// ═══════════════════════════════════════════════════════════════
+//  GLOBAL BRIDGE: Expose module-scoped functions to window object
+//  This enables inline HTML event handlers (onclick, onchange, etc.)
+//  to work after refactoring into ES6 modules
+//  Placed at top level to ensure availability even during async delays
+// ═══════════════════════════════════════════════════════════════
+window.gH = function() {};
+window.gM = function() {};
+window.doSearch = function() {};
+window.onBuildingChange = function() {};
+window.onFloorChange = function() {};
+window.clearSearch = function() {};
+window.resetMap = function() {};
+window.goToFloorMap = function() {};
+window.handleSearchKey = function() {};
+window.sT = function() {};
+window.rC = function() {};
+window.onSearchInput = function() {};
+
 // ═══════════════════════════════════════════════════════════════
 //  📄 DỮ LIỆU CSV (Loaded externally via fetch)
 //  ── Định dạng: Room_Number;Loop_Index;Segment_Type;StartX;StartY;EndX;EndY;Length
@@ -1222,7 +1241,12 @@ function initLeafletMap() {
   L.imageOverlay('VGU MAP ALL.png', globalBounds).addTo(lMap);
   lMap.fitBounds(globalBounds, { animate: false });
 
-  const csvData = parseBuildingCSV(BUILDING_BOUNDARY_CSV);
+  const csvData = parseBuildingCSV(window.BOUNDARIES_CSV || window.BUILDING_BOUNDARY_CSV);
+  if (!csvData) {
+    console.warn('Boundary data not yet loaded, retrying shortly...');
+    setTimeout(() => initLeafletMap(), 200);
+    return;
+  }
   bldLayerGroup = L.featureGroup().addTo(lMap);
 
   for (const code in csvData.polygons) {
