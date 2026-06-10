@@ -29,28 +29,8 @@ border:2px solid var(--bl);border-radius:10px;box-shadow:0 8px 24px rgba(0,37,84
 transition:all .3s ease}
 .logo-nav{height:36px;width:auto}
 .logo-hero{max-width:280px;width:100%;height:auto;margin:0 auto 22px;display:block}
-.logo-login{max-width:200px;width:100%;height:auto;filter:brightness(0) invert(1);margin:0 auto;display:block}
 .vd{width:1.5px;height:20px;background:rgba(0,37,84,.15)}
 .vt{font-size:15px;font-weight:800;color:var(--bl);letter-spacing:.02em}
-.lw { min-height: calc(100vh - 62px); display: flex; align-items: center; justify-content: center; padding: 20px 16px; }
-.lc { background: var(--wh); border-radius: 8px; width: 100%; max-width: 320px; border: 1px solid var(--gl); overflow: hidden; box-shadow: 0 8px 24px rgba(0,37,84,.06); }
-.lt { background: var(--bl); padding: 24px 24px 18px; text-align: center; }
-.lp { font-size: 12px; font-weight: 600; color: var(--wh); margin-top: 10px; letter-spacing: .04em; opacity: .85; }
-.lb { padding: 20px 24px 24px; }
-.lf { margin-bottom: 12px; }
-.lf label { display: block; font-size: 12px; font-weight: 600; color: var(--bl); margin-bottom: 4px; }
-.lf input { width: 100%; height: 36px; border: 1.5px solid var(--gl); border-radius: 4px; padding: 0 10px; font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; color: var(--bl); transition: all .2s; }
-.lf input:focus { outline: none; border-color: var(--or); box-shadow: 0 0 0 3px rgba(245,130,32,.15); }
-.lf input::placeholder { color: var(--ht); }
-.lsep { display: flex; align-items: center; gap: 8px; margin: 10px 0; }
-.lsl { flex: 1; height: 1px; background: var(--gl); }
-.lsep span { font-size: 10px; color: var(--ht); }
-.bls { width: 100%; height: 36px; border: none; border-radius: 4px; font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s; }
-.bls.solid { background: var(--or); color: var(--wh); }
-.bls.solid:hover { background: #c9661a; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(245,130,32,.25); }
-.bls.out { background: var(--wh); border: 2px solid var(--bl); color: var(--bl); margin-top: 8px; }
-.bls.out:hover { background: var(--bl); color: var(--wh); transform: translateY(-1px); }
-.lnote { font-size: 10px; color: var(--ht); text-align: center; margin-top: 10px; line-height: 1.5; }
 .header { background: var(--wh); border-bottom: 1px solid var(--gl); padding: 0 24px; display: flex; align-items: center; gap: 24px; height: 56px; box-shadow: 0 2px 8px rgba(0,37,84,.06); position: relative; z-index: 10;}
 .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; flex-shrink: 0; cursor:pointer; }
 .logo-header { height: 42px; width: auto; max-width: 100%; object-fit: contain; -webkit-transform: translateZ(0); transform: translateZ(0); -webkit-backface-visibility: hidden; backface-visibility: hidden; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; shape-rendering: geometricPrecision; }
@@ -347,24 +327,9 @@ polygon,polyline{transition:all .18s cubic-bezier(.4,0,.2,1)}
 </head>
 <body>
 <h2 class="sr-only">VGUMap — Hệ thống tra cứu Kiến trúc & Phòng ốc VGU</h2>
-<div class="page active" id="pg-l">
-<div class="lw"><div class="lc">
-<div class="lt">
-<img src="VGU-Full-Color-logo-05-_1_.svg" alt="VGU Logo" class="logo-login">
-<p class="lp">VGUMap — Tra cứu Phòng ốc</p>
-</div>
-<div class="lb">
-<div class="lf"><label>Email</label><input type="email" placeholder="example@vgu.edu.vn"></div>
-<div class="lf"><label>Mật khẩu</label><input type="password" placeholder="Nhập mật khẩu"></div>
-<button class="bls solid" onclick="gH()">Đăng nhập</button>
-<div class="lsep"><div class="lsl"></div><span>hoặc</span><div class="lsl"></div></div>
-<button class="bls out" onclick="gH()">Đăng nhập dưới dạng khách</button>
-</div>
-</div></div>
-</div>
-<div class="page" id="pg-h">
+<div class="page active" id="pg-h">
 <div class="header">
-<div class="logo" onclick="gH()">
+<div class="logo">
 <img src="VGU-Full-Color-logo-05-_1_.svg" alt="Vietnamese-German University Logo" class="logo-header">
 </div>
 <div class="page-title">VGU Map &mdash; <span>TRA CỨU PHÒNG ỐC</span></div>
@@ -427,7 +392,7 @@ polygon,polyline{transition:all .18s cubic-bezier(.4,0,.2,1)}
 </div>
 <div class="page" id="pg-m">
 <div class="ph"><div class="phi">
-<button class="pb" onclick="gH()">← Trang chủ</button>
+<button class="pb" onclick="show('pg-h')">← Trang chủ</button>
 <div><div class="pt" id="mpt">Bản đồ tầng</div><div class="ps">Nhấn vào phòng để xem chi tiết</div></div>
 <div class="pbc" id="mpbc"></div>
 </div></div>
@@ -448,7 +413,7 @@ Bản đồ tự động điều chỉnh theo màn hình. Nhấn vào phòng đ�
 <div class="page" id="pg-r">
   <div class="ph">
     <div class="phi">
-      <button class="pb" onclick="gH()">← Trang chủ</button>
+      <button class="pb" onclick="show('pg-h')">← Trang chủ</button>
       <button class="pb" onclick="gM()">Bản đồ tầng</button>
       <div class="pbc" id="rbc"></div>
     </div>
@@ -477,7 +442,7 @@ Bản đồ tự động điều chỉnh theo màn hình. Nhấn vào phòng đ�
         <div class="ib"><div class="il">Room Type</div><div class="iv" id="rtype"></div></div>
         <div class="ib"><div class="il">Room Function</div><div class="iv" id="rfunc"></div></div>
         <div class="nb">
-          <button class="bno" onclick="gH()">Trang chủ</button>
+          <button class="bno" onclick="show('pg-h')">Trang chủ</button>
           <button class="bnp" onclick="gM()">Bản đồ tầng</button>
         </div>
       </div>
@@ -525,7 +490,6 @@ Bản đồ tự động điều chỉnh theo màn hình. Nhấn vào phòng đ�
 //  to work after refactoring into ES6 modules
 //  Placed at top level to ensure availability even during async delays
 // ═══════════════════════════════════════════════════════════════
-window.gH = function() {};
 window.gM = function() {};
 window.doSearch = function() {};
 window.onBuildingChange = function() {};
@@ -1935,18 +1899,6 @@ function show(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo({ top:0, behavior:'smooth' });
-}
-
-function gH() {
-  show('pg-h');
-  setTimeout(() => {
-    if (!isMapInitialized) {
-      initLeafletMap();
-      isMapInitialized = true;
-    } else {
-      if (lMap) lMap.invalidateSize();
-    }
-  }, 50);
 }
 
 function gM() {
