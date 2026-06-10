@@ -54,14 +54,13 @@ function extractArray(payload, name) {
 function normalizeInfo(payload) {
   const rows = extractArray(payload, 'INFO');
   const data = rows.map((room) => {
-    const flat = { ...room };
-    const list = Array.isArray(room.occupants_list)
-      ? room.occupants_list.map((x) => String(x || '').trim()).filter(Boolean)
-      : String(room.occupants_list || '').split(',').map((x) => x.trim()).filter(Boolean);
-    flat.occupants_list = list;
-    flat.occupants_flat = list.join(', ');
-    if (flat.occupants_flat) flat.occupant_display = flat.occupants_flat;
-    return flat;
+    // Backend is single source of truth - occupants_list is already an array
+    // Just ensure it exists and add occupants_flat for convenience
+    const list = Array.isArray(room.occupants_list) ? room.occupants_list : [];
+    return {
+      ...room,
+      occupants_flat: list.join(', ')
+    };
   });
   return { status: 'success', total_rooms: data.length, last_updated: new Date().toISOString(), data };
 }
