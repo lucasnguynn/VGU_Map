@@ -1,16 +1,75 @@
 // ==========================================
 // 1. HÀM CHÍNH: ĐÓN NHẬN REQUEST VÀ TRẢ DỮ LIỆU
 // ==========================================
+
+// Chunking utilities for PropertiesService (9KB limit per property)
+const CHUNK_SIZE = 8000;
+const CHUNK_PREFIX = "vgu_chunk_";
+const CACHE_KEY_META = "vgu_rooms_api_meta";
+
+function storeDataWithChunking(dataStr) {
+  const props = PropertiesService.getScriptProperties();
+  // Clear any existing chunks
+  clearExistingChunks(props);
+  
+  if (dataStr.length <= CHUNK_SIZE) {
+    props.setProperty(CACHE_KEY_META, JSON.stringify({ chunks: 1, full: dataStr }));
+    return;
+  }
+  
+  const chunks = [];
+  for (let i = 0; i < dataStr.length; i += CHUNK_SIZE) {
+    chunks.push(dataStr.substring(i, i + CHUNK_SIZE));
+  }
+  
+  for (let i = 0; i < chunks.length; i++) {
+    props.setProperty(CHUNK_PREFIX + i, chunks[i]);
+  }
+  
+  props.setProperty(CACHE_KEY_META, JSON.stringify({ chunks: chunks.length }));
+}
+
+function retrieveDataWithChunking() {
+  const props = PropertiesService.getScriptProperties();
+  const metaStr = props.getProperty(CACHE_KEY_META);
+  if (!metaStr) return null;
+  
+  const meta = JSON.parse(metaStr);
+  
+  if (meta.full !== undefined) {
+    return meta.full;
+  }
+  
+  if (!meta.chunks || meta.chunks <= 0) return null;
+  
+  let result = "";
+  for (let i = 0; i < meta.chunks; i++) {
+    const chunk = props.getProperty(CHUNK_PREFIX + i);
+    if (chunk === null) return null;
+    result += chunk;
+  }
+  
+  return result;
+}
+
+function clearExistingChunks(props) {
+  const allProps = props.getProperties();
+  Object.keys(allProps).forEach(key => {
+    if (key === CACHE_KEY_META || key.startsWith(CHUNK_PREFIX)) {
+      props.deleteProperty(key);
+    }
+  });
+}
+
 function doGet(e) {
-  const cache = CacheService.getScriptCache();
-  // Đổi cacheKey để ép Google vứt bỏ bản cache lỗi đang bị kẹt
+  // Use PropertiesService instead of CacheService
   const cacheKey = "vgu_rooms_api_data_v2"; 
   
   // Chấp nhận cả tham số nocache hoặc nếu sync truyền v thì cũng cân nhắc bỏ qua cache
   const forceRefresh = e && e.parameter && (e.parameter.nocache === "true" || e.parameter.force === "1");
   
   if (!forceRefresh) {
-    const cachedData = cache.get(cacheKey);
+    const cachedData = retrieveDataWithChunking();
     if (cachedData) {
       return ContentService.createTextOutput(cachedData).setMimeType(ContentService.MimeType.JSON);
     }
@@ -76,7 +135,7 @@ function doGet(e) {
     const resultData = Object.keys(roomsMap).map(roomKey => {
       const room = roomsMap[roomKey];
       room.occupant_display = room.occupants_list.join(", ");
-      delete room.occupants_list; 
+      // Keep occupants_list - do NOT delete it, API returns it directly
       return room;
     });
 
@@ -92,13 +151,8 @@ function doGet(e) {
       data: resultData
     });
 
-    // 🚀 BỌC BẢO VỆ: Chống sập API khi dữ liệu vượt quá 100KB của CacheService
-    try {
-      cache.put(cacheKey, responsePayload, 900);
-    } catch (cacheError) {
-      // Nếu Google chê data quá bự ("Argument too large"), ta lờ đi và bỏ qua việc lưu cache.
-      // API vẫn tiếp tục chạy và trả về dữ liệu thành công!
-    }
+    // 🚀 Store data using PropertiesService with chunking mechanism
+    storeDataWithChunking(responsePayload);
 
     return ContentService.createTextOutput(responsePayload).setMimeType(ContentService.MimeType.JSON);
 
