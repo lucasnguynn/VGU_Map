@@ -3,10 +3,11 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
+// API endpoints - use environment variables if provided, otherwise use defaults
 const API_ENDPOINTS = {
-  MAP: 'https://script.google.com/macros/s/AKfycbxFmunolmZ5LSC6exu6OnGE0dZi9VYrf6gWBqMJQOrFUe8MdRQAiz0XT825JwkGd-O0/exec',
-  INFO: 'https://script.google.com/macros/s/AKfycbzfuL15z4KTKgTVGR5j24PJunAKvC6PP1YRL2Fw0TlH3zxKIDv_e4kQc_sxorlIia07/exec',
-  DRIVE: 'https://script.google.com/macros/s/AKfycbw4PtDoCILXSiIn1AAYzJhUhSvmJ6ufKD-5R-QKZGzbBy-yQTfC_bPTKJEErwt1d_iS/exec'
+  MAP: process.env.MAP_API_URL || 'https://script.google.com/macros/s/AKfycbxFmunolmZ5LSC6exu6OnGE0dZi9VYrf6gWBqMJQOrFUe8MdRQAiz0XT825JwkGd-O0/exec',
+  INFO: process.env.INFO_API_URL || 'https://script.google.com/macros/s/AKfycbzfuL15z4KTKgTVGR5j24PJunAKvC6PP1YRL2Fw0TlH3zxKIDv_e4kQc_sxorlIia07/exec',
+  DRIVE: process.env.DRIVE_API_URL || 'https://script.google.com/macros/s/AKfycbw4PtDoCILXSiIn1AAYzJhUhSvmJ6ufKD-5R-QKZGzbBy-yQTfC_bPTKJEErwt1d_iS/exec'
 };
 
 const OUTPUT = { MAP: 'map_data.json', INFO: 'info_data.json', DRIVE: 'drive_data.json' };

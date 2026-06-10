@@ -31,6 +31,10 @@ jobs:
 
       - name: Run unified data sync script
         run: node sync_all_data.js
+        env:
+          MAP_API_URL: ${{ secrets.MAP_API_URL }}
+          INFO_API_URL: ${{ secrets.INFO_API_URL }}
+          DRIVE_API_URL: ${{ secrets.DRIVE_API_URL }}
 
       - name: Stamp PWA build version into sw.js and index.html
         run: node build_pwa.js
