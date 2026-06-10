@@ -1196,6 +1196,33 @@ let selectedPolygon = null;
 let globalBounds = null;
 let cleanupMapResizeHandler = null;
 const dataRequestCache = new Map();
+const CACHE_TTL_MS = 4 * 60 * 1000; // 4 minutes TTL
+
+// Helper to get cached value if not expired
+function getCachedRequest(normalizedUrl) {
+  const entry = dataRequestCache.get(normalizedUrl);
+  if (!entry) return null;
+  if (Date.now() - entry.timestamp > CACHE_TTL_MS) {
+    dataRequestCache.delete(normalizedUrl);
+    return null;
+  }
+  return entry.request;
+}
+
+// Helper to set cached value with timestamp
+function setCachedRequest(normalizedUrl, request) {
+  dataRequestCache.set(normalizedUrl, { request, timestamp: Date.now() });
+}
+
+// Cleanup expired cache entries periodically
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of dataRequestCache.entries()) {
+    if (now - entry.timestamp > CACHE_TTL_MS) {
+      dataRequestCache.delete(key);
+    }
+  }
+}, 60000); // Check every minute
 
 const defaultPolyStyle   = { color:'#002554', fillColor:'#002554', fillOpacity:0.05, weight:2 };
 const highlightPolyStyle = { color:'#f58220', weight:4, fillColor:'#f58220', fillOpacity:0.3 };
@@ -1383,6 +1410,7 @@ let lastDataHash = '';
 let sheetRoomData = {};
 let driveImages = {};
 let isInfoLoaded = false;
+let driveImagesLoaded = false;
 
 function safeExtractArray(payload) {
   if (Array.isArray(payload)) return payload;
@@ -1393,7 +1421,8 @@ function safeExtractArray(payload) {
 
 async function fetchJsonSafe(url) {
   const normalizedUrl = `${url}?v=${dataVersion}`;
-  if (dataRequestCache.has(normalizedUrl)) return dataRequestCache.get(normalizedUrl);
+  const cached = getCachedRequest(normalizedUrl);
+  if (cached) return cached;
 
   const req = (async () => {
     const controller = new AbortController();
@@ -1409,16 +1438,19 @@ async function fetchJsonSafe(url) {
     }
   })();
 
-  dataRequestCache.set(normalizedUrl, req);
+  setCachedRequest(normalizedUrl, req);
   return req;
 }
 
 
 async function loadDriveImages() {
+  if (driveImagesLoaded) return; // Already loaded, skip
+  
   // Primary: read from static file with cache-busting to ensure fresh data
   try {
     driveImages = await fetchJsonSafe(API_DRIVE_JSON);
     console.log('✅ Drive images loaded from static JSON');
+    driveImagesLoaded = true;
     return;
   } catch (e) {
     console.warn('⚠️ drive_data.json not available, falling back to live API...');
@@ -1429,6 +1461,7 @@ async function loadDriveImages() {
     if (!res.ok) throw new Error(`API HTTP ${res.status}`);
     driveImages = await res.json();
     console.log('✅ Drive images loaded from live API (fallback)');
+    driveImagesLoaded = true;
   } catch (e) {
     console.error('❌ Failed to load drive images:', e.message);
   }
@@ -1529,6 +1562,7 @@ function stableHash(value) {
 async function refreshDataAndRerender() {
   dataVersion = Date.now();
   dataRequestCache.clear();
+  driveImagesLoaded = false; // Reset to allow re-fetch on refresh
   setStatus('loading', 'Đang đồng bộ dữ liệu mới nhất...');
   try {
     isInfoLoaded = false;
@@ -2049,7 +2083,7 @@ function rC(rid) {
   show('pg-r');
 }
 
-function sT(tab, rd) {
+async function sT(tab, rd) {
   rd = rd || ST.rd;
   if (!rd) return;
   ST.tab = tab;
@@ -2064,6 +2098,11 @@ function sT(tab, rd) {
 
   // ─── TAB 1: SƠ ĐỒ 2D ───
   if (tab === '2D') {
+    // Lazy load driveImages only when user opens 2D tab
+    if (!driveImagesLoaded) {
+      await loadDriveImages();
+    }
+    
     let fileId = null;
     for (const [key, value] of Object.entries(driveImages)) {
       if (String(key).trim().toUpperCase() === sanitizedRid) { fileId = value; break; }
@@ -2165,6 +2204,10 @@ function sT(tab, rd) {
 
   // ─── TAB 3: ẢNH THỰC TẾ (MỚI) ───
   } else if (tab === 'REAL') {
+    // Lazy load driveImages only when user opens Real Photos tab
+    if (!driveImagesLoaded) {
+      await loadDriveImages();
+    }
     
     // 👉 MÓC NỐI API RIÊNG CỦA BẠN Ở ĐÂY:
     // Lấy ID ảnh thực tế từ object/API Drive mà bạn tự dựng (Ví dụ: móc từ biến realDriveImages)
