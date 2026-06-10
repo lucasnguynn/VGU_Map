@@ -2289,6 +2289,24 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+// ═══════════════════════════════════════════════════════════════
+//  GLOBAL BRIDGE: Expose module-scoped functions to window object
+//  This enables inline HTML event handlers (onclick, onchange, etc.)
+//  to work after refactoring into ES6 modules
+// ═══════════════════════════════════════════════════════════════
+window.gH = gH;
+window.gM = gM;
+window.doSearch = doSearch;
+window.onBuildingChange = onBuildingChange;
+window.onFloorChange = onFloorChange;
+window.clearSearch = clearSearch;
+window.resetMap = resetMap;
+window.goToFloorMap = goToFloorMap;
+window.handleSearchKey = handleSearchKey;
+window.sT = sT;
+window.rC = rC;
+window.onSearchInput = onSearchInput;
+
 </script>
 </body>
 </html>
