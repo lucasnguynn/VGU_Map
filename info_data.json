@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 467,
-  "last_updated": "2026-06-11T14:49:24.637Z",
+  "last_updated": "2026-06-11T17:57:20.719Z",
   "data": [
     {
       "sheet_source": "AD",
@@ -1775,7 +1775,7 @@
       "unbounded_height": "4000",
       "capacity": "2",
       "status": "Đang sử dụng",
-      "occupant_display": "Nguyễn Quang Liêm\nVõ Văn Nam\nTrần Nguyên Hảo\nNguyễn Anh Thọ",
+      "occupant_display": "Nguyễn Quang Liêm\nV�� Văn Nam\nTrần Nguyên Hảo\nNguyễn Anh Thọ",
       "occupants_list": [],
       "occupants_flat": ""
     },
@@ -6551,7 +6551,7 @@
       "sheet_source": "B3",
       "room_number": "B3-315",
       "heading_1": "SELF STUDY",
-      "heading_2": "PHÒNG TỰ HỌC",
+      "heading_2": "PHÒNG TỰ H��C",
       "department": "___",
       "fm_room_function": "Other functions",
       "fm_room_type": "OTHER - SelfStudy",
