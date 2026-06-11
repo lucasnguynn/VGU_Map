@@ -1183,7 +1183,7 @@ let polygonLayers = {};
 let selectedPolygon = null;
 let globalBounds = null;
 let cleanupMapResizeHandler = null;
-const dataRequestCache = new Map();
+// dataRequestCache removed — replaced by _memCache in fetchJsonSafe (persists across refreshes)
 
 const defaultPolyStyle   = { color:'#002554', fillColor:'#002554', fillOpacity:0.05, weight:2 };
 const highlightPolyStyle = { color:'#f58220', weight:4, fillColor:'#f58220', fillOpacity:0.3 };
@@ -1357,7 +1357,7 @@ const API_DRIVE_JSON = './drive_data.json';
 
 const API_DRIVE_LIST = "https://script.google.com/macros/s/AKfycbw4PtDoCILXSiIn1AAYzJhUhSvmJ6ufKD-5R-QKZGzbBy-yQTfC_bPTKJEErwt1d_iS/exec";
 const DATA_REFRESH_INTERVAL_MS = 5 * 60 * 1000;
-let dataVersion = Date.now();
+// dataVersion removed — SW cache handles freshness; _memCache deduplicates within session
 let dataAutoRefreshTimer = null;
 let lastDataHash = '';
 
@@ -1372,31 +1372,53 @@ function safeExtractArray(payload) {
   return [];
 }
 
-async function fetchJsonSafe(url) {
-  const normalizedUrl = `${url}?v=${dataVersion}`;
-  if (dataRequestCache.has(normalizedUrl)) return dataRequestCache.get(normalizedUrl);
+// In-memory cache persists across background refreshes (only cleared on hard reload)
+const _memCache = new Map();
+// Deduplicate in-flight requests to prevent race conditions
+const _inflightFetches = new Map();
 
-  const req = (async () => {
+async function fetchJsonSafe(url, { backgroundRefresh = false } = {}) {
+  // Strip query string for cache key (mirrors SW normalizedRequest)
+  const cacheKey = url.split('?')[0];
+
+  // 1. Return in-memory result if available and not a forced background refresh
+  if (!backgroundRefresh && _memCache.has(cacheKey)) {
+    return _memCache.get(cacheKey);
+  }
+
+  // 2. Deduplicate in-flight requests
+  if (_inflightFetches.has(cacheKey)) {
+    return _inflightFetches.get(cacheKey);
+  }
+
+  // 3. Fetch — SW will serve from DATA_CACHE if network is slow/offline
+  //    Do NOT pass cache:'no-store' — let SW handle caching strategy
+  const promise = (async () => {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 12000);
+    const timeout = setTimeout(() => controller.abort(), 8000);
     try {
-      const res = await fetch(normalizedUrl, { cache: 'no-store', signal: controller.signal });
+      const res = await fetch(cacheKey, { signal: controller.signal });
       if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
-      return await res.json();
+      const data = await res.json();
+      _memCache.set(cacheKey, data);
+      return data;
     } catch (e) {
+      // If in-memory has stale data, return it rather than throwing
+      if (_memCache.has(cacheKey)) return _memCache.get(cacheKey);
       throw new Error(`Fetch failed for ${url}: ${e.message}`);
     } finally {
       clearTimeout(timeout);
+      _inflightFetches.delete(cacheKey);
     }
   })();
 
-  dataRequestCache.set(normalizedUrl, req);
-  return req;
+  _inflightFetches.set(cacheKey, promise);
+  return promise;
 }
 
 
 async function loadDriveImages() {
-  // Primary: read from static file with cache-busting to ensure fresh data
+  // Primary: read from static file (SW cache handles freshness)
   try {
     driveImages = await fetchJsonSafe(API_DRIVE_JSON);
     console.log('✅ Drive images loaded from static JSON');
@@ -1406,7 +1428,7 @@ async function loadDriveImages() {
   }
   // Fallback: live API (slower, used only when static file is missing)
   try {
-    const res = await fetch(`${API_DRIVE_LIST}?v=${dataVersion}`, { cache: 'no-store' });
+    const res = await fetch(API_DRIVE_LIST);
     if (!res.ok) throw new Error(`API HTTP ${res.status}`);
     driveImages = await res.json();
     console.log('✅ Drive images loaded from live API (fallback)');
@@ -1417,8 +1439,8 @@ async function loadDriveImages() {
 
 (async function initializeData() {
   try {
-    await refreshDataAndRerender();
-    dataAutoRefreshTimer = setInterval(refreshDataAndRerender, DATA_REFRESH_INTERVAL_MS);
+    await refreshDataAndRerender(false); // Initial load shows spinner
+    dataAutoRefreshTimer = setInterval(() => refreshDataAndRerender(true), DATA_REFRESH_INTERVAL_MS); // Background refresh is silent
     console.log("✅ Hệ thống tải dữ liệu API hoàn tất!");
   } catch (e) {
     console.error("❌ Lỗi khởi tạo hệ thống:", e);
@@ -1507,23 +1529,71 @@ function stableHash(value) {
   return String(hash >>> 0);
 }
 
-async function refreshDataAndRerender() {
-  dataVersion = Date.now();
-  dataRequestCache.clear();
-  setStatus('loading', 'Đang đồng bộ dữ liệu mới nhất...');
+async function refreshDataAndRerender(isBackground = false) {
+  if (!isBackground) setStatus('loading', 'Đang đồng bộ dữ liệu mới nhất...');
+  
   try {
-    isInfoLoaded = false;
-    await Promise.all([loadDriveImages(), fetchRoomInfo()]);
-    const hash = stableHash({ b: BUILDINGS.map(x => [x.code, x.rooms.length]), i: Object.keys(sheetRoomData).length, d: Object.keys(driveImages).length });
-    const changed = hash !== lastDataHash;
+    // Background fetch: don't clear _memCache, fetch in parallel silently
+    const [newMapRaw, newInfoRaw, newDriveRaw] = await Promise.all([
+      fetchJsonSafe(API_MAP, { backgroundRefresh: isBackground }),
+      fetchJsonSafe(API_INFO, { backgroundRefresh: isBackground }),
+      fetchJsonSafe(API_DRIVE_JSON, { backgroundRefresh: isBackground })
+    ]);
+
+    const hash = stableHash({ m: newMapRaw, i: newInfoRaw, d: newDriveRaw });
+    if (hash === lastDataHash) {
+      setStatus('', '');
+      return; // Data unchanged — skip all processing
+    }
+    
     lastDataHash = hash;
-    setStatus('', '');
-    if (changed && ST.fKey) {
+    
+    // Process new data
+    sheetRoomData = {};
+    BUILDINGS.forEach((bld) => { bld.rooms = []; });
+    
+    const mapArray = safeExtractArray(newMapRaw);
+    const infoArray = safeExtractArray(newInfoRaw);
+    
+    mapArray.forEach(item => {
+      const roomNumStr = item.Room_Number || item.room_number || item['Room_Number'] || item['room_number'] || "";
+      const roomNum = String(roomNumStr).trim();
+      if (!roomNum || /LB|CR|WC/i.test(roomNum)) return;
+      
+      const floorNum = roomNum.charAt(0);
+      const bldCode = item.Building_Code || item.building_code || item['Building_Code'] || item['building_code'] || "";
+      const targetBld = BUILDINGS.find(b => b.code === bldCode);
+      if (!targetBld) return;
+      
+      if (!sheetRoomData[roomNum]) sheetRoomData[roomNum] = [];
+      sheetRoomData[roomNum].push({
+        building: bldCode,
+        floor: floorNum,
+        name: item.Room_Name || item.room_name || item['Room_Name'] || item['room_name'] || "",
+        type: item.Type || item.type || item['Type'] || item['type'] || "",
+        capacity: item.Capacity || item.capacity || item['Capacity'] || item['capacity'] || ""
+      });
+      targetBld.rooms.push(roomNum);
+    });
+    
+    // Deduplicate and sort rooms per building
+    BUILDINGS.forEach((bld) => {
+      bld.rooms = [...new Set(bld.rooms)].sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+    });
+    
+    driveImages = newDriveRaw || {};
+    isInfoLoaded = true;
+    
+    if (isBackground && ST.fKey) {
+      // Silent re-render only if a floor map is currently displayed
       await renderMap(ST.bid, ST.fid, ST.flN);
     }
+    setStatus('', '');
+    
     if (navigator.serviceWorker?.controller) navigator.serviceWorker.controller.postMessage({ type: 'REFRESH_DATA_CACHE' });
   } catch (e) {
-    setStatus('error', `Không thể đồng bộ dữ liệu: ${e.message}`);
+    if (!isBackground) setStatus('error', `Không thể đồng bộ dữ liệu: ${e.message}`);
+    // Background failures are silent — user already has valid data
   }
 }
 
@@ -2354,34 +2424,64 @@ window.addEventListener('beforeunload', () => {
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    let hasReloadedForUpdate = false;
+    let waitingWorker = null;
+
+    const showUpdateToast = (worker) => {
+      waitingWorker = worker;
+      // Non-blocking toast UI (bottom-fixed bar)
+      const toast = document.getElementById('updateToast') || createUpdateToast();
+      toast.style.display = 'flex';
+      document.getElementById('updateToastBtn').onclick = () => {
+        if (waitingWorker) waitingWorker.postMessage({ type: 'SKIP_WAITING' });
+        toast.style.display = 'none';
+      };
+    };
+
+    const createUpdateToast = () => {
+      const el = document.createElement('div');
+      el.id = 'updateToast';
+      el.innerHTML = `
+        <span>🔄 Phiên bản mới đã sẵn sàng</span>
+        <button id="updateToastBtn">Cập nhật ngay</button>
+        <button onclick="this.parentElement.style.display='none'">Bỏ qua</button>
+      `;
+      // Style: fixed bottom bar, VGU brand colors
+      Object.assign(el.style, {
+        display: 'none', position: 'fixed', bottom: '16px', left: '50%',
+        transform: 'translateX(-50%)', background: '#002554', color: '#fff',
+        padding: '10px 20px', borderRadius: '8px', gap: '12px',
+        alignItems: 'center', zIndex: '9999', boxShadow: '0 4px 16px rgba(0,37,84,.4)',
+        fontFamily: "'IBM Plex Sans', sans-serif", fontSize: '13px'
+      });
+      // Style buttons
+      const buttons = el.querySelectorAll('button');
+      buttons[0].style.cssText = 'background:#F58220;color:#fff;border:none;padding:6px 14px;border-radius:4px;cursor:pointer;font-weight:600;';
+      buttons[1].style.cssText = 'background:transparent;color:#fff;border:1px solid rgba(255,255,255,.4);padding:6px 14px;border-radius:4px;cursor:pointer;';
+      document.body.appendChild(el);
+      return el;
+    };
 
     navigator.serviceWorker.register('./sw.js')
       .then((registration) => {
         console.log('✅ Service Worker registered:', registration.scope);
 
-        const promptAndActivateUpdate = (newWorker) => {
-          if (!newWorker) return;
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state !== 'installed' || !navigator.serviceWorker.controller) return;
-            const doRefresh = confirm('VGUMap has a new version. Reload now?');
-            if (doRefresh) newWorker.postMessage({ type: 'SKIP_WAITING' });
-          });
-        };
-
         // Handle already-waiting worker (user reopened tab after partial update)
         if (registration.waiting) {
-          promptAndActivateUpdate(registration.waiting);
+          showUpdateToast(registration.waiting);
         }
 
-        promptAndActivateUpdate(registration.installing);
         registration.addEventListener('updatefound', () => {
-          promptAndActivateUpdate(registration.installing);
+          const newWorker = registration.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // New SW is ready — show toast to user
+              showUpdateToast(newWorker);
+            }
+          });
         });
 
+        // Only reload after user explicitly clicked "Update" (triggers SKIP_WAITING)
         navigator.serviceWorker.addEventListener('controllerchange', () => {
-          if (hasReloadedForUpdate) return;
-          hasReloadedForUpdate = true;
           window.location.reload();
         });
       })

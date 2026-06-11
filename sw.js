@@ -8,8 +8,8 @@
  */
 
 const SW_VERSION = '20260611062332';
-const STATIC_CACHE = `vgumap-static-${SW_VERSION}`;
-const DATA_CACHE = `vgumap-data-${SW_VERSION}`;
+const STATIC_CACHE = `vgumap-static-${SW_VERSION}`;  // Versioned (shell changes)
+const DATA_CACHE   = 'vgumap-data-v1';               // Stable (data survives deploys)
 
 const APP_SHELL = [
   './',
@@ -58,7 +58,7 @@ self.addEventListener('install', (event) => {
           .catch(err => console.warn(`[SW] Pre-cache failed for ${url}:`, err))
       )
     );
-    await self.skipWaiting();
+    // DO NOT call self.skipWaiting() here — let user decide when to reload
   })());
 });
 
@@ -66,7 +66,9 @@ self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
     await Promise.all(keys.map((name) => {
-      if (name !== STATIC_CACHE && name !== DATA_CACHE) return caches.delete(name);
+      // Only delete old STATIC caches, never the stable DATA_CACHE
+      const isOldStatic = name.startsWith('vgumap-static-') && name !== STATIC_CACHE;
+      if (isOldStatic) return caches.delete(name);
       return Promise.resolve();
     }));
     await self.clients.claim();
@@ -138,16 +140,25 @@ async function staleWhileRevalidateStatic(request) {
 
 async function networkFirstData(request) {
   const cacheKey = normalizedRequest(request);
-
+  const cache = await caches.open(DATA_CACHE);
+  const cached = await cache.match(cacheKey, { ignoreSearch: true });
+  
+  // Check cache freshness (4-minute TTL)
+  if (cached) {
+    const cachedDate = new Date(cached.headers.get('date') || 0);
+    const ageMs = Date.now() - cachedDate.getTime();
+    if (ageMs < 4 * 60 * 1000) return cached; // Fresh — serve immediately
+  }
+  
+  // Stale or missing — try network
   try {
     const response = await fetch(request, { cache: 'no-store' });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     await putIfOk(DATA_CACHE, request, response);
     return response;
   } catch (error) {
-    const cached = await caches.match(cacheKey, { ignoreSearch: true });
-    if (cached) return cached;
-
+    if (cached) return cached; // Serve stale on network failure
+    
     return new Response(JSON.stringify({
       error: 'offline_data_unavailable',
       message: error?.message || 'Network error'
