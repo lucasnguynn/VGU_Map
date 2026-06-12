@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 467,
-  "last_updated": "2026-06-12T11:08:45.063Z",
+  "last_updated": "2026-06-12T14:14:25.839Z",
   "data": [
     {
       "sheet_source": "AD",
@@ -1631,7 +1631,7 @@
       "unbounded_height": "4000",
       "capacity": "2",
       "status": "Chưa sử dụng",
-      "occupant_display": "Nguyễn Th�� Hằng Nga",
+      "occupant_display": "Nguyễn Thị Hằng Nga",
       "occupants_list": [],
       "occupants_flat": ""
     },
@@ -6343,7 +6343,7 @@
       "sheet_source": "B3",
       "room_number": "B3-304A",
       "heading_1": "ROBOTICS",
-      "heading_2": "PHÒNG GIẢNG DẠY NGHIÊN CỨU THÍ NGHIỆM",
+      "heading_2": "PHÒNG GIẢNG D���Y NGHIÊN CỨU THÍ NGHIỆM",
       "department": "ECE",
       "fm_room_function": "Laboratory",
       "fm_room_type": "LABORATORY",
