@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 467,
-  "last_updated": "2026-06-13T15:53:33.867Z",
+  "last_updated": "2026-06-13T17:04:36.768Z",
   "data": [
     {
       "sheet_source": "AD",
@@ -1198,7 +1198,7 @@
       "area": "7",
       "unbounded_height": "4000",
       "capacity": "NA",
-      "status": "Đang s��� dụng",
+      "status": "Đang sử dụng",
       "occupant_display": "",
       "occupants_list": [],
       "occupants_flat": ""
@@ -1639,7 +1639,7 @@
       "sheet_source": "AD",
       "room_number": "AD-231",
       "heading_1": "OFFICE - ADMIN STAFF",
-      "heading_2": "VP HÀNH CH��NH",
+      "heading_2": "VP HÀNH CHÍNH",
       "department": "FMD",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE",
