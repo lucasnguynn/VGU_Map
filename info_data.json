@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 467,
-  "last_updated": "2026-06-14T01:57:54.756Z",
+  "last_updated": "2026-06-14T06:38:33.566Z",
   "data": [
     {
       "sheet_source": "AD",
@@ -1502,7 +1502,7 @@
       "area": "15",
       "unbounded_height": "4000",
       "capacity": "2",
-      "status": "Đang s�� dụng",
+      "status": "Đang sử dụng",
       "occupant_display": "Lê Thị Hạnh",
       "occupants_list": [],
       "occupants_flat": ""
