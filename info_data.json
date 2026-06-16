@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 467,
-  "last_updated": "2026-06-16T17:31:41.839Z",
+  "last_updated": "2026-06-16T20:26:38.219Z",
   "data": [
     {
       "sheet_source": "AD",
@@ -167,7 +167,7 @@
       "sheet_source": "AD",
       "room_number": "3.CR14",
       "heading_1": "CORRIDOR",
-      "heading_2": "HÀNH LANG",
+      "heading_2": "H��NH LANG",
       "department": "___",
       "fm_room_function": "___",
       "fm_room_type": "___",
@@ -334,7 +334,7 @@
       "area": "123",
       "unbounded_height": "4000",
       "capacity": "--",
-      "status": "Ch��a cập nhật",
+      "status": "Chưa cập nh���t",
       "occupant_display": "",
       "occupants_list": [],
       "occupants_flat": ""
@@ -5463,7 +5463,7 @@
       "sheet_source": "B3",
       "room_number": "3.WC2",
       "heading_1": "FEMALE TOILET",
-      "heading_2": "NHÀ VỆ SINH NỮ",
+      "heading_2": "NHÀ VỆ SINH N��",
       "department": "___",
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
@@ -6830,7 +6830,7 @@
       "area": "89.07",
       "unbounded_height": "4000",
       "capacity": "Mr. Nguyễn Hoàng Vĩnh Khang",
-      "status": "Chưa cập nhật",
+      "status": "Chưa cập nh��t",
       "occupant_display": "",
       "occupants_list": [],
       "occupants_flat": ""
