@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 467,
-  "last_updated": "2026-06-16T22:28:45.111Z",
+  "last_updated": "2026-06-16T23:55:50.669Z",
   "data": [
     {
       "sheet_source": "AD",
@@ -5678,7 +5678,7 @@
       "area": "3.71",
       "unbounded_height": "4000",
       "capacity": "--",
-      "status": "Chưa cập nhật",
+      "status": "Chưa c���p nhật",
       "occupant_display": "",
       "occupants_list": [],
       "occupants_flat": ""
@@ -6126,7 +6126,7 @@
       "area": "75.33",
       "unbounded_height": "4000",
       "capacity": "Nguyen Duc Thinh",
-      "status": "Chưa cập nhật",
+      "status": "Chưa cập nh��t",
       "occupant_display": "",
       "occupants_list": [],
       "occupants_flat": ""
@@ -6414,7 +6414,7 @@
       "area": "55.35",
       "unbounded_height": "4000",
       "capacity": "--",
-      "status": "Chưa cập nhật",
+      "status": "Ch��a cập nhật",
       "occupant_display": "",
       "occupants_list": [],
       "occupants_flat": ""
@@ -6551,7 +6551,7 @@
       "sheet_source": "B3",
       "room_number": "B3-315",
       "heading_1": "SELF STUDY",
-      "heading_2": "PHÒNG TỰ H��C",
+      "heading_2": "PHÒNG TỰ HỌC",
       "department": "___",
       "fm_room_function": "Other functions",
       "fm_room_type": "OTHER - SelfStudy",
