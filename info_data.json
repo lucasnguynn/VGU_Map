@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 467,
-  "last_updated": "2026-06-17T02:51:36.894Z",
+  "last_updated": "2026-06-17T06:16:15.061Z",
   "data": [
     {
       "sheet_source": "AD",
@@ -5678,7 +5678,7 @@
       "area": "3.71",
       "unbounded_height": "4000",
       "capacity": "--",
-      "status": "Chưa c���p nhật",
+      "status": "Chưa cập nhật",
       "occupant_display": "",
       "occupants_list": [],
       "occupants_flat": ""
@@ -6126,7 +6126,7 @@
       "area": "75.33",
       "unbounded_height": "4000",
       "capacity": "Nguyen Duc Thinh",
-      "status": "Chưa cập nh��t",
+      "status": "Chưa cập nhật",
       "occupant_display": "",
       "occupants_list": [],
       "occupants_flat": ""
@@ -6414,7 +6414,7 @@
       "area": "55.35",
       "unbounded_height": "4000",
       "capacity": "--",
-      "status": "Ch��a cập nhật",
+      "status": "Chưa cập nhật",
       "occupant_display": "",
       "occupants_list": [],
       "occupants_flat": ""
