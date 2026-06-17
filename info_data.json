@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 467,
-  "last_updated": "2026-06-17T22:24:09.832Z",
+  "last_updated": "2026-06-17T23:54:04.100Z",
   "data": [
     {
       "sheet_source": "AD",
@@ -1479,7 +1479,7 @@
       "sheet_source": "AD",
       "room_number": "AD-216",
       "heading_1": "OFFICE",
-      "heading_2": "VP HỌC BỔNG V�� TÀI CHÍNH",
+      "heading_2": "VP HỌC BỔNG VÀ TÀI CHÍNH",
       "department": "___",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE",
@@ -5463,7 +5463,7 @@
       "sheet_source": "B3",
       "room_number": "3.WC2",
       "heading_1": "FEMALE TOILET",
-      "heading_2": "NHÀ VỆ SINH N��",
+      "heading_2": "NHÀ VỆ SINH NỮ",
       "department": "___",
       "fm_room_function": "___",
       "fm_room_type": "WC TYPE 2",
@@ -6830,7 +6830,7 @@
       "area": "89.07",
       "unbounded_height": "4000",
       "capacity": "Mr. Nguyễn Hoàng Vĩnh Khang",
-      "status": "Chưa cập nh��t",
+      "status": "Chưa cập nhật",
       "occupant_display": "",
       "occupants_list": [],
       "occupants_flat": ""
