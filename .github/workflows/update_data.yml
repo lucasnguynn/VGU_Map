@@ -13,7 +13,34 @@ concurrency:
   cancel-in-progress: false  # Wait for in-progress run to finish before starting new one
 
 jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      shell_changed: ${{ steps.filter.outputs.shell }}
+      data_changed: ${{ steps.filter.outputs.data }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: New
+          fetch-depth: 2
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            shell:
+              - 'index.html'
+              - 'sw.js'
+              - 'manifest.json'
+              - 'build_pwa.js'
+            data:
+              - 'map_data.json'
+              - 'info_data.json'
+              - 'drive_data.json'
+
   update-info-data:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.data_changed == 'true' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -37,7 +64,11 @@ jobs:
           DRIVE_API_URL: ${{ secrets.DRIVE_API_URL }}
 
       - name: Stamp PWA build version into sw.js and index.html
-        run: node build_pwa.js
+        if: ${{ needs.detect-changes.outputs.shell_changed == 'true' || github.event_name == 'workflow_dispatch' }}
+        run: |
+          BUILD_VERSION="$(date -u +%Y%m%d%H%M%S)-${GITHUB_SHA::7}"
+          echo "BUILD_VERSION=$BUILD_VERSION" >> "$GITHUB_ENV"
+          BUILD_VERSION="$BUILD_VERSION" node build_pwa.js
 
       - name: Commit and push changes
         run: |
