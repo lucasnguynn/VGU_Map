@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 467,
-  "last_updated": "2026-06-17T12:31:15.310Z",
+  "last_updated": "2026-06-17T16:24:44.243Z",
   "data": [
     {
       "sheet_source": "AD",
@@ -1479,7 +1479,7 @@
       "sheet_source": "AD",
       "room_number": "AD-216",
       "heading_1": "OFFICE",
-      "heading_2": "VP HỌC BỔNG VÀ TÀI CHÍNH",
+      "heading_2": "VP HỌC BỔNG V�� TÀI CHÍNH",
       "department": "___",
       "fm_room_function": "Administration",
       "fm_room_type": "OFFICE",
