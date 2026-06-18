@@ -10,7 +10,7 @@ permissions:
 
 concurrency:
   group: update-data
-  cancel-in-progress: false  # Wait for in-progress run to finish before starting new one
+  cancel-in-progress: false  # Wait for in-progress run to finish before starting Neww one
 
 jobs:
   detect-changes:
@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: New
+          ref: Neww
           fetch-depth: 2
 
       - uses: dorny/paths-filter@v3
@@ -47,7 +47,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: New  # 🔥 Đảm bảo luôn lấy đúng code từ nhánh New khi chạy tự động
+          ref: Neww  # 🔥 Đảm bảo luôn lấy đúng code từ nhánh Neww khi chạy tự động
           persist-credentials: true
           fetch-depth: 0
 
@@ -77,8 +77,8 @@ jobs:
           git add info_data.json drive_data.json map_data.json sw.js index.html
           if ! git diff --staged --quiet; then
             git commit -m "chore: auto-update data and stamp PWA version [skip ci]"
-            git pull --rebase origin New # 🔥 Đổi từ main sang New
-            git push origin New           # 🔥 Chỉ định rõ đẩy về nhánh New
+            git pull --rebase origin Neww # 🔥 Đổi từ main sang Neww
+            git push origin Neww           # 🔥 Chỉ định rõ đẩy về nhánh Neww
           else
             echo "No changes to commit"
           fi
