@@ -7,7 +7,7 @@
  * - Query-string-safe matching for cache-busted URLs (?v=timestamp).
  */
 
-const SW_VERSION = '20260617235436-3109d53';
+const SW_VERSION = '20260618021113-7362f6e';
 const STATIC_CACHE = `vgumap-static-${SW_VERSION}`;  // Versioned (shell changes)
 const DATA_CACHE   = 'vgumap-data-v1';               // Stable (data survives deploys)
 
