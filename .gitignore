@@ -1,4 +1,4 @@
-```
+```gitignore
 # Compiled and build artifacts
 *.pyc
 __pycache__/
@@ -6,7 +6,6 @@ __pycache__/
 *.obj
 dist/
 build/
-target/
 *.class
 *.exe
 *.dll
@@ -15,16 +14,12 @@ target/
 *.out
 
 # Dependencies
-.venv/
-venv/
 node_modules/
-.julia/
-zig*/
-.mypy_cache/
-.pytest_cache/
-.coverage
-coverage/
-htmlcov/
+venv/
+.venv/
+.env
+.env.local
+.env.*
 
 # Logs and temp files
 *.log
@@ -32,20 +27,18 @@ htmlcov/
 *.swp
 *.swo
 
-# Environment
-.env
-.env.local
-*.env.*
-
 # Editors
 .vscode/
 .idea/
-*.swp
-*.swo
 
-# System
+# System files
 .DS_Store
 Thumbs.db
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
 
 # Compressed files
 *.zip
@@ -70,4 +63,548 @@ Thumbs.db
 *.tar.bz2
 *.tar.xz
 *.tar.zst
+
+# Python specific
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg-info/
+.eggs/
+.mypy_cache/
+.pytest_cache/
+.tox/
+.coverage
+
+# JavaScript/Node specific
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+node_modules/
+jspm_packages/
+*.min.js
+*.min.css
+
+# Java/Gradle specific
+target/
+.gradle/
+build/
+*.class
+*.jar
+*.war
+*.ear
+
+# C/C++ specific
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+*.out
+*.dSYM/
+*.ilk
+*.pdb
+*.sdf
+*.opendb
+*.VC.db
+
+# Go specific
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.prof
+*.out
+
+# Rust specific
+target/
+*.o
+*.rlib
+*.dylib
+*.so
+*.dll
+*.exe
+
+# Ruby specific
+*.gem
+*.rbc
+coverage/
+InstalledFiles
+pkg/
+spec/reports/
+test/tmp/
+test/version_tmp/
+tmp/
+
+# Web specific
+*.css.map
+*.js.map
+.sass-cache/
+.assets/
+
+# OS generated files
+ehthumbs.db
+Icon?
+Thumbs.db
+.DS_Store
+._*
+
+# IDE specific
+.vs/
+*.swp
+*.swo
+*~
+
+# Backup files
+*~
+*.bak
+*.backup
+*.old
+*.orig
+*.rej
+*.tmp
+*.temp
+
+# Testing
+*.log
+*.coverage
+htmlcov/
+.coverage
+.pytest_cache/
+.nyc_output/
+coverage/
+junit.xml
+*.har
+
+# Environment variables
+.env
+.env.local
+.env.*
+!.env.example
+
+# Configuration
+config/
+*.local
+
+# Distribution / packaging
+.Python
+*.so
+.libs/
+*.tar.gz
+*.whl
+*.egg-info/
+.eggs/
+.dist-info/
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+.env/
+.ENV/
+env.bak/
+venv.bak/
+
+# Testing
+.pytest_cache/
+.hypothesis/
+.tox/
+.coverage
+coverage/
+
+# Documentation
+docs/_build/
+
+# CI
+.semaphore/
+.circleci/
+.github/
+.travis.yml
+.jenkinsfile
+
+# Database
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Compression
+*.zip
+*.tar
+*.gz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.tgz
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+*.swp
+*.swo
+
+# Cache
+.cache/
+*.cache
+.caches/
+.node_cache/
+.yarn_cache/
+
+# Lock files
+package-lock.json
+yarn.lock
+Pipfile.lock
+poetry.lock
+Gemfile.lock
+
+# Secrets
+secrets/
+.secret
+.secrets
+config/secrets.yml
+
+# Docker
+.dockerenv
+Dockerfile.*
+docker-compose.*
+
+# Kubernetes
+.kube/
+.kubectl/
+kubectl.*
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfvars
+*.tfplan
+
+# Ansible
+*.retry
+
+# Vagrant
+.vagrant/
+.vagrant.d/
+
+# Maven
+target/
+*.jar
+*.war
+*.ear
+*.class
+
+# Gradle
+.gradle/
+build/
+*.jar
+*.war
+*.ear
+*.class
+
+# SBT
+target/
+lib_managed/
+src_managed/
+project_target/
+*.class
+
+# Leiningen
+target/
+*.class
+
+# Clojure
+target/
+*.class
+
+# Elixir
+ebin/
+deps/
+*.ez
+.erlang.cookie
+
+# Erlang
+ebin/
+deps/
+*.beam
+.erlang.cookie
+
+# Haskell
+dist/
+dist-newstyle/
+.cabal-sandbox/
+*.o
+*.hi
+
+# Elm
+elm-stuff/
+*.elmo
+
+# OCaml
+*.cmo
+*.cmi
+*.cmx
+*.cma
+*.cmxa
+*.cmxs
+*.annot
+*.spot
+*.spit
+*.cmt
+*.cmti
+*.merlin
+
+# Perl
+*.al
+blib/
+*x.3pm
+pm_to_blib/
+*.out
+Build/
+_build/
+
+# PHP
+vendor/
+composer.lock
+*.phar
+
+# Scala
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Swift
+*.xcodeproj/
+*.xcworkspace/
+*.swiftpm/
+*.build/
+
+# Objective-C
+*.xcodeproj/
+*.xcworkspace/
+*.swiftpm/
+*.build/
+
+# Unity
+Library/
+Temp/
+Obj/
+Logs/
+.vs/
+*.csproj
+*.unityproj
+*.sln
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.cache
+*.meta
+cachefolder/
+build/
+Build/
+
+# Unreal Engine
+Binaries/
+Intermediate/
+Saved/
+DerivedDataCache/
+*.uproject
+*.uplugin
+*.uasset
+*.umap
+*.inl
+*.generated.cpp
+*.generated.h
+*.dir/
+
+# Android
+*.apk
+*.aar
+*.dex
+app/build/
+.gradle/
+local.properties
+captures/
+.proguard/
+
+# iOS
+*.ipa
+*.dSYM.zip
+*.dSYM/
+*.mobileprovision
+build/
+*.xcworkspace/
+xcuserdata/
+*.xcodeproj/
+
+# Qt
+*.pro.user
+*.pro.user.*
+*.qbs.user
+*.qbs.user.*
+*.moc
+*.moc.cpp
+*.qm
+Makefile*
+*.prl
+*.pri
+*.prf
+*.mkspecs/
+*.qch
+*.qhcp
+*.qhp
+*.ts
+*.ui
+*.qrc
+*.rcc
+*.pch
+*.gch
+*.pch.cpp
+*.pch.h
+*.pch.hpp
+*.pch.hxx
+*.pch.cxx
+*.pch.c
+*.pch.cc
+*.pch.c++
+*.pch.C
+*.pch.H
+*.pch.HPP
+*.pch.HXX
+*.pch.CXX
+*.pch.C
+*.pch.CC
+*.pch.C++
+*.pch.CPP
+*.pch.CXX
+*.pch.C
+*.pch.CC
+*.pch.C++
+*.pch.CPP
+*.pch.CXX
+*.pch.C
+*.pch.CC
+*.pch.C++
+*.pch.CPP
+*.pch.CXX
+*.pch.C
+*.pch.CC
+*.pch.C++
+*.pch.CPP
+*.pch.CXX
+*.pch.C
+*.pch.CC
+*.pch.C++
+*.pch.CPP
+*.pch.CXX
+*.pch.C
+*.pch.CC
+*.pch.C++
+*.pch.CPP
+*.pch.CXX
+*.pch.C
+*.pch.CC
+*.pch.C++
+*.pch.CPP
+*.pch.CXX
+*.pch.C
+*.pch.CC
+*.pch.C++
+*.pch.CPP
+*.pch.CXX
+*.pch.C
+*.pch.CC
+*.pch.C++
+*.pch.CPP
+*.pch.CXX
+*.pch.C
+*.pch.CC
+*.pch.C++
+*.pch.CPP
+*.pch.CXX
+*.pch.C
+*.pch.CC
+*.pch.C++
+*.pch.CPP
+*.pch.CXX
+*.pch.C
+*.pch.CC
+*.pch.C++
+*.pch.CPP
+*.pch.CXX
+*.pch.C
+*.pch.CC
+*.pch.C++
+*.pch.CPP
+*.pch.CXX
+*.pch.C
+*.pch.CC
+*.pch.C++
+*.pch.CPP
+*.pch.CXX
+*.pch.C
+*.pch.CC
+*.pch.C++
+*.pch.CPP
+*.pch.CXX
+*.pch.C
+*.pch.CC
+*.pch.C++
+*.pch.CPP
+*.pch.CXX
+*.pch.C
+*.pch.CC
+*.pch.C++
+*.pch.CPP
+*.pch.CXX
+*.pch.C
+*.pch.CC
+*.pch.C++
+*.pch.CPP
+*.pch.CXX
+*.pch.C
+*.pch.CC
+*.pch.C++
+*.pch.CPP
+*.pch.CXX
+*.pch.C
+*.pch.CC
+*.pch.C++
+*.pch.CPP
+*.pch.CXX
+*.pch.C
+*.pch.CC
+*.pch.C++
+*.pch.CPP
+*.pch.CXX
+*.pch.C
+*.pch.CC
+*.pch.C++
+*.pch.CPP
+*.pch.CXX
+*.pch.C
+*.......
 ```
