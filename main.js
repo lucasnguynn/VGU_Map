@@ -811,7 +811,7 @@ async function init3DViewer(modelSrc) {
           }
         });
         viewer.meshCount = meshes;
-        document.getElementById('mesh-count').textContent = meshes;
+        document.getElementById('mesh-count-display').textContent = meshes;
         
         // Setup scanline bounds
         const scaleBox = new THREE.Box3().setFromObject(model);
