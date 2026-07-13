@@ -1,1 +1,1 @@
-Nothing should be ignored based on the provided file changes. The modified files (`index.html` and `sw.js`) are source code files that should be tracked in version control.
+Nothing needs to be added to .gitignore since the changes only include JavaScript source files (.js), HTML files (.html), and Vue component files (.vue) which are all source code files that should be tracked in version control.
