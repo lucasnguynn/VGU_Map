@@ -1,304 +1,75 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VGU Map - Digital Twin Facility Inspection</title>
-  <link rel="manifest" href="manifest.json">
-  
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            'vgu-orange': '#F37021',
-            'cyber-cyan': '#00FFFF',
-            'vgu-blue': '#002554',
-            'hologram-bg': 'rgba(0, 37, 84, 0.9)'
-          },
-          fontFamily: {
-            'vietnam': ['Be Vietnam Pro', 'sans-serif'],
-            'mono': ['Space Mono', 'monospace']
-          }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VGU Facilities Hologram Map</title>
+    
+    <!-- Tailwind CSS (CDN - Không cần build) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { 
+                extend: { 
+                    colors: { vguOrange: '#F37021', darkBg: '#070A12', cyberCyan: '#06B6D4' },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                } 
+            }
+        }
+    </script>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #070A12; color: white; touch-action: none; }
+        /* Tùy chỉnh thanh cuộn cho đẹp */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #06B6D4; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-darkBg">
+
+    <!-- Header UI -->
+    <header class="absolute top-0 w-full h-16 bg-[#0F1E36]/80 backdrop-blur-md border-b border-vguOrange/20 z-10 flex items-center justify-between px-6 pointer-events-auto">
+        <div class="flex items-center gap-3">
+            <div class="bg-vguOrange text-white px-3 py-1 rounded text-sm font-bold tracking-wider shadow-[0_0_10px_#F37021]">VGU</div>
+            <div>
+                <h1 class="text-sm font-bold text-white tracking-widest">FACILITIES MAP</h1>
+                <span class="text-[10px] text-cyberCyan tracking-widest uppercase">Hologram Engine v1.0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Canvas chứa bản đồ 3D -->
+    <div id="canvas-container" class="absolute inset-0 w-full h-full z-0"></div>
+
+    <!-- UI Overlay loading -->
+    <div id="loading-screen" class="absolute inset-0 z-50 flex items-center justify-center bg-darkBg text-cyberCyan font-mono tracking-widest transition-opacity duration-500">
+        INITIALIZING SPATIAL DATA...
+    </div>
+
+    <!-- Bottom Sheet / Sidebar hiển thị thông tin phòng -->
+    <div id="info-panel" class="absolute bottom-0 md:right-0 md:bottom-auto w-full md:w-96 h-[60%] md:h-full bg-[#0F1E36]/95 backdrop-blur-xl border-t md:border-t-0 md:border-l border-cyberCyan/30 z-20 transform translate-y-full md:translate-y-0 md:translate-x-full transition-transform duration-300 flex flex-col shadow-[-10px_0_30px_rgba(0,0,0,0.8)]">
+        
+        <!-- Nút đóng -->
+        <button id="btn-close" class="absolute top-4 right-4 text-white/50 hover:text-vguOrange transition-colors text-xl font-bold cursor-pointer">✕</button>
+        
+        <!-- Nội dung Render từ info_data.json -->
+        <div id="panel-content" class="p-6 overflow-y-auto h-full mt-12 md:mt-16">
+            <!-- JS sẽ bơm dữ liệu vào đây -->
+        </div>
+    </div>
+
+    <!-- Cấu hình Import Map cho Three.js (ES6 Module) -->
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
         }
       }
-    }
-  </script>
-  
-  <!-- Three.js Import Map -->
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-    }
-  }
-  </script>
-  
-  <!-- Custom Styles -->
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    </script>
     
-    body {
-      font-family: 'Be Vietnam Pro', sans-serif;
-      overflow: hidden;
-      background: #000;
-    }
-    
-    #app {
-      width: 100vw;
-      height: 100vh;
-      position: relative;
-    }
-    
-    #map-container {
-      width: 100%;
-      height: 100%;
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
-    
-    /* Hologram/TRON Aesthetic */
-    .holo-panel {
-      background: rgba(0, 37, 84, 0.85);
-      border: 1px solid rgba(0, 255, 255, 0.3);
-      box-shadow: 0 0 20px rgba(0, 255, 255, 0.1), inset 0 0 20px rgba(0, 255, 255, 0.05);
-      backdrop-filter: blur(10px);
-    }
-    
-    .holo-border {
-      border: 1px solid rgba(243, 112, 33, 0.5);
-      box-shadow: 0 0 10px rgba(243, 112, 33, 0.3);
-    }
-    
-    .cyber-grid {
-      background-image: 
-        linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
-      background-size: 50px 50px;
-      animation: gridMove 20s linear infinite;
-    }
-    
-    @keyframes gridMove {
-      0% { background-position: 0 0; }
-      100% { background-position: 50px 50px; }
-    }
-    
-    .pulse-dot {
-      width: 8px;
-      height: 8px;
-      background: #F37021;
-      border-radius: 50%;
-      animation: pulse 1.5s ease-in-out infinite;
-    }
-    
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(1.2); }
-    }
-    
-    /* UI Panel Transitions */
-    .panel-slide-in {
-      transform: translateX(0);
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    .panel-slide-out {
-      transform: translateX(-100%);
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    .bottom-sheet-hidden {
-      transform: translateY(100%);
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    .bottom-sheet-visible {
-      transform: translateY(0);
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    /* Scrollbar Styling */
-    ::-webkit-scrollbar {
-      width: 6px;
-    }
-    
-    ::-webkit-scrollbar-track {
-      background: rgba(0, 37, 84, 0.5);
-    }
-    
-    ::-webkit-scrollbar-thumb {
-      background: rgba(243, 112, 33, 0.5);
-      border-radius: 3px;
-    }
-    
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(243, 112, 33, 0.8);
-    }
-    
-    /* Loading Animation */
-    .loading-spinner {
-      border: 3px solid rgba(0, 255, 255, 0.1);
-      border-top: 3px solid #F37021;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    
-    /* Room Highlight Effect */
-    .room-highlight {
-      animation: roomGlow 0.5s ease-in-out;
-    }
-    
-    @keyframes roomGlow {
-      0%, 100% { filter: brightness(1); }
-      50% { filter: brightness(1.5); }
-    }
-  </style>
-</head>
-<body>
-  <div id="app">
-    <!-- 3D Map Container -->
-    <div id="map-container"></div>
-    
-    <!-- Header HUD -->
-    <header class="absolute top-0 left-0 right-0 z-10 p-4">
-      <div class="holo-panel rounded-lg p-4 flex items-center justify-between">
-        <div class="flex items-center gap-4">
-          <img src="VGU-Full-Color-logo-05-_1_.svg" alt="VGU Logo" class="h-10 w-auto">
-          <div>
-            <h1 class="text-xl font-bold text-white">VGU <span class="text-vgu-orange">MSI</span> Holographic Map</h1>
-            <p class="text-xs text-cyber-cyan font-mono">DIGITAL TWIN FACILITY INSPECTION SYSTEM</p>
-          </div>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="pulse-dot"></div>
-          <span class="text-cyber-cyan font-mono text-sm">SYSTEM ONLINE</span>
-        </div>
-      </div>
-    </header>
-    
-    <!-- Top Context Bar -->
-    <div class="absolute top-20 left-1/2 transform -translate-x-1/2 z-10 w-full max-w-2xl px-4">
-      <div class="holo-panel rounded-lg p-3 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <span class="text-vgu-orange font-mono text-sm" id="context-title">FOCUS: VGU CAMPUS OVERVIEW</span>
-        </div>
-        <span class="text-cyber-cyan font-mono text-xs" id="context-guidance">CLICK A ROOM TO VIEW DETAILS</span>
-      </div>
-    </div>
-    
-    <!-- Left Sidebar Panel (Desktop) -->
-    <aside id="sidebar-panel" class="hidden md:block absolute left-0 top-24 bottom-0 w-96 z-10 panel-slide-out">
-      <div class="holo-panel h-full rounded-r-lg p-6 overflow-y-auto">
-        <button id="close-sidebar" class="absolute top-4 right-4 text-cyber-cyan hover:text-vgu-orange transition-colors">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        </button>
-        
-        <!-- Room Info Content -->
-        <div id="room-info" class="space-y-4">
-          <div class="text-center py-12">
-            <div class="loading-spinner mx-auto mb-4"></div>
-            <p class="text-cyber-cyan font-mono text-sm">SELECT A ROOM TO VIEW DETAILS</p>
-          </div>
-        </div>
-      </div>
-    </aside>
-    
-    <!-- Bottom Sheet Panel (Mobile) -->
-    <div id="bottom-sheet" class="md:hidden absolute bottom-0 left-0 right-0 z-10 bottom-sheet-hidden">
-      <div class="holo-panel rounded-t-lg p-4 max-h-[60vh] overflow-y-auto">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-lg font-bold text-white" id="mobile-room-title">ROOM DETAILS</h2>
-          <button id="close-bottom-sheet" class="text-cyber-cyan hover:text-vgu-orange transition-colors">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
-        </div>
-        <div id="mobile-room-info" class="space-y-3">
-          <p class="text-cyber-cyan font-mono text-sm text-center">TAP A ROOM TO VIEW DETAILS</p>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Map Controls (Bottom Left) -->
-    <div class="absolute bottom-4 left-4 z-10">
-      <div class="holo-panel rounded-lg p-3">
-        <div class="text-vgu-orange font-mono text-xs mb-2">MAP CONTROLS</div>
-        <div class="space-y-1 text-cyber-cyan font-mono text-xs">
-          <div>LAT: <span id="map-coord-x">0</span> m</div>
-          <div>LON: <span id="map-coord-y">0</span> m</div>
-          <div>ZOOM: <span id="map-zoom">1.0</span>x</div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Loading Overlay -->
-    <div id="loading-overlay" class="absolute inset-0 z-50 flex items-center justify-center bg-vgu-blue/90">
-      <div class="text-center">
-        <div class="cyber-grid absolute inset-0 opacity-10"></div>
-        <div class="relative">
-          <div class="loading-spinner mx-auto mb-4"></div>
-          <p class="text-cyber-cyan font-mono text-lg">INITIALIZING 3D ENGINE...</p>
-          <p class="text-white/60 font-mono text-sm mt-2" id="loading-status">Loading map data</p>
-          <div class="mt-4 w-64 h-2 bg-vgu-blue/50 rounded-full overflow-hidden">
-            <div id="loading-progress" class="h-full bg-vgu-orange transition-all duration-300" style="width: 0%"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Error Modal -->
-    <div id="error-modal" class="hidden absolute inset-0 z-50 flex items-center justify-center bg-black/80">
-      <div class="holo-panel rounded-lg p-6 max-w-md mx-4">
-        <div class="text-center">
-          <div class="text-4xl mb-4">⚠️</div>
-          <h2 class="text-xl font-bold text-vgu-orange mb-2">SYSTEM ERROR</h2>
-          <p class="text-white/80 mb-4" id="error-message">Failed to load map data.</p>
-          <button id="retry-btn" class="bg-vgu-orange hover:bg-vgu-orange/80 text-white font-bold py-2 px-6 rounded-lg transition-colors">
-            RETRY
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Main JavaScript Entry Point -->
-  <script type="module" src="js/main.js"></script>
-  
-  <!-- Service Worker Registration -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then(registration => {
-            console.log('[SW] ServiceWorker registration successful:', registration.scope);
-          })
-          .catch(err => {
-            console.log('[SW] ServiceWorker registration failed:', err);
-          });
-      });
-    }
-  </script>
+    <!-- File xử lý lõi -->
+    <script type="module" src="./main.js"></script>
+
 </body>
 </html>
