@@ -5,60 +5,138 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VGU Facilities Hologram Map</title>
     
-    <!-- Tailwind CSS (CDN - Không cần build) -->
+    <!-- Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: { 
                 extend: { 
-                    colors: { vguOrange: '#F37021', darkBg: '#070A12', cyberCyan: '#06B6D4' },
+                    colors: { 
+                        vguOrange: '#F37021', 
+                        darkBg: '#070A12', 
+                        cyberCyan: '#06B6D4',
+                        darkPanel: '#0F1E36'
+                    },
                     fontFamily: { sans: ['Inter', 'sans-serif'] }
                 } 
             }
         }
     </script>
     <style>
-        body { margin: 0; overflow: hidden; background-color: #070A12; color: white; touch-action: none; }
-        /* Tùy chỉnh thanh cuộn cho đẹp */
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            background-color: #070A12; 
+            color: white; 
+            touch-action: none; 
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #06B6D4; border-radius: 4px; }
+        
+        /* UI Transition classes */
+        .ui-slide-in { transform: translateX(0); }
+        .ui-slide-out { transform: translateX(100%); }
+        .ui-slide-up { transform: translateY(0); }
+        .ui-slide-down { transform: translateY(100%); }
+        
+        /* Glow effects */
+        .glow-orange { box-shadow: 0 0 15px rgba(243, 112, 33, 0.5); }
+        .glow-cyan { box-shadow: 0 0 15px rgba(6, 182, 212, 0.5); }
+        
+        /* Floor button hover effect */
+        .floor-btn:hover {
+            background: linear-gradient(90deg, rgba(6,182,212,0.2), rgba(6,182,212,0.4));
+            border-left: 3px solid #06B6D4;
+        }
+        .floor-btn.active {
+            background: linear-gradient(90deg, rgba(243,112,33,0.3), rgba(243,112,33,0.5));
+            border-left: 3px solid #F37021;
+        }
     </style>
 </head>
 <body class="bg-darkBg">
 
-    <!-- Header UI -->
-    <header class="absolute top-0 w-full h-16 bg-[#0F1E36]/80 backdrop-blur-md border-b border-vguOrange/20 z-10 flex items-center justify-between px-6 pointer-events-auto">
+    <!-- ============================================
+         LAYER 1: CANVAS CONTAINER (Three.js)
+         ============================================ -->
+    <div id="canvas-container" class="absolute inset-0 w-full h-full z-0"></div>
+
+    <!-- ============================================
+         LAYER 2: TOP HEADER
+         ============================================ -->
+    <header class="absolute top-0 left-0 right-0 h-16 bg-darkPanel/80 backdrop-blur-md border-b border-vguOrange/20 z-10 flex items-center justify-between px-6 pointer-events-auto">
         <div class="flex items-center gap-3">
-            <div class="bg-vguOrange text-white px-3 py-1 rounded text-sm font-bold tracking-wider shadow-[0_0_10px_#F37021]">VGU</div>
+            <div class="bg-vguOrange text-white px-3 py-1 rounded text-sm font-bold tracking-wider glow-orange">VGU</div>
             <div>
                 <h1 class="text-sm font-bold text-white tracking-widest">FACILITIES MAP</h1>
-                <span class="text-[10px] text-cyberCyan tracking-widest uppercase">Hologram Engine v1.0</span>
+                <span class="text-[10px] text-cyberCyan tracking-widest uppercase">Hologram Drill-Down Engine</span>
             </div>
+        </div>
+        <!-- Current view indicator -->
+        <div id="view-indicator" class="hidden md:flex items-center gap-2 text-xs text-cyberCyan">
+            <span class="w-2 h-2 rounded-full bg-cyberCyan animate-pulse"></span>
+            <span id="current-view-text">CAMPUS VIEW</span>
         </div>
     </header>
 
-    <!-- Canvas chứa bản đồ 3D -->
-    <div id="canvas-container" class="absolute inset-0 w-full h-full z-0"></div>
+    <!-- ============================================
+         LAYER 3: NAVIGATION BAR (Back Button - Hidden by default)
+         ============================================ -->
+    <nav id="nav-bar" class="absolute top-16 left-0 right-0 h-12 bg-darkPanel/60 backdrop-blur-sm border-b border-cyberCyan/10 z-10 flex items-center px-6 pointer-events-auto hidden">
+        <button id="btn-back-campus" class="flex items-center gap-2 text-cyberCyan hover:text-vguOrange transition-colors text-sm font-mono">
+            <span>←</span>
+            <span>BACK TO CAMPUS</span>
+        </button>
+        <div id="breadcrumb" class="ml-6 text-xs text-white/60 font-mono hidden">
+            <span id="breadcrumb-building" class="text-cyberCyan"></span>
+            <span id="breadcrumb-floor" class="mx-2">/</span>
+        </div>
+    </nav>
 
-    <!-- UI Overlay loading -->
-    <div id="loading-screen" class="absolute inset-0 z-50 flex items-center justify-center bg-darkBg text-cyberCyan font-mono tracking-widest transition-opacity duration-500">
-        INITIALIZING SPATIAL DATA...
-    </div>
+    <!-- ============================================
+         LAYER 4: FLOOR SELECTOR MENU (Hidden by default)
+         ============================================ -->
+    <aside id="floor-selector" class="absolute left-0 top-28 bottom-0 w-48 bg-darkPanel/90 backdrop-blur-xl border-r border-cyberCyan/20 z-10 transform -translate-x-full transition-transform duration-300 pointer-events-auto">
+        <div class="p-4 border-b border-cyberCyan/20">
+            <h3 class="text-xs font-bold text-cyberCyan tracking-widest uppercase">Select Floor</h3>
+            <p id="selected-building-name" class="text-[10px] text-white/50 mt-1 truncate">Building</p>
+        </div>
+        <div id="floor-buttons-container" class="p-2 space-y-1 overflow-y-auto max-h-[calc(100vh-120px)]">
+            <!-- Floor buttons injected via JS -->
+        </div>
+    </aside>
 
-    <!-- Bottom Sheet / Sidebar hiển thị thông tin phòng -->
-    <div id="info-panel" class="absolute bottom-0 md:right-0 md:bottom-auto w-full md:w-96 h-[60%] md:h-full bg-[#0F1E36]/95 backdrop-blur-xl border-t md:border-t-0 md:border-l border-cyberCyan/30 z-20 transform translate-y-full md:translate-y-0 md:translate-x-full transition-transform duration-300 flex flex-col shadow-[-10px_0_30px_rgba(0,0,0,0.8)]">
+    <!-- ============================================
+         LAYER 5: ROOM INFO PANEL (Bottom Sheet / Sidebar)
+         ============================================ -->
+    <div id="info-panel" class="absolute bottom-0 md:right-0 md:bottom-auto w-full md:w-96 h-[55%] md:h-full bg-darkPanel/95 backdrop-blur-xl border-t md:border-t-0 md:border-l border-cyberCyan/30 z-20 transform translate-y-full md:translate-y-0 md:translate-x-full transition-transform duration-300 flex flex-col shadow-[-10px_0_30px_rgba(0,0,0,0.8)]">
         
-        <!-- Nút đóng -->
-        <button id="btn-close" class="absolute top-4 right-4 text-white/50 hover:text-vguOrange transition-colors text-xl font-bold cursor-pointer">✕</button>
+        <!-- Close button -->
+        <button id="btn-close-panel" class="absolute top-4 right-4 text-white/50 hover:text-vguOrange transition-colors text-xl font-bold cursor-pointer z-30">✕</button>
         
-        <!-- Nội dung Render từ info_data.json -->
+        <!-- Panel Content -->
         <div id="panel-content" class="p-6 overflow-y-auto h-full mt-12 md:mt-16">
-            <!-- JS sẽ bơm dữ liệu vào đây -->
+            <!-- Room info injected via JS -->
         </div>
     </div>
 
-    <!-- Cấu hình Import Map cho Three.js (ES6 Module) -->
+    <!-- ============================================
+         LOADING SCREEN
+         ============================================ -->
+    <div id="loading-screen" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-darkBg text-cyberCyan font-mono tracking-widest transition-opacity duration-500">
+        <div class="text-2xl mb-4 glow-cyan">INITIALIZING HOLOGRAM ENGINE...</div>
+        <div class="w-64 h-1 bg-white/10 rounded overflow-hidden">
+            <div id="loading-bar" class="h-full bg-cyberCyan transition-all duration-300" style="width: 0%"></div>
+        </div>
+        <div id="loading-text" class="text-xs text-white/50 mt-2">Loading spatial data...</div>
+    </div>
+
+    <!-- ============================================
+         THREE.JS IMPORT MAP (ES6 Modules)
+         ============================================ -->
     <script type="importmap">
       {
         "imports": {
@@ -68,8 +146,8 @@
       }
     </script>
     
-    <!-- File xử lý lõi -->
-    <script type="module" src="./main.js"></script>
+    <!-- Main Application Module -->
+    <script type="module" src="./js/main.js"></script>
 
 </body>
 </html>

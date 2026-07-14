@@ -1,14 +1,12 @@
 /**
- * VGU Map - Digital Twin Facility Inspection System
+ * VGU Map - Hologram Drill-Down Engine
  * Vanilla JavaScript + Three.js Implementation
  * 
- * Core Features:
- * - Cartesian coordinate normalization for map_data.json
- * - Three.js OrthographicCamera for top-down architectural view
- * - Room polygon rendering with ExtrudeGeometry and wireframe materials
- * - Raycaster-based room selection
- * - Dynamic UI panel with info_data.json integration
- * - Hologram/TRON aesthetic with VGU Orange (#F37021) and Cyber Cyan
+ * STATE MACHINE FLOW:
+ * 1. CAMPUS VIEW → Click Building → Show Floor Selector
+ * 2. FLOOR SELECTOR → Click Floor → Enter FLOOR VIEW
+ * 3. FLOOR VIEW → Click Room → Show Room Info Panel
+ * 4. BACK NAVIGATION → Return to Campus View
  */
 
 import * as THREE from 'three';
@@ -19,915 +17,710 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 // ============================================================================
 
 const COLORS = {
-  VGU_ORANGE: 0xF37021,
-  CYBER_CYAN: 0x00FFFF,
-  VGU_BLUE: 0x002554,
-  BLACK: 0x000000,
-  WHITE: 0xFFFFFF
+    VGU_ORANGE: 0xF37021,
+    CYBER_CYAN: 0x06B6D4,
+    DARK_BG: 0x070A12,
+    WHITE: 0xFFFFFF
 };
 
 const CONFIG = {
-  ROOM_HEIGHT: 10, // Extrusion height for rooms
-  HOLOGRAM_OPACITY: 0.3,
-  WIREFRAME_LINE_WIDTH: 2,
-  CAMERA_ZOOM: 0.002, // Initial zoom level for orthographic camera
-  RAYCASTER_THRESHOLD: 0.1,
-  ANIMATION_DURATION: 300 // ms for UI transitions
+    BUILDING_HEIGHT: 15,
+    HOLOGRAM_OPACITY: 0.15,
+    WIREFRAME_OPACITY: 0.8,
+    SCALE_FACTOR: 0.01,
+    CAMERA_ZOOM_FLOOR: 200,
+    CAMERA_ZOOM_CAMPUS: 800
 };
 
 // ============================================================================
-// GLOBAL STATE
-// ============================================================================
-
-const state = {
-  scene: null,
-  camera: null,
-  renderer: null,
-  controls: null,
-  raycaster: null,
-  mouse: new THREE.Vector2(),
-  roomMeshes: [], // Array of room mesh objects
-  selectedRoom: null,
-  infoData: null, // Loaded info_data.json
-  mapData: null, // Loaded map_data.json
-  boundingBox: null, // For coordinate normalization
-  isMobile: window.innerWidth < 768
-};
-
-// ============================================================================
-// COORDINATE NORMALIZATION
+// APPLICATION STATE (State Machine)
 // ============================================================================
 
 /**
- * Calculate the bounding box of all coordinates in map_data.json
- * This is essential for normalizing Cartesian (meter-based) coordinates
- * to center them at (0,0,0) in the Three.js scene.
+ * AppState controls the entire drill-down flow
+ * view: 'CAMPUS' | 'FLOOR'
+ * building: null | buildingId (e.g., 'cluster-2')
+ * floor: null | floorNumber (e.g., 1, 2, 3)
  */
-function calculateBoundingBox(mapData) {
-  let minX = Infinity, maxX = -Infinity;
-  let minY = Infinity, maxY = -Infinity;
+const AppState = {
+    view: 'CAMPUS',
+    building: null,
+    floor: null,
+    selectedRoom: null
+};
 
-  mapData.forEach(segment => {
-    const { StartX, StartY, EndX, EndY } = segment;
-    minX = Math.min(minX, StartX, EndX);
-    maxX = Math.max(maxX, StartX, EndX);
-    minY = Math.min(minY, StartY, EndY);
-    maxY = Math.max(maxY, StartY, EndY);
-  });
+// Global Three.js objects
+let scene, camera, renderer, controls;
+let mapGroup; // Main group for all map meshes - cleared on state changes
+let raycaster, mouse;
 
-  return { minX, maxX, minY, maxY };
+// Data stores
+let campusBuildingsData = null;
+let floorsConfigData = null;
+let infoData = null;
+let currentFloorData = null;
+
+// Interaction state
+let clickableObjects = [];
+let highlightedObject = null;
+
+// ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
+
+function updateLoading(progress, text) {
+    const bar = document.getElementById('loading-bar');
+    const textEl = document.getElementById('loading-text');
+    if (bar) bar.style.width = `${progress}%`;
+    if (textEl) textEl.textContent = text;
 }
 
-/**
- * Normalize a coordinate point to centered Three.js space
- * @param {number} x - Original X coordinate (meters)
- * @param {number} y - Original Y coordinate (meters)
- * @returns {object} Normalized {x, z} coordinates (Y becomes Z in Three.js)
- */
-function normalizeCoordinate(x, y) {
-  const { minX, maxX, minY, maxY } = state.boundingBox;
-  
-  // Calculate center point
-  const centerX = (minX + maxX) / 2;
-  const centerY = (minY + maxY) / 2;
-  
-  // Translate to center and flip Y axis (Three.js Y is up, we use Z for floor plan)
-  const normalizedX = x - centerX;
-  const normalizedZ = -(y - centerY); // Negate to maintain proper orientation
-  
-  return { x: normalizedX, z: normalizedZ };
+function hideLoading() {
+    const screen = document.getElementById('loading-screen');
+    if (screen) {
+        screen.style.opacity = '0';
+        setTimeout(() => screen.remove(), 500);
+    }
+}
+
+function calculateBounds(coordinates) {
+    let minX = Infinity, maxX = -Infinity;
+    let minY = Infinity, maxY = -Infinity;
+    
+    coordinates.forEach(coord => {
+        minX = Math.min(minX, coord[0]);
+        maxX = Math.max(maxX, coord[0]);
+        minY = Math.min(minY, coord[1]);
+        maxY = Math.max(maxY, coord[1]);
+    });
+    
+    return {
+        minX, maxX, minY, maxY,
+        centerX: (minX + maxX) / 2,
+        centerY: (minY + maxY) / 2
+    };
+}
+
+function normalizeCoordinates(coords, bounds, scaleFactor = CONFIG.SCALE_FACTOR) {
+    return coords.map(coord => [
+        (coord[0] - bounds.centerX) * scaleFactor,
+        (coord[1] - bounds.centerY) * scaleFactor
+    ]);
 }
 
 // ============================================================================
 // DATA LOADING
 // ============================================================================
 
-/**
- * Load JSON data with progress tracking
- */
-async function loadJSON(url, progressCallback) {
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+async function loadJSON(url) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return await response.json();
+    } catch (error) {
+        console.error(`[DATA] Failed to load ${url}:`, error);
+        throw error;
     }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error(`[DATA] Failed to load ${url}:`, error);
-    throw error;
-  }
 }
 
-/**
- * Initialize and load all required data
- */
 async function initializeData() {
-  updateLoadingStatus('Loading map geometry...');
-  updateLoadingProgress(20);
-  
-  try {
-    // Load map_data.json (room polygons)
-    state.mapData = await loadJSON('./map_data.json');
-    updateLoadingProgress(50);
+    updateLoading(10, 'Loading campus buildings...');
+    campusBuildingsData = await loadJSON('./campus-buildings.json');
     
-    // Calculate bounding box for coordinate normalization
-    state.boundingBox = calculateBoundingBox(state.mapData);
-    console.log('[GEO] Bounding Box:', state.boundingBox);
+    updateLoading(30, 'Loading floor configurations...');
+    floorsConfigData = await loadJSON('./floors-config.json');
     
-    updateLoadingStatus('Loading room information...');
+    updateLoading(60, 'Loading facility information...');
+    infoData = await loadJSON('./info_data.json');
     
-    // Load info_data.json (room details)
-    state.infoData = await loadJSON('./info_data.json');
-    updateLoadingProgress(80);
-    
-    console.log('[DATA] Loaded', state.mapData.length, 'map segments');
-    console.log('[DATA] Loaded', state.infoData.data?.length || 0, 'room records');
-    
-    updateLoadingProgress(100);
+    updateLoading(100, 'Initializing 3D engine...');
     return true;
-  } catch (error) {
-    showError('Failed to load map data. Please check your connection.');
-    return false;
-  }
 }
 
 // ============================================================================
 // THREE.JS SCENE SETUP
 // ============================================================================
 
-/**
- * Initialize the Three.js scene, camera, renderer, and controls
- */
 function initThreeJS() {
-  const container = document.getElementById('map-container');
-  
-  // Scene
-  state.scene = new THREE.Scene();
-  state.scene.background = new THREE.Color(COLORS.VGU_BLUE);
-  state.scene.fog = new THREE.Fog(COLORS.VGU_BLUE, 500, 2000);
-  
-  // Orthographic Camera for top-down architectural view
-  const aspect = container.clientWidth / container.clientHeight;
-  const frustumSize = 1000; // Adjust based on desired zoom level
-  state.camera = new THREE.OrthographicCamera(
-    -frustumSize * aspect / 2,
-    frustumSize * aspect / 2,
-    frustumSize / 2,
-    -frustumSize / 2,
-    0.1,
-    5000
-  );
-  state.camera.position.set(0, 500, 0); // Top-down view
-  state.camera.lookAt(0, 0, 0);
-  
-  // Renderer
-  state.renderer = new THREE.WebGLRenderer({ 
-    antialias: true, 
-    alpha: true,
-    preserveDrawingBuffer: true 
-  });
-  state.renderer.setSize(container.clientWidth, container.clientHeight);
-  state.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  state.renderer.setClearColor(COLORS.VGU_BLUE, 1);
-  container.appendChild(state.renderer.domElement);
-  
-  // Orbit Controls
-  state.controls = new OrbitControls(state.camera, state.renderer.domElement);
-  state.controls.enableDamping = true;
-  state.controls.dampingFactor = 0.05;
-  state.controls.screenSpacePanning = true;
-  state.controls.mouseButtons = {
-    LEFT: THREE.MOUSE.PAN,
-    MIDDLE: THREE.MOUSE.DOLLY,
-    RIGHT: THREE.MOUSE.ROTATE
-  };
-  state.controls.maxPolarAngle = Math.PI / 2; // Prevent going below ground
-  state.controls.minPolarAngle = 0; // Keep top-down view
-  
-  // Raycaster for interaction
-  state.raycaster = new THREE.Raycaster();
-  
-  // Lighting (for extruded geometry)
-  const ambientLight = new THREE.AmbientLight(COLORS.WHITE, 0.5);
-  state.scene.add(ambientLight);
-  
-  const directionalLight = new THREE.DirectionalLight(COLORS.WHITE, 1);
-  directionalLight.position.set(100, 200, 100);
-  state.scene.add(directionalLight);
-  
-  // Grid helper for reference
-  const gridHelper = new THREE.GridHelper(1000, 50, COLORS.CYBER_CYAN, COLORS.VGU_ORANGE);
-  gridHelper.position.y = -0.1;
-  state.scene.add(gridHelper);
-  
-  // Handle window resize
-  window.addEventListener('resize', onWindowResize);
-  
-  // Handle mouse/click interaction
-  state.renderer.domElement.addEventListener('pointerdown', onPointerDown);
-  state.renderer.domElement.addEventListener('pointermove', onPointerMove);
-  
-  // Start animation loop
-  animate();
+    const container = document.getElementById('canvas-container');
+    
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(COLORS.DARK_BG);
+    scene.fog = new THREE.FogExp2(COLORS.DARK_BG, 0.0005);
+    
+    mapGroup = new THREE.Group();
+    scene.add(mapGroup);
+    
+    const aspect = container.clientWidth / container.clientHeight;
+    const frustumSize = CONFIG.CAMERA_ZOOM_CAMPUS;
+    
+    camera = new THREE.OrthographicCamera(
+        -frustumSize * aspect / 2,
+        frustumSize * aspect / 2,
+        frustumSize / 2,
+        -frustumSize / 2,
+        1,
+        5000
+    );
+    camera.position.set(0, 300, 0);
+    camera.lookAt(0, 0, 0);
+    
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setClearColor(COLORS.DARK_BG, 1);
+    container.appendChild(renderer.domElement);
+    
+    controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.screenSpacePanning = true;
+    controls.mouseButtons = {
+        LEFT: THREE.MOUSE.PAN,
+        MIDDLE: THREE.MOUSE.DOLLY,
+        RIGHT: THREE.MOUSE.ROTATE
+    };
+    controls.maxPolarAngle = Math.PI / 2.2;
+    controls.minPolarAngle = 0;
+    
+    raycaster = new THREE.Raycaster();
+    mouse = new THREE.Vector2();
+    
+    const gridHelper = new THREE.GridHelper(1000, 50, COLORS.CYBER_CYAN, 0x112244);
+    gridHelper.position.y = -0.5;
+    gridHelper.material.transparent = true;
+    gridHelper.material.opacity = 0.3;
+    scene.add(gridHelper);
+    
+    window.addEventListener('resize', onWindowResize);
+    renderer.domElement.addEventListener('pointerdown', onPointerDown);
+    renderer.domElement.addEventListener('pointermove', onPointerMove);
+    
+    animate();
 }
 
-/**
- * Handle window resize events
- */
 function onWindowResize() {
-  const container = document.getElementById('map-container');
-  const aspect = container.clientWidth / container.clientHeight;
-  const frustumSize = 1000;
-  
-  state.camera.left = -frustumSize * aspect / 2;
-  state.camera.right = frustumSize * aspect / 2;
-  state.camera.top = frustumSize / 2;
-  state.camera.bottom = -frustumSize / 2;
-  state.camera.updateProjectionMatrix();
-  
-  state.renderer.setSize(container.clientWidth, container.clientHeight);
-  
-  // Update mobile/desktop detection
-  state.isMobile = window.innerWidth < 768;
+    const container = document.getElementById('canvas-container');
+    const aspect = container.clientWidth / container.clientHeight;
+    const frustumSize = AppState.view === 'CAMPUS' ? CONFIG.CAMERA_ZOOM_CAMPUS : CONFIG.CAMERA_ZOOM_FLOOR;
+    
+    camera.left = -frustumSize * aspect / 2;
+    camera.right = frustumSize * aspect / 2;
+    camera.top = frustumSize / 2;
+    camera.bottom = -frustumSize / 2;
+    camera.updateProjectionMatrix();
+    
+    renderer.setSize(container.clientWidth, container.clientHeight);
 }
 
 // ============================================================================
-// ROOM GEOMETRY GENERATION
+// STEP 1: CAMPUS VIEW
 // ============================================================================
 
-/**
- * Group map segments by room number and loop index
- * Returns a map of roomNumber -> array of loops (each loop is an array of points)
- */
-function groupSegmentsByRoom(mapData) {
-  const roomGroups = new Map();
-  
-  mapData.forEach(segment => {
-    const { Room_Number, Loop_Index, StartX, StartY, EndX, EndY } = segment;
+async function renderCampusView() {
+    mapGroup.clear();
+    clickableObjects = [];
     
-    if (!roomGroups.has(Room_Number)) {
-      roomGroups.set(Room_Number, new Map());
-    }
+    updateLoading(80, 'Rendering campus buildings...');
     
-    const loops = roomGroups.get(Room_Number);
-    if (!loops.has(Loop_Index)) {
-      loops.set(Loop_Index, []);
-    }
+    const features = campusBuildingsData.features;
     
-    const loop = loops.get(Loop_Index);
-    
-    // Add start point if it's the first segment or different from last point
-    if (loop.length === 0) {
-      loop.push({ x: StartX, y: StartY });
-    }
-    
-    // Add end point
-    loop.push({ x: EndX, y: EndY });
-  });
-  
-  // Convert to simpler structure
-  const result = {};
-  roomGroups.forEach((loops, roomNumber) => {
-    result[roomNumber] = [];
-    loops.forEach((loopPoints, loopIndex) => {
-      result[roomNumber].push(loopPoints);
+    const allCoords = [];
+    features.forEach(feature => {
+        const coords = feature.geometry.coordinates[0][0];
+        allCoords.push(...coords);
     });
-  });
-  
-  return result;
-}
-
-/**
- * Create room meshes from grouped segments
- * Uses ExtrudeGeometry for volume and wireframe materials for hologram effect
- */
-function createRoomMeshes(roomGroups) {
-  Object.entries(roomGroups).forEach(([roomNumber, loops]) => {
-    loops.forEach((loopPoints, loopIndex) => {
-      if (loopPoints.length < 3) return; // Need at least 3 points for a polygon
-      
-      // Normalize all points
-      const normalizedPoints = loopPoints.map(point => {
-        const normalized = normalizeCoordinate(point.x, point.y);
-        return new THREE.Vector2(normalized.x, normalized.z);
-      });
-      
-      // Create shape from points
-      const shape = new THREE.Shape(normalizedPoints);
-      
-      // Extrude geometry for 3D volume
-      const extrudeSettings = {
-        depth: CONFIG.ROOM_HEIGHT,
-        bevelEnabled: false
-      };
-      
-      const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-      
-      // Hologram material - VGU Orange with transparency
-      const material = new THREE.MeshPhongMaterial({
-        color: COLORS.VGU_ORANGE,
-        transparent: true,
-        opacity: CONFIG.HOLOGRAM_OPACITY,
-        side: THREE.DoubleSide,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending
-      });
-      
-      // Wireframe overlay - Cyber Cyan
-      const wireframeMaterial = new THREE.LineBasicMaterial({
-        color: COLORS.CYBER_CYAN,
-        linewidth: CONFIG.WIREFRAME_LINE_WIDTH,
-        transparent: true,
-        opacity: 0.8
-      });
-      
-      // Create mesh
-      const mesh = new THREE.Mesh(geometry, material);
-      mesh.position.y = 0; // Place at ground level
-      
-      // Create wireframe edges
-      const edgesGeometry = new THREE.EdgesGeometry(geometry);
-      const wireframe = new THREE.LineSegments(edgesGeometry, wireframeMaterial);
-      wireframe.position.copy(mesh.position);
-      
-      // Group mesh and wireframe
-      const roomGroup = new THREE.Group();
-      roomGroup.add(mesh);
-      roomGroup.add(wireframe);
-      
-      // Store room metadata for raycasting
-      roomGroup.userData = {
-        room_id: roomNumber,
-        loop_index: loopIndex,
-        isRoom: true
-      };
-      
-      // Store reference for later selection highlighting
-      roomGroup.mesh = mesh;
-      roomGroup.wireframe = wireframe;
-      
-      state.scene.add(roomGroup);
-      state.roomMeshes.push(roomGroup);
+    
+    const campusBounds = calculateBounds(allCoords);
+    
+    features.forEach(feature => {
+        const buildingId = feature.properties.building_id;
+        const buildingName = feature.properties.name;
+        const height = feature.properties.height || CONFIG.BUILDING_HEIGHT;
+        
+        const coords = feature.geometry.coordinates[0][0];
+        const normalizedCoords = normalizeCoordinates(coords, campusBounds, 0.5);
+        
+        const shape = new THREE.Shape();
+        normalizedCoords.forEach((coord, index) => {
+            if (index === 0) {
+                shape.moveTo(coord[0], coord[1]);
+            } else {
+                shape.lineTo(coord[0], coord[1]);
+            }
+        });
+        shape.closePath();
+        
+        const extrudeSettings = { depth: height, bevelEnabled: false };
+        const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+        
+        const material = new THREE.MeshPhongMaterial({
+            color: COLORS.CYBER_CYAN,
+            transparent: true,
+            opacity: CONFIG.HOLOGRAM_OPACITY,
+            side: THREE.DoubleSide,
+            depthWrite: false
+        });
+        
+        const wireframeMaterial = new THREE.LineBasicMaterial({
+            color: COLORS.CYBER_CYAN,
+            transparent: true,
+            opacity: CONFIG.WIREFRAME_OPACITY
+        });
+        
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.y = 0;
+        
+        const edgesGeometry = new THREE.EdgesGeometry(geometry);
+        const wireframe = new THREE.LineSegments(edgesGeometry, wireframeMaterial);
+        wireframe.position.copy(mesh.position);
+        
+        const buildingGroup = new THREE.Group();
+        buildingGroup.add(mesh);
+        buildingGroup.add(wireframe);
+        
+        buildingGroup.userData = {
+            type: 'building',
+            id: buildingId,
+            name: buildingName
+        };
+        
+        mapGroup.add(buildingGroup);
+        clickableObjects.push(buildingGroup);
     });
-  });
-  
-  console.log('[RENDER] Created', state.roomMeshes.length, 'room meshes');
-}
-
-/**
- * Build the complete 3D map from map_data.json
- */
-function buildMap() {
-  const roomGroups = groupSegmentsByRoom(state.mapData);
-  createRoomMeshes(roomGroups);
-  
-  // Center camera on the scene
-  fitCameraToSelection();
-}
-
-/**
- * Adjust camera to fit all room meshes in view
- */
-function fitCameraToSelection() {
-  if (state.roomMeshes.length === 0) return;
-  
-  const box = new THREE.Box3();
-  state.roomMeshes.forEach(mesh => {
-    box.expandByObject(mesh);
-  });
-  
-  const center = box.getCenter(new THREE.Vector3());
-  const size = box.getSize(new THREE.Vector3());
-  
-  // Position camera above center
-  state.camera.position.set(center.x, 500, center.z);
-  state.controls.target.copy(center);
-  state.controls.update();
+    
+    fitCameraToSelection(CONFIG.CAMERA_ZOOM_CAMPUS);
+    updateUIForCampusView();
 }
 
 // ============================================================================
-// INTERACTION (RAYCASTER)
+// STEP 2: BUILDING SELECTION & FLOOR MENU
 // ============================================================================
 
-/**
- * Handle pointer down events for room selection
- */
-function onPointerDown(event) {
-  // Calculate mouse position in normalized device coordinates
-  const rect = state.renderer.domElement.getBoundingClientRect();
-  state.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-  state.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-  
-  // Update raycaster
-  state.raycaster.setFromCamera(state.mouse, state.camera);
-  
-  // Get intersected objects
-  const intersects = state.raycaster.intersectObjects(state.roomMeshes, true);
-  
-  if (intersects.length > 0) {
-    // Find the parent group with userData
-    let selectedGroup = intersects[0].object;
-    while (selectedGroup.parent && !selectedGroup.userData.isRoom) {
-      selectedGroup = selectedGroup.parent;
+function onBuildingSelected(buildingGroup) {
+    const buildingId = buildingGroup.userData.id;
+    const buildingName = buildingGroup.userData.name;
+    
+    AppState.building = buildingId;
+    
+    highlightObject(buildingGroup, COLORS.VGU_ORANGE);
+    
+    const floors = floorsConfigData[buildingId] || [];
+    
+    if (floors.length === 0) {
+        console.warn(`[UI] No floors configured for building ${buildingId}`);
+        return;
     }
     
-    if (selectedGroup.userData.isRoom) {
-      selectRoom(selectedGroup);
-    }
-  }
+    showFloorSelector(buildingName, floors);
 }
 
-/**
- * Handle pointer move for hover effects
- */
-function onPointerMove(event) {
-  const rect = state.renderer.domElement.getBoundingClientRect();
-  state.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-  state.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-  
-  state.raycaster.setFromCamera(state.mouse, state.camera);
-  const intersects = state.raycaster.intersectObjects(state.roomMeshes, true);
-  
-  // Reset all rooms to default opacity
-  state.roomMeshes.forEach(group => {
-    if (group !== state.selectedRoom) {
-      group.mesh.material.opacity = CONFIG.HOLOGRAM_OPACITY;
-    }
-  });
-  
-  if (intersects.length > 0) {
-    document.body.style.cursor = 'pointer';
+function showFloorSelector(buildingName, floors) {
+    const selector = document.getElementById('floor-selector');
+    const nameEl = document.getElementById('selected-building-name');
+    const container = document.getElementById('floor-buttons-container');
     
-    let hoveredGroup = intersects[0].object;
-    while (hoveredGroup.parent && !hoveredGroup.userData.isRoom) {
-      hoveredGroup = hoveredGroup.parent;
-    }
+    nameEl.textContent = buildingName;
+    container.innerHTML = '';
     
-    if (hoveredGroup && hoveredGroup !== state.selectedRoom) {
-      hoveredGroup.mesh.material.opacity = CONFIG.HOLOGRAM_OPACITY + 0.2;
-    }
-  } else {
-    document.body.style.cursor = 'default';
-  }
+    floors.forEach(floorNum => {
+        const btn = document.createElement('button');
+        btn.className = 'floor-btn w-full text-left p-3 rounded text-xs font-mono text-cyberCyan hover:text-white transition-all border border-cyberCyan/20 mb-1';
+        btn.textContent = `FLOOR ${floorNum}`;
+        btn.onclick = () => onFloorSelected(floorNum);
+        container.appendChild(btn);
+    });
+    
+    selector.classList.remove('-translate-x-full');
 }
 
-/**
- * Select a room and display its information
- * @param {THREE.Group} roomGroup - The selected room group
- */
-function selectRoom(roomGroup) {
-  // Deselect previous room
-  if (state.selectedRoom && state.selectedRoom !== roomGroup) {
-    state.selectedRoom.mesh.material.opacity = CONFIG.HOLOGRAM_OPACITY;
-    state.selectedRoom.wireframe.material.color.setHex(COLORS.CYBER_CYAN);
-  }
-  
-  // Select new room
-  state.selectedRoom = roomGroup;
-  roomGroup.mesh.material.opacity = CONFIG.HOLOGRAM_OPACITY + 0.3;
-  roomGroup.wireframe.material.color.setHex(COLORS.VGU_ORANGE);
-  
-  // Get room ID and fetch info
-  const roomId = roomGroup.userData.room_id;
-  console.log('[SELECT] Room selected:', roomId);
-  
-  // Update context bar
-  updateContextBar(roomId);
-  
-  // Display room information
-  displayRoomInfo(roomId);
-  
-  // Show panel
-  showPanel();
-  
-  // Update map coordinates display
-  updateMapCoordinates(roomGroup.position);
+function hideFloorSelector() {
+    const selector = document.getElementById('floor-selector');
+    selector.classList.add('-translate-x-full');
+}
+
+// ============================================================================
+// STEP 3: FLOOR VIEW (CAD COORDINATES)
+// ============================================================================
+
+async function onFloorSelected(floorNum) {
+    AppState.floor = floorNum;
+    AppState.view = 'FLOOR';
+    
+    hideFloorSelector();
+    updateUIForFloorView(AppState.building, floorNum);
+    await renderFloorView(floorNum);
+}
+
+async function renderFloorView(floorNum) {
+    mapGroup.clear();
+    clickableObjects = [];
+    
+    const floorFile = `./msi-floor${floorNum}.json`;
+    
+    try {
+        updateLoading(50, `Loading Floor ${floorNum} data...`);
+        const floorData = await loadJSON(floorFile);
+        currentFloorData = floorData;
+        
+        const features = floorData.features || [];
+        
+        if (features.length === 0) {
+            console.warn(`[RENDER] No room data in ${floorFile}`);
+            return;
+        }
+        
+        const allCoords = [];
+        features.forEach(feature => {
+            const coords = feature.geometry.coordinates[0][0];
+            allCoords.push(...coords);
+        });
+        
+        const floorBounds = calculateBounds(allCoords);
+        
+        features.forEach(feature => {
+            const roomId = feature.properties.room_id;
+            const roomName = feature.properties.name || 'Unknown Room';
+            const roomType = feature.properties.type || 'room';
+            
+            const coords = feature.geometry.coordinates[0][0];
+            const normalizedCoords = normalizeCoordinates(coords, floorBounds, 1.5);
+            
+            const shape = new THREE.Shape();
+            normalizedCoords.forEach((coord, index) => {
+                if (index === 0) {
+                    shape.moveTo(coord[0], coord[1]);
+                } else {
+                    shape.lineTo(coord[0], coord[1]);
+                }
+            });
+            shape.closePath();
+            
+            const geometry = new THREE.ShapeGeometry(shape);
+            
+            const material = new THREE.MeshBasicMaterial({
+                color: COLORS.CYBER_CYAN,
+                transparent: true,
+                opacity: 0.08,
+                side: THREE.DoubleSide
+            });
+            
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.rotation.x = -Math.PI / 2;
+            mesh.position.y = 0;
+            
+            const edgesGeometry = new THREE.EdgesGeometry(geometry);
+            const wireframeMaterial = new THREE.LineBasicMaterial({
+                color: COLORS.CYBER_CYAN,
+                transparent: true,
+                opacity: 0.9
+            });
+            const wireframe = new THREE.LineSegments(edgesGeometry, wireframeMaterial);
+            wireframe.rotation.x = -Math.PI / 2;
+            wireframe.position.y = 0.1;
+            
+            const clickPlaneGeo = new THREE.ShapeGeometry(shape);
+            const clickPlaneMat = new THREE.MeshBasicMaterial({
+                visible: false,
+                side: THREE.DoubleSide
+            });
+            const clickPlane = new THREE.Mesh(clickPlaneGeo, clickPlaneMat);
+            clickPlane.rotation.x = -Math.PI / 2;
+            clickPlane.position.y = 0;
+            
+            const roomGroup = new THREE.Group();
+            roomGroup.add(clickPlane);
+            roomGroup.add(mesh);
+            roomGroup.add(wireframe);
+            
+            roomGroup.userData = {
+                type: 'room',
+                id: roomId,
+                name: roomName,
+                roomType: roomType
+            };
+            
+            mapGroup.add(roomGroup);
+            clickableObjects.push(roomGroup);
+        });
+        
+        fitCameraToSelection(CONFIG.CAMERA_ZOOM_FLOOR);
+        updateLoading(100, 'Floor plan ready');
+        
+    } catch (error) {
+        console.error(`[ERROR] Failed to load floor ${floorNum}:`, error);
+        alert(`Failed to load Floor ${floorNum} data.`);
+        goToCampusView();
+    }
+}
+
+// ============================================================================
+// STEP 4: ROOM SELECTION & INFO PANEL
+// ============================================================================
+
+function onRoomSelected(roomGroup) {
+    const roomId = roomGroup.userData.id;
+    
+    AppState.selectedRoom = roomId;
+    
+    highlightObject(roomGroup, COLORS.VGU_ORANGE);
+    displayRoomInfo(roomId);
+}
+
+function displayRoomInfo(roomId) {
+    const panel = document.getElementById('info-panel');
+    const content = document.getElementById('panel-content');
+    
+    const roomData = infoData.data?.find(r => r.room_number === roomId);
+    
+    let html = `<h2 class="text-3xl font-bold text-vguOrange mb-1 font-mono">${roomId}</h2>`;
+    
+    if (roomData) {
+        html += `
+            <p class="text-xs text-cyberCyan tracking-widest mb-6 uppercase border-b border-cyberCyan/30 pb-2">
+                ${roomData.department || 'GENERAL FACILITY'}
+            </p>
+            <div class="space-y-4">
+                <div class="bg-white/5 p-4 rounded-lg border border-white/10 shadow-inner">
+                    <span class="text-[10px] text-white/50 uppercase tracking-widest block mb-1">Room Type</span>
+                    <span class="text-sm font-bold text-white">${roomData.heading_1 || roomData.fm_room_type || 'N/A'}</span>
+                </div>
+                <div class="bg-white/5 p-4 rounded-lg border border-white/10 shadow-inner">
+                    <span class="text-[10px] text-white/50 uppercase tracking-widest block mb-1">Status</span>
+                    <span class="text-sm ${roomData.status === 'active' ? 'text-green-400' : 'text-yellow-400'}">
+                        ${(roomData.status || 'Active').toUpperCase()}
+                    </span>
+                </div>
+                <div class="bg-white/5 p-4 rounded-lg border border-white/10 shadow-inner">
+                    <span class="text-[10px] text-white/50 uppercase tracking-widest block mb-1">Capacity</span>
+                    <span class="text-sm text-white">${roomData.capacity || 'N/A'} persons</span>
+                </div>
+                <div class="bg-white/5 p-4 rounded-lg border border-white/10 shadow-inner">
+                    <span class="text-[10px] text-white/50 uppercase tracking-widest block mb-1">Area</span>
+                    <span class="text-sm text-white">${roomData.area || 'N/A'} m²</span>
+                </div>
+                ${roomData.occupant_display ? `
+                <div class="bg-white/5 p-4 rounded-lg border border-white/10 shadow-inner">
+                    <span class="text-[10px] text-white/50 uppercase tracking-widest block mb-1">Occupants</span>
+                    <p class="text-sm text-white leading-relaxed">${roomData.occupant_display}</p>
+                </div>
+                ` : ''}
+            </div>
+        `;
+    } else {
+        html += `
+            <p class="text-white/50 mt-4 text-sm">No detailed information available.</p>
+            <p class="text-cyberCyan/70 text-xs mt-2">Room ID: ${roomId}</p>
+        `;
+    }
+    
+    content.innerHTML = html;
+    panel.classList.remove('translate-y-full', 'md:translate-x-full');
+}
+
+function closeInfoPanel() {
+    const panel = document.getElementById('info-panel');
+    panel.classList.add('translate-y-full', 'md:translate-x-full');
+    
+    if (highlightedObject) {
+        resetHighlight(highlightedObject);
+        highlightedObject = null;
+    }
+    
+    AppState.selectedRoom = null;
+}
+
+// ============================================================================
+// STEP 5: BACK NAVIGATION
+// ============================================================================
+
+function goToCampusView() {
+    AppState.view = 'CAMPUS';
+    AppState.building = null;
+    AppState.floor = null;
+    AppState.selectedRoom = null;
+    
+    hideFloorSelector();
+    closeInfoPanel();
+    updateUIForCampusView();
+    renderCampusView();
 }
 
 // ============================================================================
 // UI MANAGEMENT
 // ============================================================================
 
-/**
- * Update loading status text
- */
-function updateLoadingStatus(status) {
-  const statusEl = document.getElementById('loading-status');
-  if (statusEl) {
-    statusEl.textContent = status;
-  }
+function updateUIForCampusView() {
+    const navBar = document.getElementById('nav-bar');
+    const viewIndicator = document.getElementById('view-indicator');
+    const viewText = document.getElementById('current-view-text');
+    
+    navBar.classList.add('hidden');
+    viewIndicator.classList.remove('hidden');
+    viewText.textContent = 'CAMPUS VIEW';
 }
 
-/**
- * Update loading progress bar
- */
-function updateLoadingProgress(percent) {
-  const progressEl = document.getElementById('loading-progress');
-  if (progressEl) {
-    progressEl.style.width = `${percent}%`;
-  }
+function updateUIForFloorView(buildingId, floorNum) {
+    const navBar = document.getElementById('nav-bar');
+    const viewIndicator = document.getElementById('view-indicator');
+    const breadcrumbBuilding = document.getElementById('breadcrumb-building');
+    const breadcrumb = document.getElementById('breadcrumb');
+    
+    navBar.classList.remove('hidden');
+    viewIndicator.classList.add('hidden');
+    breadcrumb.classList.remove('hidden');
+    breadcrumbBuilding.textContent = `${buildingId.toUpperCase()} - FLOOR ${floorNum}`;
 }
 
-/**
- * Hide loading overlay
- */
-function hideLoadingOverlay() {
-  const overlay = document.getElementById('loading-overlay');
-  if (overlay) {
-    overlay.style.opacity = '0';
-    overlay.style.transition = 'opacity 0.5s ease';
-    setTimeout(() => {
-      overlay.classList.add('hidden');
-    }, 500);
-  }
-}
+// ============================================================================
+// INTERACTION HANDLERS
+// ============================================================================
 
-/**
- * Show error modal
- */
-function showError(message) {
-  const modal = document.getElementById('error-modal');
-  const messageEl = document.getElementById('error-message');
-  
-  if (modal && messageEl) {
-    messageEl.textContent = message;
-    modal.classList.remove('hidden');
-  }
-}
-
-/**
- * Hide error modal
- */
-function hideError() {
-  const modal = document.getElementById('error-modal');
-  if (modal) {
-    modal.classList.add('hidden');
-  }
-}
-
-/**
- * Update top context bar with selected room info
- */
-function updateContextBar(roomId) {
-  const titleEl = document.getElementById('context-title');
-  const guidanceEl = document.getElementById('context-guidance');
-  
-  if (titleEl) {
-    titleEl.textContent = `FOCUS: ROOM ${roomId}`;
-  }
-  if (guidanceEl) {
-    guidanceEl.textContent = 'VIEWING ROOM DETAILS';
-  }
-}
-
-/**
- * Update map coordinates display
- */
-function updateMapCoordinates(position) {
-  const coordXEl = document.getElementById('map-coord-x');
-  const coordYEl = document.getElementById('map-coord-y');
-  const zoomEl = document.getElementById('map-zoom');
-  
-  if (coordXEl) coordXEl.textContent = position.x.toFixed(1);
-  if (coordYEl) coordYEl.textContent = position.z.toFixed(1);
-  if (zoomEl) zoomEl.textContent = state.camera.zoom.toFixed(2);
-}
-
-/**
- * Show room information panel
- */
-function showPanel() {
-  if (state.isMobile) {
-    const bottomSheet = document.getElementById('bottom-sheet');
-    if (bottomSheet) {
-      bottomSheet.classList.remove('bottom-sheet-hidden');
-      bottomSheet.classList.add('bottom-sheet-visible');
+function onPointerDown(event) {
+    if (event.target.closest('#info-panel') || 
+        event.target.closest('#floor-selector') || 
+        event.target.closest('header') ||
+        event.target.closest('#nav-bar')) {
+        return;
     }
-  } else {
-    const sidebar = document.getElementById('sidebar-panel');
-    if (sidebar) {
-      sidebar.classList.remove('panel-slide-out');
-      sidebar.classList.add('panel-slide-in');
+    
+    const rect = renderer.domElement.getBoundingClientRect();
+    mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    
+    raycaster.setFromCamera(mouse, camera);
+    
+    const intersects = raycaster.intersectObjects(clickableObjects, true);
+    
+    if (intersects.length > 0) {
+        let object = intersects[0].object;
+        while (object.parent && !object.userData.type) {
+            object = object.parent;
+        }
+        
+        if (object.userData.type === 'building') {
+            onBuildingSelected(object);
+        } else if (object.userData.type === 'room') {
+            onRoomSelected(object);
+        }
+    } else {
+        if (AppState.selectedRoom) {
+            closeInfoPanel();
+        }
     }
-  }
 }
 
-/**
- * Hide room information panel
- */
-function hidePanel() {
-  if (state.isMobile) {
-    const bottomSheet = document.getElementById('bottom-sheet');
-    if (bottomSheet) {
-      bottomSheet.classList.remove('bottom-sheet-visible');
-      bottomSheet.classList.add('bottom-sheet-hidden');
+function onPointerMove(event) {
+    const rect = renderer.domElement.getBoundingClientRect();
+    mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(clickableObjects, true);
+    
+    renderer.domElement.style.cursor = 'default';
+    
+    if (intersects.length > 0) {
+        renderer.domElement.style.cursor = 'pointer';
     }
-  } else {
-    const sidebar = document.getElementById('sidebar-panel');
-    if (sidebar) {
-      sidebar.classList.remove('panel-slide-in');
-      sidebar.classList.add('panel-slide-out');
+}
+
+function highlightObject(group, colorHex) {
+    if (highlightedObject && highlightedObject !== group) {
+        resetHighlight(highlightedObject);
     }
-  }
-  
-  // Deselect room
-  if (state.selectedRoom) {
-    state.selectedRoom.mesh.material.opacity = CONFIG.HOLOGRAM_OPACITY;
-    state.selectedRoom.wireframe.material.color.setHex(COLORS.CYBER_CYAN);
-    state.selectedRoom = null;
-  }
-  
-  // Reset context bar
-  resetContextBar();
+    
+    highlightedObject = group;
+    
+    group.traverse(child => {
+        if (child.isLineSegments) {
+            child.material.color.setHex(colorHex);
+        }
+        if (child.isMesh && child.material.opacity !== undefined) {
+            child.material.opacity = Math.min(child.material.opacity + 0.2, 0.5);
+        }
+    });
 }
 
-/**
- * Reset context bar to default state
- */
-function resetContextBar() {
-  const titleEl = document.getElementById('context-title');
-  const guidanceEl = document.getElementById('context-guidance');
-  
-  if (titleEl) {
-    titleEl.textContent = 'FOCUS: VGU CAMPUS OVERVIEW';
-  }
-  if (guidanceEl) {
-    guidanceEl.textContent = 'CLICK A ROOM TO VIEW DETAILS';
-  }
+function resetHighlight(group) {
+    group.traverse(child => {
+        if (child.isLineSegments) {
+            child.material.color.setHex(COLORS.CYBER_CYAN);
+        }
+        if (child.isMesh && child.material.opacity !== undefined) {
+            if (group.userData.type === 'building') {
+                child.material.opacity = CONFIG.HOLOGRAM_OPACITY;
+            } else {
+                child.material.opacity = 0.08;
+            }
+        }
+    });
 }
 
-/**
- * Find room info in info_data.json by room number
- */
-function findRoomInfo(roomNumber) {
-  if (!state.infoData || !state.infoData.data) return null;
-  
-  // Try exact match first
-  let roomInfo = state.infoData.data.find(
-    room => room.room_number === roomNumber
-  );
-  
-  // If not found, try case-insensitive match
-  if (!roomInfo) {
-    roomInfo = state.infoData.data.find(
-      room => room.room_number?.toLowerCase() === roomNumber.toLowerCase()
-    );
-  }
-  
-  // If still not found, try partial match
-  if (!roomInfo) {
-    roomInfo = state.infoData.data.find(
-      room => room.room_number?.includes(roomNumber) || roomNumber.includes(room.room_number)
-    );
-  }
-  
-  return roomInfo;
-}
-
-/**
- * Display room information in the UI panel
- */
-function displayRoomInfo(roomNumber) {
-  const roomInfo = findRoomInfo(roomNumber);
-  
-  if (state.isMobile) {
-    renderMobileRoomInfo(roomNumber, roomInfo);
-  } else {
-    renderDesktopRoomInfo(roomNumber, roomInfo);
-  }
-}
-
-/**
- * Render room info for desktop sidebar
- */
-function renderDesktopRoomInfo(roomNumber, roomInfo) {
-  const container = document.getElementById('room-info');
-  if (!container) return;
-  
-  if (!roomInfo) {
-    container.innerHTML = `
-      <div class="text-center py-8">
-        <h3 class="text-xl font-bold text-vgu-orange mb-2">ROOM ${roomNumber}</h3>
-        <p class="text-cyber-cyan font-mono text-sm">No detailed information available</p>
-        <p class="text-white/60 text-sm mt-2">This room exists in the map geometry but has no recorded data.</p>
-      </div>
-    `;
-    return;
-  }
-  
-  const {
-    heading_1,
-    heading_2,
-    department,
-    fm_room_function,
-    fm_room_type,
-    area,
-    unbounded_height,
-    capacity,
-    status,
-    occupant_display
-  } = roomInfo;
-  
-  container.innerHTML = `
-    <div class="space-y-4">
-      <div class="border-b border-cyber-cyan/30 pb-4">
-        <h3 class="text-2xl font-bold text-vgu-orange">ROOM ${roomNumber}</h3>
-        <p class="text-cyber-cyan font-mono text-sm">${heading_1 || 'N/A'}</p>
-        <p class="text-white/60 text-sm">${heading_2 || ''}</p>
-      </div>
-      
-      <div class="grid grid-cols-2 gap-3">
-        ${department && department !== '___' ? `
-          <div class="holo-panel rounded p-3">
-            <p class="text-xs text-white/60 mb-1">DEPARTMENT</p>
-            <p class="text-white font-semibold">${department}</p>
-          </div>
-        ` : ''}
-        
-        ${fm_room_function && fm_room_function !== '___' ? `
-          <div class="holo-panel rounded p-3">
-            <p class="text-xs text-white/60 mb-1">FUNCTION</p>
-            <p class="text-white font-semibold">${fm_room_function}</p>
-          </div>
-        ` : ''}
-        
-        ${area ? `
-          <div class="holo-panel rounded p-3">
-            <p class="text-xs text-white/60 mb-1">AREA</p>
-            <p class="text-white font-semibold">${area} m²</p>
-          </div>
-        ` : ''}
-        
-        ${unbounded_height ? `
-          <div class="holo-panel rounded p-3">
-            <p class="text-xs text-white/60 mb-1">HEIGHT</p>
-            <p class="text-white font-semibold">${parseInt(unbounded_height) / 1000} m</p>
-          </div>
-        ` : ''}
-        
-        ${capacity && capacity !== '--' ? `
-          <div class="holo-panel rounded p-3">
-            <p class="text-xs text-white/60 mb-1">CAPACITY</p>
-            <p class="text-white font-semibold">${capacity}</p>
-          </div>
-        ` : ''}
-        
-        <div class="holo-panel rounded p-3">
-          <p class="text-xs text-white/60 mb-1">STATUS</p>
-          <p class="text-vgu-orange font-semibold">${status || 'Unknown'}</p>
-        </div>
-      </div>
-      
-      ${occupant_display ? `
-        <div class="holo-panel rounded p-4">
-          <p class="text-xs text-white/60 mb-2">OCCUPANTS</p>
-          <p class="text-white">${occupant_display}</p>
-        </div>
-      ` : ''}
-      
-      ${fm_room_type && fm_room_type !== '___' ? `
-        <div class="holo-panel rounded p-4">
-          <p class="text-xs text-white/60 mb-2">ROOM TYPE</p>
-          <p class="text-cyber-cyan font-mono text-sm">${fm_room_type}</p>
-        </div>
-      ` : ''}
-    </div>
-  `;
-}
-
-/**
- * Render room info for mobile bottom sheet
- */
-function renderMobileRoomInfo(roomNumber, roomInfo) {
-  const titleEl = document.getElementById('mobile-room-title');
-  const container = document.getElementById('mobile-room-info');
-  
-  if (titleEl) {
-    titleEl.textContent = `ROOM ${roomNumber}`;
-  }
-  
-  if (!container) return;
-  
-  if (!roomInfo) {
-    container.innerHTML = `
-      <p class="text-cyber-cyan font-mono text-sm text-center">No detailed information available</p>
-    `;
-    return;
-  }
-  
-  const {
-    heading_1,
-    heading_2,
-    department,
-    area,
-    status
-  } = roomInfo;
-  
-  container.innerHTML = `
-    <div class="space-y-3">
-      <div class="flex items-center justify-between">
-        <span class="text-white/60 text-sm">FUNCTION</span>
-        <span class="text-cyber-cyan font-mono text-sm">${heading_1 || 'N/A'}</span>
-      </div>
-      
-      ${department && department !== '___' ? `
-        <div class="flex items-center justify-between">
-          <span class="text-white/60 text-sm">DEPARTMENT</span>
-          <span class="text-white text-sm">${department}</span>
-        </div>
-      ` : ''}
-      
-      ${area ? `
-        <div class="flex items-center justify-between">
-          <span class="text-white/60 text-sm">AREA</span>
-          <span class="text-white text-sm">${area} m²</span>
-        </div>
-      ` : ''}
-      
-      <div class="flex items-center justify-between">
-        <span class="text-white/60 text-sm">STATUS</span>
-        <span class="text-vgu-orange text-sm">${status || 'Unknown'}</span>
-      </div>
-    </div>
-  `;
+function fitCameraToSelection(zoomLevel) {
+    if (clickableObjects.length === 0) return;
+    
+    const box = new THREE.Box3();
+    clickableObjects.forEach(obj => {
+        box.expandByObject(obj);
+    });
+    
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    
+    camera.position.set(center.x, 300, center.z);
+    controls.target.copy(center);
+    controls.update();
+    
+    const aspect = renderer.domElement.clientWidth / renderer.domElement.clientHeight;
+    const frustumSize = zoomLevel;
+    
+    camera.left = -frustumSize * aspect / 2;
+    camera.right = frustumSize * aspect / 2;
+    camera.top = frustumSize / 2;
+    camera.bottom = -frustumSize / 2;
+    camera.updateProjectionMatrix();
 }
 
 // ============================================================================
 // ANIMATION LOOP
 // ============================================================================
 
-/**
- * Main animation loop
- */
 function animate() {
-  requestAnimationFrame(animate);
-  
-  // Update controls
-  state.controls.update();
-  
-  // Update map coordinates display periodically
-  if (state.camera) {
-    const zoomEl = document.getElementById('map-zoom');
-    if (zoomEl) {
-      zoomEl.textContent = state.camera.zoom.toFixed(2);
-    }
-  }
-  
-  // Render scene
-  state.renderer.render(state.scene, state.camera);
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
 }
 
 // ============================================================================
 // INITIALIZATION
 // ============================================================================
 
-/**
- * Main initialization function
- */
 async function init() {
-  console.log('[VGU MAP] Initializing Digital Twin Facility Inspection System...');
-  
-  // Setup retry button
-  const retryBtn = document.getElementById('retry-btn');
-  if (retryBtn) {
-    retryBtn.addEventListener('click', () => {
-      hideError();
-      init();
-    });
-  }
-  
-  // Setup close buttons
-  const closeSidebar = document.getElementById('close-sidebar');
-  if (closeSidebar) {
-    closeSidebar.addEventListener('click', hidePanel);
-  }
-  
-  const closeBottomSheet = document.getElementById('close-bottom-sheet');
-  if (closeBottomSheet) {
-    closeBottomSheet.addEventListener('click', hidePanel);
-  }
-  
-  // Load data
-  const dataLoaded = await initializeData();
-  
-  if (!dataLoaded) {
-    return;
-  }
-  
-  // Initialize Three.js
-  initThreeJS();
-  
-  // Build map geometry
-  updateLoadingStatus('Building 3D map...');
-  buildMap();
-  
-  // Hide loading overlay after a short delay
-  setTimeout(() => {
-    hideLoadingOverlay();
-    console.log('[VGU MAP] System initialized successfully');
-  }, 500);
+    try {
+        initThreeJS();
+        await initializeData();
+        
+        document.getElementById('btn-back-campus').addEventListener('click', goToCampusView);
+        document.getElementById('btn-close-panel').addEventListener('click', closeInfoPanel);
+        
+        await renderCampusView();
+        hideLoading();
+        
+        console.log('[INIT] VGU Hologram Map initialized successfully');
+        console.log('[STATE] Current view:', AppState.view);
+        
+    } catch (error) {
+        console.error('[INIT] Fatal error:', error);
+        const loadingScreen = document.getElementById('loading-screen');
+        if (loadingScreen) {
+            loadingScreen.innerHTML = `
+                <div class="text-vguOrange text-xl">INITIALIZATION FAILED</div>
+                <div class="text-white/50 text-sm mt-2">${error.message}</div>
+                <button onclick="location.reload()" class="mt-4 px-4 py-2 bg-cyberCyan text-darkBg rounded text-sm font-bold">RETRY</button>
+            `;
+        }
+    }
 }
 
-// Start the application
 init();
