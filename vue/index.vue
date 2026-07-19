@@ -142,7 +142,6 @@ onMounted(() => {
 .app-container { position: relative; width: 100vw; height: 100vh; overflow: hidden; background: #000; }
 .map-layer { position: absolute; inset: 0; }
 
-/* === CYBERPUNK GLASSMORPHISM PANEL === */
 .cyber-panel {
   position: absolute;
   top: 20px; right: 20px; bottom: 20px;
@@ -164,39 +163,10 @@ onMounted(() => {
   border-bottom: 2px solid;
   position: relative;
 }
-.sys-status { font-size: 10px; color: #00ffcc; letter-spacing: 2px; margin-bottom: 5px; }
-.panel-header h2 { margin: 0; font-size: 22px; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
-.meta-info { font-size: 12px; opacity: 0.7; margin-top: 5px; }
-.btn-close { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #ff3366; cursor: pointer; font-family: inherit; }
-.btn-close:hover { text-shadow: 0 0 8px #ff3366; }
 
-.panel-content { padding: 20px; overflow-y: auto; flex: 1; }
-.info-block h4 { color: #888; font-size: 12px; margin-bottom: 5px; border-bottom: 1px dashed #333; padding-bottom: 5px; }
+.panel-header h2 { margin: 0; font-size: 22px; color: #fff; }
 
-/* === X-RAY FLASHLIGHT EFFECT === */
-.equip-card {
-  margin-top: 20px; padding: 15px;
-  background: rgba(255,255,255,0.02);
-  border-left: 3px solid var(--accent);
-}
-.equip-title { color: var(--accent); font-weight: bold; margin-bottom: 10px; }
-
-.xray-container {
-  position: relative;
-  width: 100%; height: 200px;
-  background: #111;
-  overflow: hidden;
-  cursor: crosshair;
-  border: 1px solid #333;
-}
-.equip-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
-.exterior { opacity: 0.5; filter: grayscale(100%); }
-.blueprint {
-  /* Hiệu ứng kính lúp nhìn thấu bản vẽ */
-  transition: clip-path 0.1s ease-out;
-  mix-blend-mode: screen;
-  filter: drop-shadow(0 0 5px var(--accent));
-}
+.btn-close { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #ff3366; cursor: pointer; }
 
 .equip-desc { font-size: 13px; line-height: 1.6; margin-top: 15px; color: #ccc; }
 
