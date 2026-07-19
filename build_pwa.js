@@ -23,4 +23,4 @@ function stampHtmlVersion(filePath, version) {
 
 stampServiceWorker(swPath, buildVersion);
 stampHtmlVersion(htmlPath, buildVersion);
-console.log(`✅ PWA build version stamped: ${buildVersion}`);
+console.log(`  PWA build version stamped: ${buildVersion}`);
