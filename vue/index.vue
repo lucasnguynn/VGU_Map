@@ -1,84 +1,206 @@
 <template>
-  <div class="relative w-screen h-screen bg-[#070A12] text-white flex flex-col overflow-hidden font-sans">
-    <!-- Navbar / Cyber HUD Bar -->
-    <header class="h-16 landscape:h-11 border-b border-[#EF5A24]/20 bg-[#0F1E36]/80 backdrop-blur-md px-6 flex items-center justify-between z-30 shrink-0 transition-all duration-300">
-      <div class="flex items-center gap-3">
-        <!-- VGU Branded Badge -->
-        <div class="bg-[#EF5A24] text-white px-3 py-1 rounded-md text-sm font-technical font-extrabold uppercase tracking-wider shadow-[0_0_10px_#EF5A24]">
-          VGU
-        </div>
-        <div class="hidden sm:block">
-          <h1 class="text-sm font-bold text-white uppercase tracking-wider">LABORATORIES GALLERY</h1>
-          <span class="text-[10px] text-[#06B6D4] font-technical tracking-widest uppercase">MSI DIGITAL TWIN v1.0</span>
-        </div>
-      </div>
-      
-      <!-- Top Nav controls -->
-      <div class="flex items-center gap-2 sm:gap-4">
-        <button 
-          @click="goToMap" 
-          class="px-2.5 py-1 sm:px-4 sm:py-1.5 landscape:py-0.5 landscape:px-2 rounded-lg text-[10px] sm:text-xs landscape:text-[9px] font-technical border border-white/15 text-white/60 hover:text-white transition-all duration-300 cursor-pointer"
-        >
-          INTERACTIVE MAP
-        </button>
-        <button 
-          class="px-2.5 py-1 sm:px-4 sm:py-1.5 landscape:py-0.5 landscape:px-2 rounded-lg text-[10px] sm:text-xs landscape:text-[9px] font-technical border bg-[#EF5A24]/10 border-[#EF5A24] text-[#EF5A24] transition-all duration-300"
-        >
-          ALL INSTRUMENTS
-        </button>
-      </div>
-    </header>
+  <div class="app-container">
+    <!-- NỀN TẢNG BẢN ĐỒ MAPLIBRE -->
+    <div id="map-container" ref="mapElement" class="map-layer"></div>
 
-    <!-- Main View Content -->
-    <main class="flex-grow relative overflow-hidden bg-[#070A12]">
-      <AllQueriesView 
-        v-if="equipmentList.length"
-        :items="equipmentList" 
-        @back-to-map="goToMap" 
-        @select-item="openEquipmentDetail"
-      />
-      <div v-else class="h-full flex items-center justify-center text-white/30 text-xs font-technical">
-        LOADING REPOSITORY DATA...
+    <!-- UI HUD (Tắt/Mở khi click vào tòa nhà/phòng) -->
+    <transition name="cyber-slide">
+      <div v-if="selectedRoom" class="cyber-panel">
+        
+        <!-- HEADER PHÒNG -->
+        <div class="panel-header" :style="{ borderColor: ambientColor }">
+          <div class="sys-status">TELEMETRY: ONLINE</div>
+          <h2>{{ roomDetails?.name }}</h2>
+          <div class="meta-info">
+            <span>TÒA: {{ roomDetails?.building_id }}</span> | 
+            <span>TẦNG: {{ roomDetails?.floor }}</span>
+          </div>
+          <button @click="closePanel" class="btn-close">[ ĐÓNG ]</button>
+        </div>
+
+        <div class="panel-content">
+          <!-- THÔNG TIN PHỤ TRÁCH -->
+          <div class="info-block">
+            <h4>[ GIÁM SÁT VIÊN ]</h4>
+            <p>{{ roomDetails?.head_of_lab?.name }}</p>
+          </div>
+
+          <!-- DANH SÁCH MÁY MÓC (Lấy từ content/equipment) -->
+          <div v-if="equipmentList && equipmentList.length > 0" class="equipment-list">
+            <h4>[ TÀI SẢN THIẾT BỊ ]</h4>
+            
+            <div v-for="equip in equipmentList" :key="equip.id" class="equip-card" :style="{ '--accent': equip.media.ambient_color }">
+              <div class="equip-title">{{ equip.title }} - {{ equip.model }}</div>
+              
+              <!-- HIỆU ỨNG X-RAY FLASHLIGHT -->
+              <div class="xray-container" @mousemove="updateFlashlight($event)" @mouseleave="hideFlashlight">
+                <!-- Ảnh vỏ máy (Nền) -->
+                <img :src="equip.media.images[0] || '/placeholder.jpg'" class="equip-img exterior" />
+                <!-- Ảnh bản vẽ mạch (Ẩn dưới lớp mask) -->
+                <img :src="equip.media.internal_blueprint || '/placeholder.svg'" class="equip-img blueprint" :style="flashlightStyle" />
+              </div>
+
+              <!-- Render nội dung Markdown động -->
+              <ContentRenderer :value="equip" class="equip-desc" />
+            </div>
+          </div>
+          
+          <div v-else class="empty-state">
+            [ KHÔNG TÌM THẤY DỮ LIỆU THIẾT BỊ TẠI PHÒNG NÀY ]
+          </div>
+        </div>
       </div>
-    </main>
+    </transition>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAsyncData } from '#app'
+import { ref, onMounted, computed } from 'vue'
+import maplibregl from 'maplibre-gl'
 
-const router = useRouter()
+// State Management
+const mapElement = ref(null)
+const selectedBuilding = ref(null)
+const selectedRoom = ref(null)
 
-// Fetch data collections from Nuxt Content v3
-const { data: equipment } = await useAsyncData('equipment', () => queryCollection('equipment').all())
+// Dữ liệu từ Nuxt Content
+const roomDetails = ref(null)
+const equipmentList = ref([])
+const ambientColor = computed(() => equipmentList.value[0]?.media?.ambient_color || '#00ffcc')
 
-const equipmentList = computed(() => {
-  return (equipment.value || []).filter(item => {
-    const id = item.id || item._path || ''
-    const baseId = id.split('/').pop().replace(/\.md$/, '')
-    return baseId !== 'schema-guide' && !id.includes('schema-guide')
+// Logic cho hiệu ứng X-Ray Flashlight
+const flashlightPos = ref({ x: -100, y: -100 })
+const isHovering = ref(false)
+
+const updateFlashlight = (e) => {
+  const rect = e.target.getBoundingClientRect()
+  flashlightPos.value = { x: e.clientX - rect.left, y: e.clientY - rect.top }
+  isHovering.value = true
+}
+const hideFlashlight = () => { isHovering.value = false }
+
+const flashlightStyle = computed(() => {
+  if (!isHovering.value) return { clipPath: 'circle(0px at 0 0)' }
+  return { clipPath: `circle(80px at ${flashlightPos.value.x}px ${flashlightPos.value.y}px)` }
+})
+
+// Đóng Panel
+const closePanel = () => {
+  selectedRoom.value = null
+  roomDetails.value = null
+}
+
+// Khởi tạo MapLibre
+onMounted(() => {
+  const map = new maplibregl.Map({
+    container: mapElement.value,
+    style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json', // Futuristic Dark Map
+    center: [106.6155, 11.1083],
+    zoom: 17.5,
+    pitch: 50,
+    bearing: -17.6,
+    antialias: true
+  })
+
+  map.on('load', async () => {
+    // Giả lập load file campus-buildings.json của bạn
+    map.addSource('vgu-campus', { type: 'geojson', data: '/campus-buildings.json' })
+    
+    map.addLayer({
+      id: 'vgu-buildings-3d',
+      type: 'fill-extrusion',
+      source: 'vgu-campus',
+      paint: {
+        'fill-extrusion-color': '#0d1b2a',
+        'fill-extrusion-height': ['get', 'height'],
+        'fill-extrusion-base': ['get', 'base_height'],
+        'fill-extrusion-opacity': 0.8,
+      }
+    })
+
+    // Khi click vào tòa nhà trên bản đồ
+    map.on('click', 'vgu-buildings-3d', async (e) => {
+      const bId = e.features[0].properties.building_id
+      
+      // Giả lập: Lấy tạm 1 phòng trong toà nhà để test UI (Thực tế bạn sẽ show danh sách phòng trước)
+      // Ở đây ta mô phỏng click thẳng vào phòng AD-247
+      selectedRoom.value = "AD-247" 
+
+      // 1. DÙNG NUXT CONTENT TÌM THÔNG TIN PHÒNG
+      const labInfo = await queryContent('labs').where({ room_id: selectedRoom.value }).findOne()
+      roomDetails.value = labInfo
+
+      // 2. DÙNG NUXT CONTENT TÌM TẤT CẢ MÁY MÓC TRONG PHÒNG ĐÓ
+      const equips = await queryContent('equipment').where({ 'location.room_id': selectedRoom.value }).find()
+      equipmentList.value = equips
+    })
   })
 })
-
-useSeoMeta({
-  title: 'Equipment Search | VGU MSI Laboratories',
-  description: 'Search and filter across all VGU Materials Science laboratories and equipment.',
-  ogTitle: 'Equipment Search | VGU MSI Laboratories',
-  ogDescription: 'Search and filter across all VGU Materials Science laboratories and equipment.'
-})
-
-function goToMap() {
-  router.push('/')
-}
-
-function getCleanId(mach) {
-  if (!mach || !mach.id) return ''
-  return mach.id.split('/').pop().replace(/\.md$/, '')
-}
-
-function openEquipmentDetail(mach) {
-  router.push(`/equipment/${getCleanId(mach)}`)
-}
 </script>
+
+<style scoped>
+.app-container { position: relative; width: 100vw; height: 100vh; overflow: hidden; background: #000; }
+.map-layer { position: absolute; inset: 0; }
+
+/* === CYBERPUNK GLASSMORPHISM PANEL === */
+.cyber-panel {
+  position: absolute;
+  top: 20px; right: 20px; bottom: 20px;
+  width: 450px;
+  background: rgba(5, 10, 15, 0.65);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 255, 204, 0.3);
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 255, 204, 0.05);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Space Mono', monospace;
+  color: #e0e0e0;
+}
+
+.panel-header {
+  padding: 20px;
+  background: linear-gradient(90deg, rgba(0,255,204,0.1) 0%, transparent 100%);
+  border-bottom: 2px solid;
+  position: relative;
+}
+.sys-status { font-size: 10px; color: #00ffcc; letter-spacing: 2px; margin-bottom: 5px; }
+.panel-header h2 { margin: 0; font-size: 22px; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+.meta-info { font-size: 12px; opacity: 0.7; margin-top: 5px; }
+.btn-close { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #ff3366; cursor: pointer; font-family: inherit; }
+.btn-close:hover { text-shadow: 0 0 8px #ff3366; }
+
+.panel-content { padding: 20px; overflow-y: auto; flex: 1; }
+.info-block h4 { color: #888; font-size: 12px; margin-bottom: 5px; border-bottom: 1px dashed #333; padding-bottom: 5px; }
+
+/* === X-RAY FLASHLIGHT EFFECT === */
+.equip-card {
+  margin-top: 20px; padding: 15px;
+  background: rgba(255,255,255,0.02);
+  border-left: 3px solid var(--accent);
+}
+.equip-title { color: var(--accent); font-weight: bold; margin-bottom: 10px; }
+
+.xray-container {
+  position: relative;
+  width: 100%; height: 200px;
+  background: #111;
+  overflow: hidden;
+  cursor: crosshair;
+  border: 1px solid #333;
+}
+.equip-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.exterior { opacity: 0.5; filter: grayscale(100%); }
+.blueprint {
+  /* Hiệu ứng kính lúp nhìn thấu bản vẽ */
+  transition: clip-path 0.1s ease-out;
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 0 5px var(--accent));
+}
+
+.equip-desc { font-size: 13px; line-height: 1.6; margin-top: 15px; color: #ccc; }
+
+/* ANIMATION */
+.cyber-slide-enter-active, .cyber-slide-leave-active { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+.cyber-slide-enter-from, .cyber-slide-leave-to { transform: translateX(100%) skewX(-5deg); opacity: 0; }
+</style>
