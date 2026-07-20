@@ -89,7 +89,7 @@ export const useVguData = () => {
   const getRoomInfo = async (roomId) => {
     try {
       const { queryContent } = await import('#imports')
-      const room = await queryContent('labs')
+      const room = await queryContent('Rooms')
         .where({ room_id: roomId })
         .findOne()
       
