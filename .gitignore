@@ -1,1 +1,2 @@
 Nothing should be ignored based on the provided file changes. The modified files (`index.html` and `sw.js`) are source code files that should be tracked in version control.
+node_modules
