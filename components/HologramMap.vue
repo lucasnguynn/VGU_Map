@@ -1,6 +1,19 @@
 <!-- components/HologramMap.vue -->
 <template>
   <div ref="mapContainer" class="map-container"></div>
+
+  <!-- Bộ chọn tầng, chỉ hiện khi đã chọn 1 tòa nhà có nhiều tầng -->
+  <div v-if="availableFloors.length > 1" class="floor-switcher">
+    <button
+      v-for="floor in availableFloors"
+      :key="floor"
+      class="floor-btn"
+      :class="{ active: floor === currentFloor }"
+      @click="selectFloor(floor)"
+    >
+      {{ floor }}
+    </button>
+  </div>
 </template>
 
 <script setup>
@@ -30,6 +43,15 @@ const props = defineProps({
   }
 })
 
+// Cấu hình tầng theo tòa nhà (building_id -> [tầng...]), load 1 lần
+let floorsConfig = {}
+// Cache dữ liệu geojson của từng tầng đã fetch, tránh load lại
+const floorCache = new Map()
+
+const currentBuildingId = ref(null)
+const currentFloor = ref(null)
+const availableFloors = ref([])
+
 onMounted(() => {
   if (!mapContainer.value) return
 
@@ -49,23 +71,28 @@ onMounted(() => {
   map.addControl(new maplibregl.ScaleControl(), 'bottom-left')
 
   // Khi map load xong
-  map.on('load', () => {
+  map.on('load', async () => {
     console.log('[HologramMap] Map loaded successfully')
-    
-    // Load campus buildings data
-    loadCampusBuildings()
+
+    // Load campus buildings + khung layer phòng (rỗng ban đầu) + cấu hình tầng
+    await Promise.all([
+      loadCampusBuildings(),
+      initRoomsLayer(),
+      loadFloorsConfig()
+    ])
   })
 
-  // Handle click events trên buildings/rooms
+  // Handle click events trên buildings
   map.on('click', 'vgu-buildings-3d', (e) => {
     const feature = e.features[0]
     const buildingId = feature.properties?.building_id || feature.properties?.cluster_id
-    
+
     if (buildingId) {
       emit('building-selected', {
         buildingId,
-        floor: feature.properties?.floor || null
+        floor: currentFloor.value
       })
+      selectBuilding(buildingId)
     }
   })
 
@@ -73,22 +100,29 @@ onMounted(() => {
   map.on('click', 'vgu-rooms-fill', (e) => {
     const feature = e.features[0]
     const roomId = feature.properties?.room_id
-    
+
     if (roomId) {
       emit('room-selected', {
         roomId,
         buildingId: feature.properties?.building_id,
-        floor: feature.properties?.floor
+        floor: feature.properties?.level ?? currentFloor.value
       })
     }
   })
 
-  // Hover effect
+  // Hover effect - buildings
   map.on('mouseenter', 'vgu-buildings-3d', () => {
     map.getCanvas().style.cursor = 'pointer'
   })
-
   map.on('mouseleave', 'vgu-buildings-3d', () => {
+    map.getCanvas().style.cursor = ''
+  })
+
+  // Hover effect - rooms
+  map.on('mouseenter', 'vgu-rooms-fill', () => {
+    map.getCanvas().style.cursor = 'pointer'
+  })
+  map.on('mouseleave', 'vgu-rooms-fill', () => {
     map.getCanvas().style.cursor = ''
   })
 })
@@ -136,6 +170,96 @@ async function loadCampusBuildings() {
   }
 }
 
+// Tạo source + layer cho phòng (rỗng ban đầu), dữ liệu sẽ được nạp khi chọn tòa nhà
+async function initRoomsLayer() {
+  map.addSource('vgu-rooms', {
+    type: 'geojson',
+    data: { type: 'FeatureCollection', features: [] }
+  })
+
+  map.addLayer({
+    id: 'vgu-rooms-fill',
+    type: 'fill',
+    source: 'vgu-rooms',
+    paint: {
+      'fill-color': [
+        'match', ['get', 'type'],
+        'laboratory', '#00ffcc',
+        'corridor', '#334155',
+        '#EF5A24'
+      ],
+      'fill-opacity': 0.35
+    }
+  })
+
+  map.addLayer({
+    id: 'vgu-rooms-outline',
+    type: 'line',
+    source: 'vgu-rooms',
+    paint: {
+      'line-color': '#00ffcc',
+      'line-width': 1.5,
+      'line-opacity': 0.8
+    }
+  })
+}
+
+// Load cấu hình tầng cho từng tòa nhà
+async function loadFloorsConfig() {
+  try {
+    const response = await fetch('/data/floors-config.json')
+    floorsConfig = await response.json()
+  } catch (error) {
+    console.error('[HologramMap] Failed to load floors-config.json:', error)
+  }
+}
+
+// Được gọi khi người dùng click vào 1 tòa nhà
+async function selectBuilding(buildingId) {
+  currentBuildingId.value = buildingId
+  const floors = floorsConfig[buildingId] || []
+  availableFloors.value = [...floors].sort((a, b) => a - b)
+
+  if (!availableFloors.value.length) return
+
+  // Mặc định vào tầng 1 (hoặc tầng nhỏ nhất có sẵn)
+  const defaultFloor = availableFloors.value[0]
+  await selectFloor(defaultFloor)
+}
+
+// Được gọi khi người dùng đổi tầng
+async function selectFloor(floorNumber) {
+  currentFloor.value = floorNumber
+  const geojson = await getFloorData(floorNumber)
+  if (!geojson || !map.getSource('vgu-rooms')) return
+
+  map.getSource('vgu-rooms').setData(geojson)
+
+  // Chỉ tô sáng phòng thuộc tòa nhà đang chọn, các tòa khác cùng tầng vẫn có trong
+  // dữ liệu (msi-floor{N}.json gộp chung nhiều tòa) nhưng bị lọc ẩn đi
+  const filter = currentBuildingId.value
+    ? ['==', ['get', 'building_id'], currentBuildingId.value]
+    : true
+  map.setFilter('vgu-rooms-fill', filter)
+  map.setFilter('vgu-rooms-outline', filter)
+}
+
+// Fetch + cache dữ liệu geojson của 1 tầng
+async function getFloorData(floorNumber) {
+  if (floorCache.has(floorNumber)) return floorCache.get(floorNumber)
+
+  try {
+    const response = await fetch(`/data/json-tung/msi-floor${floorNumber}.json`)
+    if (!response.ok) throw new Error(`HTTP ${response.status}`)
+    const data = await response.json()
+    floorCache.set(floorNumber, data)
+    return data
+  } catch (error) {
+    console.error(`[HologramMap] Failed to load floor ${floorNumber}:`, error)
+    return null
+  }
+}
+
 onUnmounted(() => {
   if (map) {
     map.remove()
@@ -179,5 +303,43 @@ onUnmounted(() => {
 
 :deep(.maplibregl-popup-tip) {
   border-top-color: rgba(15, 30, 54, 0.95);
+}
+
+.floor-switcher {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  background: rgba(15, 30, 54, 0.85);
+  border: 1px solid rgba(0, 255, 204, 0.3);
+  border-radius: 6px;
+  backdrop-filter: blur(8px);
+  z-index: 10;
+}
+
+.floor-btn {
+  min-width: 36px;
+  padding: 8px 10px;
+  background: transparent;
+  border: 1px solid rgba(0, 255, 204, 0.2);
+  border-radius: 4px;
+  color: #00ffcc;
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.floor-btn:hover {
+  background: rgba(0, 255, 204, 0.1);
+}
+
+.floor-btn.active {
+  background: rgba(239, 90, 36, 0.25);
+  border-color: #EF5A24;
+  color: #fff;
 }
 </style>
