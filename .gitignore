@@ -2,14 +2,10 @@
 # Dependencies
 node_modules/
 
-# Build outputs
-dist/
-build/
-.nuxt/
-output/
-
-# Logs and temp files
-*.log
+# Editor/IDE files
+.vscode/
+*.swp
+*.swo
 *.tmp
 
 # Environment
@@ -17,22 +13,11 @@ output/
 .env.local
 *.env.*
 
-# Editors
-.vscode/
-.idea/
+# Logs
+*.log
 
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Coverage
-coverage/
-htmlcov/
-.coverage
-
-# OS
-.DS_Store
-Thumbs.db
+# Build artifacts
+dist/
+build/
+*.js.map
 ```
