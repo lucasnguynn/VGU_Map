@@ -3,6 +3,7 @@ export default defineNuxtConfig({
   // Kích hoạt các module cần thiết
   modules: [
     '@pinia/nuxt',
+    '@nuxt/content',
     '@vite-pwa/nuxt'
   ],
 
@@ -18,10 +19,8 @@ export default defineNuxtConfig({
     transpile: ['three']
   },
 
-  // Định tuyến: Render trang bản đồ thuần ở Client-side để tránh lỗi WebGL
-  routeRules: {
-    '/map': { ssr: false }
-  },
+  // Lưu ý: Bản đồ được render trực tiếp trong app.vue (route "/"), không phải "/map",
+  // và đã được bọc trong <ClientOnly> nên không cần routeRules ssr:false riêng nữa.
 
   // Cấu hình PWA (Tiến trình web ngoại tuyến)
   pwa: {
