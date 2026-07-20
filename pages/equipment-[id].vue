@@ -15,12 +15,9 @@ const route = useRoute()
 const router = useRouter()
 
 const { data: item } = await useAsyncData(`equipment-details-${route.params.id}`, () => {
-  return queryCollection('equipment').all().then(items => {
-    return items.find(item => {
-      const baseId = item.id.split('/').pop().replace(/\.md$/, '')
-      return baseId === route.params.id
-    })
-  })
+  // Lưu ý: package.json đang dùng @nuxt/content v2 -> API đúng là queryContent(),
+  // KHÔNG phải queryCollection() (đó là API của v3, gây crash nếu dùng nhầm).
+  return queryContent('equipment').where({ id: route.params.id }).findOne()
 })
 
 useSeoMeta({
