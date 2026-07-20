@@ -96,7 +96,7 @@ onMounted(() => {
 // Load campus buildings từ JSON
 async function loadCampusBuildings() {
   try {
-    const response = await fetch('/public/campus-buildings.json')
+    const response = await fetch('/campus-buildings.json')
     const data = await response.json()
 
     // Add source

@@ -33,9 +33,11 @@ export const useVguData = () => {
    * @returns {Object} - Object map với room_id làm key
    */
   const normalizeInfo = (infoData) => {
-    if (!Array.isArray(infoData)) return {}
-    
-    return infoData.reduce((acc, room) => {
+    // info_data.json gốc có dạng { status, total_rooms, last_updated, data: [...] }
+    const rooms = Array.isArray(infoData) ? infoData : (infoData?.data || [])
+    if (!Array.isArray(rooms)) return {}
+
+    return rooms.reduce((acc, room) => {
       if (room.room_id) {
         acc[room.room_id] = {
           ...room,
@@ -55,9 +57,9 @@ export const useVguData = () => {
     try {
       // Load song song tất cả dữ liệu
       const [mapData, infoData, driveData] = await Promise.all([
-        fetchJson('/json-tung/map_data.json'),
-        fetchJson('/info_data.json'),
-        fetchJson('/drive_data.json')
+        fetchJson('/data/json-tung/map_data.json'),
+        fetchJson('/data/info_data.json'),
+        fetchJson('/data/drive_data.json')
       ])
 
       const result = {
@@ -134,7 +136,7 @@ export const useVguData = () => {
       }
       
       const prefix = floorMap[buildingId] || 'msi-floor'
-      const filename = `/json-tung/${prefix}${floor}.json`
+      const filename = `/data/json-tung/${prefix}${floor}.json`
       
       return await fetchJson(filename)
     } catch (error) {
