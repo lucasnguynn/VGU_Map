@@ -11,8 +11,7 @@
     <!-- Header HUD -->
     <header class="app-header">
       <div class="header-content">
-        <!-- Chuyển sang dùng ảnh WebP tối ưu thay vì SVG base64 -->
-        <img src="/images/vgu-logo-optimized.webp" class="header-logo" alt="VGU Logo" />
+        <img src="/VGU-Full-Color-logo-05-_1_.svg" class="header-logo" alt="VGU Logo" />
         <h1 class="header-title">
           VGU <span class="title-accent">MSI</span> Holographic Map
         </h1>
