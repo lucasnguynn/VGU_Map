@@ -2,11 +2,14 @@
 # Build artifacts
 dist/
 build/
-*.js
-*.css
+/public/data/
 
 # Dependencies
 node_modules/
+
+# Logs and temp files
+*.log
+*.tmp
 
 # Environment
 .env
@@ -17,15 +20,16 @@ node_modules/
 .vscode/
 .idea/
 
-# Logs and temp files
-*.log
-*.tmp
-
 # Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
 
 # Compressed files
 *.zip
