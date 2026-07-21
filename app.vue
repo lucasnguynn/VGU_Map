@@ -5,6 +5,7 @@
       <HologramMap 
         @room-selected="handleRoomSelected"
         @building-selected="handleBuildingSelected"
+        @floor-selected="handleFloorSelected"
       />
     </ClientOnly>
 
@@ -79,6 +80,11 @@ const handleRoomSelected = async ({ roomId, buildingId, floor }) => {
 
 const handleBuildingSelected = ({ buildingId, floor }) => {
   mapStore.focusOnBuilding(buildingId, floor)
+}
+
+// Đổi tầng: chỉ cập nhật tầng trong HUD, giữ nguyên panel phòng nếu đang mở
+const handleFloorSelected = ({ floor }) => {
+  mapStore.setFloor(floor)
 }
 
 const closePanel = () => {
@@ -249,3 +255,4 @@ onMounted(async () => {
   opacity: 0;
 }
 </style>
+
