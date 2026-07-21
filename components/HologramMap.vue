@@ -105,7 +105,7 @@ onMounted(() => {
       emit('room-selected', {
         roomId,
         buildingId: feature.properties?.building_id,
-        floor: feature.properties?.level ?? currentFloor.value
+        floor: feature.properties?.floor ?? currentFloor.value
       })
     }
   })
@@ -222,40 +222,44 @@ async function selectBuilding(buildingId) {
 
   if (!availableFloors.value.length) return
 
+  // Nạp toàn bộ phòng của tòa nhà này (tất cả các tầng), rồi lọc hiển thị theo tầng
+  const geojson = await getBuildingRoomsData(buildingId)
+  if (geojson && map.getSource('vgu-rooms')) {
+    map.getSource('vgu-rooms').setData(geojson)
+  }
+
   // Mặc định vào tầng 1 (hoặc tầng nhỏ nhất có sẵn)
   const defaultFloor = availableFloors.value[0]
-  await selectFloor(defaultFloor)
+  selectFloor(defaultFloor)
 }
 
-// Được gọi khi người dùng đổi tầng
-async function selectFloor(floorNumber) {
+// Được gọi khi người dùng đổi tầng — dữ liệu tòa nhà đã nạp sẵn ở selectBuilding(),
+// đổi tầng chỉ cần đổi filter, không cần fetch lại
+function selectFloor(floorNumber) {
   currentFloor.value = floorNumber
-  const geojson = await getFloorData(floorNumber)
-  if (!geojson || !map.getSource('vgu-rooms')) return
 
-  map.getSource('vgu-rooms').setData(geojson)
-
-  // Chỉ tô sáng phòng thuộc tòa nhà đang chọn, các tòa khác cùng tầng vẫn có trong
-  // dữ liệu (msi-floor{N}.json gộp chung nhiều tòa) nhưng bị lọc ẩn đi
-  const filter = currentBuildingId.value
-    ? ['==', ['get', 'building_id'], currentBuildingId.value]
-    : true
+  const filter = ['all',
+    ['==', ['get', 'floor'], floorNumber],
+    currentBuildingId.value ? ['==', ['get', 'building_id'], currentBuildingId.value] : true
+  ]
   map.setFilter('vgu-rooms-fill', filter)
   map.setFilter('vgu-rooms-outline', filter)
 }
 
-// Fetch + cache dữ liệu geojson của 1 tầng
-async function getFloorData(floorNumber) {
-  if (floorCache.has(floorNumber)) return floorCache.get(floorNumber)
+// Fetch + cache dữ liệu geojson phòng của 1 tòa nhà (gộp tất cả các tầng của tòa đó)
+// Nguồn: public/data/rooms/{building_id}.geojson — dựng từ CSV CAD thật bằng
+// scripts/build_rooms_geojson.py (xem README trong file đó về hệ tọa độ).
+async function getBuildingRoomsData(buildingId) {
+  if (floorCache.has(buildingId)) return floorCache.get(buildingId)
 
   try {
-    const response = await fetch(`/data/json-tung/msi-floor${floorNumber}.json`)
+    const response = await fetch(`/data/rooms/${buildingId}.geojson`)
     if (!response.ok) throw new Error(`HTTP ${response.status}`)
     const data = await response.json()
-    floorCache.set(floorNumber, data)
+    floorCache.set(buildingId, data)
     return data
   } catch (error) {
-    console.error(`[HologramMap] Failed to load floor ${floorNumber}:`, error)
+    console.error(`[HologramMap] Failed to load rooms for building ${buildingId}:`, error)
     return null
   }
 }
