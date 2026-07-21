@@ -11,7 +11,7 @@
     <!-- Header HUD -->
     <header class="app-header">
       <div class="header-content">
-        <img src="/VGU-Logo-Clean.svg" class="header-logo" alt="VGU Logo" />
+        <img src="/VGU-Logo.png" class="header-logo" alt="VGU Logo" />
         <h1 class="header-title">
           VGU <span class="title-accent">MSI</span> Holographic Map
         </h1>
@@ -50,18 +50,18 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { computed, onMounted, storeToRefs } from 'vue'
 import { useVguData } from '~/composables/useVguData'
+import { useMapStore } from '~/Stores/mapStores'
 
 // Bỏ defineAsyncComponent đi, ClientOnly sẽ tự động gánh vác luồng tải
 import HologramMap from '~/components/HologramMap.vue'
 import RoomDetailPanel from '~/components/RoomDetailPanel.vue'
 
-const isLoading = ref(true)
-const selectedRoom = ref(null)
-const selectedBuilding = ref(null)
-const selectedFloor = ref(null)
-const vguData = ref(null)
+// Dùng Pinia store làm nguồn state chính thay vì ref() cục bộ (sửa bug: mapStores.ts
+// trước đây được viết sẵn nhưng chưa từng được import/dùng ở đâu)
+const mapStore = useMapStore()
+const { selectedRoom, selectedBuilding, selectedFloor, isLoading } = storeToRefs(mapStore)
 
 const { syncAll, getRoomInfo } = useVguData()
 
@@ -72,25 +72,22 @@ const contextTitle = computed(() => {
 })
 
 const handleRoomSelected = async ({ roomId, buildingId, floor }) => {
-  selectedRoom.value = roomId
-  selectedBuilding.value = buildingId
-  selectedFloor.value = floor
-  const roomInfo = await getRoomInfo(roomId)
+  mapStore.focusOnRoom(roomId, buildingId, floor)
+  await getRoomInfo(roomId)
 }
 
 const handleBuildingSelected = ({ buildingId, floor }) => {
-  selectedBuilding.value = buildingId
-  selectedFloor.value = floor
-  selectedRoom.value = null
+  mapStore.focusOnBuilding(buildingId, floor)
 }
 
 const closePanel = () => {
-  selectedRoom.value = null
+  mapStore.clearSelection()
 }
 
 onMounted(async () => {
+  isLoading.value = true
   try {
-    vguData.value = await syncAll()
+    await syncAll()
   } catch (error) {
     console.error('[System Error] Failed to init data:', error)
   } finally {
