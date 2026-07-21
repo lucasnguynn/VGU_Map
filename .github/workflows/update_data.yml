@@ -12,7 +12,7 @@ on:
 # Trước đây job này checkout/push nhánh "Test" trong khi deploy build từ "main"
 # nên dữ liệu cập nhật không bao giờ hiển thị.
 env:
-  TARGET_BRANCH: main
+  TARGET_BRANCH: OMG
 
 permissions:
   contents: write
