@@ -50,7 +50,8 @@
 </template>
 
 <script setup>
-import { computed, onMounted, storeToRefs } from 'vue'
+import { computed, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useVguData } from '~/composables/useVguData'
 import { useMapStore } from '~/Stores/mapStores'
 
