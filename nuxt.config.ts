@@ -1,49 +1,34 @@
 export default defineNuxtConfig({
   app: {
-    baseURL: '/VGU_Map/', 
-    buildAssetsDir: 'assets', 
+    baseURL: '/VGU_Map/',
+    buildAssetsDir: 'assets',
   },
-  
-  // [THÊM MỚI] Cấu hình Nitro Engine để tương thích 100% với GitHub Pages
+
   nitro: {
-    preset: 'github-pages',
+    preset: 'github_pages', // lưu ý: dùng gạch dưới "github_pages", không phải "github-pages"
     prerender: {
-      routes: ['/'] // Ép tạo file index.html cho trang chủ
+      routes: ['/']
     }
   },
 
-  // ... (giữ nguyên các đoạn code modules, vite, pwa... bên dưới)
-})
-
-  // Kích hoạt các module cần thiết
   modules: [
     '@pinia/nuxt',
     '@nuxt/content',
     '@vite-pwa/nuxt'
   ],
 
-  // Cấu hình Vite để build mượt mà với MapLibre và Three.js
   vite: {
     optimizeDeps: {
       include: ['three', 'maplibre-gl']
     }
   },
 
-  // Xử lý lỗi SSR cho các thư viện đồ họa 3D (chỉ chạy trên Client)
   build: {
     transpile: ['three']
   },
 
-  // Lưu ý: Bản đồ được render trực tiếp trong app.vue (route "/"), không phải "/map",
-  // và đã được bọc trong <ClientOnly> nên không cần routeRules ssr:false riêng nữa.
-
-  // Cấu hình PWA (Tiến trình web ngoại tuyến)
   pwa: {
-    // ----------------------------------------------------
-    // 2. THÊM MỚI: ĐỒNG BỘ BASE URL CHO PWA SERVICE WORKER
-    // ----------------------------------------------------
     base: '/VGU_Map/',
-    
     registerType: 'autoUpdate',
     manifest: {
       name: 'VGU Campus Map',
@@ -51,44 +36,21 @@ export default defineNuxtConfig({
       theme_color: '#ffffff',
       display: 'standalone',
       icons: [
-        {
-          src: '/icon-192x192.png',
-          sizes: '192x192',
-          type: 'image/png'
-        },
-        {
-          src: '/icon-512x512.png',
-          sizes: '512x512',
-          type: 'image/png'
-        }
+        { src: '/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+        { src: '/icon-512x512.png', sizes: '512x512', type: 'image/png' }
       ]
     },
     workbox: {
-      // Chiến lược Cache
       runtimeCaching: [
         {
-          // Ưu tiên mạng cho API Google Sheets, rớt mạng mới dùng Cache
           urlPattern: /^https:\/\/script\.google\.com\/.*/i,
           handler: 'NetworkFirst',
-          options: {
-            cacheName: 'api-rooms-cache',
-            expiration: {
-              maxEntries: 10,
-              maxAgeSeconds: 60 * 60 * 24 // 1 ngày
-            }
-          }
+          options: { cacheName: 'api-rooms-cache', expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 } }
         },
         {
-          // Ưu tiên Cache cho các file ảnh/model 3D
           urlPattern: /\.(?:png|jpg|jpeg|svg|webp|gltf|glb)$/,
           handler: 'CacheFirst',
-          options: {
-            cacheName: 'assets-3d-cache',
-            expiration: {
-              maxEntries: 50,
-              maxAgeSeconds: 60 * 60 * 24 * 30 // 30 ngày
-            }
-          }
+          options: { cacheName: 'assets-3d-cache', expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 * 30 } }
         }
       ]
     }
