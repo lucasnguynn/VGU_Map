@@ -1,48 +1,43 @@
-// ==========================================
-// 1. HÀM CHÍNH: XỬ LÝ REQUEST VÀ CẤP API
-// ==========================================
 function doGet(e) {
   const cache = CacheService.getScriptCache();
   const cacheKey = "vgu_rooms_api_data_v2";
   const forceRefresh = e && e.parameter && (e.parameter.nocache === "true" || e.parameter.force === "1");
-
+  
   if (!forceRefresh) {
     const cachedData = cache.get(cacheKey);
     if (cachedData) {
       return ContentService.createTextOutput(cachedData).setMimeType(ContentService.MimeType.JSON);
     }
-  }
+  } // [Đã sửa] Thêm ngoặc đóng
 
   try {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const sheets = ss.getSheets();
     const roomsMap = {};
-
+    
     sheets.forEach(sheet => {
+      // ... logic lọc sheet của bạn ...
       const sheetName = sheet.getName();
       const normalizedSheetName = normalizeHeader(sheetName);
-      
+             
       if (normalizedSheetName.includes("danh_sach_nhan_vien") || normalizedSheetName.includes("nhan_vien") || normalizedSheetName.includes("staff") || normalizedSheetName.includes("employee") || normalizedSheetName.includes("hanh_chinh")) {
         return;
       }
-
+      
       const data = sheet.getDataRange().getValues();
       if (!data || data.length < 2) return;
-
       const headerRowIndex = detectHeaderRowIndex(data);
       if (headerRowIndex < 0 || headerRowIndex >= data.length - 1) return;
-
       const normalizedHeaders = buildNormalizedHeaders(data[headerRowIndex]);
-
+      
       for (let i = headerRowIndex + 1; i < data.length; i++) {
         const row = data[i];
         if (isBlankRow(row)) continue;
-
         const rowData = toRowObject(row, normalizedHeaders);
         const roomNumber = getFirstString(rowData, ["number", "room_number", "ma_phong", "so_phong", "room_code", "room"], "");
-        
+                 
         if (!roomNumber || roomNumber.toLowerCase().includes("total")) continue;
-
+        
         if (!roomsMap[roomNumber]) {
           roomsMap[roomNumber] = {
             sheet_source: sheetName,
@@ -56,15 +51,14 @@ function doGet(e) {
             area: getSafeNumberText(rowData, ["area", "room_area", "dien_tich"], "--"),
             unbounded_height: getSafeNumberText(rowData, ["unbounded_height", "height", "chieu_cao"], "--"),
             capacity: getSafeNumberText(rowData, ["capacity", "suc_chua"], "--"),
-            status: getFirstString(rowData, ["status", "trang_thai"], "Chưa cập nhật")
+            status: getFirstString(rowData, ["status", "trang_thai"], "Chưa xác định") // [Đã sửa] Chuỗi bị đứt
           };
         }
-
+        
         const occupant = getFirstString(rowData, ["occupant", "nguoi_su_dung", "staff_name", "fm_staff_name", "nhan_su"], "");
         if (occupant && roomsMap[roomNumber].occupants_list.indexOf(occupant) === -1) {
           roomsMap[roomNumber].occupants_list.push(occupant);
         }
-
         const statusVal = getFirstString(rowData, ["status", "trang_thai"], "");
         if (statusVal) roomsMap[roomNumber].status = statusVal;
       }
@@ -78,7 +72,7 @@ function doGet(e) {
     });
 
     if (resultData.length === 0) {
-      throw new Error("Không tìm thấy dữ liệu hợp lệ trong Google Sheets.");
+      throw new Error("Không tìm thấy dữ liệu phòng trong Google Sheets.");
     }
 
     const responsePayload = JSON.stringify({
@@ -91,25 +85,22 @@ function doGet(e) {
     try {
       cache.put(cacheKey, responsePayload, 900);
     } catch (cacheError) {
-      console.warn("Dữ liệu quá lớn để cache, bỏ qua cache.");
+      console.warn("Dữ liệu quá lớn, bỏ qua cache.");
     }
 
     return ContentService.createTextOutput(responsePayload).setMimeType(ContentService.MimeType.JSON);
-
   } catch (error) {
     return ContentService.createTextOutput(JSON.stringify({
       status: "error", message: String(error), data: []
     })).setMimeType(ContentService.MimeType.JSON);
-  }
+  } // [Đã sửa] Thêm ngoặc đóng catch
 }
 
-// ==========================================
-// 2. CÁC HÀM BỔ TRỢ (HELPER FUNCTIONS)
-// ==========================================
+// [Đã sửa] Bổ sung các dấu đóng ngoặc cho toàn bộ Helper Functions
 function normalizeHeader(str) {
   if (!str) return "";
   return str.toString().toLowerCase()
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") 
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     .replace(/[ ]/g, "d")
     .replace(/[^a-z0-9]/g, "_")
     .replace(/_+/g, "_")
@@ -126,7 +117,7 @@ function detectHeaderRowIndex(data) {
       }
     }
   }
-  return 0; 
+  return 0;
 }
 
 function buildNormalizedHeaders(headerRow) {

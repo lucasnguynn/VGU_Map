@@ -220,4 +220,8 @@ const flashlightStyle = computed(() => {
   line-height: 1.7;
   color: #ccc;
 }
+<<<<<<< HEAD
 </style>
+=======
+</style>
+>>>>>>> 98fe81a646025b27efb1a96bd3ba70656bf60e16

@@ -1,30 +1,39 @@
-// nuxt.config.ts
 export default defineNuxtConfig({
-  // Kích hoạt các module cần thiết
+  // Tắt SSR: app là bản đồ 3D chạy hoàn toàn phía client (đã bọc <ClientOnly>),
+  // đồng thời né lỗi Nitro prerender không tôn trọng baseURL khi build cho GitHub Pages
+  // (Error: [404] Page not found: / khi app.baseURL khác '/')
+  ssr: false,
+
+  app: {
+    baseURL: '/VGU_Map/',
+    buildAssetsDir: 'assets',
+  },
+
+  nitro: {
+    preset: 'github_pages', // lưu ý: dùng gạch dưới "github_pages", không phải "github-pages"
+    prerender: {
+      routes: ['/']
+    }
+  },
+
   modules: [
     '@pinia/nuxt',
+    '@nuxt/content',
     '@vite-pwa/nuxt'
   ],
 
-  // Cấu hình Vite để build mượt mà với MapLibre và Three.js
   vite: {
     optimizeDeps: {
       include: ['three', 'maplibre-gl']
     }
   },
 
-  // Xử lý lỗi SSR cho các thư viện đồ họa 3D (chỉ chạy trên Client)
   build: {
     transpile: ['three']
   },
 
-  // Định tuyến: Render trang bản đồ thuần ở Client-side để tránh lỗi WebGL
-  routeRules: {
-    '/map': { ssr: false }
-  },
-
-  // Cấu hình PWA (Tiến trình web ngoại tuyến)
   pwa: {
+    base: '/VGU_Map/',
     registerType: 'autoUpdate',
     manifest: {
       name: 'VGU Campus Map',
@@ -32,44 +41,21 @@ export default defineNuxtConfig({
       theme_color: '#ffffff',
       display: 'standalone',
       icons: [
-        {
-          src: '/icon-192x192.png',
-          sizes: '192x192',
-          type: 'image/png'
-        },
-        {
-          src: '/icon-512x512.png',
-          sizes: '512x512',
-          type: 'image/png'
-        }
+        { src: '/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+        { src: '/icon-512x512.png', sizes: '512x512', type: 'image/png' }
       ]
     },
     workbox: {
-      // Chiến lược Cache
       runtimeCaching: [
         {
-          // Ưu tiên mạng cho API Google Sheets, rớt mạng mới dùng Cache
           urlPattern: /^https:\/\/script\.google\.com\/.*/i,
           handler: 'NetworkFirst',
-          options: {
-            cacheName: 'api-rooms-cache',
-            expiration: {
-              maxEntries: 10,
-              maxAgeSeconds: 60 * 60 * 24 // 1 ngày
-            }
-          }
+          options: { cacheName: 'api-rooms-cache', expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 } }
         },
         {
-          // Ưu tiên Cache cho các file ảnh/model 3D
           urlPattern: /\.(?:png|jpg|jpeg|svg|webp|gltf|glb)$/,
           handler: 'CacheFirst',
-          options: {
-            cacheName: 'assets-3d-cache',
-            expiration: {
-              maxEntries: 50,
-              maxAgeSeconds: 60 * 60 * 24 * 30 // 30 ngày
-            }
-          }
+          options: { cacheName: 'assets-3d-cache', expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 * 30 } }
         }
       ]
     }

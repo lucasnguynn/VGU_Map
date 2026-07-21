@@ -3,7 +3,7 @@
   "features": [
     {
       "type": "Feature",
-      "id": "cluster-1",
+      "id": "B1",
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -56,20 +56,22 @@
         ]
       },
       "properties": {
-        "building_id": "cluster-1",
-        "name": "Cluster 1",
-        "departments": [
-          "Materials Science and Engineering",
-          "Applied Physics",
-          "Chemistry"
-        ],
+        "building_id": "B1",
+        "name": "B1",
         "height": 18,
-        "base_height": 0
+        "base_height": 0,
+        "floors": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
       }
     },
     {
       "type": "Feature",
-      "id": "cluster-2",
+      "id": "B2",
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -122,20 +124,22 @@
         ]
       },
       "properties": {
-        "building_id": "cluster-2",
-        "name": "Cluster 2",
-        "departments": [
-          "Electrical Engineering",
-          "Information Technology",
-          "Computer Science"
-        ],
+        "building_id": "B2",
+        "name": "B2",
         "height": 18,
-        "base_height": 0
+        "base_height": 0,
+        "floors": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
       }
     },
     {
       "type": "Feature",
-      "id": "cluster-3",
+      "id": "B3",
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -176,19 +180,22 @@
         ]
       },
       "properties": {
-        "building_id": "cluster-3",
-        "name": "Cluster 3",
-        "departments": [
-          "Mechanical Engineering",
-          "Mechatronics"
-        ],
+        "building_id": "B3",
+        "name": "B3",
         "height": 18,
-        "base_height": 0
+        "base_height": 0,
+        "floors": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
       }
     },
     {
       "type": "Feature",
-      "id": "cluster-5",
+      "id": "B5",
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -237,19 +244,22 @@
         ]
       },
       "properties": {
-        "building_id": "cluster-5",
-        "name": "Cluster 5",
-        "departments": [
-          "Chemical Engineering",
-          "Civil Engineering"
-        ],
+        "building_id": "B5",
+        "name": "B5",
         "height": 18,
-        "base_height": 0
+        "base_height": 0,
+        "floors": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
       }
     },
     {
       "type": "Feature",
-      "id": "cluster-6",
+      "id": "B6",
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -298,14 +308,73 @@
         ]
       },
       "properties": {
-        "building_id": "cluster-6",
-        "name": "Cluster 6",
-        "departments": [
-          "Business Administration",
-          "Finance"
-        ],
+        "building_id": "B6",
+        "name": "B6",
         "height": 18,
-        "base_height": 0
+        "base_height": 0,
+        "floors": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AD",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.61461671,
+              11.10947253
+            ],
+            [
+              106.61522574,
+              11.10967745
+            ],
+            [
+              106.61537581,
+              11.10967303
+            ],
+            [
+              106.61535922,
+              11.10972316
+            ],
+            [
+              106.61573357,
+              11.10984912
+            ],
+            [
+              106.61562626,
+              11.11017343
+            ],
+            [
+              106.61450916,
+              11.10979756
+            ],
+            [
+              106.61461671,
+              11.10947253
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "building_id": "AD",
+        "name": "AD",
+        "height": 18,
+        "base_height": 0,
+        "floors": [
+          1,
+          3,
+          4,
+          5,
+          6
+        ]
       }
     }
   ]
