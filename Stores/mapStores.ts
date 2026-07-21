@@ -48,6 +48,12 @@ export const useMapStore = defineStore('map', () => {
     selectedRoom.value = null
   }
 
+  // Chỉ đổi tầng đang xem, KHÔNG đụng tới phòng/tòa đang chọn
+  // (dùng khi người dùng bấm nút tầng trên thang máy mà panel phòng vẫn mở)
+  function setFloor(floor) {
+    selectedFloor.value = floor
+  }
+
   function clearSelection() {
     selectedRoom.value = null
   }
@@ -65,6 +71,8 @@ export const useMapStore = defineStore('map', () => {
     fetchRoomsData, 
     focusOnRoom, 
     focusOnBuilding,
+    setFloor,
     clearSelection 
   }
 })
+
