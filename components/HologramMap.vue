@@ -21,6 +21,12 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 
+// ----------------------------------------------------
+// [CẬP NHẬT] Lấy baseURL để sửa lỗi fetch file trên GitHub Pages
+// ----------------------------------------------------
+const config = useRuntimeConfig()
+const base = config.app.baseURL
+
 const mapContainer = ref(null)
 let map = null
 
@@ -130,7 +136,8 @@ onMounted(() => {
 // Load campus buildings từ JSON
 async function loadCampusBuildings() {
   try {
-    const response = await fetch('/campus-buildings.json')
+    // [CẬP NHẬT] Thêm biến base và bỏ dấu '/' ở đầu
+    const response = await fetch(`${base}campus-buildings.json`)
     const data = await response.json()
 
     // Add source
@@ -207,7 +214,8 @@ async function initRoomsLayer() {
 // Load cấu hình tầng cho từng tòa nhà
 async function loadFloorsConfig() {
   try {
-    const response = await fetch('/data/floors-config.json')
+    // [CẬP NHẬT] Thêm biến base và bỏ dấu '/' ở đầu
+    const response = await fetch(`${base}data/floors-config.json`)
     floorsConfig = await response.json()
   } catch (error) {
     console.error('[HologramMap] Failed to load floors-config.json:', error)
@@ -253,7 +261,8 @@ async function getBuildingRoomsData(buildingId) {
   if (floorCache.has(buildingId)) return floorCache.get(buildingId)
 
   try {
-    const response = await fetch(`/data/rooms/${buildingId}.geojson`)
+    // [CẬP NHẬT] Thêm biến base và bỏ dấu '/' ở đầu
+    const response = await fetch(`${base}data/rooms/${buildingId}.geojson`)
     if (!response.ok) throw new Error(`HTTP ${response.status}`)
     const data = await response.json()
     floorCache.set(buildingId, data)
