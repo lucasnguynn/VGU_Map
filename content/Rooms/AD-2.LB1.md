@@ -1,6 +1,6 @@
 ---
 room_id: "AD-2.LB1"
-name: "WEST LOBBY - SẢNH PHÍA TÂY"
+name: "WEST LOBBY - WEST LOBBY"
 building_id: "AD"
 floor: 1
 departments:

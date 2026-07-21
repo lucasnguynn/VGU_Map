@@ -1,6 +1,6 @@
 ---
 room_id: "AD-2.LB7"
-name: "COMP.C LOUNGE - SẢNH KHU LÀM VIỆC III"
+name: "COMP.C LOUNGE - COMP.C LOUNGE"
 building_id: "AD"
 floor: 1
 departments:

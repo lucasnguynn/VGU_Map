@@ -1,6 +1,6 @@
 ---
 room_id: "AD-2.WC5"
-name: "UNI-WC - VỆ SINH CHUNG"
+name: "UNI-WC - UNI-WC"
 building_id: "AD"
 floor: 1
 departments:

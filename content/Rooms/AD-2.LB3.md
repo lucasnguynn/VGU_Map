@@ -1,6 +1,6 @@
 ---
 room_id: "AD-2.LB3"
-name: "FOOD LOUNGE - KHU VỰC ĂN NHẸ"
+name: "FOOD LOUNGE - FOOD LOUNGE"
 building_id: "AD"
 floor: 1
 departments:
