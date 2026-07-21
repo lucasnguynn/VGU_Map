@@ -1,5 +1,13 @@
 // nuxt.config.ts
 export default defineNuxtConfig({
+  // ----------------------------------------------------
+  // 1. THÊM MỚI: CẤU HÌNH ĐƯỜNG DẪN CHO GITHUB PAGES
+  // ----------------------------------------------------
+  app: {
+    baseURL: '/VGU_Map/', 
+    buildAssetsDir: 'assets', // Tránh lỗi GitHub Pages bỏ qua thư mục bắt đầu bằng dấu '_'
+  },
+
   // Kích hoạt các module cần thiết
   modules: [
     '@pinia/nuxt',
@@ -24,6 +32,11 @@ export default defineNuxtConfig({
 
   // Cấu hình PWA (Tiến trình web ngoại tuyến)
   pwa: {
+    // ----------------------------------------------------
+    // 2. THÊM MỚI: ĐỒNG BỘ BASE URL CHO PWA SERVICE WORKER
+    // ----------------------------------------------------
+    base: '/VGU_Map/',
+    
     registerType: 'autoUpdate',
     manifest: {
       name: 'VGU Campus Map',
