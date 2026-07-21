@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <!-- Cố lập luồng 3D chỉ chạy ở Client -->
+    <!-- Cấp luồng 3D cho Client -->
     <ClientOnly fallback-tag="div" fallback-class="loading-overlay">
       <HologramMap 
         @room-selected="handleRoomSelected"
@@ -55,16 +55,11 @@ import { computed, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useVguData } from '~/composables/useVguData'
 import { useMapStore } from '~/Stores/mapStores'
-
-// Bỏ defineAsyncComponent đi, ClientOnly sẽ tự động gánh vác luồng tải
 import HologramMap from '~/components/HologramMap.vue'
 import RoomDetailPanel from '~/components/RoomDetailPanel.vue'
 
-// Dùng Pinia store làm nguồn state chính thay vì ref() cục bộ (sửa bug: mapStores.ts
-// trước đây được viết sẵn nhưng chưa từng được import/dùng ở đâu)
 const mapStore = useMapStore()
 const { selectedRoom, selectedBuilding, selectedFloor, isLoading } = storeToRefs(mapStore)
-
 const { syncAll, getRoomInfo } = useVguData()
 
 const contextTitle = computed(() => {
@@ -82,7 +77,6 @@ const handleBuildingSelected = ({ buildingId, floor }) => {
   mapStore.focusOnBuilding(buildingId, floor)
 }
 
-// Đổi tầng: chỉ cập nhật tầng trong HUD, giữ nguyên panel phòng nếu đang mở
 const handleFloorSelected = ({ floor }) => {
   mapStore.setFloor(floor)
 }
@@ -107,7 +101,6 @@ onMounted(async () => {
 * {
   box-sizing: border-box;
 }
-
 .app-container {
   position: relative;
   width: 100vw;
@@ -132,19 +125,16 @@ onMounted(async () => {
   background: linear-gradient(180deg, rgba(5, 10, 15, 0.85) 0%, rgba(5, 10, 15, 0) 100%);
   pointer-events: none;
 }
-
 .header-content {
   display: flex;
   align-items: center;
   gap: 14px;
 }
-
 .header-logo {
   height: 36px;
   width: auto;
   filter: drop-shadow(0 0 6px rgba(0, 255, 204, 0.4));
 }
-
 .header-title {
   font-family: 'Be Vietnam Pro', sans-serif;
   font-size: 18px;
@@ -153,7 +143,6 @@ onMounted(async () => {
   letter-spacing: 0.5px;
   margin: 0;
 }
-
 .title-accent {
   color: #EF5A24;
 }
@@ -166,7 +155,6 @@ onMounted(async () => {
   letter-spacing: 1px;
   color: #00ffcc;
 }
-
 .pulse-dot {
   width: 8px;
   height: 8px;
@@ -175,7 +163,6 @@ onMounted(async () => {
   box-shadow: 0 0 8px #00ffcc;
   animation: pulse 1.6s ease-in-out infinite;
 }
-
 @keyframes pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.4; transform: scale(0.7); }
@@ -189,7 +176,6 @@ onMounted(async () => {
   z-index: 20;
   pointer-events: none;
 }
-
 .hud-context-panel {
   display: flex;
   align-items: center;
@@ -219,7 +205,6 @@ onMounted(async () => {
   font-size: 13px;
   letter-spacing: 1px;
 }
-
 .cyber-loader {
   width: 56px;
   height: 56px;
@@ -228,31 +213,22 @@ onMounted(async () => {
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
-
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
 /* Transitions */
-.fade-enter-active,
-.fade-leave-active {
+.fade-enter-active, .fade-leave-active {
   transition: opacity 0.3s ease;
 }
-
-.fade-enter-from,
-.fade-leave-to {
+.fade-enter-from, .fade-leave-to {
   opacity: 0;
 }
-
-.cyber-slide-enter-active,
-.cyber-slide-leave-active {
+.cyber-slide-enter-active, .cyber-slide-leave-active {
   transition: transform 0.35s ease, opacity 0.35s ease;
 }
-
-.cyber-slide-enter-from,
-.cyber-slide-leave-to {
+.cyber-slide-enter-from, .cyber-slide-leave-to {
   transform: translateX(30px);
   opacity: 0;
 }
 </style>
-
