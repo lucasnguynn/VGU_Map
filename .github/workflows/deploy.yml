@@ -34,8 +34,16 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
+      # Đổi thành npx nuxi (CLI chuẩn của Nuxt 3)
       - name: Generate Static HTML
-        run: npx nuxt generate
+        run: npx nuxi generate
+
+      # [THÊM MỚI] Chốt chặn an toàn: Tắt Jekyll và kiểm tra file
+      - name: Fix GitHub Pages requirements and Debug
+        run: |
+          touch .output/public/.nojekyll
+          echo "Danh sách các file chuẩn bị upload:"
+          ls -la .output/public
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
