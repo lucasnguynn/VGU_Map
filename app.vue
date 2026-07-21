@@ -12,7 +12,7 @@
     <!-- Header HUD -->
     <header class="app-header">
       <div class="header-content">
-        <img src="/VGU-Logo-Clean.svg" class="header-logo" alt="VGU Logo" />
+        <img src="/VGU-Logo.png" class="header-logo" alt="VGU Logo" />
         <h1 class="header-title">
           <span class="title-accent">VGU</span> MAP
         </h1>
