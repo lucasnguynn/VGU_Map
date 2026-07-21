@@ -6,7 +6,9 @@ export const useMapStore = defineStore('map', () => {
   // Trạng thái (State)
   const rooms = ref([])
   const selectedRoom = ref(null)
-  const mapCoordinates = ref({ lng: 106.666, lat: 11.111 }) // Tọa độ trung tâm VGU
+  const selectedBuilding = ref(null)
+  const selectedFloor = ref(null)
+  const mapCoordinates = ref({ lng: 106.6155, lat: 11.1083 }) // Tọa độ trung tâm VGU (khớp initialCenter trong HologramMap.vue)
   const mapZoom = ref(16)
   const isLoading = ref(false)
 
@@ -34,12 +36,16 @@ export const useMapStore = defineStore('map', () => {
     }
   }
 
-  function focusOnRoom(roomInfo, coordinates) {
-    selectedRoom.value = roomInfo
-    if (coordinates) {
-      mapCoordinates.value = coordinates
-      mapZoom.value = 19 // Phóng to vào phòng
-    }
+  function focusOnRoom(roomId, buildingId, floor) {
+    selectedRoom.value = roomId
+    selectedBuilding.value = buildingId
+    selectedFloor.value = floor
+  }
+
+  function focusOnBuilding(buildingId, floor) {
+    selectedBuilding.value = buildingId
+    selectedFloor.value = floor
+    selectedRoom.value = null
   }
 
   function clearSelection() {
@@ -50,12 +56,15 @@ export const useMapStore = defineStore('map', () => {
   return { 
     rooms, 
     selectedRoom, 
+    selectedBuilding,
+    selectedFloor,
     mapCoordinates, 
     mapZoom, 
     isLoading, 
     getRoomByNumber, 
     fetchRoomsData, 
     focusOnRoom, 
+    focusOnBuilding,
     clearSelection 
   }
 })
