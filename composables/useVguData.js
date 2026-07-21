@@ -108,7 +108,8 @@ export const useVguData = () => {
   const getRoomEquipment = async (roomId) => {
     try {
       const { queryContent } = await import('#imports')
-      const equipments = await queryContent('equipment')
+      // Thư mục thật là content/equipment/Equipment/*.md, không phải content/equipment/*.md
+      const equipments = await queryContent('equipment/Equipment')
         .where({ 'location.room_id': roomId })
         .find()
       
@@ -127,18 +128,14 @@ export const useVguData = () => {
    */
   const getFloorPlan = async (buildingId, floor) => {
     try {
-      const floorMap = {
-        'cluster-1': 'msi-floor',
-        'cluster-2': 'msi-floor',
-        'cluster-3': 'msi-floor',
-        'cluster-5': 'msi-floor',
-        'cluster-6': 'msi-floor'
+      // Nguồn thật: public/data/rooms/{building_id}.geojson (dựng từ CSV CAD bằng
+      // scripts/build_rooms_geojson.py), gộp mọi tầng của tòa — lọc theo floor tại đây.
+      const data = await fetchJson(`/data/rooms/${buildingId}.geojson`)
+      if (!data?.features) return null
+      return {
+        type: 'FeatureCollection',
+        features: data.features.filter(f => f.properties?.floor === floor)
       }
-      
-      const prefix = floorMap[buildingId] || 'msi-floor'
-      const filename = `/data/json-tung/${prefix}${floor}.json`
-      
-      return await fetchJson(filename)
     } catch (error) {
       console.error(`[useVguData] Failed to get floor plan:`, error)
       return null
