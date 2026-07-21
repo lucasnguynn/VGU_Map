@@ -54,6 +54,73 @@ let floorsConfig = {}
 // Cache dữ liệu geojson của từng tầng đã fetch, tránh load lại
 const floorCache = new Map()
 
+// ----------------------------------------------------------------
+// Hệ số biến đổi Affine: CAD-XY (mét cục bộ, gốc riêng từng tòa) -> lat/lng thật.
+// lon = a*x + b*y + c ; lat = d*x + e*y + f
+// Lấy trực tiếp từ hệ thống MSI_Laboratories (đã giải sẵn bằng least-squares
+// từ nhiều điểm đối chiếu CAD <-> GPS thật cho tòa B1 và B5).
+// TODO: chưa có hệ số thật cho AD, B2, B3, B6 -> phòng các tòa này sẽ CHƯA
+// hiển thị đúng vị trí cho tới khi có hệ số affine tương ứng.
+// ----------------------------------------------------------------
+const BUILDING_AFFINE = {
+  B1: {
+    a: 8.953441376466221e-9,
+    b: -3.1497975865435756e-9,
+    c: 106.61539732322666,
+    d: 3.182455243237762e-9,
+    e: 8.530074661663595e-9,
+    f: 11.108226425177252
+  },
+  B5: {
+    a: 9.348060047786096e-9,
+    b: -3.137160929858734e-9,
+    c: 106.61606158856533,
+    d: 3.3218630132168528e-9,
+    e: 8.497975978545847e-9,
+    f: 11.108450685256834
+  }
+}
+
+// Áp affine transform lên 1 vòng điểm [[x,y], ...].
+// LƯU Ý: build_rooms_geojson.py đã đổi CAD-mm -> mét (UNIT_TO_METERS = 1/1000)
+// khi xuất rooms/*.geojson, nhưng hệ số affine (a,b,c,d,e,f) bên dưới được giải
+// sẵn trên toạ độ CAD-mm GỐC (chưa đổi đơn vị) -> phải nhân lại x1000 (m -> mm)
+// trước khi áp affine, nếu không toàn bộ tòa nhà sẽ bị co lại thành 1 điểm.
+const METERS_TO_MM = 1000
+
+function transformRing(ring, coeffs) {
+  return ring.map(([x, y]) => {
+    const xMm = x * METERS_TO_MM
+    const yMm = y * METERS_TO_MM
+    return [
+      coeffs.a * xMm + coeffs.b * yMm + coeffs.c,
+      coeffs.d * xMm + coeffs.e * yMm + coeffs.f
+    ]
+  })
+}
+
+// Áp affine transform lên toàn bộ FeatureCollection của 1 tòa nhà.
+// Nếu tòa chưa có hệ số affine (AD, B2, B3, B6), trả nguyên geojson gốc
+// (toạ độ vẫn sai vị trí thật, nhưng ít nhất không crash).
+function transformBuildingGeojson(buildingId, geojson) {
+  const coeffs = BUILDING_AFFINE[buildingId]
+  if (!coeffs) {
+    console.warn(`[HologramMap] Chưa có hệ số affine cho tòa ${buildingId} — toạ độ phòng có thể sai vị trí thật.`)
+    return geojson
+  }
+
+  return {
+    type: 'FeatureCollection',
+    features: geojson.features.map(f => ({
+      ...f,
+      geometry: {
+        ...f.geometry,
+        coordinates: f.geometry.coordinates.map(ring => transformRing(ring, coeffs))
+      }
+    }))
+  }
+}
+
 const currentBuildingId = ref(null)
 const currentFloor = ref(null)
 const availableFloors = ref([])
@@ -264,7 +331,9 @@ async function getBuildingRoomsData(buildingId) {
     // [CẬP NHẬT] Thêm biến base và bỏ dấu '/' ở đầu
     const response = await fetch(`${base}data/rooms/${buildingId}.geojson`)
     if (!response.ok) throw new Error(`HTTP ${response.status}`)
-    const data = await response.json()
+    const raw = await response.json()
+    // Chuyển toạ độ CAD cục bộ -> lat/lng thật bằng affine transform (nếu có hệ số)
+    const data = transformBuildingGeojson(buildingId, raw)
     floorCache.set(buildingId, data)
     return data
   } catch (error) {
