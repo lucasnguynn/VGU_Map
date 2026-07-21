@@ -1,12 +1,19 @@
-// nuxt.config.ts
 export default defineNuxtConfig({
-  // ----------------------------------------------------
-  // 1. THÊM MỚI: CẤU HÌNH ĐƯỜNG DẪN CHO GITHUB PAGES
-  // ----------------------------------------------------
   app: {
     baseURL: '/VGU_Map/', 
-    buildAssetsDir: 'assets', // Tránh lỗi GitHub Pages bỏ qua thư mục bắt đầu bằng dấu '_'
+    buildAssetsDir: 'assets', 
   },
+  
+  // [THÊM MỚI] Cấu hình Nitro Engine để tương thích 100% với GitHub Pages
+  nitro: {
+    preset: 'github-pages',
+    prerender: {
+      routes: ['/'] // Ép tạo file index.html cho trang chủ
+    }
+  },
+
+  // ... (giữ nguyên các đoạn code modules, vite, pwa... bên dưới)
+})
 
   // Kích hoạt các module cần thiết
   modules: [
