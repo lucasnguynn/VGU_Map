@@ -100,7 +100,7 @@ function doGet(e) {
 function normalizeHeader(str) {
   if (!str) return "";
   return str.toString().toLowerCase()
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") 
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     .replace(/[ ]/g, "d")
     .replace(/[^a-z0-9]/g, "_")
     .replace(/_+/g, "_")
