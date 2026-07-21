@@ -1,4 +1,9 @@
 export default defineNuxtConfig({
+  // Tắt SSR: app là bản đồ 3D chạy hoàn toàn phía client (đã bọc <ClientOnly>),
+  // đồng thời né lỗi Nitro prerender không tôn trọng baseURL khi build cho GitHub Pages
+  // (Error: [404] Page not found: / khi app.baseURL khác '/')
+  ssr: false,
+
   app: {
     baseURL: '/VGU_Map/',
     buildAssetsDir: 'assets',
