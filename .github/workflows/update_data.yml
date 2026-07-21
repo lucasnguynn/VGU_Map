@@ -1,16 +1,25 @@
-name: Update Info Data
+name: Update Info Data (Google Sheets → site)
 
 on:
   schedule:
-    - cron: '*/5 * * * *'  # Run every 5 minutes
-  workflow_dispatch:      # Allow manual trigger
+    # Chạy mỗi 15 phút. GitHub Actions thường trễ vài phút với lịch dày,
+    # và mỗi lần CÓ thay đổi sẽ kích hoạt deploy, nên 15' là mức cân bằng hợp lý.
+    # Muốn nhanh hơn đổi thành '*/5 * * * *'; chậm hơn '0 * * * *' (mỗi giờ).
+    - cron: '*/15 * * * *'
+  workflow_dispatch: {}   # Cho phép bấm chạy tay
+
+# QUAN TRỌNG: commit thẳng lên nhánh deploy (main) để dữ liệu mới LÊN SÓNG.
+# Trước đây job này checkout/push nhánh "Test" trong khi deploy build từ "main"
+# nên dữ liệu cập nhật không bao giờ hiển thị.
+env:
+  TARGET_BRANCH: main
 
 permissions:
   contents: write
 
 concurrency:
   group: update-data
-  cancel-in-progress: false  # Wait for in-progress run to finish before starting new one
+  cancel-in-progress: false
 
 jobs:
   update-info-data:
@@ -20,7 +29,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: OMG  # 🔥 Đảm bảo luôn lấy đúng code từ nhánh Test khi chạy tự động
+          ref: ${{ env.TARGET_BRANCH }}
           persist-credentials: true
           fetch-depth: 0
 
@@ -29,21 +38,23 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Run unified data sync script
-        run: node sync_all_data.js
+      - name: Sync data from Google Sheets
+        env:
+          # Đặt URL Web App của Code.gs tại:
+          # Settings → Secrets and variables → Actions → Variables → APPS_SCRIPT_URL
+          APPS_SCRIPT_URL: ${{ vars.APPS_SCRIPT_URL }}
+        run: node scripts/sync_all_data.js
 
-      - name: Stamp PWA build version into sw.js and index.html
-        run: node build_pwa.js
-
-      - name: Commit and push changes
+      - name: Commit & push if data changed
         run: |
           git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add info_data.json drive_data.json map_data.json sw.js
-          if ! git diff --staged --quiet; then
-            git commit -m "chore: auto-update data and stamp PWA version [skip ci]"
-            git pull --rebase origin OMG # 🔥 Đổi từ main sang Test
-            git push origin OMG           # 🔥 Chỉ định rõ đẩy về nhánh Test
+          git config --local user.name "GitHub Action (data sync)"
+          git add public/data/info_data.json content/Rooms
+          if git diff --staged --quiet; then
+            echo "Không có thay đổi — bỏ qua commit."
           else
-            echo "No changes to commit"
+            git commit -m "chore(data): auto-sync rooms from Google Sheets"
+            # KHÔNG dùng [skip ci]: cần deploy.yml chạy để đẩy dữ liệu mới lên Pages.
+            git pull --rebase origin "$TARGET_BRANCH"
+            git push origin HEAD:"$TARGET_BRANCH"
           fi
