@@ -20,7 +20,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: Test  # 🔥 Đảm bảo luôn lấy đúng code từ nhánh Test khi chạy tự động
+          ref: OMG  # 🔥 Đảm bảo luôn lấy đúng code từ nhánh Test khi chạy tự động
           persist-credentials: true
           fetch-depth: 0
 
@@ -42,8 +42,8 @@ jobs:
           git add info_data.json drive_data.json map_data.json sw.js
           if ! git diff --staged --quiet; then
             git commit -m "chore: auto-update data and stamp PWA version [skip ci]"
-            git pull --rebase origin Test # 🔥 Đổi từ main sang Test
-            git push origin Test           # 🔥 Chỉ định rõ đẩy về nhánh Test
+            git pull --rebase origin OMG # 🔥 Đổi từ main sang Test
+            git push origin OMG           # 🔥 Chỉ định rõ đẩy về nhánh Test
           else
             echo "No changes to commit"
           fi
