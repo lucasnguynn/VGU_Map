@@ -3,31 +3,20 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "nuxt build",
     "dev": "nuxt dev",
+    "build": "nuxt build",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-<<<<<<< HEAD
-=======
+    "@nuxt/content": "^2.13.4",
     "@pinia/nuxt": "^0.5.5",
     "@vite-pwa/nuxt": "^1.1.1",
->>>>>>> 98fe81a646025b27efb1a96bd3ba70656bf60e16
-    "@nuxt/content": "^2.13.4",
-    "@pinia/nuxt": "^1.0.1",
-    "@vite-pwa/nuxt": "^1.1.1",
-    "maplibre-gl": "^4.0.2",
-<<<<<<< HEAD
+    "maplibre-gl": "^4.7.1",
     "nuxt": "^3.14.0",
-    "pinia": "^4.0.2",
-    "three": "^0.160.0"
-=======
     "pinia": "^2.2.6",
-    "three": "^0.160.0",
-    "nuxt": "^3.14.0"
->>>>>>> 98fe81a646025b27efb1a96bd3ba70656bf60e16
+    "three": "^0.160.0"
   },
   "devDependencies": {
     "typescript": "^5.3.0"
