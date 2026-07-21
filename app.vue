@@ -13,7 +13,7 @@
       <div class="header-content">
         <img src="/VGU-Logo.png" class="header-logo" alt="VGU Logo" />
         <h1 class="header-title">
-          VGU <span class="title-accent">MSI</span> Holographic Map
+          <span class="title-accent">VGU</span> MAP
         </h1>
       </div>
       <div class="sys-status">
