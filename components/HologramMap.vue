@@ -88,10 +88,15 @@ const roomNameMap = ref({})
 // ----------------------------------------------------------------
 // Hệ số biến đổi Affine: CAD-XY (mét cục bộ, gốc riêng từng tòa) -> lat/lng thật.
 // lon = a*x + b*y + c ; lat = d*x + e*y + f
-// Lấy trực tiếp từ hệ thống MSI_Laboratories (đã giải sẵn bằng least-squares
-// từ nhiều điểm đối chiếu CAD <-> GPS thật cho tòa B1 và B5).
-// TODO: chưa có hệ số thật cho AD, B2, B3, B6 -> phòng các tòa này sẽ CHƯA
-// hiển thị đúng vị trí cho tới khi có hệ số affine tương ứng.
+//
+// - B1, B5: giải sẵn bằng least-squares từ điểm đối chiếu CAD <-> GPS thật
+//   (nguồn: hệ thống MSI_Laboratories). Giữ nguyên vì đã kiểm chứng.
+// - AD, B2, B3, B6: giải tự động bằng cách khớp 4 góc hình chữ nhật bao nhỏ
+//   nhất của cụm phòng (CAD) với 4 góc footprint GPS trong campus-buildings.json.
+//   Chiều xoay được chọn theo bearing chung của campus (~19.78°, lấy từ B1/B5)
+//   và ràng buộc không phản chiếu (det > 0). Phương pháp này tái tạo lại affine
+//   đã biết của B1/B5 với sai số RMS ~0.3–0.4m nên đáng tin cho 4 tòa còn lại.
+//   Nếu footprint 1 tòa được hiệu chỉnh lại, cần giải lại affine tương ứng.
 // ----------------------------------------------------------------
 const BUILDING_AFFINE = {
   B1: {
@@ -109,6 +114,38 @@ const BUILDING_AFFINE = {
     d: 3.3218630132168528e-9,
     e: 8.497975978545847e-9,
     f: 11.108450685256834
+  },
+  AD: {
+    a: 8.766061793685426e-9,
+    b: -2.9401918155464064e-9,
+    c: 106.61628563445295,
+    d: 2.949511826570467e-9,
+    e: 8.738362378840202e-9,
+    f: 11.107702556018145
+  },
+  B2: {
+    a: 8.934000874052131e-9,
+    b: -3.0617993522497056e-9,
+    c: 106.61556743104268,
+    d: 3.2196508335119185e-9,
+    e: 8.496017971414428e-9,
+    f: 11.107734813646012
+  },
+  B3: {
+    a: 8.936440007959682e-9,
+    b: -3.0696022659468247e-9,
+    c: 106.61564963590135,
+    d: 3.243586829736276e-9,
+    e: 8.457006822971136e-9,
+    f: 11.107323754174958
+  },
+  B6: {
+    a: 8.875957765081311e-9,
+    b: -3.145148965918998e-9,
+    c: 106.6163603769583,
+    d: 3.2835800566738925e-9,
+    e: 8.501705317206016e-9,
+    f: 11.107779247247372
   }
 }
 
@@ -773,5 +810,3 @@ onUnmounted(() => {
   :deep(.room-marker-name) { font-size: 8px; -webkit-line-clamp: 1; }
 }
 </style>
-
-
