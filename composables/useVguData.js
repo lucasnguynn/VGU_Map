@@ -2,6 +2,10 @@
 // Composable để quản lý dữ liệu VGU Map - thay thế sync_all_data.js
 
 export const useVguData = () => {
+  // [CẬP NHẬT] Lấy baseURL từ cấu hình Nuxt (sẽ trả về '/VGU_Map/' trên production và '/' trên local)
+  const config = useRuntimeConfig()
+  const base = config.app.baseURL
+
   /**
    * Fetch JSON với handling UTF-8 và error chuẩn
    * @param {string} url - URL endpoint
@@ -55,11 +59,11 @@ export const useVguData = () => {
    */
   const syncAll = async () => {
     try {
-      // Load song song tất cả dữ liệu
+      // [CẬP NHẬT] Thêm biến 'base' và bỏ dấu '/' ở đầu đường dẫn
       const [mapData, infoData, driveData] = await Promise.all([
-        fetchJson('/data/json-tung/map_data.json'),
-        fetchJson('/data/info_data.json'),
-        fetchJson('/data/drive_data.json')
+        fetchJson(`${base}data/json-tung/map_data.json`),
+        fetchJson(`${base}data/info_data.json`),
+        fetchJson(`${base}data/drive_data.json`)
       ])
 
       const result = {
@@ -128,9 +132,8 @@ export const useVguData = () => {
    */
   const getFloorPlan = async (buildingId, floor) => {
     try {
-      // Nguồn thật: public/data/rooms/{building_id}.geojson (dựng từ CSV CAD bằng
-      // scripts/build_rooms_geojson.py), gộp mọi tầng của tòa — lọc theo floor tại đây.
-      const data = await fetchJson(`/data/rooms/${buildingId}.geojson`)
+      // [CẬP NHẬT] Thêm biến 'base' và bỏ dấu '/' ở đầu đường dẫn
+      const data = await fetchJson(`${base}data/rooms/${buildingId}.geojson`)
       if (!data?.features) return null
       return {
         type: 'FeatureCollection',
