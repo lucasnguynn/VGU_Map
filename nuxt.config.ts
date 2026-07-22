@@ -33,10 +33,16 @@ export default defineNuxtConfig({
   },
 
   modules: [
-    '@pinia/nuxt',
-    '@nuxt/content',
-    '@vite-pwa/nuxt'
-  ],
+  '@pinia/nuxt',
+  '@nuxt/content',
+  '@vite-pwa/nuxt'
+],
+
+content: {
+  experimental: {
+    clientDB: true
+  }
+},
 
   vite: {
     optimizeDeps: {
