@@ -1,5 +1,5 @@
 <template>
-  <div class="room-detail-panel" v-if="isOpen">
+  <div class="room-detail-panel">
     <!-- Nút Đóng -->
     <button class="close-btn" @click="closePanel">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -11,80 +11,83 @@
     <!-- 1. Header Section -->
     <div class="panel-header">
       <div class="room-location">
-        <span class="building">{{ room.building || 'N/A' }}</span>
+        <span class="building">{{ display.building || 'N/A' }}</span>
         <span class="separator">//</span>
-        <span class="level">FLOOR {{ room.level || 'N/A' }}</span>
+        <span class="level">FLOOR {{ display.level ?? 'N/A' }}</span>
       </div>
-      <h2 class="room-name">{{ room.name || 'N/A' }}</h2>
-      <p class="department">{{ room.department || 'N/A' }}</p>
+      <h2 class="room-name">{{ display.name || 'N/A' }}</h2>
+      <p class="department">{{ display.department || 'N/A' }}</p>
     </div>
 
     <!-- Vùng nội dung có thể cuộn -->
     <div class="panel-content">
-      
-      <!-- 2. Ảnh thực tế -->
-      <div class="photo-section">
-        <template v-if="room.photos && room.photos.length > 0">
-          <div class="photo-grid" :class="{'single-photo': room.photos.length === 1}">
-            <img v-for="(photo, index) in room.photos.slice(0, 2)" :key="index" :src="photo" alt="Room Photo" class="room-image" />
-          </div>
-        </template>
-        <div v-else class="no-photo-placeholder">
-          <div class="placeholder-content">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="7" width="18" height="14" rx="2" ry="2"></rect>
-              <circle cx="12" cy="14" r="3"></circle>
-              <path d="M16 3h-8l-2 4h12l-2-4z"></path>
-            </svg>
-            <p>Chưa có ảnh thực tế</p>
-            <span>Sẽ cập nhật ảnh thực tế tại đây cho phòng {{ room.name }}</span>
-          </div>
-        </div>
-      </div>
 
-      <!-- 3. Thông tin người phụ trách (Room Incharge) -->
-      <div class="info-card">
-        <h3 class="card-title">ROOM INCHARGE</h3>
-        <div class="card-body">
-          <p class="incharge-name">{{ room.occupant || 'N/A' }}</p>
-          <p class="incharge-position">
-            {{ room.position || 'N/A' }} 
-            <span v-if="room.office"> | Office: {{ room.office }}</span>
-          </p>
-          <p class="incharge-email"><a :href="'mailto:' + room.email" v-if="room.email">{{ room.email }}</a><span v-else>N/A</span></p>
-          <p class="incharge-phone" v-if="room.phone">Tel: {{ room.phone }}</p>
-        </div>
-      </div>
+      <div v-if="isLoading" class="state-msg">Đang tải dữ liệu phòng…</div>
 
-      <!-- 4. Thông tin mô tả (Room Description) -->
-      <div class="info-card">
-        <h3 class="card-title">ROOM DESCRIPTION</h3>
-        <div class="card-body">
-          <p class="description-text">{{ room.description || 'N/A' }}</p>
-          <div class="working-hours mt-2">
-            <strong class="text-highlight">Trạng thái / Hoạt động:</strong>
-            <p>{{ room.status || 'N/A' }}</p>
+      <template v-else>
+        <!-- 2. Ảnh thực tế -->
+        <div class="photo-section">
+          <template v-if="display.photos && display.photos.length > 0">
+            <div class="photo-grid" :class="{'single-photo': display.photos.length === 1}">
+              <img v-for="(photo, index) in display.photos.slice(0, 2)" :key="index" :src="photo" alt="Room Photo" class="room-image" />
+            </div>
+          </template>
+          <div v-else class="no-photo-placeholder">
+            <div class="placeholder-content">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="7" width="18" height="14" rx="2" ry="2"></rect>
+                <circle cx="12" cy="14" r="3"></circle>
+                <path d="M16 3h-8l-2 4h12l-2-4z"></path>
+              </svg>
+              <p>Chưa có ảnh thực tế</p>
+              <span>Sẽ cập nhật ảnh thực tế tại đây cho phòng {{ display.name }}</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- 5. Featured Facility / Instruments -->
-      <div class="info-card">
-        <h3 class="card-title highlight-title">
-          FEATURED INSTRUMENTS ({{ room.instruments ? room.instruments.length : 0 }})
-        </h3>
-        <div class="card-body">
-          <ul v-if="room.instruments && room.instruments.length > 0" class="instrument-list">
-            <li v-for="(item, index) in room.instruments" :key="index">
-              <!-- Có thể tùy chỉnh item.name tùy theo cấu trúc object trong mảng highlighted_equipment -->
-              {{ item.name || item }} 
-            </li>
-          </ul>
-          <div v-else class="empty-instruments">
-            <p>No highlighted instruments available.</p>
+        <!-- 3. Thông tin người phụ trách (Room Incharge) -->
+        <div class="info-card">
+          <h3 class="card-title">ROOM INCHARGE</h3>
+          <div class="card-body">
+            <p class="incharge-name">{{ display.occupant || 'N/A' }}</p>
+            <p class="incharge-position">
+              {{ display.position || 'N/A' }}
+              <span v-if="display.office"> | Office: {{ display.office }}</span>
+            </p>
+            <p class="incharge-email"><a :href="'mailto:' + display.email" v-if="display.email">{{ display.email }}</a><span v-else>N/A</span></p>
+            <p class="incharge-phone" v-if="display.phone">Tel: {{ display.phone }}</p>
           </div>
         </div>
-      </div>
+
+        <!-- 4. Thông tin mô tả (Room Description) -->
+        <div class="info-card">
+          <h3 class="card-title">ROOM DESCRIPTION</h3>
+          <div class="card-body">
+            <p class="description-text">{{ display.description || 'N/A' }}</p>
+            <div class="working-hours mt-2">
+              <strong class="text-highlight">Trạng thái / Hoạt động:</strong>
+              <p>{{ display.status || 'N/A' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Featured Facility / Instruments -->
+        <div class="info-card">
+          <h3 class="card-title highlight-title">
+            FEATURED INSTRUMENTS ({{ display.instruments ? display.instruments.length : 0 }})
+          </h3>
+          <div class="card-body">
+            <ul v-if="display.instruments && display.instruments.length > 0" class="instrument-list">
+              <li v-for="(item, index) in display.instruments" :key="index">
+                {{ item.name || item }}
+              </li>
+            </ul>
+            <div v-else class="empty-instruments">
+              <p>No highlighted instruments available.</p>
+            </div>
+          </div>
+        </div>
+      </template>
     </div>
 
     <!-- 6. Action Button -->
@@ -95,19 +98,54 @@
 </template>
 
 <script setup>
+import { ref, computed, watch } from 'vue'
+
+// roomId/buildingId là những gì pages/index.vue THỰC SỰ truyền xuống
+// (:room-id="selectedRoom" :building-id="selectedBuilding"). Bản cũ của
+// component này khai báo props isOpen/room -> không khớp -> luôn nhận
+// giá trị mặc định rỗng -> panel hiện "N/A" cho mọi trường dù sheet đã
+// có dữ liệu. Sửa lại để component tự fetch theo roomId.
 const props = defineProps({
-  isOpen: {
-    type: Boolean,
-    default: false
-  },
-  room: {
-    type: Object,
-    default: () => ({
-      building: '',
-      level: '',
-      name: '',
+  roomId: { type: String, default: null },
+  buildingId: { type: String, default: null }
+})
+
+const emit = defineEmits(['close'])
+const closePanel = () => emit('close')
+
+const { getRoomInfo } = useVguData()
+
+const isLoading = ref(false)
+const roomData = ref(null) // raw frontmatter từ content/Rooms/*.md
+
+// Loại bỏ dữ liệu rác placeholder từ sheet (___ / -- / "Chưa cập nhật" / "unknown")
+const cleanData = (data) => {
+  if (!data || data === '___' || data === '--' || data === 'Chưa cập nhật' || data === 'unknown') return ''
+  return data
+}
+
+const fetchRoom = async (id) => {
+  if (!id) {
+    roomData.value = null
+    return
+  }
+  isLoading.value = true
+  roomData.value = await getRoomInfo(id)
+  isLoading.value = false
+}
+
+watch(() => props.roomId, fetchRoom, { immediate: true })
+
+// Ánh xạ (mapping) từ frontmatter MD sang các trường hiển thị của panel
+const display = computed(() => {
+  const r = roomData.value
+  if (!r) {
+    return {
+      building: cleanData(props.buildingId),
+      level: null,
+      name: props.roomId || '',
       department: '',
-      photos: [], 
+      photos: [],
       occupant: '',
       position: '',
       office: '',
@@ -115,16 +153,37 @@ const props = defineProps({
       phone: '',
       description: '',
       status: '',
-      instruments: [] 
-    })
+      instruments: []
+    }
   }
-});
 
-const emit = defineEmits(['close']);
+  let photos = []
+  if (r.image) {
+    photos = Array.isArray(r.image) ? r.image.filter(Boolean) : [r.image]
+  }
 
-const closePanel = () => {
-  emit('close');
-};
+  const departments = Array.isArray(r.departments)
+    ? r.departments.map(cleanData).filter(Boolean).join(', ')
+    : cleanData(r.departments)
+
+  const headName = r.head_of_lab ? cleanData(r.head_of_lab.name) : ''
+
+  return {
+    building: cleanData(r.building_id) || cleanData(props.buildingId),
+    level: r.floor ?? null,
+    name: cleanData(r.name) || props.roomId,
+    department: departments,
+    photos,
+    occupant: headName,
+    position: headName ? 'Room Incharge' : '',
+    office: r.head_of_lab ? cleanData(r.head_of_lab.office) : '',
+    email: r.head_of_lab ? cleanData(r.head_of_lab.email) : '',
+    phone: r.head_of_lab ? cleanData(r.head_of_lab.phone) : '',
+    description: `Phân loại: ${cleanData(r.room_type) || 'N/A'} | Diện tích: ${cleanData(r.area_m2) || 'N/A'} m2 | Sức chứa: ${cleanData(r.capacity) || 'N/A'}`,
+    status: cleanData(r.status),
+    instruments: r.highlighted_equipment || []
+  }
+})
 </script>
 
 <style scoped>
@@ -204,6 +263,13 @@ const closePanel = () => {
 .panel-content::-webkit-scrollbar-thumb {
   background: #334155;
   border-radius: 4px;
+}
+
+.state-msg {
+  padding: 20px 0;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 13px;
 }
 
 /* Photo Section */
