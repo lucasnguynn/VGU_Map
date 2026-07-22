@@ -1,382 +1,347 @@
-<!-- components/RoomDetailPanel.vue -->
 <template>
-  <div class="room-panel">
-    <!-- Header -->
-    <div class="panel-header" :style="{ borderColor: ambientColor }">
-      <div class="sys-status">TELEMETRY: ONLINE</div>
-      <h2>{{ roomDetails?.name || roomId }}</h2>
-      <div class="meta-info">
-        <span>TÒA: {{ roomDetails?.building_id || 'N/A' }}</span> |
-        <span>TẦNG: {{ roomDetails?.floor || 'N/A' }}</span>
+  <div class="room-detail-panel" v-if="isOpen">
+    <!-- Nút Đóng -->
+    <button class="close-btn" @click="closePanel">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    <!-- 1. Header Section -->
+    <div class="panel-header">
+      <div class="room-location">
+        <span class="building">{{ room.building || 'N/A' }}</span>
+        <span class="separator">//</span>
+        <span class="level">FLOOR {{ room.level || 'N/A' }}</span>
       </div>
-      <button @click="$emit('close')" class="btn-close">[ ĐÓNG ]</button>
+      <h2 class="room-name">{{ room.name || 'N/A' }}</h2>
+      <p class="department">{{ room.department || 'N/A' }}</p>
     </div>
 
-    <!-- Content -->
+    <!-- Vùng nội dung có thể cuộn -->
     <div class="panel-content">
-      <!-- Loading State -->
-      <div v-if="isLoading" class="loading-state">
-        <div class="cyber-loader small"></div>
-        <p>LOADING ROOM DATA...</p>
-      </div>
-
-      <!-- Room Info -->
-      <template v-else-if="roomDetails">
-        <!-- Thông tin phụ trách -->
-        <div class="info-block">
-          <h4>[ GIÁM SÁT VIÊN ]</h4>
-          <p>{{ roomDetails?.head_of_lab?.name || 'Chưa cập nhật' }}</p>
-          <p class="email">{{ roomDetails?.head_of_lab?.email || '' }}</p>
-        </div>
-
-        <!-- Danh sách thiết bị -->
-        <div v-if="equipmentList && equipmentList.length > 0" class="equipment-list">
-          <h4>[ TÀI SẢN THIẾT BỊ ]</h4>
-
-          <div 
-            v-for="equip in equipmentList" 
-            :key="equip._id || equip.id" 
-            class="equip-card" 
-            :style="{ '--accent': equip.media?.ambient_color || '#00ffcc' }"
-          >
-            <div class="equip-title">{{ equip.title }} - {{ equip.model }}</div>
-
-            <!-- Hiệu ứng X-Ray Flashlight -->
-            <div 
-              class="xray-container" 
-              @mousemove="updateFlashlight($event)" 
-              @mouseleave="hideFlashlight"
-            >
-              <!-- Ảnh vỏ máy (Nền) -->
-              <img :src="equip.media?.images?.[0] || '/placeholder.jpg'" class="equip-img exterior" />
-              <!-- Ảnh bản vẽ mạch (Ẩn dưới lớp mask) -->
-              <img 
-                :src="equip.media?.internal_blueprint || '/placeholder.svg'" 
-                class="equip-img blueprint" 
-                :style="flashlightStyle" 
-              />
-            </div>
-
-            <!-- Render nội dung Markdown động -->
-            <ContentRenderer v-if="equip.body" :value="equip" class="equip-desc" />
-            
-            <!-- Fallback description -->
-            <p v-else class="equip-desc">{{ equip.description || 'Không có mô tả chi tiết.' }}</p>
-
-            <!-- Mở trang chi tiết thiết bị đầy đủ -->
-            <NuxtLink
-              v-if="equip.id"
-              :to="`/equipment-${equip.id}`"
-              class="equip-detail-link"
-            >
-              XEM CHI TIẾT THIẾT BỊ →
-            </NuxtLink>
+      
+      <!-- 2. Ảnh thực tế -->
+      <div class="photo-section">
+        <template v-if="room.photos && room.photos.length > 0">
+          <div class="photo-grid" :class="{'single-photo': room.photos.length === 1}">
+            <img v-for="(photo, index) in room.photos.slice(0, 2)" :key="index" :src="photo" alt="Room Photo" class="room-image" />
+          </div>
+        </template>
+        <div v-else class="no-photo-placeholder">
+          <div class="placeholder-content">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="7" width="18" height="14" rx="2" ry="2"></rect>
+              <circle cx="12" cy="14" r="3"></circle>
+              <path d="M16 3h-8l-2 4h12l-2-4z"></path>
+            </svg>
+            <p>Chưa có ảnh thực tế</p>
+            <span>Sẽ cập nhật ảnh thực tế tại đây cho phòng {{ room.name }}</span>
           </div>
         </div>
-
-        <div v-else class="empty-state">
-          [ KHÔNG TÌM THẤY DỮ LIỆU THIẾT BỊ TẠI PHÒNG NÀY ]
-        </div>
-      </template>
-
-      <!-- Error State -->
-      <div v-else-if="error" class="error-state">
-        <p>{{ error }}</p>
       </div>
+
+      <!-- 3. Thông tin người phụ trách (Room Incharge) -->
+      <div class="info-card">
+        <h3 class="card-title">ROOM INCHARGE</h3>
+        <div class="card-body">
+          <p class="incharge-name">{{ room.occupant || 'N/A' }}</p>
+          <p class="incharge-position">{{ room.position || 'N/A' }}</p>
+          <p class="incharge-email"><a :href="'mailto:' + room.email" v-if="room.email">{{ room.email }}</a><span v-else>N/A</span></p>
+          <p class="incharge-phone" v-if="room.phone">Tel: {{ room.phone }}</p>
+        </div>
+      </div>
+
+      <!-- 4. Thông tin mô tả (Room Description) -->
+      <div class="info-card">
+        <h3 class="card-title">ROOM DESCRIPTION</h3>
+        <div class="card-body">
+          <p class="description-text">{{ room.description || 'N/A' }}</p>
+          <div class="working-hours mt-2">
+            <strong class="text-highlight">Thời gian hoạt động/có mặt:</strong>
+            <p>{{ room.workingHours || 'N/A' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Featured Facility / Instruments -->
+      <div class="info-card">
+        <h3 class="card-title highlight-title">
+          FEATURED INSTRUMENTS ({{ room.instruments ? room.instruments.length : 0 }})
+        </h3>
+        <div class="card-body">
+          <ul v-if="room.instruments && room.instruments.length > 0" class="instrument-list">
+            <li v-for="(item, index) in room.instruments" :key="index">
+              <span class="item-id">{{ item.id }}</span> - {{ item.name }}
+            </li>
+          </ul>
+          <div v-else class="empty-instruments">
+            <p>No highlighted instruments available.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Action Button -->
+    <div class="panel-footer">
+      <button class="action-btn">VIEW ALL MACHINES IN THIS ROOM</button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useVguData } from '~/composables/useVguData'
-
+// Khai báo props nhận dữ liệu từ Component cha (Map)
 const props = defineProps({
-  roomId: {
-    type: String,
-    required: true
+  isOpen: {
+    type: Boolean,
+    default: false
   },
-  buildingId: {
-    type: String,
-    default: null
-  }
-})
-
-const emit = defineEmits(['close'])
-
-// Composables
-const { getRoomInfo, getRoomEquipment } = useVguData()
-
-// State
-const isLoading = ref(true)
-const error = ref(null)
-const roomDetails = ref(null)
-const equipmentList = ref([])
-
-// Ambient color từ thiết bị đầu tiên
-const ambientColor = computed(() => {
-  return equipmentList.value[0]?.media?.ambient_color || '#00ffcc'
-})
-
-// Flashlight effect state
-const flashlightPos = ref({ x: -100, y: -100 })
-const isHovering = ref(false)
-
-const updateFlashlight = (e) => {
-  const rect = e.target.getBoundingClientRect()
-  flashlightPos.value = {
-    x: e.clientX - rect.left,
-    y: e.clientY - rect.top
-  }
-  isHovering.value = true
-}
-
-const hideFlashlight = () => {
-  isHovering.value = false
-}
-
-const flashlightStyle = computed(() => {
-  if (!isHovering.value) {
-    return { clipPath: 'circle(0px at 0 0)' }
-  }
-  return {
-    clipPath: `circle(80px at ${flashlightPos.value.x}px ${flashlightPos.value.y}px)`
-  }
-})
-
-// Load room data
-onMounted(async () => {
-  try {
-    isLoading.value = true
-    
-    // Load room info từ Nuxt Content
-    roomDetails.value = await getRoomInfo(props.roomId)
-    
-    // Load equipment list
-    equipmentList.value = await getRoomEquipment(props.roomId)
-    
-    console.log('[RoomDetailPanel] Loaded data for:', props.roomId, {
-      room: roomDetails.value,
-      equipmentCount: equipmentList.value.length
+  room: {
+    type: Object,
+    default: () => ({
+      building: '',
+      level: '',
+      name: '',
+      department: '',
+      photos: [], // Array link ảnh ['url1', 'url2']
+      occupant: '',
+      position: '',
+      email: '',
+      phone: '',
+      description: '',
+      workingHours: '',
+      instruments: [] // Array object thiết bị [{id: '01', name: 'Machine A'}]
     })
-  } catch (err) {
-    console.error('[RoomDetailPanel] Failed to load room data:', err)
-    error.value = 'KHÔNG THỂ TẢI DỮ LIỆU PHÒNG'
-  } finally {
-    isLoading.value = false
   }
-})
+});
+
+const emit = defineEmits(['close']);
+
+// Hàm đóng panel
+const closePanel = () => {
+  emit('close');
+};
 </script>
 
 <style scoped>
-.room-panel {
+/* Tổng quan Panel */
+.room-detail-panel {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  bottom: 20px;
-  width: 450px;
-  max-width: calc(100vw - 40px);
-  background: rgba(5, 10, 15, 0.65);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(0, 255, 204, 0.3);
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 255, 204, 0.05);
-  border-radius: 4px;
+  top: 0;
+  right: 0;
+  width: 400px;
+  height: 100vh;
+  background-color: #0b1120; /* Màu nền dark blue theo thiết kế */
+  border-left: 1px solid #1f2d40;
   display: flex;
   flex-direction: column;
-  font-family: 'Space Mono', monospace;
-  color: #e0e0e0;
-  z-index: 50;
-  overflow: hidden;
+  color: #e2e8f0;
+  font-family: 'Inter', sans-serif;
+  box-shadow: -4px 0 15px rgba(0,0,0,0.5);
+  z-index: 100;
 }
 
-.panel-header {
-  padding: 20px;
-  background: linear-gradient(90deg, rgba(0, 255, 204, 0.1) 0%, transparent 100%);
-  border-bottom: 2px solid;
-  position: relative;
-}
-
-.panel-header h2 {
-  margin: 10px 0 5px;
-  font-size: 22px;
-  color: #fff;
-  font-family: 'Be Vietnam Pro', sans-serif;
-}
-
-.meta-info {
-  font-size: 11px;
-  color: #00ffcc;
-  opacity: 0.8;
-}
-
-.sys-status {
-  font-size: 10px;
-  color: #00ffcc;
-  letter-spacing: 1px;
-}
-
-.btn-close {
+/* Nút Đóng */
+.close-btn {
   position: absolute;
   top: 15px;
   right: 15px;
-  background: none;
+  background: transparent;
   border: none;
-  color: #ff3366;
+  color: #64748b;
   cursor: pointer;
-  font-family: 'Space Mono', monospace;
-  font-size: 12px;
-  transition: all 0.2s;
+  transition: color 0.2s;
+}
+.close-btn:hover {
+  color: #f87171;
 }
 
-.btn-close:hover {
-  color: #ff6699;
-  transform: scale(1.1);
+/* Header */
+.panel-header {
+  padding: 24px 20px 16px;
+  border-bottom: 1px dashed #1f2d40;
+}
+.room-location {
+  font-size: 10px;
+  font-weight: 700;
+  color: #f97316; /* Màu cam */
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+.room-location .separator {
+  margin: 0 4px;
+  color: #64748b;
+}
+.room-name {
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 4px 0;
+}
+.department {
+  font-size: 13px;
+  color: #94a3b8;
+  margin: 0;
 }
 
+/* Scroll Content */
 .panel-content {
   flex: 1;
   overflow-y: auto;
   padding: 20px;
-}
-
-.info-block {
-  margin-bottom: 25px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid rgba(0, 255, 204, 0.2);
-}
-
-.info-block h4 {
-  font-size: 12px;
-  color: #EF5A24;
-  margin-bottom: 10px;
-  letter-spacing: 1px;
-}
-
-.info-block p {
-  font-size: 13px;
-  margin: 5px 0;
-}
-
-.info-block .email {
-  color: #06B6D4;
-  font-size: 12px;
-}
-
-.equipment-list h4 {
-  font-size: 12px;
-  color: #EF5A24;
-  margin-bottom: 15px;
-  letter-spacing: 1px;
-}
-
-.equip-card {
-  margin-bottom: 25px;
-  padding: 15px;
-  background: rgba(15, 30, 54, 0.5);
-  border: 1px solid rgba(0, 255, 204, 0.15);
-  border-radius: 4px;
-}
-
-.equip-title {
-  font-size: 14px;
-  font-weight: bold;
-  color: var(--accent);
-  margin-bottom: 12px;
-  font-family: 'Be Vietnam Pro', sans-serif;
-}
-
-.xray-container {
-  position: relative;
-  width: 100%;
-  height: 200px;
-  margin-bottom: 15px;
-  overflow: hidden;
-  border-radius: 4px;
-  background: #0a0f1a;
-}
-
-.equip-img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.equip-img.blueprint {
-  filter: invert(1) hue-rotate(180deg);
-  opacity: 0.8;
-}
-
-.equip-desc {
-  font-size: 12px;
-  line-height: 1.6;
-  color: #ccc;
-  margin-top: 10px;
-}
-
-.equip-detail-link {
-  display: inline-block;
-  margin-top: 12px;
-  padding: 6px 12px;
-  font-size: 11px;
-  letter-spacing: 0.5px;
-  color: var(--accent, #00ffcc);
-  text-decoration: none;
-  border: 1px solid var(--accent, #00ffcc);
-  border-radius: 4px;
-  transition: background 0.2s ease, color 0.2s ease;
-}
-.equip-detail-link:hover {
-  background: var(--accent, #00ffcc);
-  color: #05080d;
-}
-
-.empty-state,
-.error-state,
-.loading-state {
-  text-align: center;
-  padding: 40px 20px;
-  color: #666;
-  font-size: 13px;
-}
-
-.loading-state {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 15px;
+  gap: 16px;
 }
-
-.cyber-loader.small {
-  width: 40px;
-  height: 40px;
-  border: 2px solid rgba(239, 90, 36, 0.3);
-  border-top-color: #EF5A24;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* Scrollbar styling */
 .panel-content::-webkit-scrollbar {
   width: 6px;
 }
-
-.panel-content::-webkit-scrollbar-track {
-  background: rgba(15, 30, 54, 0.5);
-}
-
 .panel-content::-webkit-scrollbar-thumb {
-  background: rgba(239, 90, 36, 0.5);
-  border-radius: 3px;
+  background: #334155;
+  border-radius: 4px;
 }
 
-.panel-content::-webkit-scrollbar-thumb:hover {
-  background: rgba(239, 90, 36, 0.8);
+/* Photo Section */
+.photo-section {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.photo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.photo-grid.single-photo {
+  grid-template-columns: 1fr;
+}
+.room-image {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+.no-photo-placeholder {
+  width: 100%;
+  height: 180px;
+  background-color: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: #475569;
+  text-align: center;
+}
+.placeholder-content svg {
+  margin-bottom: 8px;
+  color: #94a3b8;
+}
+.placeholder-content p {
+  font-weight: 600;
+  margin: 0;
+  font-size: 14px;
+}
+.placeholder-content span {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+/* Info Cards */
+.info-card {
+  background-color: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  padding: 16px;
+}
+.card-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 1px;
+  margin: 0 0 12px 0;
+  text-transform: uppercase;
+}
+.highlight-title {
+  color: #f97316;
+}
+.card-body p {
+  margin: 0 0 4px 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.incharge-name {
+  font-weight: 700;
+  font-size: 16px !important;
+  color: #ffffff;
+}
+.incharge-position {
+  color: #cbd5e1;
+}
+.incharge-email a {
+  color: #0ea5e9;
+  text-decoration: none;
+}
+.incharge-email a:hover {
+  text-decoration: underline;
+}
+.mt-2 {
+  margin-top: 12px;
+}
+.text-highlight {
+  color: #f8fafc;
+  font-size: 12px;
+}
+
+/* Instruments List */
+.instrument-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 13px;
+}
+.instrument-list li {
+  padding: 6px 0;
+  border-bottom: 1px solid #1e293b;
+}
+.instrument-list li:last-child {
+  border-bottom: none;
+}
+.item-id {
+  color: #f97316;
+  font-weight: bold;
+}
+.empty-instruments {
+  background-color: #1e293b;
+  padding: 12px;
+  border-radius: 4px;
+  text-align: center;
+  color: #64748b;
+  font-style: italic;
+  font-size: 12px;
+}
+
+/* Footer & Button */
+.panel-footer {
+  padding: 16px 20px;
+  border-top: 1px solid #1f2d40;
+}
+.action-btn {
+  width: 100%;
+  background-color: #f97316; /* Nút màu cam */
+  color: #ffffff;
+  border: none;
+  padding: 14px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background-color 0.2s;
+}
+.action-btn:hover {
+  background-color: #ea580c;
 }
 </style>
