@@ -1,5 +1,5 @@
 <template>
-  <div class="room-detail-panel">
+  <div class="room-detail-panel" v-if="isOpen">
     <!-- Nút Đóng -->
     <button class="close-btn" @click="closePanel">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -47,7 +47,10 @@
         <h3 class="card-title">ROOM INCHARGE</h3>
         <div class="card-body">
           <p class="incharge-name">{{ room.occupant || 'N/A' }}</p>
-          <p class="incharge-position">{{ room.position || 'N/A' }}</p>
+          <p class="incharge-position">
+            {{ room.position || 'N/A' }} 
+            <span v-if="room.office"> | Office: {{ room.office }}</span>
+          </p>
           <p class="incharge-email"><a :href="'mailto:' + room.email" v-if="room.email">{{ room.email }}</a><span v-else>N/A</span></p>
           <p class="incharge-phone" v-if="room.phone">Tel: {{ room.phone }}</p>
         </div>
@@ -59,8 +62,8 @@
         <div class="card-body">
           <p class="description-text">{{ room.description || 'N/A' }}</p>
           <div class="working-hours mt-2">
-            <strong class="text-highlight">Thời gian hoạt động/có mặt:</strong>
-            <p>{{ room.workingHours || 'N/A' }}</p>
+            <strong class="text-highlight">Trạng thái / Hoạt động:</strong>
+            <p>{{ room.status || 'N/A' }}</p>
           </div>
         </div>
       </div>
@@ -73,7 +76,8 @@
         <div class="card-body">
           <ul v-if="room.instruments && room.instruments.length > 0" class="instrument-list">
             <li v-for="(item, index) in room.instruments" :key="index">
-              <span class="item-id">{{ item.id }}</span> - {{ item.name }}
+              <!-- Có thể tùy chỉnh item.name tùy theo cấu trúc object trong mảng highlighted_equipment -->
+              {{ item.name || item }} 
             </li>
           </ul>
           <div v-else class="empty-instruments">
@@ -91,7 +95,6 @@
 </template>
 
 <script setup>
-// Khai báo props nhận dữ liệu từ Component cha (Map)
 const props = defineProps({
   isOpen: {
     type: Boolean,
@@ -104,21 +107,21 @@ const props = defineProps({
       level: '',
       name: '',
       department: '',
-      photos: [], // Array link ảnh ['url1', 'url2']
+      photos: [], 
       occupant: '',
       position: '',
+      office: '',
       email: '',
       phone: '',
       description: '',
-      workingHours: '',
-      instruments: [] // Array object thiết bị [{id: '01', name: 'Machine A'}]
+      status: '',
+      instruments: [] 
     })
   }
 });
 
 const emit = defineEmits(['close']);
 
-// Hàm đóng panel
 const closePanel = () => {
   emit('close');
 };
@@ -132,7 +135,7 @@ const closePanel = () => {
   right: 0;
   width: 400px;
   height: 100vh;
-  background-color: #0b1120; /* Màu nền dark blue theo thiết kế */
+  background-color: #0b1120;
   border-left: 1px solid #1f2d40;
   display: flex;
   flex-direction: column;
@@ -165,7 +168,7 @@ const closePanel = () => {
 .room-location {
   font-size: 10px;
   font-weight: 700;
-  color: #f97316; /* Màu cam */
+  color: #f97316;
   letter-spacing: 1px;
   margin-bottom: 8px;
   text-transform: uppercase;
@@ -329,7 +332,7 @@ const closePanel = () => {
 }
 .action-btn {
   width: 100%;
-  background-color: #f97316; /* Nút màu cam */
+  background-color: #f97316;
   color: #ffffff;
   border: none;
   padding: 14px;
