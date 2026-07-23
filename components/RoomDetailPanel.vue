@@ -28,7 +28,14 @@
         <div class="photo-section">
           <template v-if="display.photos && display.photos.length > 0">
             <div class="photo-grid" :class="{'single-photo': display.photos.length === 1}">
-              <img v-for="(photo, index) in display.photos.slice(0, 2)" :key="index" :src="photo" alt="Room Photo" class="room-image" />
+              <img
+                v-for="(photo, index) in display.photos.slice(0, 2)"
+                :key="index"
+                :src="photo"
+                alt="Room Photo"
+                class="room-image"
+                @error="onImageError($event, index)"
+              />
             </div>
           </template>
           <div v-else class="no-photo-placeholder">
@@ -125,11 +132,33 @@ onMounted(async () => {
     const res = await $fetch('/data/drive_data.json')
     if (res) {
       driveData.value = res
+      console.log('[RoomDetailPanel] Đã load drive_data.json, số lượng phòng có ảnh:', Object.keys(res).length)
     }
   } catch (err) {
-    console.error('Không thể load file drive_data.json:', err)
+    console.error('[RoomDetailPanel] Không thể load file drive_data.json (kiểm tra file có nằm ở public/data/drive_data.json không):', err)
   }
 })
+
+// Nếu ảnh từ lh3.googleusercontent.com bị lỗi (thường do file Drive chưa share
+// "Anyone with the link"), tự động thử lại bằng endpoint thumbnail dự phòng.
+// Nếu endpoint dự phòng cũng lỗi, ẩn ảnh và log rõ nguyên nhân.
+const onImageError = (event, index) => {
+  const img = event.target
+  if (img.dataset.fallbackTried) {
+    console.error(`[RoomDetailPanel] Ảnh #${index} vẫn lỗi sau khi thử fallback. Nhiều khả năng file Google Drive chưa được chia sẻ ở chế độ "Anyone with the link".`, img.src)
+    img.style.display = 'none'
+    return
+  }
+  img.dataset.fallbackTried = '1'
+  const match = img.src.match(/\/d\/([^=]+)/)
+  const fileId = match ? match[1] : null
+  if (fileId) {
+    console.warn(`[RoomDetailPanel] Ảnh #${index} lỗi từ lh3, thử fallback sang drive.google.com/thumbnail cho fileId=${fileId}`)
+    img.src = `https://drive.google.com/thumbnail?id=${fileId}&sz=w800`
+  } else {
+    img.style.display = 'none'
+  }
+}
 
 const cleanData = (data) => {
   if (!data || data === '___' || data === '--' || data === 'Chưa cập nhật' || data === 'unknown') return ''
