@@ -98,6 +98,7 @@ const ROOM_TYPE_LABELS = {
   other: 'Khác'
 }
 
+// Lọc trùng tên
 const formatRoomName = (name) => {
   if (!name || typeof name !== 'string') return name
   const parts = name.split(/\s*-\s*/)
@@ -110,6 +111,23 @@ const formatRoomName = (name) => {
   return name
 }
 
+// [FIX] Hàm trích xuất chính xác tầng từ Mã Phòng (cross-check)
+// Ví dụ: "AD-2.CR1" -> Tầng 2 | "1.LB1" -> Tầng 1 | "B2-214" -> Tầng 2
+const getFloorFromRoomNumber = (roomNumber, buildingId) => {
+  if (!roomNumber) return null
+  let s = String(roomNumber).toUpperCase()
+  const b = (buildingId || '').toUpperCase()
+  
+  // Xóa tiền tố tòa nhà nếu có (VD: bỏ "AD-" trong "AD-2.CR1")
+  if (b && s.startsWith(b + '-')) {
+    s = s.substring(b.length + 1)
+  }
+  
+  // Bắt con số đầu tiên xuất hiện (trước dấu chấm hoặc số hàng trăm)
+  const match = s.match(/^(\d+)/)
+  return match ? match[1] : null
+}
+
 const loadRooms = async () => {
   if (!props.buildingId || props.floor == null) {
     rooms.value = []
@@ -120,10 +138,24 @@ const loadRooms = async () => {
   try {
     const fetchedRooms = await getRoomsByFloor(props.buildingId, props.floor)
     
-    // [FIX LOGIC CONFLICT] 
-    // Ép kiểu về chuỗi (String) để lọc triệt để các phòng khớp với tầng hiện tại.
-    // Việc này cũng giúp hàm tính toán số lượng phòng ở các Tabs hoạt động đúng.
-    rooms.value = fetchedRooms.filter(r => String(r.floor) === String(props.floor))
+    const expectedFloor = String(props.floor)
+
+    // Lọc triệt để các phòng bị sai tầng từ Data
+    rooms.value = fetchedRooms.filter(r => {
+      // 1. Tầng gán trong data
+      const dataFloor = String(r.floor)
+      
+      // 2. Tầng trích xuất từ chuỗi mã phòng
+      const extractedFloor = getFloorFromRoomNumber(r.roomNumber, props.buildingId)
+      
+      // Nếu có thể trích xuất ra tầng từ mã phòng và nó khác với tầng đang xem -> Lọc bỏ (Khắc phục lỗi AD-2 hiện ở floor 1)
+      if (extractedFloor && extractedFloor !== expectedFloor) {
+        return false
+      }
+      
+      // Nếu không parse được (hoặc trùng khớp), fallback về việc check dataFloor
+      return dataFloor === expectedFloor
+    })
 
   } catch (err) {
     console.error('[FloorPanel] Lỗi khi tải danh sách phòng theo tầng:', err)
@@ -228,9 +260,10 @@ const handleSelectRoom = (room) => {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
+/* HIỆU ỨNG KHI ĐÓNG PANEL (Dịch nút ra lề và kéo thấp xuống để né logo) */
 .floor-panel.is-collapsed .toggle-btn {
   right: -36px;
-  top: 16px;
+  top: 80px; /* Hạ thấp xuống 80px để nhường chỗ cho logo Web */
   width: 36px;
   height: 36px;
   background-color: #0b1120;
