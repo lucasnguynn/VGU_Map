@@ -169,12 +169,21 @@ const display = computed(() => {
     : cleanData(r.departments)
 
   // 1. XỬ LÝ LỖI LẶP TÊN PHÒNG (VD: "OFFICE - OFFICE")
+  // 1. XỬ LÝ LỖI LẶP TÊN PHÒNG (Nâng cấp)
   let roomName = cleanData(r.name) || props.roomId;
   if (typeof roomName === 'string' && roomName.includes('-')) {
     const parts = roomName.split('-').map(p => p.trim());
-    // Nếu phần trước và sau dấu '-' giống hệt nhau, chỉ lấy 1 phần
-    if (parts.length === 2 && parts[0] === parts[1]) {
-      roomName = parts[0];
+    
+    // Nếu số phần tử chẵn (ví dụ chia thành 2, 4, 6 phần), cắt đôi mảng ra so sánh
+    if (parts.length > 1 && parts.length % 2 === 0) {
+      const halfIndex = parts.length / 2;
+      const firstHalf = parts.slice(0, halfIndex).join(' - ');
+      const secondHalf = parts.slice(halfIndex).join(' - ');
+      
+      // Nếu nửa đầu và nửa sau giống hệt nhau -> Lấy nửa đầu
+      if (firstHalf === secondHalf) {
+        roomName = firstHalf;
+      }
     }
   }
 
