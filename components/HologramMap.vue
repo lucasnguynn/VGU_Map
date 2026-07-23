@@ -601,6 +601,7 @@ function updateRoomHighlightPaint() {
 function selectRoom(roomId, centroid, propsObj = {}) {
   currentRoomId.value = roomId
   updateRoomHighlightPaint()
+  updateMarkerVisibility()
   emit('room-selected', {
     roomId,
     buildingId: propsObj.building_id || currentBuildingId.value,
@@ -614,6 +615,7 @@ function selectRoom(roomId, centroid, propsObj = {}) {
 function closeRoomDetail() {
   currentRoomId.value = null
   updateRoomHighlightPaint()
+  updateMarkerVisibility()
 }
 
 function exitBuilding() {
@@ -701,8 +703,17 @@ watch(currentRoomId, (roomId) => {
 let roomMarkers = []
 
 function clearRoomMarkers() {
-  roomMarkers.forEach(m => m.remove())
+  roomMarkers.forEach(m => m.marker.remove())
   roomMarkers = []
+}
+
+// Khi có phòng đang được chọn, ẩn hết marker (chấm + thẻ tên) của các phòng
+// khác trên tầng, chỉ giữ lại marker của phòng đang chọn để nó thực sự nổi bật.
+function updateMarkerVisibility() {
+  const selId = currentRoomId.value
+  roomMarkers.forEach(({ el, roomId }) => {
+    el.style.display = (!selId || roomId === selId) ? '' : 'none'
+  })
 }
 
 function renderRoomMarkers(floorNumber) {
@@ -740,8 +751,10 @@ function renderRoomMarkers(floorNumber) {
     })
 
     const marker = new maplibregl.Marker({ element: el }).setLngLat(centroid).addTo(map)
-    roomMarkers.push(marker)
+    roomMarkers.push({ marker, el, roomId })
   })
+
+  updateMarkerVisibility()
 }
 
 async function getBuildingRoomsData(buildingId) {
