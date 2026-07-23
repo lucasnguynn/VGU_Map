@@ -15,7 +15,6 @@
         <span class="separator">//</span>
         <span class="level">FLOOR {{ display.level ?? 'N/A' }}</span>
       </div>
-      <!-- Tên phòng đã được xử lý để không bị lặp -->
       <h2 class="room-name">{{ display.name || 'N/A' }}</h2>
       <p class="department">{{ display.department || 'N/A' }}</p>
     </div>
@@ -25,7 +24,7 @@
       <div v-if="isLoading" class="state-msg">Đang tải dữ liệu phòng…</div>
 
       <template v-else>
-        <!-- 2. Ảnh thực tế -->
+        <!-- 2. ẢNH THỰC TẾ (ĐẢM BẢO BẠN COPY ĐOẠN NÀY) -->
         <div class="photo-section">
           <template v-if="display.photos && display.photos.length > 0">
             <div class="photo-grid" :class="{'single-photo': display.photos.length === 1}">
@@ -45,10 +44,9 @@
           </div>
         </div>
 
-        <!-- 3. Thông tin nhân sự (Hỗ trợ nhiều người) -->
+        <!-- 3. Thông tin nhân sự -->
         <div class="info-card" v-if="display.occupants.length > 0 || display.office || display.email">
           <div class="card-body">
-            <!-- Vòng lặp hiển thị từng staff trên một dòng -->
             <p v-for="(person, idx) in display.occupants" :key="idx" class="incharge-name">
               {{ person }}
             </p>
@@ -63,7 +61,7 @@
           </div>
         </div>
 
-        <!-- 4. Thông tin mô tả (Tách xuống dòng) -->
+        <!-- 4. Thông tin mô tả -->
         <div class="info-card">
           <h3 class="card-title">ROOM DESCRIPTION</h3>
           <div class="card-body">
@@ -105,7 +103,10 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
+
+// Import trực tiếp file JSON từ thư mục public để dữ liệu có sẵn ngay lập tức
+import driveData from '~/public/data/drive_data.json'
 
 const props = defineProps({
   roomId: { type: String, default: null },
@@ -119,19 +120,6 @@ const { getRoomInfo } = useVguData()
 
 const isLoading = ref(false)
 const roomData = ref(null)
-
-// 1. Biến lưu trữ dữ liệu ảnh từ JSON
-const roomImageMap = ref({})
-
-// 2. Fetch file JSON từ thư mục public khi Component vừa mount
-onMounted(async () => {
-  try {
-    const data = await $fetch('/data/drive_data.json')
-    if (data) roomImageMap.value = data
-  } catch (error) {
-    console.error('Không thể tải file drive_data.json:', error)
-  }
-})
 
 const cleanData = (data) => {
   if (!data || data === '___' || data === '--' || data === 'Chưa cập nhật' || data === 'unknown') return ''
@@ -171,10 +159,11 @@ const display = computed(() => {
     }
   }
 
-  // --- UPDATE ẢNH TỪ BIẾN JSON ĐÃ FETCH ---
+  // --- UPDATE ẢNH: Đọc trực tiếp từ file JSON ---
   let photos = []
-  if (props.roomId && roomImageMap.value[props.roomId]) {
-    photos = [`https://drive.google.com/uc?export=view&id=${roomImageMap.value[props.roomId]}`]
+  if (props.roomId && driveData[props.roomId]) {
+    // Dùng Thumbnail API để tránh bị Google Drive chặn thẻ <img>
+    photos = [`https://drive.google.com/thumbnail?id=${driveData[props.roomId]}&sz=w800`]
   } else if (r.image) {
     photos = Array.isArray(r.image) ? r.image.filter(Boolean) : [r.image]
   }
@@ -183,7 +172,7 @@ const display = computed(() => {
     ? r.departments.map(cleanData).filter(Boolean).join(', ')
     : cleanData(r.departments)
 
-  // XỬ LÝ LỖI LẶP TÊN PHÒNG (Nâng cấp)
+  // XỬ LÝ LỖI LẶP TÊN PHÒNG
   let roomName = cleanData(r.name) || props.roomId;
   if (typeof roomName === 'string' && roomName.includes('-')) {
     const parts = roomName.split('-').map(p => p.trim());
@@ -228,7 +217,6 @@ const display = computed(() => {
 </script>
 
 <style scoped>
-/* Tổng quan Panel */
 .room-detail-panel {
   position: absolute;
   top: 0;
@@ -244,8 +232,6 @@ const display = computed(() => {
   box-shadow: -4px 0 15px rgba(0,0,0,0.5);
   z-index: 100;
 }
-
-/* Nút Đóng */
 .close-btn {
   position: absolute;
   top: 15px;
@@ -259,8 +245,6 @@ const display = computed(() => {
 .close-btn:hover {
   color: #f87171;
 }
-
-/* Header */
 .panel-header {
   padding: 24px 20px 16px;
   border-bottom: 1px dashed #1f2d40;
@@ -288,8 +272,6 @@ const display = computed(() => {
   color: #94a3b8;
   margin: 0;
 }
-
-/* Scroll Content */
 .panel-content {
   flex: 1;
   overflow-y: auto;
@@ -305,15 +287,12 @@ const display = computed(() => {
   background: #334155;
   border-radius: 4px;
 }
-
 .state-msg {
   padding: 20px 0;
   text-align: center;
   color: #94a3b8;
   font-size: 13px;
 }
-
-/* Photo Section */
 .photo-section {
   width: 100%;
   border-radius: 8px;
@@ -357,8 +336,6 @@ const display = computed(() => {
   font-size: 11px;
   color: #94a3b8;
 }
-
-/* Info Cards */
 .info-card {
   background-color: #0f172a;
   border: 1px solid #1e293b;
@@ -408,8 +385,6 @@ const display = computed(() => {
   color: #f8fafc;
   font-size: 12px;
 }
-
-/* Instruments List */
 .instrument-list {
   list-style: none;
   padding: 0;
@@ -432,8 +407,6 @@ const display = computed(() => {
   font-style: italic;
   font-size: 12px;
 }
-
-/* Footer & Button */
 .panel-footer {
   padding: 16px 20px;
   border-top: 1px solid #1f2d40;
