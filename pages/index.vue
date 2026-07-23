@@ -20,7 +20,7 @@
       </div>
       <div class="sys-status" role="status" aria-live="polite">
         <span class="pulse-dot" aria-hidden="true"></span>
-        <span>SYSTEM: ONLINE</span>
+        <span>ĐANG TẢI BẢN ĐỒ…</span>
       </div>
     </header>
 
@@ -183,5 +183,52 @@ onBeforeUnmount(() => {
   .header-title { font-size: 16px; }
   .hud-bar { top: 58px; left: 14px; }
   .hud-context-panel { font-size: 11px; padding: 6px 12px; }
+}
+
+.shell {
+  background: linear-gradient(180deg, var(--surface-panel) 0%, var(--surface-root) 100%);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.brand-mark {
+  filter: none;
+  box-shadow: none;
+}
+
+.page-title {
+  color: var(--ink-strong);
+  font-family: var(--type-main);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.page-title em {
+  color: var(--brand-accent);
+  font-style: normal;
+}
+
+.quick-indicator {
+  background: var(--brand-accent);
+}
+
+.quick-indicator::after {
+  background: var(--brand-accent);
+}
+
+.map-hud {
+  background: var(--surface-panel);
+  border: 1px solid var(--line-soft);
+}
+
+.map-hud__accent {
+  color: var(--brand-accent);
+}
+
+.map-frame {
+  background: var(--surface-root);
+}
+
+.loading-copy {
+  color: var(--ink-strong);
 }
 </style>

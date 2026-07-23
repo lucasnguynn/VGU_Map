@@ -379,4 +379,40 @@ onMounted(async () => {
 .panel-content::-webkit-scrollbar-thumb:hover {
   background: rgba(239, 90, 36, 0.8);
 }
+
+.sheet {
+  background: var(--surface-root);
+  color: var(--ink-strong);
+  font-family: var(--type-main);
+}
+
+.sheet__crumb {
+  color: var(--brand-accent);
+}
+
+.info-box {
+  background: var(--surface-panel);
+  border: 1px solid var(--line-soft);
+}
+
+.primary-action {
+  background: var(--brand-accent);
+  color: var(--ink-strong);
+}
+
+.primary-action:hover {
+  background: var(--brand-accent-soft);
+}
+
+.sheet__spinner {
+  color: var(--brand-accent);
+}
+
+.mail-link {
+  color: #8092A9;
+}
+
+.close-control:hover {
+  color: var(--brand-accent);
+}
 </style>

@@ -14,6 +14,61 @@
 </script>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  --brand-accent: #F58220;
+  --brand-accent-soft: #F7A14C;
+  --brand-accent-muted: #FAC08F;
+
+  --brand-deep: #002554;
+  --brand-deep-2: #001A3A;
+  --brand-deep-3: #002040;
+  --brand-deep-4: #002D5C;
+
+  --ink-strong: #FFFFFF;
+  --ink-soft: #B3BFCD;
+  --ink-dim: #6B7FA0;
+
+  --line-soft: rgba(255, 255, 255, 0.10);
+  --line-accent: rgba(245, 130, 32, 0.45);
+
+  --surface-root: var(--brand-deep-2);
+  --surface-panel: var(--brand-deep-3);
+  --surface-elevated: var(--brand-deep-4);
+  --type-main: 'Be Vietnam Pro', sans-serif;
+  --type-alt: 'Space Mono', monospace;
+}
+
+html,
+body {
+  background: var(--surface-root);
+  color: var(--ink-soft);
+  font-family: var(--type-main);
+  margin: 0;
+  padding: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a,
+button,
+input,
+select,
+textarea {
+  font-family: var(--type-main);
+}
+
+.app-loader {
+  background: linear-gradient(180deg, #001A3A 0%, #002554 100%);
+}
+
+.app-loader__ring {
+  border-top-color: var(--brand-accent);
+}
+
 /* ===== Global reset & nền dùng chung toàn app ===== */
 * { box-sizing: border-box; }
 

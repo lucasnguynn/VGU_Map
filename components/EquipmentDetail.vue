@@ -220,4 +220,31 @@ const flashlightStyle = computed(() => {
   line-height: 1.7;
   color: #ccc;
 }
+
+.detail-layout {
+  font-family: var(--type-main);
+}
+
+.detail-status {
+  color: var(--brand-accent);
+  text-transform: none;
+}
+
+.detail-close {
+  color: var(--brand-accent);
+}
+
+.detail-close:hover {
+  color: var(--ink-strong);
+  background: var(--brand-accent);
+}
+
+.detail-frame,
+.detail-scan {
+  border-color: var(--line-soft);
+  background: var(--surface-panel);
+}
 </style>
+
+<!-- Replace cyberpunk labels with a neutral status label:
+"Trạng thái thiết bị: Đang hoạt động" -->

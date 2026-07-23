@@ -64,4 +64,20 @@ function goBack() {
   transition: all 0.2s ease;
 }
 .eq-back:hover { background: rgba(0, 255, 204, 0.1); }
+
+.wrapper {
+  background: var(--surface-root);
+  color: var(--ink-strong);
+  font-family: var(--type-main);
+}
+
+.cta {
+  background: var(--brand-accent);
+  border: 1px solid transparent;
+  color: var(--ink-strong);
+}
+
+.cta:hover {
+  background: var(--brand-accent-soft);
+}
 </style>
