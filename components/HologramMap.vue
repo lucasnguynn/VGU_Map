@@ -720,6 +720,11 @@ onUnmounted(() => {
   clearRoomMarkers()
   if (map) { map.remove(); map = null }
 })
+
+// Cho phép component cha (pages/index.vue) gọi trực tiếp khi người dùng chọn
+// phòng từ danh sách trong FloorPanel, để bản đồ bay camera zoom vào đúng
+// phòng đó — giống hệt hành vi khi bấm thẳng vào phòng trên map.
+defineExpose({ goToRoom })
 </script>
 
 <style scoped>
