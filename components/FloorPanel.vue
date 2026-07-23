@@ -71,11 +71,13 @@ const loadError = ref('')
 const rooms = ref([])
 const activeType = ref('all')
 
-const ROOM_TYPE_ORDER = ['office', 'laboratory', 'service_meeting']
+const ROOM_TYPE_ORDER = ['administration', 'teaching', 'laboratory', 'workshop', 'other']
 const ROOM_TYPE_LABELS = {
-  office: 'Office',
+  administration: 'Administration',
+  teaching: 'Teaching',
   laboratory: 'Laboratory',
-  service_meeting: 'Service / Meeting Room'
+  workshop: 'Workshop',
+  other: 'Khác'
 }
 
 // getRoomsByFloor() (trong composables/useVguData.js) đã trả về room record
