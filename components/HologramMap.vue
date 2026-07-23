@@ -1049,6 +1049,7 @@ onUnmounted(() => {
   color: rgba(255, 255, 255, 0.82);
   margin-top: 2px;
   display: -webkit-box;
+  line-clamp: 2;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
