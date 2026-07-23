@@ -52,14 +52,22 @@
         </div>
 
         <!-- 3. Thông tin nhân sự (Đã được xử lý để xuống dòng) -->
-        <div class="info-card" v-if="display.occupants.length > 0">
-          <h3 class="card-title">PERSON(S) IN CHARGE</h3>
+        <div class="info-card" v-if="display.occupants.length > 0 || display.office || display.email">
           <div class="card-body">
             <p v-for="(person, idx) in display.occupants" :key="idx" class="incharge-name">
               {{ person }}
             </p>
+            <p class="incharge-position" v-if="display.office">
+              Office: {{ display.office }}
+            </p>
+            <p class="incharge-email">
+              <a :href="'mailto:' + display.email" v-if="display.email">{{ display.email }}</a>
+              <span v-else>N/A</span>
+            </p>
+            <p class="incharge-phone" v-if="display.phone">Tel: {{ display.phone }}</p>
           </div>
         </div>
+
 
         <!-- 4. Thông tin mô tả -->
         <div class="info-card">
