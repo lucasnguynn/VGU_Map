@@ -76,6 +76,7 @@
 
         <!-- 3. Thông tin nhân sự (Đã được xử lý để xuống dòng) -->
   <div class="info-card" v-if="display.occupants.length > 0 || display.office || display.email">
+          <h3 class="card-title highlight-title">ROOM INCHARGE</h3>
           <div class="card-body">
             <p v-for="(person, idx) in display.occupants" :key="idx" class="incharge-name">
               {{ person }}
@@ -94,7 +95,7 @@
 
         <!-- 4. Thông tin mô tả -->
         <div class="info-card">
-          <h3 class="card-title">ROOM DESCRIPTION</h3>
+          <h3 class="card-title highlight-title">ROOM DESCRIPTION</h3>
           <div class="card-body">
             <p><strong>Phân loại:</strong> {{ display.roomType }}</p>
             <p v-if="display.roomFunction"><strong>Chức năng:</strong> {{ display.roomFunction }}</p>
@@ -466,6 +467,9 @@ const display = computed(() => {
 }
 .highlight-title {
   color: #f97316;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
 }
 .card-body p {
   margin: 0 0 6px 0;
@@ -477,7 +481,7 @@ const display = computed(() => {
 }
 .incharge-name {
   font-weight: 700;
-  font-size: 16px !important;
+  font-size: 13px !important;
   color: #ffffff;
   margin-bottom: 4px !important;
 }
