@@ -89,7 +89,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import RoomDetailPanel from '~/components/RoomDetailPanel.vue'
@@ -102,7 +102,7 @@ const base = config.app.baseURL
 const mapContainer = ref(null)
 let map = null
 
-const emit = defineEmits(['room-selected', 'building-selected', 'floor-selected', 'ready'])
+const emit = defineEmits(['room-selected', 'building-selected', 'floor-selected', 'equipment-selected', 'ready'])
 
 const props = defineProps({
   initialCenter: {
@@ -275,6 +275,32 @@ onMounted(() => {
   map.on('mouseleave', 'vgu-buildings-3d', setPointer(false))
   map.on('mouseenter', 'vgu-rooms-fill', setPointer(true))
   map.on('mouseleave', 'vgu-rooms-fill', setPointer(false))
+
+  // ===== Hover highlight cho từng khối thiết bị trong phòng =====
+  map.on('mousemove', 'vgu-equipment-fill', (e) => {
+    if (!e.features.length) return
+    map.getCanvas().style.cursor = 'pointer'
+    const id = e.features[0].id
+    if (hoveredEquipmentId !== null && hoveredEquipmentId !== id) {
+      map.setFeatureState({ source: 'vgu-equipment', id: hoveredEquipmentId }, { hover: false })
+    }
+    if (id !== undefined && hoveredEquipmentId !== id) {
+      hoveredEquipmentId = id
+      map.setFeatureState({ source: 'vgu-equipment', id }, { hover: true })
+    }
+  })
+  map.on('mouseleave', 'vgu-equipment-fill', () => {
+    map.getCanvas().style.cursor = ''
+    if (hoveredEquipmentId !== null) {
+      map.setFeatureState({ source: 'vgu-equipment', id: hoveredEquipmentId }, { hover: false })
+      hoveredEquipmentId = null
+    }
+  })
+  map.on('click', 'vgu-equipment-fill', (e) => {
+    const feature = e.features[0]
+    const equipmentId = feature?.properties?.equipment_id
+    if (equipmentId) emit('equipment-selected', { equipmentId, roomId: currentRoomId.value })
+  })
 })
 
 async function loadCampusBuildings() {
@@ -356,6 +382,53 @@ async function initRoomsLayer() {
     type: 'line',
     source: 'vgu-rooms',
     paint: { 'line-color': '#00ffcc', 'line-width': 1.5, 'line-opacity': 0.8 }
+  })
+
+  // ================= Layer thiết bị trong phòng =================
+  // Chỉ hiện khi có phòng đang được chọn (xem loadEquipmentForRoom / watch currentRoomId).
+  // `generateId: true` để MapLibre tự gán id số cho từng feature, cần cho feature-state (hover).
+  map.addSource('vgu-equipment', {
+    type: 'geojson',
+    data: { type: 'FeatureCollection', features: [] },
+    generateId: true
+  })
+  map.addLayer({
+    id: 'vgu-equipment-fill',
+    type: 'fill',
+    source: 'vgu-equipment',
+    paint: {
+      'fill-color': [
+        'case',
+        ['boolean', ['feature-state', 'hover'], false],
+        '#00ffcc', // highlight xanh khi hover
+        '#38bdf8'  // màu mặc định của khối thiết bị
+      ],
+      'fill-opacity': [
+        'case',
+        ['boolean', ['feature-state', 'hover'], false],
+        0.75,
+        0.4
+      ]
+    }
+  })
+  map.addLayer({
+    id: 'vgu-equipment-outline',
+    type: 'line',
+    source: 'vgu-equipment',
+    paint: {
+      'line-color': [
+        'case',
+        ['boolean', ['feature-state', 'hover'], false],
+        '#00ffcc',
+        '#38bdf8'
+      ],
+      'line-width': [
+        'case',
+        ['boolean', ['feature-state', 'hover'], false],
+        2.5,
+        1.2
+      ]
+    }
   })
 }
 
@@ -514,6 +587,7 @@ function exitBuilding() {
   searchResults.value = []
 
   clearRoomMarkers()
+  clearEquipmentLayer()
 
   map.setFilter('vgu-buildings-3d', null)
   map.setFilter('vgu-buildings-outline', null)
@@ -534,6 +608,52 @@ function exitBuilding() {
 
   emit('building-selected', { buildingId: null, floor: null })
 }
+
+let hoveredEquipmentId = null
+const equipmentCache = new Map()
+
+// Tải geojson thiết bị của 1 phòng (public/data/equipment/{roomId}.geojson), áp
+// CHUNG affine transform của building (giống hệt transformBuildingGeojson dùng
+// cho rooms) vì file này được sinh ra ở CÙNG hệ toạ độ mét cục bộ của building.
+// Nếu phòng chưa có file thiết bị (404) thì chỉ cần xoá layer, không phải lỗi.
+async function loadEquipmentForRoom(buildingId, roomId) {
+  if (!map.getSource('vgu-equipment')) return
+  const cacheKey = `${buildingId}:${roomId}`
+  try {
+    let data = equipmentCache.get(cacheKey)
+    if (!data) {
+      const response = await fetch(`${base}data/equipment/${roomId}.geojson`)
+      if (!response.ok) {
+        clearEquipmentLayer()
+        return
+      }
+      const raw = await response.json()
+      data = transformBuildingGeojson(buildingId, raw)
+      equipmentCache.set(cacheKey, data)
+    }
+    map.getSource('vgu-equipment').setData(data)
+  } catch (error) {
+    console.warn(`[HologramMap] Không tải được thiết bị cho phòng ${roomId}:`, error)
+    clearEquipmentLayer()
+  }
+}
+
+function clearEquipmentLayer() {
+  hoveredEquipmentId = null
+  if (map?.getSource('vgu-equipment')) {
+    map.getSource('vgu-equipment').setData({ type: 'FeatureCollection', features: [] })
+  }
+}
+
+// Chỉ hiện thiết bị khi có phòng đang được chọn — khớp đúng yêu cầu "thiết bị
+// của phòng chỉ hiện lên khi nhấn vào phòng đó".
+watch(currentRoomId, (roomId) => {
+  if (!roomId || !currentBuildingId.value) {
+    clearEquipmentLayer()
+    return
+  }
+  loadEquipmentForRoom(currentBuildingId.value, roomId)
+})
 
 let roomMarkers = []
 
