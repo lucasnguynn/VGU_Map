@@ -15,13 +15,13 @@
         <span class="separator">//</span>
         <span class="level">FLOOR {{ display.level ?? 'N/A' }}</span>
       </div>
+      <!-- Tên phòng đã được xử lý để không bị lặp -->
       <h2 class="room-name">{{ display.name || 'N/A' }}</h2>
       <p class="department">{{ display.department || 'N/A' }}</p>
     </div>
 
     <!-- Vùng nội dung có thể cuộn -->
     <div class="panel-content">
-
       <div v-if="isLoading" class="state-msg">Đang tải dữ liệu phòng…</div>
 
       <template v-else>
@@ -45,25 +45,33 @@
           </div>
         </div>
 
-        <!-- 3. Thông tin người phụ trách (Room Incharge) -->
-        <div class="info-card">
-          <h3 class="card-title">ROOM INCHARGE</h3>
+        <!-- 3. Thông tin nhân sự (Đã xóa tiêu đề và chữ Room Incharge, hỗ trợ nhiều người) -->
+        <div class="info-card" v-if="display.occupants.length > 0 || display.office || display.email">
           <div class="card-body">
-            <p class="incharge-name">{{ display.occupant || 'N/A' }}</p>
-            <p class="incharge-position">
-              {{ display.position || 'N/A' }}
-              <span v-if="display.office"> | Office: {{ display.office }}</span>
+            <!-- Vòng lặp hiển thị từng staff trên một dòng -->
+            <p v-for="(person, idx) in display.occupants" :key="idx" class="incharge-name">
+              {{ person }}
             </p>
-            <p class="incharge-email"><a :href="'mailto:' + display.email" v-if="display.email">{{ display.email }}</a><span v-else>N/A</span></p>
+            <p class="incharge-position" v-if="display.office">
+              Office: {{ display.office }}
+            </p>
+            <p class="incharge-email">
+              <a :href="'mailto:' + display.email" v-if="display.email">{{ display.email }}</a>
+              <span v-else>N/A</span>
+            </p>
             <p class="incharge-phone" v-if="display.phone">Tel: {{ display.phone }}</p>
           </div>
         </div>
 
-        <!-- 4. Thông tin mô tả (Room Description) -->
+        <!-- 4. Thông tin mô tả (Room Description - Đã xuống dòng) -->
         <div class="info-card">
           <h3 class="card-title">ROOM DESCRIPTION</h3>
           <div class="card-body">
-            <p class="description-text">{{ display.description || 'N/A' }}</p>
+            <!-- Tách từng thông tin ra các thẻ p riêng biệt -->
+            <p><strong>Phân loại:</strong> {{ display.roomType }}</p>
+            <p><strong>Diện tích:</strong> {{ display.area }} m2</p>
+            <p><strong>Sức chứa:</strong> {{ display.capacity }}</p>
+            
             <div class="working-hours mt-2">
               <strong class="text-highlight">Trạng thái / Hoạt động:</strong>
               <p>{{ display.status || 'N/A' }}</p>
@@ -100,11 +108,6 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 
-// roomId/buildingId là những gì pages/index.vue THỰC SỰ truyền xuống
-// (:room-id="selectedRoom" :building-id="selectedBuilding"). Bản cũ của
-// component này khai báo props isOpen/room -> không khớp -> luôn nhận
-// giá trị mặc định rỗng -> panel hiện "N/A" cho mọi trường dù sheet đã
-// có dữ liệu. Sửa lại để component tự fetch theo roomId.
 const props = defineProps({
   roomId: { type: String, default: null },
   buildingId: { type: String, default: null }
@@ -116,9 +119,8 @@ const closePanel = () => emit('close')
 const { getRoomInfo } = useVguData()
 
 const isLoading = ref(false)
-const roomData = ref(null) // raw frontmatter từ content/Rooms/*.md
+const roomData = ref(null)
 
-// Loại bỏ dữ liệu rác placeholder từ sheet (___ / -- / "Chưa cập nhật" / "unknown")
 const cleanData = (data) => {
   if (!data || data === '___' || data === '--' || data === 'Chưa cập nhật' || data === 'unknown') return ''
   return data
@@ -136,7 +138,6 @@ const fetchRoom = async (id) => {
 
 watch(() => props.roomId, fetchRoom, { immediate: true })
 
-// Ánh xạ (mapping) từ frontmatter MD sang các trường hiển thị của panel
 const display = computed(() => {
   const r = roomData.value
   if (!r) {
@@ -146,12 +147,13 @@ const display = computed(() => {
       name: props.roomId || '',
       department: '',
       photos: [],
-      occupant: '',
-      position: '',
+      occupants: [],
       office: '',
       email: '',
       phone: '',
-      description: '',
+      roomType: 'N/A',
+      area: 'N/A',
+      capacity: 'N/A',
       status: '',
       instruments: []
     }
@@ -166,20 +168,43 @@ const display = computed(() => {
     ? r.departments.map(cleanData).filter(Boolean).join(', ')
     : cleanData(r.departments)
 
-  const headName = r.head_of_lab ? cleanData(r.head_of_lab.name) : ''
+  // 1. XỬ LÝ LỖI LẶP TÊN PHÒNG (VD: "OFFICE - OFFICE")
+  let roomName = cleanData(r.name) || props.roomId;
+  if (typeof roomName === 'string' && roomName.includes('-')) {
+    const parts = roomName.split('-').map(p => p.trim());
+    // Nếu phần trước và sau dấu '-' giống hệt nhau, chỉ lấy 1 phần
+    if (parts.length === 2 && parts[0] === parts[1]) {
+      roomName = parts[0];
+    }
+  }
+
+  // 2. XỬ LÝ NHIỀU NHÂN SỰ
+  // Tách tên nhân sự bằng dấu xuống dòng (\n) thành mảng các tên riêng biệt
+  let occupantsList = [];
+  const rawName = r.head_of_lab ? cleanData(r.head_of_lab.name) : '';
+  if (rawName) {
+    if (Array.isArray(rawName)) {
+      occupantsList = rawName.map(cleanData).filter(Boolean);
+    } else if (typeof rawName === 'string') {
+      // Cắt chuỗi dựa trên dấu xuống dòng (hỗ trợ cả \n và \r\n từ Excel)
+      occupantsList = rawName.split(/\r?\n/).map(name => name.trim()).filter(Boolean);
+    }
+  }
 
   return {
     building: cleanData(r.building_id) || cleanData(props.buildingId),
     level: r.floor ?? null,
-    name: cleanData(r.name) || props.roomId,
+    name: roomName,
     department: departments,
     photos,
-    occupant: headName,
-    position: headName ? 'Room Incharge' : '',
+    occupants: occupantsList, // Trả về mảng chứa tên các staff
     office: r.head_of_lab ? cleanData(r.head_of_lab.office) : '',
     email: r.head_of_lab ? cleanData(r.head_of_lab.email) : '',
     phone: r.head_of_lab ? cleanData(r.head_of_lab.phone) : '',
-    description: `Phân loại: ${cleanData(r.room_type) || 'N/A'} | Diện tích: ${cleanData(r.area_m2) || 'N/A'} m2 | Sức chứa: ${cleanData(r.capacity) || 'N/A'}`,
+    // 3. TÁCH DỮ LIỆU DESCRIPTION ĐỂ XUỐNG DÒNG
+    roomType: cleanData(r.room_type) || 'N/A',
+    area: cleanData(r.area_m2) || 'N/A',
+    capacity: cleanData(r.capacity) || 'N/A',
     status: cleanData(r.status),
     instruments: r.highlighted_equipment || []
   }
@@ -336,17 +361,22 @@ const display = computed(() => {
   color: #f97316;
 }
 .card-body p {
-  margin: 0 0 4px 0;
+  margin: 0 0 6px 0;
   font-size: 13px;
   line-height: 1.5;
+}
+.card-body p strong {
+  color: #cbd5e1;
 }
 .incharge-name {
   font-weight: 700;
   font-size: 16px !important;
   color: #ffffff;
+  margin-bottom: 4px !important;
 }
 .incharge-position {
   color: #cbd5e1;
+  margin-top: 8px !important;
 }
 .incharge-email a {
   color: #0ea5e9;
@@ -376,10 +406,6 @@ const display = computed(() => {
 }
 .instrument-list li:last-child {
   border-bottom: none;
-}
-.item-id {
-  color: #f97316;
-  font-weight: bold;
 }
 .empty-instruments {
   background-color: #1e293b;
