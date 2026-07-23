@@ -38,12 +38,11 @@
                 <span class="spinner-ring"></span>
               </div>
 
-              <!-- Ảnh thật -->
+              <!-- Ảnh thật: Đổi v-show thành opacity class để đảm bảo event @load luôn chạy -->
               <img
-                v-show="photoStates[index] === 'loaded'"
+                :class="['room-image', { 'is-loaded': photoStates[index] === 'loaded' }]"
                 :src="photo"
                 alt="Room Photo"
-                class="room-image"
                 @load="onImageLoad(index)"
                 @error="onImageError($event, index)"
               />
@@ -75,7 +74,7 @@
         </div>
 
         <!-- 3. Thông tin nhân sự (Đã được xử lý để xuống dòng) -->
-  <div class="info-card" v-if="display.occupants.length > 0 || display.office || display.email">
+        <div class="info-card" v-if="display.occupants.length > 0 || display.office || display.email">
           <h3 class="card-title highlight-title">ROOM INCHARGE</h3>
           <div class="card-body">
             <p v-for="(person, idx) in display.occupants" :key="idx" class="incharge-name">
@@ -93,7 +92,6 @@
           </div>
         </div>
 
-
         <!-- 4. Thông tin mô tả -->
         <div class="info-card">
           <h3 class="card-title highlight-title">ROOM DESCRIPTION</h3>
@@ -109,7 +107,6 @@
             </div>
           </div>
         </div>
-
 
         <!-- 5. Featured Facility / Instruments -->
         <div class="info-card">
@@ -182,9 +179,6 @@ onMounted(async () => {
   }
 })
 
-// Trạng thái từng khung ảnh: 'loading' | 'loaded' | 'error'. Luôn có khung cố
-// định kích thước hiển thị (spinner/ảnh/icon lỗi) — không bao giờ "biến mất"
-// như cách làm cũ (ẩn <img> bằng display:none khiến cả khối co về 0).
 const photoStates = ref({})
 
 const onImageLoad = (index) => {
@@ -250,6 +244,9 @@ const display = computed(() => {
       department: '',
       photos: [],
       occupants: [],
+      office: '',
+      email: '',
+      phone: '',
       roomFunction: '',
       roomType: 'N/A',
       area: 'N/A',
@@ -281,6 +278,9 @@ const display = computed(() => {
     department: r.department,
     photos,
     occupants: occupantsList,
+    office: r.office || '',   // Đã bổ sung biến
+    email: r.email || '',     // Đã bổ sung biến
+    phone: r.phone || '',     // Đã bổ sung biến
     roomFunction: r.roomFunction,
     roomType: r.rawRoomType || 'N/A',
     area: r.area || 'N/A',
@@ -372,6 +372,7 @@ const display = computed(() => {
   width: 100%;
   border-radius: 8px;
   overflow: hidden;
+  flex-shrink: 0; /* [QUAN TRỌNG] Ngăn chặn flexbox tự động bóp ép chiều cao ảnh khi nội dung info-card dài ra */
 }
 .photo-grid {
   display: grid;
@@ -397,6 +398,11 @@ const display = computed(() => {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.room-image.is-loaded {
+  opacity: 1;
 }
 .frame-spinner {
   position: absolute;
@@ -457,6 +463,7 @@ const display = computed(() => {
   border: 1px solid #1e293b;
   border-radius: 8px;
   padding: 16px;
+  flex-shrink: 0; /* Ngăn chặn khối thông tin bị bóp hẹp */
 }
 .card-title {
   font-size: 10px;
@@ -553,41 +560,5 @@ const display = computed(() => {
 }
 .action-btn:hover {
   background-color: #ea580c;
-}
-
-.sheet {
-  background: var(--surface-root);
-  color: var(--ink-strong);
-  font-family: var(--type-main);
-}
-
-.sheet__crumb {
-  color: var(--brand-accent);
-}
-
-.info-box {
-  background: var(--surface-panel);
-  border: 1px solid var(--line-soft);
-}
-
-.primary-action {
-  background: var(--brand-accent);
-  color: var(--ink-strong);
-}
-
-.primary-action:hover {
-  background: var(--brand-accent-soft);
-}
-
-.sheet__spinner {
-  color: var(--brand-accent);
-}
-
-.mail-link {
-  color: #8092A9;
-}
-
-.close-control:hover {
-  color: var(--brand-accent);
 }
 </style>
