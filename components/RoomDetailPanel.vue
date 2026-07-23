@@ -51,23 +51,15 @@
           </div>
         </div>
 
-        <!-- 3. Thông tin nhân sự (Đã được xử lý để xuống dòng) -->
-        <div class="info-card" v-if="display.occupants.length > 0 || display.office || display.email">
+        <!-- 3. Thông tin nhân sự (occupant_display từ Sheet — chưa có office/email/phone riêng) -->
+        <div class="info-card" v-if="display.occupants.length > 0">
+          <h3 class="card-title">PERSON(S) IN CHARGE</h3>
           <div class="card-body">
             <p v-for="(person, idx) in display.occupants" :key="idx" class="incharge-name">
               {{ person }}
             </p>
-            <p class="incharge-position" v-if="display.office">
-              Office: {{ display.office }}
-            </p>
-            <p class="incharge-email">
-              <a :href="'mailto:' + display.email" v-if="display.email">{{ display.email }}</a>
-              <span v-else>N/A</span>
-            </p>
-            <p class="incharge-phone" v-if="display.phone">Tel: {{ display.phone }}</p>
           </div>
         </div>
-
 
         <!-- 4. Thông tin mô tả -->
         <div class="info-card">
@@ -137,6 +129,10 @@ const closePanel = () => emit('close')
 
 const { getRoomInfo } = useVguData()
 
+// [FIX] Lấy baseURL giống HologramMap.vue — thiếu bước này khiến fetch luôn
+// 404 khi deploy lên GitHub Pages (baseURL: '/VGU_Map/'), vì $fetch('/data/...')
+// luôn trỏ vào domain gốc thay vì '/VGU_Map/data/...'. Trên localhost (baseURL='/')
+// thì không thấy lỗi, nên bug này rất dễ bị bỏ sót.
 const config = useRuntimeConfig()
 const base = config.app.baseURL
 
@@ -144,6 +140,7 @@ const isLoading = ref(false)
 const roomData = ref(null)
 const driveData = ref({})
 
+// Tải file JSON trực tiếp từ thư mục public khi component được gắn vào DOM
 onMounted(async () => {
   try {
     const res = await $fetch(`${base}data/drive_data.json`)
@@ -152,13 +149,17 @@ onMounted(async () => {
       console.log('[RoomDetailPanel] Đã load drive_data.json, số lượng phòng có ảnh:', Object.keys(res).length)
     }
   } catch (err) {
-    console.error('[RoomDetailPanel] Không thể load file drive_data.json:', err)
+    console.error('[RoomDetailPanel] Không thể load file drive_data.json (kiểm tra file có nằm ở public/data/drive_data.json không):', err)
   }
 })
 
+// Nếu ảnh từ lh3.googleusercontent.com bị lỗi (thường do file Drive chưa share
+// "Anyone with the link"), tự động thử lại bằng endpoint thumbnail dự phòng.
+// Nếu endpoint dự phòng cũng lỗi, ẩn ảnh và log rõ nguyên nhân.
 const onImageError = (event, index) => {
   const img = event.target
   if (img.dataset.fallbackTried) {
+    console.error(`[RoomDetailPanel] Ảnh #${index} vẫn lỗi sau khi thử fallback. Nhiều khả năng file Google Drive chưa được chia sẻ ở chế độ "Anyone with the link".`, img.src)
     img.style.display = 'none'
     return
   }
@@ -166,6 +167,7 @@ const onImageError = (event, index) => {
   const match = img.src.match(/\/d\/([^=]+)/)
   const fileId = match ? match[1] : null
   if (fileId) {
+    console.warn(`[RoomDetailPanel] Ảnh #${index} lỗi từ lh3, thử fallback sang drive.google.com/thumbnail cho fileId=${fileId}`)
     img.src = `https://drive.google.com/thumbnail?id=${fileId}&sz=w800`
   } else {
     img.style.display = 'none'
@@ -175,19 +177,6 @@ const onImageError = (event, index) => {
 const cleanData = (data) => {
   if (!data || data === '___' || data === '--' || data === 'Chưa cập nhật' || data === 'unknown') return ''
   return data
-}
-
-// Helper: Lọc bỏ tên bị lặp lại
-const formatRoomName = (name) => {
-  if (!name || typeof name !== 'string') return name
-  const parts = name.split(/\s*-\s*/)
-  if (parts.length > 1 && parts.length % 2 === 0) {
-    const halfIndex = parts.length / 2
-    const firstHalf = parts.slice(0, halfIndex).join(' - ')
-    const secondHalf = parts.slice(halfIndex).join(' - ')
-    if (firstHalf === secondHalf) return firstHalf
-  }
-  return name
 }
 
 const fetchRoom = async (id) => {
@@ -202,13 +191,18 @@ const fetchRoom = async (id) => {
 
 watch(() => props.roomId, fetchRoom, { immediate: true })
 
+// display() dùng shape đã chuẩn hoá sẵn bởi useVguData()/getRoomInfo — khớp
+// đúng dữ liệu thật từ Code.gs (room_number, heading_1/2, department,
+// occupant_display, fm_room_function, fm_room_type, area, capacity, status).
+// Sheet KHÔNG có office/email/phone hay danh sách thiết bị nổi bật riêng cho
+// từng phòng, nên các phần đó tạm để trống/rỗng cho tới khi có nguồn dữ liệu đó.
 const display = computed(() => {
   const r = roomData.value
   if (!r) {
     return {
       building: cleanData(props.buildingId),
       level: null,
-      name: formatRoomName(props.roomId || ''),
+      name: props.roomId || '',
       department: '',
       photos: [],
       occupants: [],
@@ -221,6 +215,9 @@ const display = computed(() => {
     }
   }
 
+  // --- CHECK ẢNH TỪ JSON (Dùng lh3.googleusercontent.com để hiển thị ảnh mượt mà) ---
+  // drive_data.json là file riêng (không phải info_data.json từ Code.gs), map
+  // room_number -> Google Drive fileId, vẫn giữ nguyên logic cũ.
   let photos = []
   const currentRoomId = props.roomId ? props.roomId.trim() : ''
 
@@ -229,25 +226,20 @@ const display = computed(() => {
     photos = [`https://lh3.googleusercontent.com/d/${fileId}=s800`]
   }
 
-  // Tách tên nhân sự bằng dấu phẩy để hiển thị trên nhiều dòng
-  let occupantsList = []
-  if (r.occupants) {
-    const occString = Array.isArray(r.occupants) ? r.occupants.join(', ') : r.occupants
-    occupantsList = occString.split(',').map(s => s.trim()).filter(Boolean)
-  }
-
   return {
     building: r.buildingId || cleanData(props.buildingId),
     level: r.floor ?? null,
-    name: formatRoomName(r.roomName),
+    name: r.roomName,
     department: r.department,
     photos,
-    occupants: occupantsList,
+    occupants: r.occupants,
     roomFunction: r.roomFunction,
     roomType: r.rawRoomType || 'N/A',
     area: r.area || 'N/A',
     capacity: r.capacity || 'N/A',
     status: r.rawStatus,
+    // Sheet hiện chưa có danh sách thiết bị nổi bật riêng cho từng phòng.
+    // Để rỗng cho tới khi có nguồn dữ liệu equipment (vd content/Equipment/*.md).
     instruments: []
   }
 })
