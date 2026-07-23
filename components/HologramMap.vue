@@ -1082,6 +1082,6 @@ onUnmounted(() => {
 
   :deep(.room-marker-card) { min-width: 84px; max-width: 130px; padding: 4px 8px; }
   :deep(.room-marker-id) { font-size: 9px; }
-  :deep(.room-marker-name) { font-size: 8px; -webkit-line-clamp: 1; }
+  :deep(.room-marker-name) { font-size: 8px; line-clamp: 1; -webkit-line-clamp: 1; }
 }
 </style>
