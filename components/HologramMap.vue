@@ -2,17 +2,47 @@
 <template>
   <div ref="mapContainer" class="map-container"></div>
 
-  <!-- ================= Thang máy chọn tầng (Elevator HUD) =================
-       Chỉ hiện khi đã chọn 1 tòa nhà. Mỗi nút là 1 tầng, có 3 trạng thái:
-       - active  : tầng đang xem (cam)
-       - detail  : tầng có phòng đã cập nhật thông tin chi tiết (cyan phát sáng)
-       - trơn    : tầng chỉ có hình khối, chưa có dữ liệu chi tiết
-       Nút ✕ dưới cùng để thoát khỏi tòa nhà, quay lại toàn cảnh campus. -->
-  <!-- ================= Thanh điều hướng tầng (ngang, dưới cùng, giữa màn hình) =================
-       Trước đây là HUD dọc bên trái ("thang máy") nhưng bị FloorPanel (panel danh
-       sách phòng theo tầng) che mất khi mở, không bấm đổi tầng / thoát toà được
-       nữa. Chuyển sang thanh ngang neo giữa dưới cùng để không bị FloorPanel
-       (neo trái) hay RoomDetailPanel (neo phải) che. Có kèm ô tìm phòng. -->
+  <!-- ================= Thanh tìm kiếm toàn cục (Global Search) ================= -->
+  <!-- Đứng độc lập, luôn hiển thị. Sẽ tự thay đổi placeholder và logic lọc khi click vào toà -->
+  <div class="global-search-container">
+    <div class="search-wrapper">
+      <!-- Icon kính lúp -->
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input
+        v-model="searchQuery"
+        type="text"
+        class="global-search-input"
+        :placeholder="currentBuildingId ? `Tìm phòng trong toà ${currentBuildingId}…` : 'Tìm phòng trên toàn Campus…'"
+        @input="onSearchInput"
+        @focus="onSearchInput"
+      />
+    </div>
+    
+    <div v-if="searchResults.length > 0" class="global-search-results">
+      <button
+        v-for="r in searchResults"
+        :key="r.id"
+        class="global-search-item"
+        @click="goToRoom(r)"
+      >
+        <div class="rs-info">
+          <span class="rs-id">{{ r.roomNumber }}</span>
+          <!-- Hàm lọc lặp tên vẫn được giữ nguyên -->
+          <span class="rs-name">{{ formatRoomName(r.roomName) }}</span>
+        </div>
+        <!-- Chỉ hiện thẻ tên Toà nếu đang tìm ở chế độ Campus -->
+        <span v-if="!currentBuildingId" class="rs-building">{{ r.buildingId }}</span>
+      </button>
+    </div>
+    <div v-else-if="searchQuery.trim() && !isSearching" class="global-search-results">
+      <div class="room-search-empty">Không tìm thấy phòng phù hợp.</div>
+    </div>
+  </div>
+
+  <!-- ================= Thang máy chọn tầng (Elevator HUD) ================= -->
   <Transition name="hud-slide">
     <div v-if="currentBuildingId" class="floor-bar" role="group" :aria-label="`Chọn tầng toà ${currentBuildingId}`">
       <button class="floor-btn exit-btn" aria-label="Thoát khỏi toà nhà, về toàn cảnh" title="Thoát khỏi toà nhà" @click="exitBuilding">
@@ -36,33 +66,6 @@
       >
         L{{ floor }}
       </button>
-
-      <!-- Ô tìm phòng: gõ mã/tên phòng, chọn kết quả để nhảy thẳng tới phòng đó
-           (tự chuyển toà + tầng nếu khác toà đang xem). -->
-      <div class="room-search">
-        <input
-          v-model="searchQuery"
-          type="text"
-          class="room-search-input"
-          placeholder="Tìm phòng…"
-          @input="onSearchInput"
-          @focus="onSearchInput"
-        />
-        <div v-if="searchResults.length > 0" class="room-search-results">
-          <button
-            v-for="r in searchResults"
-            :key="r.id"
-            class="room-search-item"
-            @click="goToRoom(r)"
-          >
-            <span class="rs-id">{{ r.roomNumber }}</span>
-            <span class="rs-name">{{ r.roomName }}</span>
-          </button>
-        </div>
-        <div v-else-if="searchQuery.trim() && !isSearching" class="room-search-results">
-          <div class="room-search-empty">Không tìm thấy phòng phù hợp.</div>
-        </div>
-      </div>
     </div>
   </Transition>
 
@@ -89,29 +92,22 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
-
-// [FIX] Thêm import Component Panel vào đây
 import RoomDetailPanel from '~/components/RoomDetailPanel.vue'
 
 const { searchRooms } = useVguData()
 
-// ----------------------------------------------------
-// [CẬP NHẬT] Lấy baseURL để sửa lỗi fetch file trên GitHub Pages
-// ----------------------------------------------------
 const config = useRuntimeConfig()
 const base = config.app.baseURL
 
 const mapContainer = ref(null)
 let map = null
 
-// Emit events lên parent
 const emit = defineEmits(['room-selected', 'building-selected', 'floor-selected', 'ready'])
 
-// Props từ parent (nếu cần)
 const props = defineProps({
   initialCenter: {
     type: Array,
-    default: () => [106.6155, 11.1083] // Tọa độ VGU
+    default: () => [106.6155, 11.1083]
   },
   initialZoom: {
     type: Number,
@@ -125,67 +121,47 @@ const props = defineProps({
 
 const INITIAL_BEARING = -17.6
 
-// Cấu hình tầng theo tòa nhà (building_id -> [tầng...]), load 1 lần
 let floorsConfig = {}
-// Cache dữ liệu geojson của từng tầng đã fetch, tránh load lại
 const floorCache = new Map()
-// Tâm (centroid) mỗi tòa nhà, tính từ campus-buildings.json sau khi load
 let buildingCenters = {}
-// Bản đồ tên phòng: room_id -> { en, vi } (chỉ có cho AD, B3)
 const roomNameMap = ref({})
 
-// ----------------------------------------------------------------
-// Hệ số biến đổi Affine: CAD-XY (mét cục bộ, gốc riêng từng tòa) -> lat/lng thật.
-// lon = a*x + b*y + c ; lat = d*x + e*y + f
-// ----------------------------------------------------------------
+const formatRoomName = (name) => {
+  if (!name || typeof name !== 'string') return name
+  const parts = name.split(/\s*-\s*/)
+  if (parts.length > 1 && parts.length % 2 === 0) {
+    const halfIndex = parts.length / 2
+    const firstHalf = parts.slice(0, halfIndex).join(' - ')
+    const secondHalf = parts.slice(halfIndex).join(' - ')
+    if (firstHalf === secondHalf) return firstHalf
+  }
+  return name
+}
+
 const BUILDING_AFFINE = {
   B1: {
-    a: 8.953441376466221e-9,
-    b: -3.1497975865435756e-9,
-    c: 106.61539732322666,
-    d: 3.182455243237762e-9,
-    e: 8.530074661663595e-9,
-    f: 11.108226425177252
+    a: 8.953441376466221e-9, b: -3.1497975865435756e-9, c: 106.61539732322666,
+    d: 3.182455243237762e-9, e: 8.530074661663595e-9, f: 11.108226425177252
   },
   B5: {
-    a: 9.348060047786096e-9,
-    b: -3.137160929858734e-9,
-    c: 106.61606158856533,
-    d: 3.3218630132168528e-9,
-    e: 8.497975978545847e-9,
-    f: 11.108450685256834
+    a: 9.348060047786096e-9, b: -3.137160929858734e-9, c: 106.61606158856533,
+    d: 3.3218630132168528e-9, e: 8.497975978545847e-9, f: 11.108450685256834
   },
   AD: {
-    a: 8.766061793685426e-9,
-    b: -2.9401918155464064e-9,
-    c: 106.61628563445295,
-    d: 2.949511826570467e-9,
-    e: 8.738362378840202e-9,
-    f: 11.107702556018145
+    a: 8.766061793685426e-9, b: -2.9401918155464064e-9, c: 106.61628563445295,
+    d: 2.949511826570467e-9, e: 8.738362378840202e-9, f: 11.107702556018145
   },
   B2: {
-    a: 8.934000874052131e-9,
-    b: -3.0617993522497056e-9,
-    c: 106.61556743104268,
-    d: 3.2196508335119185e-9,
-    e: 8.496017971414428e-9,
-    f: 11.107734813646012
+    a: 8.934000874052131e-9, b: -3.0617993522497056e-9, c: 106.61556743104268,
+    d: 3.2196508335119185e-9, e: 8.496017971414428e-9, f: 11.107734813646012
   },
   B3: {
-    a: 8.936440007959682e-9,
-    b: -3.0696022659468247e-9,
-    c: 106.61564963590135,
-    d: 3.243586829736276e-9,
-    e: 8.457006822971136e-9,
-    f: 11.107323754174958
+    a: 8.936440007959682e-9, b: -3.0696022659468247e-9, c: 106.61564963590135,
+    d: 3.243586829736276e-9, e: 8.457006822971136e-9, f: 11.107323754174958
   },
   B6: {
-    a: 8.875957765081311e-9,
-    b: -3.145148965918998e-9,
-    c: 106.6163603769583,
-    d: 3.2835800566738925e-9,
-    e: 8.501705317206016e-9,
-    f: 11.107779247247372
+    a: 8.875957765081311e-9, b: -3.145148965918998e-9, c: 106.6163603769583,
+    d: 3.2835800566738925e-9, e: 8.501705317206016e-9, f: 11.107779247247372
   }
 }
 
@@ -204,11 +180,7 @@ function transformRing(ring, coeffs) {
 
 function transformBuildingGeojson(buildingId, geojson) {
   const coeffs = BUILDING_AFFINE[buildingId]
-  if (!coeffs) {
-    console.warn(`[HologramMap] Chưa có hệ số affine cho tòa ${buildingId} — toạ độ phòng có thể sai vị trí thật.`)
-    return geojson
-  }
-
+  if (!coeffs) return geojson
   return {
     type: 'FeatureCollection',
     features: geojson.features.map(f => ({
@@ -319,7 +291,6 @@ async function loadCampusBuildings() {
     }
 
     map.addSource('vgu-campus', { type: 'geojson', data })
-
     map.addLayer({
       id: 'vgu-buildings-3d',
       type: 'fill-extrusion',
@@ -331,14 +302,12 @@ async function loadCampusBuildings() {
         'fill-extrusion-opacity': 0.9
       }
     })
-
     map.addLayer({
       id: 'vgu-buildings-outline',
       type: 'line',
       source: 'vgu-campus',
       paint: { 'line-color': '#EF5A24', 'line-width': 1, 'line-opacity': 0.6 }
     })
-
     map.addLayer({
       id: 'vgu-selected-3d',
       type: 'fill-extrusion',
@@ -351,7 +320,6 @@ async function loadCampusBuildings() {
       },
       filter: ['==', ['get', 'building_id'], '']
     })
-
     map.addLayer({
       id: 'vgu-selected-outline',
       type: 'line',
@@ -359,8 +327,6 @@ async function loadCampusBuildings() {
       paint: { 'line-color': '#EF5A24', 'line-width': 3, 'line-opacity': 0.95 },
       filter: ['==', ['get', 'building_id'], '']
     })
-
-    console.log('[HologramMap] Campus buildings loaded')
   } catch (error) {
     console.error('[HologramMap] Failed to load campus buildings:', error)
   }
@@ -371,7 +337,6 @@ async function initRoomsLayer() {
     type: 'geojson',
     data: { type: 'FeatureCollection', features: [] }
   })
-
   map.addLayer({
     id: 'vgu-rooms-fill',
     type: 'fill',
@@ -386,7 +351,6 @@ async function initRoomsLayer() {
       'fill-opacity': 0.35
     }
   })
-
   map.addLayer({
     id: 'vgu-rooms-outline',
     type: 'line',
@@ -418,9 +382,8 @@ async function loadRoomNames() {
       if (en || vi) map_[key] = { en, vi }
     }
     roomNameMap.value = map_
-    console.log('[HologramMap] Room names loaded:', Object.keys(map_).length)
   } catch (error) {
-    console.warn('[HologramMap] Không tải được info_data.json (tên phòng):', error)
+    console.warn('[HologramMap] Không tải được info_data.json:', error)
   }
 }
 
@@ -455,7 +418,6 @@ async function selectBuilding(buildingId) {
 
   const defaultFloor = availableFloors.value[0] ?? null
   emit('building-selected', { buildingId, floor: defaultFloor })
-
   if (defaultFloor != null) selectFloor(defaultFloor)
 }
 
@@ -489,7 +451,18 @@ function onSearchInput() {
   searchDebounce = setTimeout(async () => {
     isSearching.value = true
     try {
-      searchResults.value = await searchRooms(q, 8)
+      // [FIX] Lấy nhiều kết quả hơn (VD: 50) để tự do lọc trên máy khách nếu đang ở trong 1 toà
+      const rawResults = await searchRooms(q, 50)
+      
+      if (currentBuildingId.value) {
+        // Lọc kết quả thuộc toà đang xem, sau đó cắt lấy top 8
+        searchResults.value = rawResults
+          .filter(r => r.buildingId === currentBuildingId.value)
+          .slice(0, 8)
+      } else {
+        // Đang xem toàn trường
+        searchResults.value = rawResults.slice(0, 8)
+      }
     } finally {
       isSearching.value = false
     }
@@ -535,6 +508,10 @@ function exitBuilding() {
   availableFloors.value = []
   isGeolocated.value = false
   currentBuildingGeojson = null
+  
+  // Dọn dẹp ô tìm kiếm
+  searchQuery.value = ''
+  searchResults.value = []
 
   clearRoomMarkers()
 
@@ -591,7 +568,7 @@ function renderRoomMarkers(floorNumber) {
       </div>
       <div class="room-marker-card">
         <div class="room-marker-id">${roomId}</div>
-        ${label ? `<div class="room-marker-name">${label}</div>` : ''}
+        ${label ? `<div class="room-marker-name">${formatRoomName(label)}</div>` : ''}
       </div>
     `
     el.addEventListener('click', (e) => {
@@ -642,7 +619,6 @@ onUnmounted(() => {
 }
 :deep(.maplibregl-ctrl button) { background: transparent; color: #00ffcc; }
 :deep(.maplibregl-ctrl button:hover) { background: rgba(239, 90, 36, 0.2); }
-
 :deep(.maplibregl-popup-content) {
   background: rgba(15, 30, 54, 0.95);
   border: 1px solid rgba(239, 90, 36, 0.4);
@@ -651,6 +627,131 @@ onUnmounted(() => {
   backdrop-filter: blur(8px);
 }
 :deep(.maplibregl-popup-tip) { border-top-color: rgba(15, 30, 54, 0.95); }
+
+
+/* ================= Thanh tìm kiếm TOÀN CỤC (Mới) ================= */
+.global-search-container {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 70;
+  width: 320px;
+  max-width: 90vw;
+}
+
+.search-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: #94a3b8;
+}
+
+.global-search-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 16px 0 40px; /* Nhường chỗ cho icon */
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(11, 17, 32, 0.85);
+  color: #fff;
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  outline: none;
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.global-search-input::placeholder { color: rgba(255, 255, 255, 0.5); }
+
+.global-search-input:focus {
+  border-color: #EF5A24;
+  background: rgba(11, 17, 32, 0.95);
+}
+
+.global-search-results {
+  margin-top: 8px;
+  width: 100%;
+  max-height: 320px;
+  overflow-y: auto;
+  background: rgba(11, 17, 32, 0.95);
+  border: 1px solid rgba(239, 90, 36, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  backdrop-filter: blur(8px);
+}
+
+.global-search-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 12px;
+  cursor: pointer;
+  color: #e2e8f0;
+  transition: background 0.15s;
+}
+
+.global-search-item:hover { background: rgba(239, 90, 36, 0.15); }
+
+.rs-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rs-id {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: #EF5A24;
+}
+
+.rs-name { 
+  font-size: 11px; 
+  color: #94a3b8; 
+}
+
+.rs-building {
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  background: rgba(255,255,255,0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 10px;
+}
+
+.room-search-empty {
+  padding: 10px;
+  font-size: 11px;
+  color: #64748b;
+  text-align: center;
+}
+
+/* Scrollbar cho search results */
+.global-search-results::-webkit-scrollbar { width: 6px; }
+.global-search-results::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
 
 /* ================= Thang máy chọn tầng ================= */
 .floor-bar {
@@ -702,7 +803,6 @@ onUnmounted(() => {
   color: #fff;
 }
 
-/* Tầng có dữ liệu chi tiết -> viền + chữ cyan phát sáng */
 .floor-btn.detail {
   border-color: rgba(6, 182, 212, 0.6);
   background: rgba(6, 182, 212, 0.08);
@@ -711,7 +811,6 @@ onUnmounted(() => {
 }
 .floor-btn.detail:hover { color: #fff; border-color: #06B6D4; }
 
-/* Tầng đang xem -> cam đặc, phát sáng mạnh */
 .floor-btn.active {
   background: #EF5A24;
   border-color: #EF5A24;
@@ -727,75 +826,11 @@ onUnmounted(() => {
 }
 .exit-btn:hover { background: rgba(239, 90, 36, 0.12); color: #fff; }
 
-/* ================= Ô tìm kiếm phòng (trong floor-bar) ================= */
-.room-search {
-  position: relative;
-  margin-left: 4px;
-}
-.room-search-input {
-  width: 150px;
-  height: 34px;
-  padding: 0 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(5, 10, 18, 0.6);
-  color: #fff;
-  font-family: 'Space Mono', monospace;
-  font-size: 12px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-.room-search-input::placeholder { color: rgba(255, 255, 255, 0.4); }
-.room-search-input:focus { border-color: #EF5A24; }
-.room-search-results {
-  position: absolute;
-  bottom: calc(100% + 10px);
-  left: 50%;
-  transform: translateX(-50%);
-  width: 240px;
-  max-height: 260px;
-  overflow-y: auto;
-  background: rgba(11, 17, 32, 0.97);
-  border: 1px solid rgba(239, 90, 36, 0.3);
-  border-radius: 10px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  padding: 6px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.room-search-item {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  text-align: left;
-  background: transparent;
-  border: none;
-  border-radius: 6px;
-  padding: 8px 10px;
-  cursor: pointer;
-  color: #e2e8f0;
-  transition: background 0.15s;
-}
-.room-search-item:hover { background: rgba(239, 90, 36, 0.15); }
-.rs-id {
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  font-weight: 700;
-  color: #EF5A24;
-}
-.rs-name { font-size: 11px; color: #94a3b8; }
-.room-search-empty {
-  padding: 10px;
-  font-size: 11px;
-  color: #64748b;
-  text-align: center;
-}
 
 /* ================= Thông báo chưa định vị ================= */
 .calib-notice {
   position: absolute;
-  bottom: 40px;
+  bottom: 80px; /* Đẩy lên một chút cho đỡ cấn thanh tầng */
   left: 50%;
   transform: translateX(-50%);
   z-index: 20;
@@ -910,7 +945,6 @@ onUnmounted(() => {
 .fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
 
-/* Tôn trọng người dùng tắt hiệu ứng chuyển động */
 @media (prefers-reduced-motion: reduce) {
   :deep(.room-ping) { animation: none; opacity: 0.4; }
   .calib-dot { animation: none; }
@@ -918,11 +952,13 @@ onUnmounted(() => {
   .fade-enter-active, .fade-leave-active { transition: none; }
 }
 
-/* Responsive: thu nhỏ thang máy trên màn hình hẹp */
 @media (max-width: 640px) {
   .floor-bar { gap: 6px; padding: 6px 8px; max-width: 94vw; }
-  .room-search-input { width: 96px; }
   .floor-btn { width: 34px; height: 34px; font-size: 11px; }
+  
+  .global-search-container { width: 90vw; }
+  .global-search-input { font-size: 12px; }
+
   :deep(.room-marker-card) { min-width: 84px; max-width: 130px; padding: 4px 8px; }
   :deep(.room-marker-id) { font-size: 9px; }
   :deep(.room-marker-name) { font-size: 8px; -webkit-line-clamp: 1; }
