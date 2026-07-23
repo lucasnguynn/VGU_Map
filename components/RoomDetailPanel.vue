@@ -24,8 +24,7 @@
       <div v-if="isLoading" class="state-msg">Đang tải dữ liệu phòng…</div>
 
       <template v-else>
-        <!-- 2. Ảnh thực tế — luôn có khung (frame) cố định kích thước, không phụ
-             thuộc ảnh tải được hay không, để không bao giờ "biến mất" như trước -->
+        <!-- 2. Ảnh thực tế — Đã cấu hình để khung tự động co giãn ôm sát theo tỷ lệ ảnh -->
         <div class="photo-section">
           <div v-if="display.photos && display.photos.length > 0" class="photo-grid" :class="{'single-photo': display.photos.length === 1}">
             <div
@@ -38,7 +37,7 @@
                 <span class="spinner-ring"></span>
               </div>
 
-              <!-- Ảnh thật: Đổi v-show thành opacity class để đảm bảo event @load luôn chạy -->
+              <!-- Ảnh thật -->
               <img
                 :class="['room-image', { 'is-loaded': photoStates[index] === 'loaded' }]"
                 :src="photo"
@@ -73,7 +72,7 @@
           </div>
         </div>
 
-        <!-- 3. Thông tin nhân sự (Đã được xử lý để xuống dòng) -->
+        <!-- 3. Thông tin nhân sự -->
         <div class="info-card" v-if="display.occupants.length > 0 || display.office || display.email">
           <h3 class="card-title highlight-title">ROOM INCHARGE</h3>
           <div class="card-body">
@@ -278,9 +277,9 @@ const display = computed(() => {
     department: r.department,
     photos,
     occupants: occupantsList,
-    office: r.office || '',   // Đã bổ sung biến
-    email: r.email || '',     // Đã bổ sung biến
-    phone: r.phone || '',     // Đã bổ sung biến
+    office: r.office || '',   
+    email: r.email || '',     
+    phone: r.phone || '',     
     roomFunction: r.roomFunction,
     roomType: r.rawRoomType || 'N/A',
     area: r.area || 'N/A',
@@ -368,11 +367,13 @@ const display = computed(() => {
   color: #94a3b8;
   font-size: 13px;
 }
+
+/* [CẬP NHẬT] Đảm bảo phần hình ảnh không bị chèn ép */
 .photo-section {
   width: 100%;
   border-radius: 8px;
   overflow: hidden;
-  flex-shrink: 0; /* [QUAN TRỌNG] Ngăn chặn flexbox tự động bóp ép chiều cao ảnh khi nội dung info-card dài ra */
+  flex-shrink: 0; 
 }
 .photo-grid {
   display: grid;
@@ -382,10 +383,12 @@ const display = computed(() => {
 .photo-grid.single-photo {
   grid-template-columns: 1fr;
 }
+
+/* [CẬP NHẬT] Bỏ height cố định để tự động kéo dài/thu ngắn theo tỷ lệ ảnh thực tế */
 .photo-frame {
   position: relative;
   width: 100%;
-  height: 160px;
+  min-height: 120px; /* Vẫn cần 1 khoảng nhỏ tối thiểu để hiện spinner xoay khi chờ load */
   background-color: #1e293b;
   border: 1px solid #334155;
   border-radius: 6px;
@@ -394,16 +397,21 @@ const display = computed(() => {
   align-items: center;
   justify-content: center;
 }
+
+/* [CẬP NHẬT] Auto height và dùng contain để giữ nguyên vẹn hình ảnh bản vẽ */
 .room-image {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto; 
+  max-height: 350px; /* Giới hạn độ dài tối đa tránh việc panel bị lấn chiếm toàn màn hình */
+  object-fit: contain; 
+  display: block; 
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 .room-image.is-loaded {
   opacity: 1;
 }
+
 .frame-spinner {
   position: absolute;
   inset: 0;
@@ -463,7 +471,7 @@ const display = computed(() => {
   border: 1px solid #1e293b;
   border-radius: 8px;
   padding: 16px;
-  flex-shrink: 0; /* Ngăn chặn khối thông tin bị bóp hẹp */
+  flex-shrink: 0; 
 }
 .card-title {
   font-size: 10px;
