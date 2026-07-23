@@ -3,6 +3,7 @@
     <!-- Luồng 3D chỉ chạy ở client -->
     <ClientOnly fallback-tag="div" fallback-class="loading-overlay">
       <HologramMap
+        ref="hologramMapRef"
         @room-selected="handleRoomSelected"
         @building-selected="handleBuildingSelected"
         @floor-selected="handleFloorSelected"
@@ -64,7 +65,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onBeforeUnmount } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useMapStore } from '~/Stores/mapStores'
 import HologramMap from '~/components/HologramMap.vue'
@@ -73,6 +74,7 @@ import FloorPanel from '~/components/FloorPanel.vue'
 
 const mapStore = useMapStore()
 const { selectedRoom, selectedBuilding, selectedFloor, isLoading } = storeToRefs(mapStore)
+const hologramMapRef = ref(null)
 
 const contextTitle = computed(() => {
   if (!selectedBuilding.value) return 'TIÊU ĐIỂM: TOÀN CẢNH KHUÔN VIÊN VGU'
@@ -90,9 +92,18 @@ const handleFloorSelected = ({ floor }) => {
   mapStore.setFloor(floor)
 }
 const closePanel = () => mapStore.clearSelection()
-// Nhấn phòng trong FloorPanel -> mở RoomDetailPanel bên phải, giữ nguyên FloorPanel bên trái.
+// Nhấn phòng trong FloorPanel -> bay camera zoom vào đúng phòng trên map
+// (giống hệt bấm thẳng vào phòng), đồng thời mở RoomDetailPanel bên phải.
+// goToRoom() bên trong HologramMap tự emit 'room-selected' -> handleRoomSelected
+// ở trên sẽ cập nhật store, nên không cần gọi mapStore.focusOnRoom ở đây nữa.
 const handleFloorRoomSelect = ({ roomId, buildingId }) => {
-  mapStore.focusOnRoom(roomId, buildingId ?? selectedBuilding.value, selectedFloor.value)
+  const bId = buildingId ?? selectedBuilding.value
+  if (hologramMapRef.value?.goToRoom) {
+    hologramMapRef.value.goToRoom({ id: roomId, buildingId: bId, floor: selectedFloor.value })
+  } else {
+    // Dự phòng nếu ref chưa sẵn sàng (ví dụ map chưa mount xong)
+    mapStore.focusOnRoom(roomId, bId, selectedFloor.value)
+  }
 }
 
 const onMapReady = () => { isLoading.value = false }
