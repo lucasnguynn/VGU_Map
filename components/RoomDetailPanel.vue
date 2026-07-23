@@ -45,7 +45,7 @@
           </div>
         </div>
 
-        <!-- 3. Thông tin nhân sự (Đã xóa tiêu đề và chữ Room Incharge, hỗ trợ nhiều người) -->
+        <!-- 3. Thông tin nhân sự (Hỗ trợ nhiều người) -->
         <div class="info-card" v-if="display.occupants.length > 0 || display.office || display.email">
           <div class="card-body">
             <!-- Vòng lặp hiển thị từng staff trên một dòng -->
@@ -63,11 +63,10 @@
           </div>
         </div>
 
-        <!-- 4. Thông tin mô tả (Room Description - Đã xuống dòng) -->
+        <!-- 4. Thông tin mô tả (Tách xuống dòng) -->
         <div class="info-card">
           <h3 class="card-title">ROOM DESCRIPTION</h3>
           <div class="card-body">
-            <!-- Tách từng thông tin ra các thẻ p riêng biệt -->
             <p><strong>Phân loại:</strong> {{ display.roomType }}</p>
             <p><strong>Diện tích:</strong> {{ display.area }} m2</p>
             <p><strong>Sức chứa:</strong> {{ display.capacity }}</p>
@@ -106,7 +105,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 
 const props = defineProps({
   roomId: { type: String, default: null },
@@ -120,6 +119,19 @@ const { getRoomInfo } = useVguData()
 
 const isLoading = ref(false)
 const roomData = ref(null)
+
+// 1. Biến lưu trữ dữ liệu ảnh từ JSON
+const roomImageMap = ref({})
+
+// 2. Fetch file JSON từ thư mục public khi Component vừa mount
+onMounted(async () => {
+  try {
+    const data = await $fetch('/data/drive_data.json')
+    if (data) roomImageMap.value = data
+  } catch (error) {
+    console.error('Không thể tải file drive_data.json:', error)
+  }
+})
 
 const cleanData = (data) => {
   if (!data || data === '___' || data === '--' || data === 'Chưa cập nhật' || data === 'unknown') return ''
@@ -159,8 +171,11 @@ const display = computed(() => {
     }
   }
 
+  // --- UPDATE ẢNH TỪ BIẾN JSON ĐÃ FETCH ---
   let photos = []
-  if (r.image) {
+  if (props.roomId && roomImageMap.value[props.roomId]) {
+    photos = [`https://drive.google.com/uc?export=view&id=${roomImageMap.value[props.roomId]}`]
+  } else if (r.image) {
     photos = Array.isArray(r.image) ? r.image.filter(Boolean) : [r.image]
   }
 
@@ -168,34 +183,27 @@ const display = computed(() => {
     ? r.departments.map(cleanData).filter(Boolean).join(', ')
     : cleanData(r.departments)
 
-  // 1. XỬ LÝ LỖI LẶP TÊN PHÒNG (VD: "OFFICE - OFFICE")
-  // 1. XỬ LÝ LỖI LẶP TÊN PHÒNG (Nâng cấp)
+  // XỬ LÝ LỖI LẶP TÊN PHÒNG (Nâng cấp)
   let roomName = cleanData(r.name) || props.roomId;
   if (typeof roomName === 'string' && roomName.includes('-')) {
     const parts = roomName.split('-').map(p => p.trim());
-    
-    // Nếu số phần tử chẵn (ví dụ chia thành 2, 4, 6 phần), cắt đôi mảng ra so sánh
     if (parts.length > 1 && parts.length % 2 === 0) {
       const halfIndex = parts.length / 2;
       const firstHalf = parts.slice(0, halfIndex).join(' - ');
       const secondHalf = parts.slice(halfIndex).join(' - ');
-      
-      // Nếu nửa đầu và nửa sau giống hệt nhau -> Lấy nửa đầu
       if (firstHalf === secondHalf) {
         roomName = firstHalf;
       }
     }
   }
 
-  // Tách tên nhân sự bằng dấu xuống dòng (\n) thành mảng các tên riêng biệt
-  // 2. XỬ LÝ NHIỀU NHÂN SỰ
+  // XỬ LÝ NHIỀU NHÂN SỰ
   let occupantsList = [];
   const rawName = r.head_of_lab ? cleanData(r.head_of_lab.name) : '';
   if (rawName) {
     if (Array.isArray(rawName)) {
       occupantsList = rawName.map(cleanData).filter(Boolean);
     } else if (typeof rawName === 'string') {
-      // Tách chuỗi bằng dấu phẩy (,) VÀ dấu xuống dòng (\n) để phòng hờ mọi trường hợp
       occupantsList = rawName.split(/,|\r?\n/).map(name => name.trim()).filter(Boolean);
     }
   }
@@ -205,12 +213,11 @@ const display = computed(() => {
     level: r.floor ?? null,
     name: roomName,
     department: departments,
-    photos,
-    occupants: occupantsList, // Trả về mảng chứa tên các staff
+    photos, 
+    occupants: occupantsList, 
     office: r.head_of_lab ? cleanData(r.head_of_lab.office) : '',
     email: r.head_of_lab ? cleanData(r.head_of_lab.email) : '',
     phone: r.head_of_lab ? cleanData(r.head_of_lab.phone) : '',
-    // 3. TÁCH DỮ LIỆU DESCRIPTION ĐỂ XUỐNG DÒNG
     roomType: cleanData(r.room_type) || 'N/A',
     area: cleanData(r.area_m2) || 'N/A',
     capacity: cleanData(r.capacity) || 'N/A',
@@ -329,12 +336,12 @@ const display = computed(() => {
 .no-photo-placeholder {
   width: 100%;
   height: 180px;
-  background-color: #f1f5f9;
+  background-color: #1e293b;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 6px;
-  color: #475569;
+  color: #94a3b8;
   text-align: center;
 }
 .placeholder-content svg {
