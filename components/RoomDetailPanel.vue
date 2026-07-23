@@ -178,16 +178,16 @@ const display = computed(() => {
     }
   }
 
-  // 2. XỬ LÝ NHIỀU NHÂN SỰ
   // Tách tên nhân sự bằng dấu xuống dòng (\n) thành mảng các tên riêng biệt
+  // 2. XỬ LÝ NHIỀU NHÂN SỰ
   let occupantsList = [];
   const rawName = r.head_of_lab ? cleanData(r.head_of_lab.name) : '';
   if (rawName) {
     if (Array.isArray(rawName)) {
       occupantsList = rawName.map(cleanData).filter(Boolean);
     } else if (typeof rawName === 'string') {
-      // Cắt chuỗi dựa trên dấu xuống dòng (hỗ trợ cả \n và \r\n từ Excel)
-      occupantsList = rawName.split(/\r?\n/).map(name => name.trim()).filter(Boolean);
+      // Tách chuỗi bằng dấu phẩy (,) VÀ dấu xuống dòng (\n) để phòng hờ mọi trường hợp
+      occupantsList = rawName.split(/,|\r?\n/).map(name => name.trim()).filter(Boolean);
     }
   }
 
