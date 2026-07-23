@@ -20,7 +20,11 @@ export const useVguData = () => {
       const room = await queryContent()
         .where({ room_id: roomId })
         .findOne()
-      return room || null
+      // Chuẩn hoá về field name mà RoomDetailPanel.vue mong đợi (roomName,
+      // buildingId, rawRoomType, area, capacity, rawStatus…) — trước đây hàm
+      // này trả thẳng bản ghi thô (name, building_id, room_type, area_m2…),
+      // không khớp field RoomDetailPanel đọc, nên panel luôn hiện "N/A".
+      return room ? { ...normalizeRoom(room), roomFunction: '' } : null
     } catch (error) {
       console.error(`[useVguData] Không lấy được thông tin phòng ${roomId}:`, error)
       return null
