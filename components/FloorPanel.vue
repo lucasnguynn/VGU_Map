@@ -140,8 +140,11 @@ const handleSelectRoom = (room) => {
 
 <style scoped>
 .floor-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 280px;
-  height: 100%;
+  height: 100vh;
   background-color: #0b1120;
   border-right: 1px solid #1f2d40;
   display: flex;
@@ -150,6 +153,8 @@ const handleSelectRoom = (room) => {
   font-family: 'Inter', sans-serif;
   padding: 16px 16px 0;
   overflow: hidden;
+  box-shadow: 4px 0 15px rgba(0,0,0,0.5);
+  z-index: 90;
 }
 .breadcrumb {
   font-size: 11px;
