@@ -1,6 +1,6 @@
 <template>
   <div class="floor-panel" :class="{ 'is-collapsed': isCollapsed }">
-    <!-- Nút Toggle thu gọn/mở rộng (giống Gemini) -->
+    <!-- Nút Toggle thu gọn/mở rộng -->
     <button class="toggle-btn" @click="isCollapsed = !isCollapsed" :title="isCollapsed ? 'Mở danh sách phòng' : 'Thu gọn'">
       <svg v-if="!isCollapsed" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
@@ -118,7 +118,13 @@ const loadRooms = async () => {
   isLoading.value = true
   loadError.value = ''
   try {
-    rooms.value = await getRoomsByFloor(props.buildingId, props.floor)
+    const fetchedRooms = await getRoomsByFloor(props.buildingId, props.floor)
+    
+    // [FIX LOGIC CONFLICT] 
+    // Ép kiểu về chuỗi (String) để lọc triệt để các phòng khớp với tầng hiện tại.
+    // Việc này cũng giúp hàm tính toán số lượng phòng ở các Tabs hoạt động đúng.
+    rooms.value = fetchedRooms.filter(r => String(r.floor) === String(props.floor))
+
   } catch (err) {
     console.error('[FloorPanel] Lỗi khi tải danh sách phòng theo tầng:', err)
     loadError.value = 'Không tải được dữ liệu phòng. Vui lòng thử lại sau.'
@@ -131,7 +137,6 @@ const loadRooms = async () => {
 
 watch(() => [props.buildingId, props.floor], () => {
   loadRooms()
-  // Tự động mở lại panel nếu người dùng đổi tầng hoặc tòa nhà
   isCollapsed.value = false 
 }, { immediate: true })
 onMounted(loadRooms)
@@ -182,12 +187,10 @@ const handleSelectRoom = (room) => {
   font-family: 'Inter', sans-serif;
   box-shadow: 4px 0 15px rgba(0,0,0,0.5);
   z-index: 90;
-  /* Thêm hiệu ứng trượt cho toàn bộ panel */
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: visible; /* Để nút toggle tràn ra ngoài */
+  overflow: visible;
 }
 
-/* Kích hoạt khi biến isCollapsed = true */
 .floor-panel.is-collapsed {
   transform: translateX(-100%);
 }
@@ -198,36 +201,45 @@ const handleSelectRoom = (room) => {
   width: 100%;
   height: 100%;
   padding: 16px 16px 0;
-  overflow: hidden; /* Cắt phần nội dung bị dư */
+  overflow: hidden;
 }
 
-/* --- Thiết kế nút Toggle --- */
+/* NÚT TOGGLE */
 .toggle-btn {
   position: absolute;
-  top: 16px;
-  right: -36px; /* Đẩy ra ngoài panel */
-  width: 36px;
-  height: 36px;
-  background-color: #0b1120;
-  border: 1px solid #1f2d40;
-  border-left: none; /* Nối liền mạch với panel */
-  border-radius: 0 8px 8px 0;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  background-color: transparent; 
+  border: none;
+  border-radius: 6px;
   color: #94a3b8;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   z-index: 91;
-  transition: color 0.2s, background-color 0.2s;
-  box-shadow: 4px 0 10px rgba(0,0,0,0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .toggle-btn:hover {
   color: #f1f5f9;
-  background-color: #1e293b;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Các styles cũ của bạn */
+.floor-panel.is-collapsed .toggle-btn {
+  right: -36px;
+  top: 16px;
+  width: 36px;
+  height: 36px;
+  background-color: #0b1120;
+  border: 1px solid #1f2d40;
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+  box-shadow: 4px 0 10px rgba(0,0,0,0.3);
+}
+
 .breadcrumb {
   font-size: 11px;
   letter-spacing: 0.5px;
@@ -235,6 +247,7 @@ const handleSelectRoom = (room) => {
   margin-bottom: 10px;
   text-transform: uppercase;
   flex-shrink: 0;
+  padding-right: 32px; 
 }
 .breadcrumb .crumb.active {
   color: #f1f5f9;
@@ -249,6 +262,7 @@ const handleSelectRoom = (room) => {
   font-weight: 700;
   color: #fff;
   flex-shrink: 0;
+  padding-right: 32px; 
 }
 .type-tabs {
   display: flex;
