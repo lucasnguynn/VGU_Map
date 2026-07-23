@@ -1,7 +1,7 @@
 {
   "status": "success",
   "total_rooms": 1098,
-  "last_updated": "2026-07-21T11:46:25.093Z",
+  "last_updated": "2026-07-23T01:26:58.537Z",
   "data": [
     {
       "sheet_source": "B1",
@@ -1373,7 +1373,7 @@
       "unbounded_height": "--",
       "capacity": "4",
       "status": "Đang sử dụng",
-      "occupant_display": "Nguyễn Thị Thu Hà\nHồ Thị Thanh Hằng\nLê Thị Mai\nNguyễn Phúc Như Quỳnh\nNguyễn Thu Quỳnh Trang\nBùi Thanh Mến"
+      "occupant_display": "Nguyễn Thị Thu Hà, Hồ Thị Thanh Hằng, Lê Thị Mai, Nguyễn Phúc Như Quỳnh, Nguyễn Thu Quỳnh Trang, Bùi Thanh Mến"
     },
     {
       "sheet_source": "AD",
@@ -1471,7 +1471,7 @@
       "unbounded_height": "--",
       "capacity": "4",
       "status": "Đang sử dụng",
-      "occupant_display": "Bùi Tố Nguyên\nNguyễn Ngọc Khánh Linh\nNguyễn Bình Hải Đăng\nPhạm Thị Cẩm My\nBùi Thanh Tịnh\nHuỳnh Ngọc Thành"
+      "occupant_display": "Bùi Tố Nguyên, Nguyễn Ngọc Khánh Linh, Nguyễn Bình Hải Đăng, Phạm Thị Cẩm My, Bùi Thanh Tịnh, Huỳnh Ngọc Thành"
     },
     {
       "sheet_source": "AD",
@@ -1499,7 +1499,7 @@
       "unbounded_height": "--",
       "capacity": "4",
       "status": "Đang sử dụng",
-      "occupant_display": "Phạm Chi Mai\nNguyễn Hoàng Thiên Thư\nTrần Thị Ngọc Thủy\nTô Diễm Huỳnh\nNguyễn Thị Mỹ Hường\nNguyễn Ngọc Anh Thư\nHuỳnh Anh Hậu\nNguyễn Ngọc Thiên Thanh"
+      "occupant_display": "Phạm Chi Mai, Nguyễn Hoàng Thiên Thư, Trần Thị Ngọc Thủy, Tô Diễm Huỳnh, Nguyễn Thị Mỹ Hường, Nguyễn Ngọc Anh Thư, Huỳnh Anh Hậu, Nguyễn Ngọc Thiên Thanh"
     },
     {
       "sheet_source": "AD",
@@ -1513,7 +1513,7 @@
       "unbounded_height": "--",
       "capacity": "5",
       "status": "Đang sử dụng",
-      "occupant_display": "Đỗ Hữu Tuấn Anh\nLê Trần Tú Uyên\nPhan Hồng Thy\nNguyễn Hoàng Hải"
+      "occupant_display": "Đỗ Hữu Tuấn Anh, Lê Trần Tú Uyên, Phan Hồng Thy, Nguyễn Hoàng Hải"
     },
     {
       "sheet_source": "AD",
@@ -1555,7 +1555,7 @@
       "unbounded_height": "--",
       "capacity": "2",
       "status": "Đang sử dụng",
-      "occupant_display": "Đỗ Tuấn Hải\nLê Tuấn Nghĩa"
+      "occupant_display": "Đỗ Tuấn Hải, Lê Tuấn Nghĩa"
     },
     {
       "sheet_source": "AD",
@@ -1583,7 +1583,7 @@
       "unbounded_height": "--",
       "capacity": "2",
       "status": "Đang sử dụng",
-      "occupant_display": "Lê Văn Thành\nNguyễn Đồng Ngân\nPhạm Minh Vương"
+      "occupant_display": "Lê Văn Thành, Nguyễn Đồng Ngân, Phạm Minh Vương"
     },
     {
       "sheet_source": "AD",
@@ -1625,7 +1625,7 @@
       "unbounded_height": "--",
       "capacity": "2",
       "status": "Đang sử dụng",
-      "occupant_display": "Vương Thanh Hải\nPhạm Thanh Hải\nMr. Vũ Nam Long"
+      "occupant_display": "Vương Thanh Hải, Phạm Thanh Hải, Mr. Vũ Nam Long"
     },
     {
       "sheet_source": "AD",
@@ -1681,7 +1681,7 @@
       "unbounded_height": "--",
       "capacity": "0",
       "status": "Đang sử dụng",
-      "occupant_display": "Nguyễn Hữu Dần\nLê Ngọc Thành\nLê Ngọc Thành\nPhạm Bảo Tài"
+      "occupant_display": "Nguyễn Hữu Dần, Lê Ngọc Thành, Phạm Bảo Tài"
     },
     {
       "sheet_source": "AD",
@@ -1695,7 +1695,7 @@
       "unbounded_height": "--",
       "capacity": "2",
       "status": "Đang sử dụng",
-      "occupant_display": "Nguyễn Quang Liêm\nVõ Văn Nam\nTrần Nguyên Hảo\nNguyễn Anh Thọ"
+      "occupant_display": "Nguyễn Quang Liêm, Võ Văn Nam, Trần Nguyên Hảo, Nguyễn Anh Thọ"
     },
     {
       "sheet_source": "AD",
@@ -1737,7 +1737,7 @@
       "unbounded_height": "--",
       "capacity": "1",
       "status": "Đang sử dụng",
-      "occupant_display": "Trần Quốc Khánh\nMr. Nguyễn Văn Huỳnh"
+      "occupant_display": "Trần Quốc Khánh, Mr. Nguyễn Văn Huỳnh"
     },
     {
       "sheet_source": "AD",
@@ -2059,7 +2059,7 @@
       "unbounded_height": "--",
       "capacity": "0",
       "status": "Đang sử dụng",
-      "occupant_display": "Dr. Nguyễn Ngọc Hiếu\nDr. Phạm Thái Sơn\nDr. Hứa Trần Minh Trí\nDr. Đào Thị Bích Vân"
+      "occupant_display": "Dr. Nguyễn Ngọc Hiếu, Dr. Phạm Thái Sơn, Dr. Hứa Trần Minh Trí, Dr. Đào Thị Bích Vân"
     },
     {
       "sheet_source": "AD",
@@ -2213,7 +2213,7 @@
       "unbounded_height": "--",
       "capacity": "2",
       "status": "Đang sử dụng",
-      "occupant_display": "Trần Văn Tiến\nTrịnh Nguyễn Hoàng Thi"
+      "occupant_display": "Trần Văn Tiến, Trịnh Nguyễn Hoàng Thi"
     },
     {
       "sheet_source": "AD",
@@ -2255,7 +2255,7 @@
       "unbounded_height": "--",
       "capacity": "2",
       "status": "Chưa sử dụng",
-      "occupant_display": "Lê Thị Hoa\nHuỳnh Đỗ Hiếu Như"
+      "occupant_display": "Lê Thị Hoa, Huỳnh Đỗ Hiếu Như"
     },
     {
       "sheet_source": "AD",
@@ -2283,7 +2283,7 @@
       "unbounded_height": "--",
       "capacity": "2",
       "status": "Chưa sử dụng",
-      "occupant_display": "Nguyễn Ngọc Đoan Trang\nNguyễn Thị Mỹ Tiên"
+      "occupant_display": "Nguyễn Ngọc Đoan Trang, Nguyễn Thị Mỹ Tiên"
     },
     {
       "sheet_source": "AD",
@@ -2353,7 +2353,7 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Chưa xác định",
-      "occupant_display": "Nguyễn Thanh Duy\nLê Hồng Duyên"
+      "occupant_display": "Nguyễn Thanh Duy, Lê Hồng Duyên"
     },
     {
       "sheet_source": "AD",
@@ -2367,7 +2367,7 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Chưa xác định",
-      "occupant_display": "Nguyễn Thị Hòa\nPhạm Tú Bình"
+      "occupant_display": "Nguyễn Thị Hòa, Phạm Tú Bình"
     },
     {
       "sheet_source": "AD",
@@ -2381,7 +2381,7 @@
       "unbounded_height": "--",
       "capacity": "2",
       "status": "Đang sử dụng",
-      "occupant_display": "Ngô Xuân Thúy Hằng\nTrần Thị Bích Thuận"
+      "occupant_display": "Ngô Xuân Thúy Hằng, Trần Thị Bích Thuận"
     },
     {
       "sheet_source": "AD",
@@ -2395,7 +2395,7 @@
       "unbounded_height": "--",
       "capacity": "2",
       "status": "Đang sử dụng",
-      "occupant_display": "Nguyễn Thị Huỳnh\nĐào Thị Vân Anh"
+      "occupant_display": "Nguyễn Thị Huỳnh, Đào Thị Vân Anh"
     },
     {
       "sheet_source": "AD",
@@ -2409,7 +2409,7 @@
       "unbounded_height": "--",
       "capacity": "2",
       "status": "Đang sử dụng",
-      "occupant_display": "Sử Thị Ái Diễm\nTrương Thị Huyền"
+      "occupant_display": "Sử Thị Ái Diễm, Trương Thị Huyền"
     },
     {
       "sheet_source": "AD",
@@ -2437,7 +2437,7 @@
       "unbounded_height": "--",
       "capacity": "2",
       "status": "Đang sử dụng",
-      "occupant_display": "Đặng Thị Thanh Thúy\nDương Đình Khánh\nVõ Thị Mai Hương"
+      "occupant_display": "Đặng Thị Thanh Thúy, Dương Đình Khánh, Võ Thị Mai Hương"
     },
     {
       "sheet_source": "AD",
@@ -2451,7 +2451,7 @@
       "unbounded_height": "--",
       "capacity": "2",
       "status": "Đang sử dụng",
-      "occupant_display": "Đào Thị Thu Dung\nNguyễn Công Việt"
+      "occupant_display": "Đào Thị Thu Dung, Nguyễn Công Việt"
     },
     {
       "sheet_source": "AD",
@@ -2493,7 +2493,7 @@
       "unbounded_height": "--",
       "capacity": "3",
       "status": "Đang sử dụng",
-      "occupant_display": "Nguyễn Mai Linh\nTrần Văn Phúc"
+      "occupant_display": "Nguyễn Mai Linh, Trần Văn Phúc"
     },
     {
       "sheet_source": "AD",
@@ -2507,7 +2507,7 @@
       "unbounded_height": "--",
       "capacity": "3",
       "status": "Đang sử dụng",
-      "occupant_display": "Trần Thị Trang\nTrần Ngọc Thùy Ngân\nNgô Thị Kiều Phương"
+      "occupant_display": "Trần Thị Trang, Trần Ngọc Thùy Ngân, Ngô Thị Kiều Phương"
     },
     {
       "sheet_source": "AD",
@@ -2577,7 +2577,7 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Đang sử dụng",
-      "occupant_display": "Nguyễn Thị Bông\nVõ Quốc Cường\nNguyễn Văn Xuân\nNguyễn Văn Dần\nNguyễn Anh Xuân"
+      "occupant_display": "Nguyễn Thị Bông, Võ Quốc Cường, Nguyễn Văn Xuân, Nguyễn Văn Dần, Nguyễn Anh Xuân"
     },
     {
       "sheet_source": "AD",
@@ -3333,7 +3333,7 @@
       "unbounded_height": "--",
       "capacity": "4",
       "status": "Đang sử dụng",
-      "occupant_display": "Nguyễn Thế Tuấn\nTrương Phúc Thịnh\nNguyễn Thanh Tùng\nNguyễn Thị Mỹ Tiên"
+      "occupant_display": "Nguyễn Thế Tuấn, Trương Phúc Thịnh, Nguyễn Thanh Tùng, Nguyễn Thị Mỹ Tiên"
     },
     {
       "sheet_source": "AD",
@@ -3347,7 +3347,7 @@
       "unbounded_height": "--",
       "capacity": "2",
       "status": "Đang sử dụng",
-      "occupant_display": "Ms. Nguyễn Thị Khánh Giao\nTrần Hồng Sự\nPhạm Hoàng Sơn"
+      "occupant_display": "Ms. Nguyễn Thị Khánh Giao, Trần Hồng Sự, Phạm Hoàng Sơn"
     },
     {
       "sheet_source": "AD",
@@ -3361,7 +3361,7 @@
       "unbounded_height": "--",
       "capacity": "2",
       "status": "Đang sử dụng",
-      "occupant_display": "Nguyễn Thành Công\nLê Đình Hùng\nPhạm Đăng Khoa\nTrần Văn Tuấn\nNguyễn Ngọc Tài"
+      "occupant_display": "Nguyễn Thành Công, Lê Đình Hùng, Phạm Đăng Khoa, Trần Văn Tuấn, Nguyễn Ngọc Tài"
     },
     {
       "sheet_source": "AD",
@@ -3403,7 +3403,7 @@
       "unbounded_height": "--",
       "capacity": "2",
       "status": "Đang sử dụng",
-      "occupant_display": "Doãn Ngọc Tín\nNguyễn Thị Thu Hường"
+      "occupant_display": "Doãn Ngọc Tín, Nguyễn Thị Thu Hường"
     },
     {
       "sheet_source": "AD",
@@ -3417,7 +3417,7 @@
       "unbounded_height": "--",
       "capacity": "2",
       "status": "Đang sử dụng",
-      "occupant_display": "Nguyễn Việt Tiến\nNguyễn Quang Hảo"
+      "occupant_display": "Nguyễn Việt Tiến, Nguyễn Quang Hảo"
     },
     {
       "sheet_source": "AD",
@@ -3991,7 +3991,7 @@
       "unbounded_height": "--",
       "capacity": "2",
       "status": "Đang sử dụng",
-      "occupant_display": "Thái Thị Hà Trang\nNguyễn Võ Chí Thục"
+      "occupant_display": "Thái Thị Hà Trang, Nguyễn Võ Chí Thục"
     },
     {
       "sheet_source": "AD",
@@ -4005,7 +4005,7 @@
       "unbounded_height": "--",
       "capacity": "2",
       "status": "Đang sử dụng",
-      "occupant_display": "Nguyễn Thị Hiền\nĐặng Khánh Linh"
+      "occupant_display": "Nguyễn Thị Hiền, Đặng Khánh Linh"
     },
     {
       "sheet_source": "AD",
@@ -4131,7 +4131,7 @@
       "unbounded_height": "--",
       "capacity": "2",
       "status": "Đang sử dụng",
-      "occupant_display": "Nguyễn Hồng Dung\nLại Thị An"
+      "occupant_display": "Nguyễn Hồng Dung, Lại Thị An"
     },
     {
       "sheet_source": "AD",
@@ -4229,7 +4229,7 @@
       "unbounded_height": "--",
       "capacity": "2",
       "status": "Đang sử dụng",
-      "occupant_display": "Nguyễn Thị Thanh Hiền\nNguyễn Thị Thùy Trang"
+      "occupant_display": "Nguyễn Thị Thanh Hiền, Nguyễn Thị Thùy Trang"
     },
     {
       "sheet_source": "AD",
@@ -4985,7 +4985,7 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Chưa xác định",
-      "occupant_display": "Lê Thị Cẩm Thủy\nLê Vũ Bảo Trâm\nNguyễn Bảo Trân"
+      "occupant_display": "Lê Thị Cẩm Thủy, Lê Vũ Bảo Trâm, Nguyễn Bảo Trân"
     },
     {
       "sheet_source": "B1",
@@ -5013,7 +5013,7 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Chưa xác định",
-      "occupant_display": "Nguyễn Đình Hải\nĐỗ Xuân Vinh"
+      "occupant_display": "Nguyễn Đình Hải, Đỗ Xuân Vinh"
     },
     {
       "sheet_source": "B1",
@@ -5041,7 +5041,7 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Chưa xác định",
-      "occupant_display": "Trần Ngọc Tiến\nMr. Michael Smithson"
+      "occupant_display": "Trần Ngọc Tiến, Mr. Michael Smithson"
     },
     {
       "sheet_source": "B1",
@@ -5055,7 +5055,7 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Chưa xác định",
-      "occupant_display": "Dr. Nguyễn Phạm Duy Anh\nNguyễn Thành Được"
+      "occupant_display": "Dr. Nguyễn Phạm Duy Anh, Nguyễn Thành Được"
     },
     {
       "sheet_source": "B1",
@@ -5069,7 +5069,7 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Chưa xác định",
-      "occupant_display": "M.sc. Terence Curtis\nMr. Alex Steven Turner"
+      "occupant_display": "M.sc. Terence Curtis, Mr. Alex Steven Turner"
     },
     {
       "sheet_source": "B1",
@@ -5097,7 +5097,7 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Chưa xác định",
-      "occupant_display": "Ms. Châu Trần Khánh Hà\nMs. Huỳnh Hiếu Ngân\nNguyễn Thị Nhật Linh"
+      "occupant_display": "Ms. Châu Trần Khánh Hà, Ms. Huỳnh Hiếu Ngân, Nguyễn Thị Nhật Linh"
     },
     {
       "sheet_source": "B1",
@@ -5125,7 +5125,7 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Chưa xác định",
-      "occupant_display": "Phan Thị Bích Sơn\nTôn Nữ Nguyệt An\nMs. Vũ Thị Thu An"
+      "occupant_display": "Phan Thị Bích Sơn, Tôn Nữ Nguyệt An, Ms. Vũ Thị Thu An"
     },
     {
       "sheet_source": "B1",
@@ -6063,7 +6063,7 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Chưa xác định",
-      "occupant_display": "Nguyễn Hữu Phước\nLê Thị Thủy"
+      "occupant_display": "Nguyễn Hữu Phước, Lê Thị Thủy"
     },
     {
       "sheet_source": "B1",
@@ -6077,7 +6077,7 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Chưa xác định",
-      "occupant_display": "Phạm Ngọc Thẩm\nTrần Trọng Hiếu\nDr. Trần Bình Đại"
+      "occupant_display": "Phạm Ngọc Thẩm, Trần Trọng Hiếu, Dr. Trần Bình Đại"
     },
     {
       "sheet_source": "B1",
@@ -6371,7 +6371,7 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Chưa xác định",
-      "occupant_display": "Nguyễn Thị Kim Ngân\nNguyễn Trần Phương Anh\nPhùng Ngọc Huyền"
+      "occupant_display": "Nguyễn Thị Kim Ngân, Nguyễn Trần Phương Anh, Phùng Ngọc Huyền"
     },
     {
       "sheet_source": "B1",
@@ -8443,7 +8443,7 @@
       "unbounded_height": "--",
       "capacity": "Nguyen Vo That Thuyet",
       "status": "Chưa xác định",
-      "occupant_display": "Biện Minh Trí\nNguyễn Võ Thất Thuyết"
+      "occupant_display": "Biện Minh Trí, Nguyễn Võ Thất Thuyết"
     },
     {
       "sheet_source": "B3",
@@ -8905,7 +8905,7 @@
       "unbounded_height": "--",
       "capacity": "Phi Tường Uyên, Nguyễn Thị Tựu, Trần Tuyết Ân",
       "status": "Chưa xác định",
-      "occupant_display": "Phí Tường Uyên\nNguyễn Thị Tựu\nTrần Tuyết Ân"
+      "occupant_display": "Phí Tường Uyên, Nguyễn Thị Tựu, Trần Tuyết Ân"
     },
     {
       "sheet_source": "B3",
@@ -8989,7 +8989,7 @@
       "unbounded_height": "--",
       "capacity": "Nguyễn Thanh Ngân",
       "status": "Chưa xác định",
-      "occupant_display": "Nguyễn Thanh Ngân\nTrần Thị Yến"
+      "occupant_display": "Nguyễn Thanh Ngân, Trần Thị Yến"
     },
     {
       "sheet_source": "B3",
@@ -13721,7 +13721,7 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Chưa xác định",
-      "occupant_display": "Dr. Nguyễn Trọng Nghĩa\nDr. Lê Mạnh Tuấn"
+      "occupant_display": "Dr. Nguyễn Trọng Nghĩa, Dr. Lê Mạnh Tuấn"
     },
     {
       "sheet_source": "B6",
@@ -14813,7 +14813,7 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Chưa xác định",
-      "occupant_display": "Nguyễn Hoài Vũ\nTrần Tuấn Nghi\nPhạm Phú Song Hưng\nNguyễn Thị Hương Lan\nNguyễn Võ Vạn Lịch\nNguyễn Thị Bích Huệ\nNguyễn Lĩnh Tâm"
+      "occupant_display": "Nguyễn Hoài Vũ, Trần Tuấn Nghi, Phạm Phú Song Hưng, Nguyễn Thị Hương Lan, Nguyễn Võ Vạn Lịch, Nguyễn Thị Bích Huệ, Nguyễn Lĩnh Tâm"
     },
     {
       "sheet_source": "B6",
@@ -14855,7 +14855,7 @@
       "unbounded_height": "--",
       "capacity": "--",
       "status": "Chưa xác định",
-      "occupant_display": "Thu Alexander Quynh\nDr. Lê Thị Thúy Hằng"
+      "occupant_display": "Thu Alexander Quynh, Dr. Lê Thị Thúy Hằng"
     },
     {
       "sheet_source": "B6",
