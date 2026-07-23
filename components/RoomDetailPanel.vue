@@ -75,7 +75,7 @@
         </div>
 
         <!-- 3. Thông tin nhân sự (Đã được xử lý để xuống dòng) -->
-        <div class="info-card" v-if="display.occupants.length > 0 || display.office || display.email">
+  <div class="info-card" v-if="display.occupants.length > 0 || display.office || display.email">
           <div class="card-body">
             <p v-for="(person, idx) in display.occupants" :key="idx" class="incharge-name">
               {{ person }}
@@ -107,6 +107,7 @@
             </div>
           </div>
         </div>
+
 
         <!-- 5. Featured Facility / Instruments -->
         <div class="info-card">
