@@ -2,15 +2,54 @@
 <template>
   <div ref="mapContainer" class="map-container"></div>
 
-  <!-- ================= Thang máy chọn tầng (Elevator HUD) =================
-       Chỉ hiện khi đã chọn 1 tòa nhà. Mỗi nút là 1 tầng, có 3 trạng thái:
-       - active  : tầng đang xem (cam)
-       - detail  : tầng có phòng đã cập nhật thông tin chi tiết (cyan phát sáng)
-       - trơn    : tầng chỉ có hình khối, chưa có dữ liệu chi tiết
-       Nút ✕ dưới cùng để thoát khỏi tòa nhà, quay lại toàn cảnh campus. -->
+  <!-- ================= Thanh tìm kiếm toàn cục (Global Search) ================= -->
+  <!-- Đứng độc lập, luôn hiển thị. Sẽ tự thay đổi placeholder và logic lọc khi click vào toà -->
+  <div class="global-search-container">
+    <div class="search-wrapper">
+      <!-- Icon kính lúp -->
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input
+        v-model="searchQuery"
+        type="text"
+        class="global-search-input"
+        :placeholder="currentBuildingId ? `Tìm phòng trong toà ${currentBuildingId}…` : 'Tìm phòng trên toàn Campus…'"
+        @input="onSearchInput"
+        @focus="onSearchInput"
+      />
+    </div>
+    
+    <div v-if="searchResults.length > 0" class="global-search-results">
+      <button
+        v-for="r in searchResults"
+        :key="r.id"
+        class="global-search-item"
+        @click="goToRoom(r)"
+      >
+        <div class="rs-info">
+          <span class="rs-id">{{ r.roomNumber }}</span>
+          <!-- Hàm lọc lặp tên vẫn được giữ nguyên -->
+          <span class="rs-name">{{ formatRoomName(r.roomName) }}</span>
+        </div>
+        <!-- Chỉ hiện thẻ tên Toà nếu đang tìm ở chế độ Campus -->
+        <span v-if="!currentBuildingId" class="rs-building">{{ r.buildingId }}</span>
+      </button>
+    </div>
+    <div v-else-if="searchQuery.trim() && !isSearching" class="global-search-results">
+      <div class="room-search-empty">Không tìm thấy phòng phù hợp.</div>
+    </div>
+  </div>
+
+  <!-- ================= Thang máy chọn tầng (Elevator HUD) ================= -->
   <Transition name="hud-slide">
-    <div v-if="currentBuildingId" class="elevator-hud" role="group" :aria-label="`Chọn tầng toà ${currentBuildingId}`">
-      <div class="elevator-label">{{ currentBuildingId }}</div>
+    <div v-if="currentBuildingId" class="floor-bar" role="group" :aria-label="`Chọn tầng toà ${currentBuildingId}`">
+      <button class="floor-btn exit-btn" aria-label="Thoát khỏi toà nhà, về toàn cảnh" title="Thoát khỏi toà nhà" @click="exitBuilding">
+        ✕
+      </button>
+
+      <div class="floor-bar-label">{{ currentBuildingId }}</div>
 
       <button
         v-for="floor in availableFloors"
@@ -27,10 +66,6 @@
       >
         L{{ floor }}
       </button>
-
-      <button class="floor-btn exit-btn" aria-label="Thoát khỏi toà nhà, về toàn cảnh" title="Thoát khỏi toà nhà" @click="exitBuilding">
-        ✕
-      </button>
     </div>
   </Transition>
 
@@ -41,30 +76,38 @@
       Sơ đồ phòng tòa <b>{{ currentBuildingId }}</b> chưa được định vị GPS — đang chờ hiệu chỉnh tọa độ.
     </div>
   </Transition>
+
+  <!-- ================= Bảng thông tin chi tiết phòng ================= -->
+  <Transition name="fade">
+    <RoomDetailPanel
+      v-if="currentRoomId"
+      :room-id="currentRoomId"
+      :building-id="currentBuildingId"
+      @close="currentRoomId = null"
+    />
+  </Transition>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
+import RoomDetailPanel from '~/components/RoomDetailPanel.vue'
 
-// ----------------------------------------------------
-// [CẬP NHẬT] Lấy baseURL để sửa lỗi fetch file trên GitHub Pages
-// ----------------------------------------------------
+const { searchRooms } = useVguData()
+
 const config = useRuntimeConfig()
 const base = config.app.baseURL
 
 const mapContainer = ref(null)
 let map = null
 
-// Emit events lên parent
-const emit = defineEmits(['room-selected', 'building-selected', 'floor-selected', 'ready'])
+const emit = defineEmits(['room-selected', 'building-selected', 'floor-selected', 'equipment-selected', 'ready'])
 
-// Props từ parent (nếu cần)
 const props = defineProps({
   initialCenter: {
     type: Array,
-    default: () => [106.6155, 11.1083] // Tọa độ VGU
+    default: () => [106.6155, 11.1083]
   },
   initialZoom: {
     type: Number,
@@ -78,84 +121,50 @@ const props = defineProps({
 
 const INITIAL_BEARING = -17.6
 
-// Cấu hình tầng theo tòa nhà (building_id -> [tầng...]), load 1 lần
 let floorsConfig = {}
-// Cache dữ liệu geojson của từng tầng đã fetch, tránh load lại
 const floorCache = new Map()
-// Tâm (centroid) mỗi tòa nhà, tính từ campus-buildings.json sau khi load
 let buildingCenters = {}
-// Bản đồ tên phòng: room_id -> { en, vi } (chỉ có cho AD, B3)
 const roomNameMap = ref({})
 
-// ----------------------------------------------------------------
-// Hệ số biến đổi Affine: CAD-XY (mét cục bộ, gốc riêng từng tòa) -> lat/lng thật.
-// lon = a*x + b*y + c ; lat = d*x + e*y + f
-//
-// - B1, B5: giải sẵn bằng least-squares từ điểm đối chiếu CAD <-> GPS thật
-//   (nguồn: hệ thống MSI_Laboratories). Giữ nguyên vì đã kiểm chứng.
-// - AD, B2, B3, B6: giải tự động bằng cách khớp 4 góc hình chữ nhật bao nhỏ
-//   nhất của cụm phòng (CAD) với 4 góc footprint GPS trong campus-buildings.json.
-//   Chiều xoay được chọn theo bearing chung của campus (~19.78°, lấy từ B1/B5)
-//   và ràng buộc không phản chiếu (det > 0). Phương pháp này tái tạo lại affine
-//   đã biết của B1/B5 với sai số RMS ~0.3–0.4m nên đáng tin cho 4 tòa còn lại.
-//   Nếu footprint 1 tòa được hiệu chỉnh lại, cần giải lại affine tương ứng.
-// ----------------------------------------------------------------
+const formatRoomName = (name) => {
+  if (!name || typeof name !== 'string') return name
+  const parts = name.split(/\s*-\s*/)
+  if (parts.length > 1 && parts.length % 2 === 0) {
+    const halfIndex = parts.length / 2
+    const firstHalf = parts.slice(0, halfIndex).join(' - ')
+    const secondHalf = parts.slice(halfIndex).join(' - ')
+    if (firstHalf === secondHalf) return firstHalf
+  }
+  return name
+}
+
 const BUILDING_AFFINE = {
   B1: {
-    a: 8.953441376466221e-9,
-    b: -3.1497975865435756e-9,
-    c: 106.61539732322666,
-    d: 3.182455243237762e-9,
-    e: 8.530074661663595e-9,
-    f: 11.108226425177252
+    a: 8.953441376466221e-9, b: -3.1497975865435756e-9, c: 106.61539732322666,
+    d: 3.182455243237762e-9, e: 8.530074661663595e-9, f: 11.108226425177252
   },
   B5: {
-    a: 9.348060047786096e-9,
-    b: -3.137160929858734e-9,
-    c: 106.61606158856533,
-    d: 3.3218630132168528e-9,
-    e: 8.497975978545847e-9,
-    f: 11.108450685256834
+    a: 9.348060047786096e-9, b: -3.137160929858734e-9, c: 106.61606158856533,
+    d: 3.3218630132168528e-9, e: 8.497975978545847e-9, f: 11.108450685256834
   },
   AD: {
-    a: 8.766061793685426e-9,
-    b: -2.9401918155464064e-9,
-    c: 106.61628563445295,
-    d: 2.949511826570467e-9,
-    e: 8.738362378840202e-9,
-    f: 11.107702556018145
+    a: 8.766061793685426e-9, b: -2.9401918155464064e-9, c: 106.61628563445295,
+    d: 2.949511826570467e-9, e: 8.738362378840202e-9, f: 11.107702556018145
   },
   B2: {
-    a: 8.934000874052131e-9,
-    b: -3.0617993522497056e-9,
-    c: 106.61556743104268,
-    d: 3.2196508335119185e-9,
-    e: 8.496017971414428e-9,
-    f: 11.107734813646012
+    a: 8.934000874052131e-9, b: -3.0617993522497056e-9, c: 106.61556743104268,
+    d: 3.2196508335119185e-9, e: 8.496017971414428e-9, f: 11.107734813646012
   },
   B3: {
-    a: 8.936440007959682e-9,
-    b: -3.0696022659468247e-9,
-    c: 106.61564963590135,
-    d: 3.243586829736276e-9,
-    e: 8.457006822971136e-9,
-    f: 11.107323754174958
+    a: 8.936440007959682e-9, b: -3.0696022659468247e-9, c: 106.61564963590135,
+    d: 3.243586829736276e-9, e: 8.457006822971136e-9, f: 11.107323754174958
   },
   B6: {
-    a: 8.875957765081311e-9,
-    b: -3.145148965918998e-9,
-    c: 106.6163603769583,
-    d: 3.2835800566738925e-9,
-    e: 8.501705317206016e-9,
-    f: 11.107779247247372
+    a: 8.875957765081311e-9, b: -3.145148965918998e-9, c: 106.6163603769583,
+    d: 3.2835800566738925e-9, e: 8.501705317206016e-9, f: 11.107779247247372
   }
 }
 
-// Áp affine transform lên 1 vòng điểm [[x,y], ...].
-// LƯU Ý: build_rooms_geojson.py đã đổi CAD-mm -> mét (UNIT_TO_METERS = 1/1000)
-// khi xuất rooms/*.geojson, nhưng hệ số affine (a,b,c,d,e,f) bên dưới được giải
-// sẵn trên toạ độ CAD-mm GỐC (chưa đổi đơn vị) -> phải nhân lại x1000 (m -> mm)
-// trước khi áp affine, nếu không toàn bộ tòa nhà sẽ bị co lại thành 1 điểm.
 const METERS_TO_MM = 1000
 
 function transformRing(ring, coeffs) {
@@ -169,16 +178,9 @@ function transformRing(ring, coeffs) {
   })
 }
 
-// Áp affine transform lên toàn bộ FeatureCollection của 1 tòa nhà.
-// Nếu tòa chưa có hệ số affine (AD, B2, B3, B6), trả nguyên geojson gốc
-// (toạ độ vẫn sai vị trí thật, nhưng ít nhất không crash).
 function transformBuildingGeojson(buildingId, geojson) {
   const coeffs = BUILDING_AFFINE[buildingId]
-  if (!coeffs) {
-    console.warn(`[HologramMap] Chưa có hệ số affine cho tòa ${buildingId} — toạ độ phòng có thể sai vị trí thật.`)
-    return geojson
-  }
-
+  if (!coeffs) return geojson
   return {
     type: 'FeatureCollection',
     features: geojson.features.map(f => ({
@@ -191,9 +193,6 @@ function transformBuildingGeojson(buildingId, geojson) {
   }
 }
 
-// ---- Tiện ích hình học ----------------------------------------------------
-// Khung tọa độ hợp lệ quanh VGU. Dùng để phát hiện tòa nhà CHƯA định vị GPS
-// (dữ liệu phòng còn ở hệ CAD thô -> giá trị nằm ngoài khung này).
 const VGU_BOUNDS = { minLon: 106.60, maxLon: 106.63, minLat: 11.10, maxLat: 11.12 }
 function isLatLng([lon, lat]) {
   return lon >= VGU_BOUNDS.minLon && lon <= VGU_BOUNDS.maxLon
@@ -208,16 +207,13 @@ function polygonCentroid(coordinates) {
   return [sx / n, sy / n]
 }
 
-// ---- Trạng thái phản ứng ---------------------------------------------------
 const currentBuildingId = ref(null)
 const currentFloor = ref(null)
 const currentRoomId = ref(null)
 const availableFloors = ref([])
 const isGeolocated = ref(false)
-// geojson đã transform của tòa đang chọn (để tra centroid phòng, đặt marker)
 let currentBuildingGeojson = null
 
-// Tập các tầng (của tòa đang chọn) có ít nhất 1 phòng đã cập nhật thông tin chi tiết
 const floorsWithDetail = computed(() => {
   const s = new Set()
   if (!currentBuildingGeojson) return s
@@ -228,7 +224,6 @@ const floorsWithDetail = computed(() => {
   return s
 })
 
-// ---- Khởi tạo bản đồ -------------------------------------------------------
 onMounted(() => {
   if (!mapContainer.value) return
 
@@ -257,19 +252,16 @@ onMounted(() => {
     } catch (e) {
       console.error('[HologramMap] Init error:', e)
     } finally {
-      // Báo parent tắt overlay loading dù thành công hay có lỗi cục bộ.
       emit('ready')
     }
   })
 
-  // Click vào tòa nhà -> vào tòa đó
   map.on('click', 'vgu-buildings-3d', (e) => {
     const feature = e.features[0]
     const buildingId = feature.properties?.building_id || feature.properties?.cluster_id
     if (buildingId) selectBuilding(buildingId)
   })
 
-  // Click vào phòng (polygon) -> mở chi tiết + bay tới phòng
   map.on('click', 'vgu-rooms-fill', (e) => {
     const feature = e.features[0]
     const roomId = feature.properties?.room_id
@@ -278,21 +270,44 @@ onMounted(() => {
     }
   })
 
-  // Con trỏ phản hồi khi hover
   const setPointer = (v) => () => { map.getCanvas().style.cursor = v ? 'pointer' : '' }
   map.on('mouseenter', 'vgu-buildings-3d', setPointer(true))
   map.on('mouseleave', 'vgu-buildings-3d', setPointer(false))
   map.on('mouseenter', 'vgu-rooms-fill', setPointer(true))
   map.on('mouseleave', 'vgu-rooms-fill', setPointer(false))
+
+  // ===== Hover highlight cho từng khối thiết bị trong phòng =====
+  map.on('mousemove', 'vgu-equipment-fill', (e) => {
+    if (!e.features.length) return
+    map.getCanvas().style.cursor = 'pointer'
+    const id = e.features[0].id
+    if (hoveredEquipmentId !== null && hoveredEquipmentId !== id) {
+      map.setFeatureState({ source: 'vgu-equipment', id: hoveredEquipmentId }, { hover: false })
+    }
+    if (id !== undefined && hoveredEquipmentId !== id) {
+      hoveredEquipmentId = id
+      map.setFeatureState({ source: 'vgu-equipment', id }, { hover: true })
+    }
+  })
+  map.on('mouseleave', 'vgu-equipment-fill', () => {
+    map.getCanvas().style.cursor = ''
+    if (hoveredEquipmentId !== null) {
+      map.setFeatureState({ source: 'vgu-equipment', id: hoveredEquipmentId }, { hover: false })
+      hoveredEquipmentId = null
+    }
+  })
+  map.on('click', 'vgu-equipment-fill', (e) => {
+    const feature = e.features[0]
+    const equipmentId = feature?.properties?.equipment_id
+    if (equipmentId) emit('equipment-selected', { equipmentId, roomId: currentRoomId.value })
+  })
 })
 
-// ---- Nạp khối 3D các tòa nhà + layer focus ---------------------------------
 async function loadCampusBuildings() {
   try {
     const response = await fetch(`${base}campus-buildings.json`)
     const data = await response.json()
 
-    // Tính tâm mỗi tòa để camera bay tới khi chọn
     buildingCenters = {}
     for (const f of data.features) {
       const id = f.properties?.building_id || f.id
@@ -302,8 +317,6 @@ async function loadCampusBuildings() {
     }
 
     map.addSource('vgu-campus', { type: 'geojson', data })
-
-    // Khối 3D của TẤT CẢ các tòa (nền)
     map.addLayer({
       id: 'vgu-buildings-3d',
       type: 'fill-extrusion',
@@ -315,16 +328,12 @@ async function loadCampusBuildings() {
         'fill-extrusion-opacity': 0.9
       }
     })
-
-    // Viền cam của tất cả các tòa
     map.addLayer({
       id: 'vgu-buildings-outline',
       type: 'line',
       source: 'vgu-campus',
       paint: { 'line-color': '#EF5A24', 'line-width': 1, 'line-opacity': 0.6 }
     })
-
-    // Khối 3D "vỏ trong suốt" cho tòa đang chọn (hiệu ứng X-ray)
     map.addLayer({
       id: 'vgu-selected-3d',
       type: 'fill-extrusion',
@@ -337,8 +346,6 @@ async function loadCampusBuildings() {
       },
       filter: ['==', ['get', 'building_id'], '']
     })
-
-    // Viền sáng đậm cho tòa đang chọn
     map.addLayer({
       id: 'vgu-selected-outline',
       type: 'line',
@@ -346,20 +353,16 @@ async function loadCampusBuildings() {
       paint: { 'line-color': '#EF5A24', 'line-width': 3, 'line-opacity': 0.95 },
       filter: ['==', ['get', 'building_id'], '']
     })
-
-    console.log('[HologramMap] Campus buildings loaded')
   } catch (error) {
     console.error('[HologramMap] Failed to load campus buildings:', error)
   }
 }
 
-// ---- Layer phòng (rỗng ban đầu) --------------------------------------------
 async function initRoomsLayer() {
   map.addSource('vgu-rooms', {
     type: 'geojson',
     data: { type: 'FeatureCollection', features: [] }
   })
-
   map.addLayer({
     id: 'vgu-rooms-fill',
     type: 'fill',
@@ -374,16 +377,61 @@ async function initRoomsLayer() {
       'fill-opacity': 0.35
     }
   })
-
   map.addLayer({
     id: 'vgu-rooms-outline',
     type: 'line',
     source: 'vgu-rooms',
     paint: { 'line-color': '#00ffcc', 'line-width': 1.5, 'line-opacity': 0.8 }
   })
+
+  // ================= Layer thiết bị trong phòng =================
+  // Chỉ hiện khi có phòng đang được chọn (xem loadEquipmentForRoom / watch currentRoomId).
+  // `generateId: true` để MapLibre tự gán id số cho từng feature, cần cho feature-state (hover).
+  map.addSource('vgu-equipment', {
+    type: 'geojson',
+    data: { type: 'FeatureCollection', features: [] },
+    generateId: true
+  })
+  map.addLayer({
+    id: 'vgu-equipment-fill',
+    type: 'fill',
+    source: 'vgu-equipment',
+    paint: {
+      'fill-color': [
+        'case',
+        ['boolean', ['feature-state', 'hover'], false],
+        '#00ffcc', // highlight xanh khi hover
+        '#38bdf8'  // màu mặc định của khối thiết bị
+      ],
+      'fill-opacity': [
+        'case',
+        ['boolean', ['feature-state', 'hover'], false],
+        0.75,
+        0.4
+      ]
+    }
+  })
+  map.addLayer({
+    id: 'vgu-equipment-outline',
+    type: 'line',
+    source: 'vgu-equipment',
+    paint: {
+      'line-color': [
+        'case',
+        ['boolean', ['feature-state', 'hover'], false],
+        '#00ffcc',
+        '#38bdf8'
+      ],
+      'line-width': [
+        'case',
+        ['boolean', ['feature-state', 'hover'], false],
+        2.5,
+        1.2
+      ]
+    }
+  })
 }
 
-// ---- Cấu hình tầng ---------------------------------------------------------
 async function loadFloorsConfig() {
   try {
     const response = await fetch(`${base}data/floors-config.json`)
@@ -393,7 +441,6 @@ async function loadFloorsConfig() {
   }
 }
 
-// ---- Bản đồ tên phòng (từ info_data.json; hiện chỉ có AD & B3) --------------
 async function loadRoomNames() {
   try {
     const response = await fetch(`${base}data/info_data.json`)
@@ -401,7 +448,6 @@ async function loadRoomNames() {
     const rows = Array.isArray(json) ? json : (json?.data || [])
     const map_ = {}
     for (const r of rows) {
-      // Khớp theo room_number (đúng với room_id trong geojson của AD/B3)
       const key = r.room_number
       if (!key) continue
       const en = (r.heading_1 || '').trim()
@@ -409,13 +455,11 @@ async function loadRoomNames() {
       if (en || vi) map_[key] = { en, vi }
     }
     roomNameMap.value = map_
-    console.log('[HologramMap] Room names loaded:', Object.keys(map_).length)
   } catch (error) {
-    console.warn('[HologramMap] Không tải được info_data.json (tên phòng):', error)
+    console.warn('[HologramMap] Không tải được info_data.json:', error)
   }
 }
 
-// ---- Chọn tòa nhà ----------------------------------------------------------
 async function selectBuilding(buildingId) {
   if (buildingId === currentBuildingId.value) return
   currentBuildingId.value = buildingId
@@ -424,40 +468,32 @@ async function selectBuilding(buildingId) {
   const floors = floorsConfig[buildingId] || []
   availableFloors.value = [...floors].sort((a, b) => a - b)
 
-  // Hiệu ứng focus: làm mờ các tòa khác, làm nổi tòa đang chọn
   map.setFilter('vgu-buildings-3d', ['!=', ['get', 'building_id'], buildingId])
   map.setFilter('vgu-buildings-outline', ['!=', ['get', 'building_id'], buildingId])
   map.setFilter('vgu-selected-3d', ['==', ['get', 'building_id'], buildingId])
   map.setFilter('vgu-selected-outline', ['==', ['get', 'building_id'], buildingId])
 
-  // Camera bay tới, nhìn từ trên xuống để xem sơ đồ tầng
   const center = buildingCenters[buildingId] || props.initialCenter
   map.flyTo({ center, zoom: 19.2, pitch: 0, bearing: 0, duration: 1500 })
 
-  // Nạp phòng của tòa (đã transform sang lat/lng nếu có affine)
   currentBuildingGeojson = await getBuildingRoomsData(buildingId)
 
-  // Kiểm tra tòa đã định vị GPS chưa (toạ độ nằm trong khung VGU)
   isGeolocated.value = !!(currentBuildingGeojson?.features?.length
     && isLatLng(currentBuildingGeojson.features[0].geometry.coordinates[0][0]))
 
   if (isGeolocated.value && map.getSource('vgu-rooms')) {
     map.getSource('vgu-rooms').setData(currentBuildingGeojson)
   } else {
-    // Chưa định vị -> không đổ polygon sai ra bản đồ
     if (map.getSource('vgu-rooms')) {
       map.getSource('vgu-rooms').setData({ type: 'FeatureCollection', features: [] })
     }
   }
 
-  // Emit lên parent để mở/đồng bộ HUD ngữ cảnh
   const defaultFloor = availableFloors.value[0] ?? null
   emit('building-selected', { buildingId, floor: defaultFloor })
-
   if (defaultFloor != null) selectFloor(defaultFloor)
 }
 
-// ---- Đổi tầng --------------------------------------------------------------
 function selectFloor(floorNumber) {
   currentFloor.value = floorNumber
   currentRoomId.value = null
@@ -473,7 +509,59 @@ function selectFloor(floorNumber) {
   emit('floor-selected', { buildingId: currentBuildingId.value, floor: floorNumber })
 }
 
-// ---- Chọn phòng ------------------------------------------------------------
+const searchQuery = ref('')
+const searchResults = ref([])
+const isSearching = ref(false)
+let searchDebounce = null
+
+function onSearchInput() {
+  clearTimeout(searchDebounce)
+  const q = searchQuery.value.trim()
+  if (!q) {
+    searchResults.value = []
+    return
+  }
+  searchDebounce = setTimeout(async () => {
+    isSearching.value = true
+    try {
+      // [FIX] Lấy nhiều kết quả hơn (VD: 50) để tự do lọc trên máy khách nếu đang ở trong 1 toà
+      const rawResults = await searchRooms(q, 50)
+      
+      if (currentBuildingId.value) {
+        // Lọc kết quả thuộc toà đang xem, sau đó cắt lấy top 8
+        searchResults.value = rawResults
+          .filter(r => r.buildingId === currentBuildingId.value)
+          .slice(0, 8)
+      } else {
+        // Đang xem toàn trường
+        searchResults.value = rawResults.slice(0, 8)
+      }
+    } finally {
+      isSearching.value = false
+    }
+  }, 250)
+}
+
+async function goToRoom(result) {
+  if (!result?.buildingId) return
+  searchQuery.value = ''
+  searchResults.value = []
+
+  if (currentBuildingId.value !== result.buildingId) {
+    currentBuildingId.value = null
+    await selectBuilding(result.buildingId)
+  }
+  if (result.floor != null && result.floor !== currentFloor.value) {
+    selectFloor(result.floor)
+  }
+
+  const feature = currentBuildingGeojson?.features?.find(
+    f => f.properties?.room_id === result.id
+  )
+  const centroid = feature ? polygonCentroid(feature.geometry.coordinates) : null
+  selectRoom(result.id, centroid, feature?.properties || { building_id: result.buildingId, floor: result.floor })
+}
+
 function selectRoom(roomId, centroid, propsObj = {}) {
   currentRoomId.value = roomId
   emit('room-selected', {
@@ -486,7 +574,6 @@ function selectRoom(roomId, centroid, propsObj = {}) {
   }
 }
 
-// ---- Thoát khỏi tòa nhà ----------------------------------------------------
 function exitBuilding() {
   currentBuildingId.value = null
   currentFloor.value = null
@@ -494,21 +581,23 @@ function exitBuilding() {
   availableFloors.value = []
   isGeolocated.value = false
   currentBuildingGeojson = null
+  
+  // Dọn dẹp ô tìm kiếm
+  searchQuery.value = ''
+  searchResults.value = []
 
   clearRoomMarkers()
+  clearEquipmentLayer()
 
-  // Khôi phục hiển thị toàn bộ khối tòa nhà
   map.setFilter('vgu-buildings-3d', null)
   map.setFilter('vgu-buildings-outline', null)
   map.setFilter('vgu-selected-3d', ['==', ['get', 'building_id'], ''])
   map.setFilter('vgu-selected-outline', ['==', ['get', 'building_id'], ''])
 
-  // Ẩn layer phòng
   if (map.getSource('vgu-rooms')) {
     map.getSource('vgu-rooms').setData({ type: 'FeatureCollection', features: [] })
   }
 
-  // Camera bay về toàn cảnh campus
   map.flyTo({
     center: props.initialCenter,
     zoom: props.initialZoom,
@@ -517,11 +606,55 @@ function exitBuilding() {
     duration: 1500
   })
 
-  // Báo parent: đã rời tòa (store sẽ tự clear cả phòng đang mở)
   emit('building-selected', { buildingId: null, floor: null })
 }
 
-// ---- Marker phòng (chấm phát sáng + thẻ nhãn) ------------------------------
+let hoveredEquipmentId = null
+const equipmentCache = new Map()
+
+// Tải geojson thiết bị của 1 phòng (public/data/equipment/{roomId}.geojson), áp
+// CHUNG affine transform của building (giống hệt transformBuildingGeojson dùng
+// cho rooms) vì file này được sinh ra ở CÙNG hệ toạ độ mét cục bộ của building.
+// Nếu phòng chưa có file thiết bị (404) thì chỉ cần xoá layer, không phải lỗi.
+async function loadEquipmentForRoom(buildingId, roomId) {
+  if (!map.getSource('vgu-equipment')) return
+  const cacheKey = `${buildingId}:${roomId}`
+  try {
+    let data = equipmentCache.get(cacheKey)
+    if (!data) {
+      const response = await fetch(`${base}data/equipment/${roomId}.geojson`)
+      if (!response.ok) {
+        clearEquipmentLayer()
+        return
+      }
+      const raw = await response.json()
+      data = transformBuildingGeojson(buildingId, raw)
+      equipmentCache.set(cacheKey, data)
+    }
+    map.getSource('vgu-equipment').setData(data)
+  } catch (error) {
+    console.warn(`[HologramMap] Không tải được thiết bị cho phòng ${roomId}:`, error)
+    clearEquipmentLayer()
+  }
+}
+
+function clearEquipmentLayer() {
+  hoveredEquipmentId = null
+  if (map?.getSource('vgu-equipment')) {
+    map.getSource('vgu-equipment').setData({ type: 'FeatureCollection', features: [] })
+  }
+}
+
+// Chỉ hiện thiết bị khi có phòng đang được chọn — khớp đúng yêu cầu "thiết bị
+// của phòng chỉ hiện lên khi nhấn vào phòng đó".
+watch(currentRoomId, (roomId) => {
+  if (!roomId || !currentBuildingId.value) {
+    clearEquipmentLayer()
+    return
+  }
+  loadEquipmentForRoom(currentBuildingId.value, roomId)
+})
+
 let roomMarkers = []
 
 function clearRoomMarkers() {
@@ -546,8 +679,6 @@ function renderRoomMarkers(floorNumber) {
     const label = name ? (name.vi || name.en) : ''
 
     const el = document.createElement('div')
-    // Dự án KHÔNG dùng Tailwind nên đặt style trực tiếp (các class utility trước
-    // đây là vô tác dụng). width/height 0 để marker tự canh giữa quanh centroid.
     el.className = 'vgu-room-marker'
     el.style.cssText = 'position:relative;width:0;height:0;cursor:pointer;pointer-events:auto;'
     el.innerHTML = `
@@ -557,7 +688,7 @@ function renderRoomMarkers(floorNumber) {
       </div>
       <div class="room-marker-card">
         <div class="room-marker-id">${roomId}</div>
-        ${label ? `<div class="room-marker-name">${label}</div>` : ''}
+        ${label ? `<div class="room-marker-name">${formatRoomName(label)}</div>` : ''}
       </div>
     `
     el.addEventListener('click', (e) => {
@@ -570,7 +701,6 @@ function renderRoomMarkers(floorNumber) {
   })
 }
 
-// ---- Fetch + cache phòng của 1 tòa (gộp mọi tầng), transform về lat/lng -----
 async function getBuildingRoomsData(buildingId) {
   if (floorCache.has(buildingId)) return floorCache.get(buildingId)
   try {
@@ -609,7 +739,6 @@ onUnmounted(() => {
 }
 :deep(.maplibregl-ctrl button) { background: transparent; color: #00ffcc; }
 :deep(.maplibregl-ctrl button:hover) { background: rgba(239, 90, 36, 0.2); }
-
 :deep(.maplibregl-popup-content) {
   background: rgba(15, 30, 54, 0.95);
   border: 1px solid rgba(239, 90, 36, 0.4);
@@ -619,17 +748,143 @@ onUnmounted(() => {
 }
 :deep(.maplibregl-popup-tip) { border-top-color: rgba(15, 30, 54, 0.95); }
 
-/* ================= Thang máy chọn tầng ================= */
-.elevator-hud {
+
+/* ================= Thanh tìm kiếm TOÀN CỤC (Mới) ================= */
+.global-search-container {
   position: absolute;
-  left: 20px;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 70;
+  width: 320px;
+  max-width: 90vw;
+}
+
+.search-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.search-icon {
+  position: absolute;
+  left: 14px;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 20;
+  width: 16px;
+  height: 16px;
+  color: #94a3b8;
+}
+
+.global-search-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 16px 0 40px; /* Nhường chỗ cho icon */
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(11, 17, 32, 0.85);
+  color: #fff;
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  outline: none;
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.global-search-input::placeholder { color: rgba(255, 255, 255, 0.5); }
+
+.global-search-input:focus {
+  border-color: #EF5A24;
+  background: rgba(11, 17, 32, 0.95);
+}
+
+.global-search-results {
+  margin-top: 8px;
+  width: 100%;
+  max-height: 320px;
+  overflow-y: auto;
+  background: rgba(11, 17, 32, 0.95);
+  border: 1px solid rgba(239, 90, 36, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  padding: 8px;
   display: flex;
   flex-direction: column;
+  gap: 4px;
+  backdrop-filter: blur(8px);
+}
+
+.global-search-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 12px;
+  cursor: pointer;
+  color: #e2e8f0;
+  transition: background 0.15s;
+}
+
+.global-search-item:hover { background: rgba(239, 90, 36, 0.15); }
+
+.rs-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rs-id {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: #EF5A24;
+}
+
+.rs-name { 
+  font-size: 11px; 
+  color: #94a3b8; 
+}
+
+.rs-building {
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  background: rgba(255,255,255,0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 10px;
+}
+
+.room-search-empty {
+  padding: 10px;
+  font-size: 11px;
+  color: #64748b;
+  text-align: center;
+}
+
+/* Scrollbar cho search results */
+.global-search-results::-webkit-scrollbar { width: 6px; }
+.global-search-results::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+
+/* ================= Thang máy chọn tầng ================= */
+.floor-bar {
+  position: absolute;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 60;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   gap: 8px;
-  padding: 10px 8px;
+  padding: 8px 10px;
   background: rgba(15, 30, 54, 0.9);
   border: 1px solid rgba(239, 90, 36, 0.3);
   border-radius: 999px;
@@ -637,16 +892,14 @@ onUnmounted(() => {
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
 }
 
-.elevator-label {
-  text-align: center;
+.floor-bar-label {
   font-family: 'Space Mono', monospace;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 1px;
   color: #EF5A24;
-  padding-bottom: 4px;
-  margin-bottom: 2px;
-  border-bottom: 1px solid rgba(239, 90, 36, 0.2);
+  padding: 0 6px 0 4px;
+  border-right: 1px solid rgba(239, 90, 36, 0.2);
 }
 
 .floor-btn {
@@ -670,7 +923,6 @@ onUnmounted(() => {
   color: #fff;
 }
 
-/* Tầng có dữ liệu chi tiết -> viền + chữ cyan phát sáng */
 .floor-btn.detail {
   border-color: rgba(6, 182, 212, 0.6);
   background: rgba(6, 182, 212, 0.08);
@@ -679,7 +931,6 @@ onUnmounted(() => {
 }
 .floor-btn.detail:hover { color: #fff; border-color: #06B6D4; }
 
-/* Tầng đang xem -> cam đặc, phát sáng mạnh */
 .floor-btn.active {
   background: #EF5A24;
   border-color: #EF5A24;
@@ -688,17 +939,18 @@ onUnmounted(() => {
 }
 
 .exit-btn {
-  margin-top: 4px;
+  margin-right: 4px;
   color: #EF5A24;
   border-color: rgba(239, 90, 36, 0.25);
   font-size: 14px;
 }
 .exit-btn:hover { background: rgba(239, 90, 36, 0.12); color: #fff; }
 
+
 /* ================= Thông báo chưa định vị ================= */
 .calib-notice {
   position: absolute;
-  bottom: 40px;
+  bottom: 80px; /* Đẩy lên một chút cho đỡ cấn thanh tầng */
   left: 50%;
   transform: translateX(-50%);
   z-index: 20;
@@ -813,7 +1065,6 @@ onUnmounted(() => {
 .fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
 
-/* Tôn trọng người dùng tắt hiệu ứng chuyển động */
 @media (prefers-reduced-motion: reduce) {
   :deep(.room-ping) { animation: none; opacity: 0.4; }
   .calib-dot { animation: none; }
@@ -821,10 +1072,13 @@ onUnmounted(() => {
   .fade-enter-active, .fade-leave-active { transition: none; }
 }
 
-/* Responsive: thu nhỏ thang máy trên màn hình hẹp */
 @media (max-width: 640px) {
-  .elevator-hud { left: 10px; gap: 6px; padding: 8px 6px; }
+  .floor-bar { gap: 6px; padding: 6px 8px; max-width: 94vw; }
   .floor-btn { width: 34px; height: 34px; font-size: 11px; }
+  
+  .global-search-container { width: 90vw; }
+  .global-search-input { font-size: 12px; }
+
   :deep(.room-marker-card) { min-width: 84px; max-width: 130px; padding: 4px 8px; }
   :deep(.room-marker-id) { font-size: 9px; }
   :deep(.room-marker-name) { font-size: 8px; -webkit-line-clamp: 1; }

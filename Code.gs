@@ -55,10 +55,21 @@ function doGet(e) {
           };
         }
         
-        const occupant = getFirstString(rowData, ["occupant", "nguoi_su_dung", "staff_name", "fm_staff_name", "nhan_su"], "");
-        if (occupant && roomsMap[roomNumber].occupants_list.indexOf(occupant) === -1) {
-          roomsMap[roomNumber].occupants_list.push(occupant);
-        }
+        // ĐOẠN MỚI:
+const occupantRaw = getFirstString(rowData, ["occupant", "nguoi_su_dung", "staff_name", "fm_staff_name", "nhan_su"], "");
+if (occupantRaw) {
+  // Tách chuỗi bằng dấu xuống dòng (hỗ trợ cả \n và \r\n từ Sheet)
+  const occupantNames = occupantRaw.split(/\r?\n/);
+  
+  occupantNames.forEach(name => {
+    const cleanName = name.trim();
+    // Đưa từng tên riêng biệt vào mảng
+    if (cleanName && roomsMap[roomNumber].occupants_list.indexOf(cleanName) === -1) {
+      roomsMap[roomNumber].occupants_list.push(cleanName);
+    }
+  });
+}
+
         const statusVal = getFirstString(rowData, ["status", "trang_thai"], "");
         if (statusVal) roomsMap[roomNumber].status = statusVal;
       }

@@ -31,7 +31,19 @@
       </div>
     </div>
 
-    <!-- Panel thông tin phòng -->
+    <!-- Panel danh sách phòng theo tầng (bên trái) -->
+    <transition name="cyber-slide-left">
+      <FloorPanel
+        v-if="selectedBuilding && selectedFloor != null"
+        :building-id="selectedBuilding"
+        :cluster-label="String(selectedBuilding).toUpperCase()"
+        :floor="selectedFloor"
+        :selected-room-id="selectedRoom"
+        @select-room="handleFloorRoomSelect"
+      />
+    </transition>
+
+    <!-- Panel thông tin phòng (bên phải) -->
     <transition name="cyber-slide">
       <RoomDetailPanel
         v-if="selectedRoom"
@@ -57,6 +69,7 @@ import { storeToRefs } from 'pinia'
 import { useMapStore } from '~/Stores/mapStores'
 import HologramMap from '~/components/HologramMap.vue'
 import RoomDetailPanel from '~/components/RoomDetailPanel.vue'
+import FloorPanel from '~/components/FloorPanel.vue'
 
 const mapStore = useMapStore()
 const { selectedRoom, selectedBuilding, selectedFloor, isLoading } = storeToRefs(mapStore)
@@ -77,6 +90,10 @@ const handleFloorSelected = ({ floor }) => {
   mapStore.setFloor(floor)
 }
 const closePanel = () => mapStore.clearSelection()
+// Nhấn phòng trong FloorPanel -> mở RoomDetailPanel bên phải, giữ nguyên FloorPanel bên trái.
+const handleFloorRoomSelect = ({ roomId, buildingId }) => {
+  mapStore.focusOnRoom(roomId, buildingId ?? selectedBuilding.value, selectedFloor.value)
+}
 
 const onMapReady = () => { isLoading.value = false }
 
@@ -170,6 +187,10 @@ onBeforeUnmount(() => {
   transition: transform 0.35s ease, opacity 0.35s ease;
 }
 .cyber-slide-enter-from, .cyber-slide-leave-to { transform: translateX(30px); opacity: 0; }
+.cyber-slide-left-enter-active, .cyber-slide-left-leave-active {
+  transition: transform 0.35s ease, opacity 0.35s ease;
+}
+.cyber-slide-left-enter-from, .cyber-slide-left-leave-to { transform: translateX(-30px); opacity: 0; }
 
 /* Tôn trọng người dùng tắt hiệu ứng chuyển động */
 @media (prefers-reduced-motion: reduce) {
