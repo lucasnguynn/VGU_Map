@@ -1,442 +1,187 @@
 <template>
-  <div class="room-detail-panel">
-    <!-- Nút Đóng -->
-    <button class="close-btn" @click="closePanel">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
-      </svg>
-    </button>
+  <div class="map-page">
+    <!-- Luồng 3D chỉ chạy ở client -->
+    <ClientOnly fallback-tag="div" fallback-class="loading-overlay">
+      <HologramMap
+        @room-selected="handleRoomSelected"
+        @building-selected="handleBuildingSelected"
+        @floor-selected="handleFloorSelected"
+        @ready="onMapReady"
+      />
+    </ClientOnly>
 
-    <!-- 1. Header Section -->
-    <div class="panel-header">
-      <div class="room-location">
-        <span class="building">{{ display.building || 'N/A' }}</span>
-        <span class="separator">//</span>
-        <span class="level">FLOOR {{ display.level ?? 'N/A' }}</span>
+    <!-- Header HUD -->
+    <header class="app-header">
+      <div class="header-content">
+        <img src="/VGU-Logo.png" class="header-logo" alt="Logo VGU" />
+        <h1 class="header-title">
+          <span class="title-accent">VGU</span> MAP
+        </h1>
       </div>
-      <!-- Tên phòng đã được xử lý để không bị lặp -->
-      <h2 class="room-name">{{ display.name || 'N/A' }}</h2>
-      <p class="department">{{ display.department || 'N/A' }}</p>
+      <div class="sys-status" role="status" aria-live="polite">
+        <span class="pulse-dot" aria-hidden="true"></span>
+        <span>SYSTEM: ONLINE</span>
+      </div>
+    </header>
+
+    <div class="hud-bar">
+      <div class="hud-context-panel">
+        <span class="pulse-dot" aria-hidden="true"></span>
+        <span>{{ contextTitle }}</span>
+      </div>
     </div>
 
-    <!-- Vùng nội dung có thể cuộn -->
-    <div class="panel-content">
-      <div v-if="isLoading" class="state-msg">Đang tải dữ liệu phòng…</div>
+    <!-- Panel thông tin phòng -->
+    <transition name="cyber-slide">
+      <RoomDetailPanel
+        v-if="selectedRoom"
+        :room-id="selectedRoom"
+        :building-id="selectedBuilding"
+        @close="closePanel"
+      />
+    </transition>
 
-      <template v-else>
-        <!-- 2. Ảnh thực tế -->
-        <div class="photo-section">
-          <template v-if="display.photos && display.photos.length > 0">
-            <div class="photo-grid" :class="{'single-photo': display.photos.length === 1}">
-              <img v-for="(photo, index) in display.photos.slice(0, 2)" :key="index" :src="photo" alt="Room Photo" class="room-image" />
-            </div>
-          </template>
-          <div v-else class="no-photo-placeholder">
-            <div class="placeholder-content">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="7" width="18" height="14" rx="2" ry="2"></rect>
-                <circle cx="12" cy="14" r="3"></circle>
-                <path d="M16 3h-8l-2 4h12l-2-4z"></path>
-              </svg>
-              <p>Chưa có ảnh thực tế</p>
-              <span>Sẽ cập nhật ảnh thực tế tại đây cho phòng {{ display.name }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 3. Thông tin nhân sự (Đã xóa tiêu đề và chữ Room Incharge, hỗ trợ nhiều người) -->
-        <div class="info-card" v-if="display.occupants.length > 0 || display.office || display.email">
-          <div class="card-body">
-            <!-- Vòng lặp hiển thị từng staff trên một dòng -->
-            <p v-for="(person, idx) in display.occupants" :key="idx" class="incharge-name">
-              {{ person }}
-            </p>
-            <p class="incharge-position" v-if="display.office">
-              Office: {{ display.office }}
-            </p>
-            <p class="incharge-email">
-              <a :href="'mailto:' + display.email" v-if="display.email">{{ display.email }}</a>
-              <span v-else>N/A</span>
-            </p>
-            <p class="incharge-phone" v-if="display.phone">Tel: {{ display.phone }}</p>
-          </div>
-        </div>
-
-        <!-- 4. Thông tin mô tả (Room Description - Đã xuống dòng) -->
-        <div class="info-card">
-          <h3 class="card-title">ROOM DESCRIPTION</h3>
-          <div class="card-body">
-            <!-- Tách từng thông tin ra các thẻ p riêng biệt -->
-            <p><strong>Phân loại:</strong> {{ display.roomType }}</p>
-            <p><strong>Diện tích:</strong> {{ display.area }} m2</p>
-            <p><strong>Sức chứa:</strong> {{ display.capacity }}</p>
-            
-            <div class="working-hours mt-2">
-              <strong class="text-highlight">Trạng thái / Hoạt động:</strong>
-              <p>{{ display.status || 'N/A' }}</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- 5. Featured Facility / Instruments -->
-        <div class="info-card">
-          <h3 class="card-title highlight-title">
-            FEATURED INSTRUMENTS ({{ display.instruments ? display.instruments.length : 0 }})
-          </h3>
-          <div class="card-body">
-            <ul v-if="display.instruments && display.instruments.length > 0" class="instrument-list">
-              <li v-for="(item, index) in display.instruments" :key="index">
-                {{ item.name || item }}
-              </li>
-            </ul>
-            <div v-else class="empty-instruments">
-              <p>No highlighted instruments available.</p>
-            </div>
-          </div>
-        </div>
-      </template>
-    </div>
-
-    <!-- 6. Action Button -->
-    <div class="panel-footer">
-      <button class="action-btn">VIEW ALL MACHINES IN THIS ROOM</button>
-    </div>
+    <!-- Loading overlay: tắt khi bản đồ báo 'ready' (có timeout an toàn) -->
+    <transition name="fade">
+      <div v-if="isLoading" class="loading-overlay">
+        <div class="cyber-loader" aria-hidden="true"></div>
+        <p>ĐANG KHỞI TẠO HỆ THỐNG BẢN ĐỒ…</p>
+      </div>
+    </transition>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { computed, onMounted, onBeforeUnmount } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useMapStore } from '~/Stores/mapStores'
+import HologramMap from '~/components/HologramMap.vue'
+import RoomDetailPanel from '~/components/RoomDetailPanel.vue'
 
-const props = defineProps({
-  roomId: { type: String, default: null },
-  buildingId: { type: String, default: null }
+const mapStore = useMapStore()
+const { selectedRoom, selectedBuilding, selectedFloor, isLoading } = storeToRefs(mapStore)
+
+const contextTitle = computed(() => {
+  if (!selectedBuilding.value) return 'TIÊU ĐIỂM: TOÀN CẢNH KHUÔN VIÊN VGU'
+  if (selectedRoom.value) return `PHÒNG: ${selectedRoom.value}`
+  return `TOÀ: ${String(selectedBuilding.value).toUpperCase()} · TẦNG ${selectedFloor.value ?? '-'}`
 })
 
-const emit = defineEmits(['close'])
-const closePanel = () => emit('close')
-
-const { getRoomInfo } = useVguData()
-
-const isLoading = ref(false)
-const roomData = ref(null)
-
-const cleanData = (data) => {
-  if (!data || data === '___' || data === '--' || data === 'Chưa cập nhật' || data === 'unknown') return ''
-  return data
+const handleRoomSelected = ({ roomId, buildingId, floor }) => {
+  mapStore.focusOnRoom(roomId, buildingId, floor)
 }
+const handleBuildingSelected = ({ buildingId, floor }) => {
+  mapStore.focusOnBuilding(buildingId, floor)
+}
+const handleFloorSelected = ({ floor }) => {
+  mapStore.setFloor(floor)
+}
+const closePanel = () => mapStore.clearSelection()
 
-const fetchRoom = async (id) => {
-  if (!id) {
-    roomData.value = null
-    return
-  }
+const onMapReady = () => { isLoading.value = false }
+
+// Đóng panel bằng phím Esc
+const onKey = (e) => { if (e.key === 'Escape' && selectedRoom.value) closePanel() }
+
+let safety
+onMounted(() => {
   isLoading.value = true
-  roomData.value = await getRoomInfo(id)
-  isLoading.value = false
-}
-
-watch(() => props.roomId, fetchRoom, { immediate: true })
-
-const display = computed(() => {
-  const r = roomData.value
-  if (!r) {
-    return {
-      building: cleanData(props.buildingId),
-      level: null,
-      name: props.roomId || '',
-      department: '',
-      photos: [],
-      occupants: [],
-      office: '',
-      email: '',
-      phone: '',
-      roomType: 'N/A',
-      area: 'N/A',
-      capacity: 'N/A',
-      status: '',
-      instruments: []
-    }
-  }
-
-  let photos = []
-  if (r.image) {
-    photos = Array.isArray(r.image) ? r.image.filter(Boolean) : [r.image]
-  }
-
-  const departments = Array.isArray(r.departments)
-    ? r.departments.map(cleanData).filter(Boolean).join(', ')
-    : cleanData(r.departments)
-
-  // 1. XỬ LÝ LỖI LẶP TÊN PHÒNG (VD: "OFFICE - OFFICE")
-  let roomName = cleanData(r.name) || props.roomId;
-  if (typeof roomName === 'string' && roomName.includes('-')) {
-    const parts = roomName.split('-').map(p => p.trim());
-    // Nếu phần trước và sau dấu '-' giống hệt nhau, chỉ lấy 1 phần
-    if (parts.length === 2 && parts[0] === parts[1]) {
-      roomName = parts[0];
-    }
-  }
-
-  // 2. XỬ LÝ NHIỀU NHÂN SỰ
-  // Tách tên nhân sự bằng dấu xuống dòng (\n) thành mảng các tên riêng biệt
-  let occupantsList = [];
-  const rawName = r.head_of_lab ? cleanData(r.head_of_lab.name) : '';
-  if (rawName) {
-    if (Array.isArray(rawName)) {
-      occupantsList = rawName.map(cleanData).filter(Boolean);
-    } else if (typeof rawName === 'string') {
-      // Cắt chuỗi dựa trên dấu xuống dòng (hỗ trợ cả \n và \r\n từ Excel)
-      occupantsList = rawName.split(/\r?\n/).map(name => name.trim()).filter(Boolean);
-    }
-  }
-
-  return {
-    building: cleanData(r.building_id) || cleanData(props.buildingId),
-    level: r.floor ?? null,
-    name: roomName,
-    department: departments,
-    photos,
-    occupants: occupantsList, // Trả về mảng chứa tên các staff
-    office: r.head_of_lab ? cleanData(r.head_of_lab.office) : '',
-    email: r.head_of_lab ? cleanData(r.head_of_lab.email) : '',
-    phone: r.head_of_lab ? cleanData(r.head_of_lab.phone) : '',
-    // 3. TÁCH DỮ LIỆU DESCRIPTION ĐỂ XUỐNG DÒNG
-    roomType: cleanData(r.room_type) || 'N/A',
-    area: cleanData(r.area_m2) || 'N/A',
-    capacity: cleanData(r.capacity) || 'N/A',
-    status: cleanData(r.status),
-    instruments: r.highlighted_equipment || []
-  }
+  // Nếu vì lý do nào đó bản đồ không phát 'ready', vẫn ẩn overlay sau 6s.
+  safety = setTimeout(() => { isLoading.value = false }, 6000)
+  window.addEventListener('keydown', onKey)
+})
+onBeforeUnmount(() => {
+  clearTimeout(safety)
+  window.removeEventListener('keydown', onKey)
 })
 </script>
 
 <style scoped>
-/* Tổng quan Panel */
-.room-detail-panel {
+.map-page {
   position: absolute;
-  top: 0;
-  right: 0;
-  width: 400px;
-  height: 100vh;
-  background-color: #0b1120;
-  border-left: 1px solid #1f2d40;
-  display: flex;
-  flex-direction: column;
-  color: #e2e8f0;
-  font-family: 'Inter', sans-serif;
-  box-shadow: -4px 0 15px rgba(0,0,0,0.5);
-  z-index: 100;
-}
-
-/* Nút Đóng */
-.close-btn {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: transparent;
-  border: none;
-  color: #64748b;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-.close-btn:hover {
-  color: #f87171;
-}
-
-/* Header */
-.panel-header {
-  padding: 24px 20px 16px;
-  border-bottom: 1px dashed #1f2d40;
-}
-.room-location {
-  font-size: 10px;
-  font-weight: 700;
-  color: #f97316;
-  letter-spacing: 1px;
-  margin-bottom: 8px;
-  text-transform: uppercase;
-}
-.room-location .separator {
-  margin: 0 4px;
-  color: #64748b;
-}
-.room-name {
-  font-size: 22px;
-  font-weight: 700;
-  color: #ffffff;
-  margin: 0 0 4px 0;
-}
-.department {
-  font-size: 13px;
-  color: #94a3b8;
-  margin: 0;
-}
-
-/* Scroll Content */
-.panel-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-.panel-content::-webkit-scrollbar {
-  width: 6px;
-}
-.panel-content::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 4px;
-}
-
-.state-msg {
-  padding: 20px 0;
-  text-align: center;
-  color: #94a3b8;
-  font-size: 13px;
-}
-
-/* Photo Section */
-.photo-section {
-  width: 100%;
-  border-radius: 8px;
+  inset: 0;
   overflow: hidden;
 }
-.photo-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-.photo-grid.single-photo {
-  grid-template-columns: 1fr;
-}
-.room-image {
-  width: 100%;
-  height: 160px;
-  object-fit: cover;
-  border-radius: 6px;
-}
-.no-photo-placeholder {
-  width: 100%;
-  height: 180px;
-  background-color: #f1f5f9;
+
+/* Header HUD */
+.app-header {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  z-index: 20;
   display: flex;
   align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  color: #475569;
-  text-align: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  background: linear-gradient(180deg, rgba(5, 10, 15, 0.85) 0%, rgba(5, 10, 15, 0) 100%);
+  pointer-events: none;
 }
-.placeholder-content svg {
-  margin-bottom: 8px;
-  color: #94a3b8;
+.header-content { display: flex; align-items: center; gap: 14px; }
+.header-logo { height: 36px; width: auto; filter: drop-shadow(0 0 6px rgba(0, 255, 204, 0.4)); }
+.header-title {
+  font-family: 'Be Vietnam Pro', sans-serif;
+  font-size: 18px; font-weight: 600; color: #fff; letter-spacing: 0.5px; margin: 0;
 }
-.placeholder-content p {
-  font-weight: 600;
-  margin: 0;
-  font-size: 14px;
+.title-accent { color: #EF5A24; }
+.sys-status {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; letter-spacing: 1px; color: #00ffcc;
 }
-.placeholder-content span {
-  font-size: 11px;
-  color: #94a3b8;
+.pulse-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #00ffcc; box-shadow: 0 0 8px #00ffcc;
+  animation: pulse 1.6s ease-in-out infinite;
 }
-
-/* Info Cards */
-.info-card {
-  background-color: #0f172a;
-  border: 1px solid #1e293b;
-  border-radius: 8px;
-  padding: 16px;
-}
-.card-title {
-  font-size: 10px;
-  font-weight: 700;
-  color: #94a3b8;
-  letter-spacing: 1px;
-  margin: 0 0 12px 0;
-  text-transform: uppercase;
-}
-.highlight-title {
-  color: #f97316;
-}
-.card-body p {
-  margin: 0 0 6px 0;
-  font-size: 13px;
-  line-height: 1.5;
-}
-.card-body p strong {
-  color: #cbd5e1;
-}
-.incharge-name {
-  font-weight: 700;
-  font-size: 16px !important;
-  color: #ffffff;
-  margin-bottom: 4px !important;
-}
-.incharge-position {
-  color: #cbd5e1;
-  margin-top: 8px !important;
-}
-.incharge-email a {
-  color: #0ea5e9;
-  text-decoration: none;
-}
-.incharge-email a:hover {
-  text-decoration: underline;
-}
-.mt-2 {
-  margin-top: 12px;
-}
-.text-highlight {
-  color: #f8fafc;
-  font-size: 12px;
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
 }
 
-/* Instruments List */
-.instrument-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  font-size: 13px;
-}
-.instrument-list li {
-  padding: 6px 0;
-  border-bottom: 1px solid #1e293b;
-}
-.instrument-list li:last-child {
-  border-bottom: none;
-}
-.empty-instruments {
-  background-color: #1e293b;
-  padding: 12px;
+/* HUD Bar */
+.hud-bar { position: absolute; top: 68px; left: 24px; z-index: 20; pointer-events: none; }
+.hud-context-panel {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 16px;
+  background: rgba(15, 30, 54, 0.75);
+  border: 1px solid rgba(0, 255, 204, 0.25);
   border-radius: 4px;
-  text-align: center;
-  color: #64748b;
-  font-style: italic;
-  font-size: 12px;
+  backdrop-filter: blur(8px);
+  font-family: 'Space Mono', monospace;
+  font-size: 12px; letter-spacing: 0.5px; color: #00ffcc;
 }
 
-/* Footer & Button */
-.panel-footer {
-  padding: 16px 20px;
-  border-top: 1px solid #1f2d40;
+/* Loading overlay */
+.loading-overlay {
+  position: absolute; inset: 0; z-index: 100;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 20px; background: #05080d; color: #00ffcc;
+  font-family: 'Space Mono', monospace; font-size: 13px; letter-spacing: 1px;
 }
-.action-btn {
-  width: 100%;
-  background-color: #f97316;
-  color: #ffffff;
-  border: none;
-  padding: 14px;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 1px;
-  border-radius: 6px;
-  cursor: pointer;
-  text-transform: uppercase;
-  transition: background-color 0.2s;
+.cyber-loader {
+  width: 56px; height: 56px;
+  border: 3px solid rgba(0, 255, 204, 0.2); border-top-color: #00ffcc;
+  border-radius: 50%; animation: spin 1s linear infinite;
 }
-.action-btn:hover {
-  background-color: #ea580c;
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Transitions */
+.fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
+.cyber-slide-enter-active, .cyber-slide-leave-active {
+  transition: transform 0.35s ease, opacity 0.35s ease;
+}
+.cyber-slide-enter-from, .cyber-slide-leave-to { transform: translateX(30px); opacity: 0; }
+
+/* Tôn trọng người dùng tắt hiệu ứng chuyển động */
+@media (prefers-reduced-motion: reduce) {
+  .pulse-dot, .cyber-loader { animation: none; }
+  .fade-enter-active, .fade-leave-active,
+  .cyber-slide-enter-active, .cyber-slide-leave-active { transition: none; }
+}
+
+@media (max-width: 640px) {
+  .app-header { padding: 10px 14px; }
+  .header-title { font-size: 16px; }
+  .hud-bar { top: 58px; left: 14px; }
+  .hud-context-panel { font-size: 11px; padding: 6px 12px; }
 }
 </style>
