@@ -122,6 +122,13 @@ const closePanel = () => emit('close')
 
 const { getRoomInfo } = useVguData()
 
+// [FIX] Lấy baseURL giống HologramMap.vue — thiếu bước này khiến fetch luôn
+// 404 khi deploy lên GitHub Pages (baseURL: '/VGU_Map/'), vì $fetch('/data/...')
+// luôn trỏ vào domain gốc thay vì '/VGU_Map/data/...'. Trên localhost (baseURL='/')
+// thì không thấy lỗi, nên bug này rất dễ bị bỏ sót.
+const config = useRuntimeConfig()
+const base = config.app.baseURL
+
 const isLoading = ref(false)
 const roomData = ref(null)
 const driveData = ref({})
@@ -129,7 +136,7 @@ const driveData = ref({})
 // Tải file JSON trực tiếp từ thư mục public khi component được gắn vào DOM
 onMounted(async () => {
   try {
-    const res = await $fetch('/data/drive_data.json')
+    const res = await $fetch(`${base}data/drive_data.json`)
     if (res) {
       driveData.value = res
       console.log('[RoomDetailPanel] Đã load drive_data.json, số lượng phòng có ảnh:', Object.keys(res).length)
