@@ -85,6 +85,7 @@
               Office: {{ display.office }}
             </p>
             <p class="incharge-email">
+              <span class="contact-label">Contact:</span>
               <a :href="'mailto:' + display.email" v-if="display.email">{{ display.email }}</a>
               <span v-else>N/A</span>
             </p>
@@ -488,6 +489,13 @@ const display = computed(() => {
 .incharge-position {
   color: #cbd5e1;
   margin-top: 8px !important;
+}
+.incharge-email {
+  color: #94a3b8;
+}
+.contact-label {
+  color: #94a3b8;
+  margin-right: 4px;
 }
 .incharge-email a {
   color: #0ea5e9;
