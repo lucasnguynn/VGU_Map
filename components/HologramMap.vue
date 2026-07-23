@@ -83,7 +83,7 @@
       v-if="currentRoomId"
       :room-id="currentRoomId"
       :building-id="currentBuildingId"
-      @close="currentRoomId = null"
+      @close="closeRoomDetail"
     />
   </Transition>
 </template>
@@ -497,6 +497,7 @@ async function selectBuilding(buildingId) {
 function selectFloor(floorNumber) {
   currentFloor.value = floorNumber
   currentRoomId.value = null
+  updateRoomHighlightPaint()
 
   const filter = ['all',
     ['==', ['get', 'floor'], floorNumber],
@@ -562,8 +563,44 @@ async function goToRoom(result) {
   selectRoom(result.id, centroid, feature?.properties || { building_id: result.buildingId, floor: result.floor })
 }
 
+// ================= Làm nổi bật phòng đang chọn, làm mờ phòng xung quanh =================
+// Viền phòng được chọn dùng đúng màu theo loại phòng (giống màu fill mặc định),
+// tăng độ dày viền + độ đục fill để nổi bật; các phòng còn lại bị mờ đi.
+const ROOM_TYPE_COLOR_EXPR = ['match', ['get', 'type'],
+  'laboratory', '#00ffcc',
+  'corridor', '#334155',
+  '#EF5A24'
+]
+
+function updateRoomHighlightPaint() {
+  if (!map || !map.getLayer('vgu-rooms-fill') || !map.getLayer('vgu-rooms-outline')) return
+  const selId = currentRoomId.value
+
+  if (!selId) {
+    map.setPaintProperty('vgu-rooms-fill', 'fill-opacity', 0.35)
+    map.setPaintProperty('vgu-rooms-outline', 'line-color', ROOM_TYPE_COLOR_EXPR)
+    map.setPaintProperty('vgu-rooms-outline', 'line-width', 1.5)
+    map.setPaintProperty('vgu-rooms-outline', 'line-opacity', 0.8)
+    return
+  }
+
+  map.setPaintProperty('vgu-rooms-fill', 'fill-opacity', [
+    'case', ['==', ['get', 'room_id'], selId], 0.6, 0.1
+  ])
+  map.setPaintProperty('vgu-rooms-outline', 'line-color', [
+    'case', ['==', ['get', 'room_id'], selId], ROOM_TYPE_COLOR_EXPR, '#334155'
+  ])
+  map.setPaintProperty('vgu-rooms-outline', 'line-width', [
+    'case', ['==', ['get', 'room_id'], selId], 3, 1
+  ])
+  map.setPaintProperty('vgu-rooms-outline', 'line-opacity', [
+    'case', ['==', ['get', 'room_id'], selId], 1, 0.25
+  ])
+}
+
 function selectRoom(roomId, centroid, propsObj = {}) {
   currentRoomId.value = roomId
+  updateRoomHighlightPaint()
   emit('room-selected', {
     roomId,
     buildingId: propsObj.building_id || currentBuildingId.value,
@@ -572,6 +609,11 @@ function selectRoom(roomId, centroid, propsObj = {}) {
   if (centroid && isLatLng(centroid)) {
     map.flyTo({ center: centroid, zoom: 20.6, pitch: 30, bearing: 10, duration: 1200 })
   }
+}
+
+function closeRoomDetail() {
+  currentRoomId.value = null
+  updateRoomHighlightPaint()
 }
 
 function exitBuilding() {
@@ -588,6 +630,7 @@ function exitBuilding() {
 
   clearRoomMarkers()
   clearEquipmentLayer()
+  updateRoomHighlightPaint()
 
   map.setFilter('vgu-buildings-3d', null)
   map.setFilter('vgu-buildings-outline', null)
