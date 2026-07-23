@@ -1,54 +1,68 @@
 <template>
-  <div class="floor-panel">
-    <!-- Breadcrumb -->
-    <div class="breadcrumb">
-      <span class="crumb">CAMPUS</span>
-      <span class="sep">/</span>
-      <span class="crumb active">{{ clusterLabel }}</span>
-    </div>
+  <div class="floor-panel" :class="{ 'is-collapsed': isCollapsed }">
+    <!-- Nút Toggle thu gọn/mở rộng (giống Gemini) -->
+    <button class="toggle-btn" @click="isCollapsed = !isCollapsed" :title="isCollapsed ? 'Mở danh sách phòng' : 'Thu gọn'">
+      <svg v-if="!isCollapsed" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="9" y1="3" x2="9" y2="21"></line>
+      </svg>
+      <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="15" y1="3" x2="15" y2="21"></line>
+      </svg>
+    </button>
 
-    <h2 class="floor-title">Floor {{ floor }} Rooms</h2>
-
-    <!-- Tabs phân loại theo FM-Room-Type -->
-    <div class="type-tabs" v-if="roomTypes.length > 1">
-      <button
-        v-for="type in roomTypes"
-        :key="type"
-        class="type-tab"
-        :class="{ active: activeType === type }"
-        @click="activeType = type"
-      >
-        {{ typeLabel(type) }}
-        <span class="tab-count">{{ countByType(type) }}</span>
-      </button>
-    </div>
-
-    <!-- Danh sách phòng -->
-    <div class="room-list">
-      <div v-if="isLoading" class="state-msg">Đang tải danh sách phòng…</div>
-
-      <div v-else-if="loadError" class="state-msg error">{{ loadError }}</div>
-
-      <div v-else-if="filteredRooms.length === 0" class="state-msg">
-        Không có phòng nào thuộc loại này.
+    <!-- Gói nội dung vào 1 wrapper để tránh bị tràn khi thu gọn -->
+    <div class="panel-content-wrapper">
+      <!-- Breadcrumb -->
+      <div class="breadcrumb">
+        <span class="crumb">CAMPUS</span>
+        <span class="sep">/</span>
+        <span class="crumb active">{{ clusterLabel }}</span>
       </div>
 
-      <button
-        v-for="room in filteredRooms"
-        :key="room.id"
-        class="room-card"
-        :class="{ selected: selectedRoomId === room.id }"
-        @click="handleSelectRoom(room)"
-      >
-        <div class="room-card-top">
-          <span class="room-number">{{ room.roomNumber }}</span>
-          <span class="room-status" :class="statusClass(room.status)">
-            {{ statusLabel(room.status) }}
-          </span>
+      <h2 class="floor-title">Floor {{ floor }} Rooms</h2>
+
+      <!-- Tabs phân loại theo FM-Room-Type -->
+      <div class="type-tabs" v-if="roomTypes.length > 1">
+        <button
+          v-for="type in roomTypes"
+          :key="type"
+          class="type-tab"
+          :class="{ active: activeType === type }"
+          @click="activeType = type"
+        >
+          {{ typeLabel(type) }}
+          <span class="tab-count">{{ countByType(type) }}</span>
+        </button>
+      </div>
+
+      <!-- Danh sách phòng -->
+      <div class="room-list">
+        <div v-if="isLoading" class="state-msg">Đang tải danh sách phòng…</div>
+
+        <div v-else-if="loadError" class="state-msg error">{{ loadError }}</div>
+
+        <div v-else-if="filteredRooms.length === 0" class="state-msg">
+          Không có phòng nào thuộc loại này.
         </div>
-        <!-- Áp dụng hàm lọc lặp tên ở đây -->
-        <span class="room-name">{{ formatRoomName(room.roomName) }}</span>
-      </button>
+
+        <button
+          v-for="room in filteredRooms"
+          :key="room.id"
+          class="room-card"
+          :class="{ selected: selectedRoomId === room.id }"
+          @click="handleSelectRoom(room)"
+        >
+          <div class="room-card-top">
+            <span class="room-number">{{ room.roomNumber }}</span>
+            <span class="room-status" :class="statusClass(room.status)">
+              {{ statusLabel(room.status) }}
+            </span>
+          </div>
+          <span class="room-name">{{ formatRoomName(room.roomName) }}</span>
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -72,6 +86,9 @@ const loadError = ref('')
 const rooms = ref([])
 const activeType = ref('all')
 
+// Biến điều khiển trạng thái đóng/mở của thanh bên
+const isCollapsed = ref(false)
+
 const ROOM_TYPE_ORDER = ['administration', 'teaching', 'laboratory', 'workshop', 'other']
 const ROOM_TYPE_LABELS = {
   administration: 'Administration',
@@ -81,7 +98,6 @@ const ROOM_TYPE_LABELS = {
   other: 'Khác'
 }
 
-// Helper: Lọc bỏ tên bị lặp lại
 const formatRoomName = (name) => {
   if (!name || typeof name !== 'string') return name
   const parts = name.split(/\s*-\s*/)
@@ -113,7 +129,11 @@ const loadRooms = async () => {
   }
 }
 
-watch(() => [props.buildingId, props.floor], loadRooms, { immediate: true })
+watch(() => [props.buildingId, props.floor], () => {
+  loadRooms()
+  // Tự động mở lại panel nếu người dùng đổi tầng hoặc tòa nhà
+  isCollapsed.value = false 
+}, { immediate: true })
 onMounted(loadRooms)
 
 const roomTypes = computed(() => {
@@ -158,21 +178,63 @@ const handleSelectRoom = (room) => {
   height: 100vh;
   background-color: #0b1120;
   border-right: 1px solid #1f2d40;
-  display: flex;
-  flex-direction: column;
   color: #e2e8f0;
   font-family: 'Inter', sans-serif;
-  padding: 16px 16px 0;
-  overflow: hidden;
   box-shadow: 4px 0 15px rgba(0,0,0,0.5);
   z-index: 90;
+  /* Thêm hiệu ứng trượt cho toàn bộ panel */
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible; /* Để nút toggle tràn ra ngoài */
 }
+
+/* Kích hoạt khi biến isCollapsed = true */
+.floor-panel.is-collapsed {
+  transform: translateX(-100%);
+}
+
+.panel-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: 16px 16px 0;
+  overflow: hidden; /* Cắt phần nội dung bị dư */
+}
+
+/* --- Thiết kế nút Toggle --- */
+.toggle-btn {
+  position: absolute;
+  top: 16px;
+  right: -36px; /* Đẩy ra ngoài panel */
+  width: 36px;
+  height: 36px;
+  background-color: #0b1120;
+  border: 1px solid #1f2d40;
+  border-left: none; /* Nối liền mạch với panel */
+  border-radius: 0 8px 8px 0;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 91;
+  transition: color 0.2s, background-color 0.2s;
+  box-shadow: 4px 0 10px rgba(0,0,0,0.3);
+}
+
+.toggle-btn:hover {
+  color: #f1f5f9;
+  background-color: #1e293b;
+}
+
+/* Các styles cũ của bạn */
 .breadcrumb {
   font-size: 11px;
   letter-spacing: 0.5px;
   color: #64748b;
   margin-bottom: 10px;
   text-transform: uppercase;
+  flex-shrink: 0;
 }
 .breadcrumb .crumb.active {
   color: #f1f5f9;
@@ -186,12 +248,14 @@ const handleSelectRoom = (room) => {
   font-size: 18px;
   font-weight: 700;
   color: #fff;
+  flex-shrink: 0;
 }
 .type-tabs {
   display: flex;
   gap: 6px;
   margin-bottom: 14px;
   flex-wrap: wrap;
+  flex-shrink: 0;
 }
 .type-tab {
   background: #0f172a;
