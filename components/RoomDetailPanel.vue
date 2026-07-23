@@ -24,7 +24,7 @@
       <div v-if="isLoading" class="state-msg">Đang tải dữ liệu phòng…</div>
 
       <template v-else>
-        <!-- 2. ẢNH THỰC TẾ (ĐẢM BẢO BẠN COPY ĐOẠN NÀY) -->
+        <!-- 2. Ảnh thực tế -->
         <div class="photo-section">
           <template v-if="display.photos && display.photos.length > 0">
             <div class="photo-grid" :class="{'single-photo': display.photos.length === 1}">
@@ -103,10 +103,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
-
-// Import trực tiếp file JSON từ thư mục public để dữ liệu có sẵn ngay lập tức
-import driveData from '~/public/data/drive_data.json'
+import { ref, computed, watch, onMounted } from 'vue'
 
 const props = defineProps({
   roomId: { type: String, default: null },
@@ -120,6 +117,19 @@ const { getRoomInfo } = useVguData()
 
 const isLoading = ref(false)
 const roomData = ref(null)
+const driveData = ref({})
+
+// Tải file JSON trực tiếp từ thư mục public khi component được gắn vào DOM
+onMounted(async () => {
+  try {
+    const res = await $fetch('/data/drive_data.json')
+    if (res) {
+      driveData.value = res
+    }
+  } catch (err) {
+    console.error('Không thể load file drive_data.json:', err)
+  }
+})
 
 const cleanData = (data) => {
   if (!data || data === '___' || data === '--' || data === 'Chưa cập nhật' || data === 'unknown') return ''
@@ -159,11 +169,13 @@ const display = computed(() => {
     }
   }
 
-  // --- UPDATE ẢNH: Đọc trực tiếp từ file JSON ---
+  // --- CHECK ẢNH TỪ JSON (Dùng lh3.googleusercontent.com để hiển thị ảnh mượt mà) ---
   let photos = []
-  if (props.roomId && driveData[props.roomId]) {
-    // Dùng Thumbnail API để tránh bị Google Drive chặn thẻ <img>
-    photos = [`https://drive.google.com/thumbnail?id=${driveData[props.roomId]}&sz=w800`]
+  const currentRoomId = props.roomId ? props.roomId.trim() : ''
+  
+  if (currentRoomId && driveData.value[currentRoomId]) {
+    const fileId = driveData.value[currentRoomId]
+    photos = [`https://lh3.googleusercontent.com/d/${fileId}=s800`]
   } else if (r.image) {
     photos = Array.isArray(r.image) ? r.image.filter(Boolean) : [r.image]
   }
