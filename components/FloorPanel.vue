@@ -46,7 +46,8 @@
             {{ statusLabel(room.status) }}
           </span>
         </div>
-        <span class="room-name">{{ room.roomName }}</span>
+        <!-- Áp dụng hàm lọc lặp tên ở đây -->
+        <span class="room-name">{{ formatRoomName(room.roomName) }}</span>
       </button>
     </div>
   </div>
@@ -80,9 +81,19 @@ const ROOM_TYPE_LABELS = {
   other: 'Khác'
 }
 
-// getRoomsByFloor() (trong composables/useVguData.js) đã trả về room record
-// CHUẨN HOÁ SẴN theo schema thật từ Code.gs — không cần map lại field ở đây nữa.
-// Field dùng trong template: id, roomNumber, roomName, roomType, status.
+// Helper: Lọc bỏ tên bị lặp lại
+const formatRoomName = (name) => {
+  if (!name || typeof name !== 'string') return name
+  const parts = name.split(/\s*-\s*/)
+  if (parts.length > 1 && parts.length % 2 === 0) {
+    const halfIndex = parts.length / 2
+    const firstHalf = parts.slice(0, halfIndex).join(' - ')
+    const secondHalf = parts.slice(halfIndex).join(' - ')
+    if (firstHalf === secondHalf) return firstHalf
+  }
+  return name
+}
+
 const loadRooms = async () => {
   if (!props.buildingId || props.floor == null) {
     rooms.value = []
@@ -93,7 +104,7 @@ const loadRooms = async () => {
   try {
     rooms.value = await getRoomsByFloor(props.buildingId, props.floor)
   } catch (err) {
-    console.error('[FloorPanel] Lỗi khi tải danh sách phòng theo tầng (kiểm tra public/data/info_data.json):', err)
+    console.error('[FloorPanel] Lỗi khi tải danh sách phòng theo tầng:', err)
     loadError.value = 'Không tải được dữ liệu phòng. Vui lòng thử lại sau.'
     rooms.value = []
   } finally {
@@ -105,8 +116,6 @@ const loadRooms = async () => {
 watch(() => [props.buildingId, props.floor], loadRooms, { immediate: true })
 onMounted(loadRooms)
 
-// Chỉ những loại phòng thực sự xuất hiện trong dữ liệu mới hiện tab tương ứng,
-// cộng thêm tab "Tất cả" khi có từ 2 loại trở lên.
 const roomTypes = computed(() => {
   const present = new Set(rooms.value.map(r => r.roomType))
   const ordered = ROOM_TYPE_ORDER.filter(t => present.has(t))
