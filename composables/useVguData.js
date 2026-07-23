@@ -46,5 +46,31 @@ export const useVguData = () => {
     }
   }
 
-  return { getRoomInfo, getRoomEquipment }
+  /**
+   * Alias của getRoomEquipment — tên gọi mà MachineViewerModal.vue mong đợi.
+   * Trả về danh sách bản ghi thiết bị thô (content/equipment/**), để
+   * MachineViewerModal tự chuẩn hoá qua normalizeMachine().
+   * @param {string} roomId
+   */
+  const getEquipmentListByRoom = async (roomId) => getRoomEquipment(roomId)
+
+  /**
+   * Lấy chi tiết đầy đủ 1 thiết bị theo id (trường `id` trong frontmatter,
+   * ví dụ "spectrometer-01"), dùng khi MachineViewerModal mở view chi tiết.
+   * @param {string} equipmentId
+   */
+  const getEquipmentInfo = async (equipmentId) => {
+    try {
+      const { queryContent } = await import('#imports')
+      const equipment = await queryContent('equipment')
+        .where({ id: equipmentId })
+        .findOne()
+      return equipment || null
+    } catch (error) {
+      console.error(`[useVguData] Không lấy được chi tiết thiết bị ${equipmentId}:`, error)
+      return null
+    }
+  }
+
+  return { getRoomInfo, getRoomEquipment, getEquipmentListByRoom, getEquipmentInfo }
 }
