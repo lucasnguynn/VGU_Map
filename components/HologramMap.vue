@@ -8,9 +8,18 @@
        - detail  : tầng có phòng đã cập nhật thông tin chi tiết (cyan phát sáng)
        - trơn    : tầng chỉ có hình khối, chưa có dữ liệu chi tiết
        Nút ✕ dưới cùng để thoát khỏi tòa nhà, quay lại toàn cảnh campus. -->
+  <!-- ================= Thanh điều hướng tầng (ngang, dưới cùng, giữa màn hình) =================
+       Trước đây là HUD dọc bên trái ("thang máy") nhưng bị FloorPanel (panel danh
+       sách phòng theo tầng) che mất khi mở, không bấm đổi tầng / thoát toà được
+       nữa. Chuyển sang thanh ngang neo giữa dưới cùng để không bị FloorPanel
+       (neo trái) hay RoomDetailPanel (neo phải) che. Có kèm ô tìm phòng. -->
   <Transition name="hud-slide">
-    <div v-if="currentBuildingId" class="elevator-hud" role="group" :aria-label="`Chọn tầng toà ${currentBuildingId}`">
-      <div class="elevator-label">{{ currentBuildingId }}</div>
+    <div v-if="currentBuildingId" class="floor-bar" role="group" :aria-label="`Chọn tầng toà ${currentBuildingId}`">
+      <button class="floor-btn exit-btn" aria-label="Thoát khỏi toà nhà, về toàn cảnh" title="Thoát khỏi toà nhà" @click="exitBuilding">
+        ✕
+      </button>
+
+      <div class="floor-bar-label">{{ currentBuildingId }}</div>
 
       <button
         v-for="floor in availableFloors"
@@ -28,9 +37,32 @@
         L{{ floor }}
       </button>
 
-      <button class="floor-btn exit-btn" aria-label="Thoát khỏi toà nhà, về toàn cảnh" title="Thoát khỏi toà nhà" @click="exitBuilding">
-        ✕
-      </button>
+      <!-- Ô tìm phòng: gõ mã/tên phòng, chọn kết quả để nhảy thẳng tới phòng đó
+           (tự chuyển toà + tầng nếu khác toà đang xem). -->
+      <div class="room-search">
+        <input
+          v-model="searchQuery"
+          type="text"
+          class="room-search-input"
+          placeholder="Tìm phòng…"
+          @input="onSearchInput"
+          @focus="onSearchInput"
+        />
+        <div v-if="searchResults.length > 0" class="room-search-results">
+          <button
+            v-for="r in searchResults"
+            :key="r.id"
+            class="room-search-item"
+            @click="goToRoom(r)"
+          >
+            <span class="rs-id">{{ r.roomNumber }}</span>
+            <span class="rs-name">{{ r.roomName }}</span>
+          </button>
+        </div>
+        <div v-else-if="searchQuery.trim() && !isSearching" class="room-search-results">
+          <div class="room-search-empty">Không tìm thấy phòng phù hợp.</div>
+        </div>
+      </div>
     </div>
   </Transition>
 
@@ -47,6 +79,8 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
+
+const { searchRooms } = useVguData()
 
 // ----------------------------------------------------
 // [CẬP NHẬT] Lấy baseURL để sửa lỗi fetch file trên GitHub Pages
@@ -473,6 +507,51 @@ function selectFloor(floorNumber) {
   emit('floor-selected', { buildingId: currentBuildingId.value, floor: floorNumber })
 }
 
+// ---- Tìm kiếm phòng (thanh điều hướng dưới cùng) ---------------------------
+const searchQuery = ref('')
+const searchResults = ref([])
+const isSearching = ref(false)
+let searchDebounce = null
+
+function onSearchInput() {
+  clearTimeout(searchDebounce)
+  const q = searchQuery.value.trim()
+  if (!q) {
+    searchResults.value = []
+    return
+  }
+  searchDebounce = setTimeout(async () => {
+    isSearching.value = true
+    try {
+      searchResults.value = await searchRooms(q, 8)
+    } finally {
+      isSearching.value = false
+    }
+  }, 250)
+}
+
+// Nhảy thẳng tới 1 phòng từ kết quả tìm kiếm: tự chuyển toà (nếu khác toà đang
+// xem) + tầng, rồi highlight/bay camera tới đúng phòng nếu tòa đã định vị GPS.
+async function goToRoom(result) {
+  if (!result?.buildingId) return
+  searchQuery.value = ''
+  searchResults.value = []
+
+  if (currentBuildingId.value !== result.buildingId) {
+    currentBuildingId.value = null // cho phép selectBuilding chạy lại dù trùng id cũ
+    await selectBuilding(result.buildingId)
+  }
+  if (result.floor != null && result.floor !== currentFloor.value) {
+    selectFloor(result.floor)
+  }
+
+  const feature = currentBuildingGeojson?.features?.find(
+    f => f.properties?.room_id === result.id
+  )
+  const centroid = feature ? polygonCentroid(feature.geometry.coordinates) : null
+  selectRoom(result.id, centroid, feature?.properties || { building_id: result.buildingId, floor: result.floor })
+}
+
 // ---- Chọn phòng ------------------------------------------------------------
 function selectRoom(roomId, centroid, propsObj = {}) {
   currentRoomId.value = roomId
@@ -620,16 +699,17 @@ onUnmounted(() => {
 :deep(.maplibregl-popup-tip) { border-top-color: rgba(15, 30, 54, 0.95); }
 
 /* ================= Thang máy chọn tầng ================= */
-.elevator-hud {
+.floor-bar {
   position: absolute;
-  left: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 20;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 60;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
   gap: 8px;
-  padding: 10px 8px;
+  padding: 8px 10px;
   background: rgba(15, 30, 54, 0.9);
   border: 1px solid rgba(239, 90, 36, 0.3);
   border-radius: 999px;
@@ -637,16 +717,14 @@ onUnmounted(() => {
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
 }
 
-.elevator-label {
-  text-align: center;
+.floor-bar-label {
   font-family: 'Space Mono', monospace;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 1px;
   color: #EF5A24;
-  padding-bottom: 4px;
-  margin-bottom: 2px;
-  border-bottom: 1px solid rgba(239, 90, 36, 0.2);
+  padding: 0 6px 0 4px;
+  border-right: 1px solid rgba(239, 90, 36, 0.2);
 }
 
 .floor-btn {
@@ -688,12 +766,77 @@ onUnmounted(() => {
 }
 
 .exit-btn {
-  margin-top: 4px;
+  margin-right: 4px;
   color: #EF5A24;
   border-color: rgba(239, 90, 36, 0.25);
   font-size: 14px;
 }
 .exit-btn:hover { background: rgba(239, 90, 36, 0.12); color: #fff; }
+
+/* ================= Ô tìm kiếm phòng (trong floor-bar) ================= */
+.room-search {
+  position: relative;
+  margin-left: 4px;
+}
+.room-search-input {
+  width: 150px;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(5, 10, 18, 0.6);
+  color: #fff;
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.room-search-input::placeholder { color: rgba(255, 255, 255, 0.4); }
+.room-search-input:focus { border-color: #EF5A24; }
+.room-search-results {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 240px;
+  max-height: 260px;
+  overflow-y: auto;
+  background: rgba(11, 17, 32, 0.97);
+  border: 1px solid rgba(239, 90, 36, 0.3);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.room-search-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 10px;
+  cursor: pointer;
+  color: #e2e8f0;
+  transition: background 0.15s;
+}
+.room-search-item:hover { background: rgba(239, 90, 36, 0.15); }
+.rs-id {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: #EF5A24;
+}
+.rs-name { font-size: 11px; color: #94a3b8; }
+.room-search-empty {
+  padding: 10px;
+  font-size: 11px;
+  color: #64748b;
+  text-align: center;
+}
 
 /* ================= Thông báo chưa định vị ================= */
 .calib-notice {
@@ -823,7 +966,8 @@ onUnmounted(() => {
 
 /* Responsive: thu nhỏ thang máy trên màn hình hẹp */
 @media (max-width: 640px) {
-  .elevator-hud { left: 10px; gap: 6px; padding: 8px 6px; }
+  .floor-bar { gap: 6px; padding: 6px 8px; max-width: 94vw; }
+  .room-search-input { width: 96px; }
   .floor-btn { width: 34px; height: 34px; font-size: 11px; }
   :deep(.room-marker-card) { min-width: 84px; max-width: 130px; padding: 4px 8px; }
   :deep(.room-marker-id) { font-size: 9px; }
