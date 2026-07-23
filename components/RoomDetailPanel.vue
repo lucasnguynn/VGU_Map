@@ -51,20 +51,13 @@
           </div>
         </div>
 
-        <!-- 3. Thông tin nhân sự -->
-        <div class="info-card" v-if="display.occupants.length > 0 || display.office || display.email">
+        <!-- 3. Thông tin nhân sự (occupant_display từ Sheet — chưa có office/email/phone riêng) -->
+        <div class="info-card" v-if="display.occupants.length > 0">
+          <h3 class="card-title">PERSON(S) IN CHARGE</h3>
           <div class="card-body">
             <p v-for="(person, idx) in display.occupants" :key="idx" class="incharge-name">
               {{ person }}
             </p>
-            <p class="incharge-position" v-if="display.office">
-              Office: {{ display.office }}
-            </p>
-            <p class="incharge-email">
-              <a :href="'mailto:' + display.email" v-if="display.email">{{ display.email }}</a>
-              <span v-else>N/A</span>
-            </p>
-            <p class="incharge-phone" v-if="display.phone">Tel: {{ display.phone }}</p>
           </div>
         </div>
 
@@ -73,6 +66,7 @@
           <h3 class="card-title">ROOM DESCRIPTION</h3>
           <div class="card-body">
             <p><strong>Phân loại:</strong> {{ display.roomType }}</p>
+            <p v-if="display.roomFunction"><strong>Chức năng:</strong> {{ display.roomFunction }}</p>
             <p><strong>Diện tích:</strong> {{ display.area }} m2</p>
             <p><strong>Sức chứa:</strong> {{ display.capacity }}</p>
             
@@ -104,13 +98,26 @@
 
     <!-- 6. Action Button -->
     <div class="panel-footer">
-      <button class="action-btn">VIEW ALL MACHINES IN THIS ROOM</button>
+      <button class="action-btn" @click="showMachineModal = true">VIEW ALL MACHINES IN THIS ROOM</button>
     </div>
+
+    <!-- 7. Modal xem danh sách / 3D thiết bị trong phòng -->
+    <MachineViewerModal
+      v-if="showMachineModal"
+      :room-id="roomId"
+      :building-id="buildingId"
+      :room-name="display.name"
+      :instruments="display.instruments"
+      @close="showMachineModal = false"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
+import MachineViewerModal from './MachineViewerModal.vue'
+
+const showMachineModal = ref(false)
 
 const props = defineProps({
   roomId: { type: String, default: null },
@@ -184,6 +191,11 @@ const fetchRoom = async (id) => {
 
 watch(() => props.roomId, fetchRoom, { immediate: true })
 
+// display() dùng shape đã chuẩn hoá sẵn bởi useVguData()/getRoomInfo — khớp
+// đúng dữ liệu thật từ Code.gs (room_number, heading_1/2, department,
+// occupant_display, fm_room_function, fm_room_type, area, capacity, status).
+// Sheet KHÔNG có office/email/phone hay danh sách thiết bị nổi bật riêng cho
+// từng phòng, nên các phần đó tạm để trống/rỗng cho tới khi có nguồn dữ liệu đó.
 const display = computed(() => {
   const r = roomData.value
   if (!r) {
@@ -194,9 +206,7 @@ const display = computed(() => {
       department: '',
       photos: [],
       occupants: [],
-      office: '',
-      email: '',
-      phone: '',
+      roomFunction: '',
       roomType: 'N/A',
       area: 'N/A',
       capacity: 'N/A',
@@ -206,60 +216,31 @@ const display = computed(() => {
   }
 
   // --- CHECK ẢNH TỪ JSON (Dùng lh3.googleusercontent.com để hiển thị ảnh mượt mà) ---
+  // drive_data.json là file riêng (không phải info_data.json từ Code.gs), map
+  // room_number -> Google Drive fileId, vẫn giữ nguyên logic cũ.
   let photos = []
   const currentRoomId = props.roomId ? props.roomId.trim() : ''
-  
+
   if (currentRoomId && driveData.value[currentRoomId]) {
     const fileId = driveData.value[currentRoomId]
     photos = [`https://lh3.googleusercontent.com/d/${fileId}=s800`]
-  } else if (r.image) {
-    photos = Array.isArray(r.image) ? r.image.filter(Boolean) : [r.image]
-  }
-
-  const departments = Array.isArray(r.departments)
-    ? r.departments.map(cleanData).filter(Boolean).join(', ')
-    : cleanData(r.departments)
-
-  // XỬ LÝ LỖI LẶP TÊN PHÒNG
-  let roomName = cleanData(r.name) || props.roomId;
-  if (typeof roomName === 'string' && roomName.includes('-')) {
-    const parts = roomName.split('-').map(p => p.trim());
-    if (parts.length > 1 && parts.length % 2 === 0) {
-      const halfIndex = parts.length / 2;
-      const firstHalf = parts.slice(0, halfIndex).join(' - ');
-      const secondHalf = parts.slice(halfIndex).join(' - ');
-      if (firstHalf === secondHalf) {
-        roomName = firstHalf;
-      }
-    }
-  }
-
-  // XỬ LÝ NHIỀU NHÂN SỰ
-  let occupantsList = [];
-  const rawName = r.head_of_lab ? cleanData(r.head_of_lab.name) : '';
-  if (rawName) {
-    if (Array.isArray(rawName)) {
-      occupantsList = rawName.map(cleanData).filter(Boolean);
-    } else if (typeof rawName === 'string') {
-      occupantsList = rawName.split(/,|\r?\n/).map(name => name.trim()).filter(Boolean);
-    }
   }
 
   return {
-    building: cleanData(r.building_id) || cleanData(props.buildingId),
+    building: r.buildingId || cleanData(props.buildingId),
     level: r.floor ?? null,
-    name: roomName,
-    department: departments,
-    photos, 
-    occupants: occupantsList, 
-    office: r.head_of_lab ? cleanData(r.head_of_lab.office) : '',
-    email: r.head_of_lab ? cleanData(r.head_of_lab.email) : '',
-    phone: r.head_of_lab ? cleanData(r.head_of_lab.phone) : '',
-    roomType: cleanData(r.room_type) || 'N/A',
-    area: cleanData(r.area_m2) || 'N/A',
-    capacity: cleanData(r.capacity) || 'N/A',
-    status: cleanData(r.status),
-    instruments: r.highlighted_equipment || []
+    name: r.roomName,
+    department: r.department,
+    photos,
+    occupants: r.occupants,
+    roomFunction: r.roomFunction,
+    roomType: r.rawRoomType || 'N/A',
+    area: r.area || 'N/A',
+    capacity: r.capacity || 'N/A',
+    status: r.rawStatus,
+    // Sheet hiện chưa có danh sách thiết bị nổi bật riêng cho từng phòng.
+    // Để rỗng cho tới khi có nguồn dữ liệu equipment (vd content/Equipment/*.md).
+    instruments: []
   }
 })
 </script>
