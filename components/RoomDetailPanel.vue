@@ -104,13 +104,26 @@
 
     <!-- 6. Action Button -->
     <div class="panel-footer">
-      <button class="action-btn">VIEW ALL MACHINES IN THIS ROOM</button>
+      <button class="action-btn" @click="showMachineModal = true">VIEW ALL MACHINES IN THIS ROOM</button>
     </div>
+
+    <!-- 7. Modal xem danh sách / 3D thiết bị trong phòng -->
+    <MachineViewerModal
+      v-if="showMachineModal"
+      :room-id="roomId"
+      :building-id="buildingId"
+      :room-name="display.name"
+      :instruments="display.instruments"
+      @close="showMachineModal = false"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
+import MachineViewerModal from './MachineViewerModal.vue'
+
+const showMachineModal = ref(false)
 
 const props = defineProps({
   roomId: { type: String, default: null },
