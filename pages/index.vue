@@ -91,7 +91,10 @@ const handleBuildingSelected = ({ buildingId, floor }) => {
 const handleFloorSelected = ({ floor }) => {
   mapStore.setFloor(floor)
 }
-const closePanel = () => mapStore.clearSelection()
+const closePanel = () => {
+  mapStore.clearSelection()
+  hologramMapRef.value?.closeRoomDetail?.()
+}
 // Nhấn phòng trong FloorPanel -> bay camera zoom vào đúng phòng trên map
 // (giống hệt bấm thẳng vào phòng), đồng thời mở RoomDetailPanel bên phải.
 // goToRoom() bên trong HologramMap tự emit 'room-selected' -> handleRoomSelected
