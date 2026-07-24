@@ -77,22 +77,16 @@
     </div>
   </Transition>
 
-  <!-- ================= Bảng thông tin chi tiết phòng ================= -->
-  <Transition name="fade">
-    <RoomDetailPanel
-      v-if="currentRoomId"
-      :room-id="currentRoomId"
-      :building-id="currentBuildingId"
-      @close="closeRoomDetail"
-    />
-  </Transition>
+  <!-- Lưu ý: RoomDetailPanel KHÔNG render ở đây nữa để tránh 2 panel chồng nhau.
+       Panel thật (duy nhất) được render ở pages/index.vue, điều khiển bởi
+       Pinia store (selectedRoom). currentRoomId ở component này chỉ dùng nội bộ
+       để tô sáng phòng / hiện marker / load thiết bị trên bản đồ. -->
 </template>
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import RoomDetailPanel from '~/components/RoomDetailPanel.vue'
 
 const { searchRooms } = useVguData()
 
@@ -780,7 +774,7 @@ onUnmounted(() => {
 // Cho phép component cha (pages/index.vue) gọi trực tiếp khi người dùng chọn
 // phòng từ danh sách trong FloorPanel, để bản đồ bay camera zoom vào đúng
 // phòng đó — giống hệt hành vi khi bấm thẳng vào phòng trên map.
-defineExpose({ goToRoom })
+defineExpose({ goToRoom, closeRoomDetail })
 </script>
 
 <style scoped>
