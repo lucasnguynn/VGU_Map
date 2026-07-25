@@ -10,7 +10,28 @@
      Bố cục chi tiết máy đổi từ 2 cột (viewer trái, thông tin phải — cần màn rộng) sang
      xếp DỌC (ảnh/3D trên, thông tin cuộn bên dưới) vì panel chỉ rộng ~420px. -->
 <template>
-  <div class="side-panel">
+  <!-- Tablet/mobile: panel này che RoomDetailPanel (không dock cạnh nữa vì
+       không đủ chỗ) nên cần backdrop riêng, đậm hơn 1 chút vì đang là lớp
+       trên cùng. Bấm ra ngoài = đóng, quay lại panel phòng phía sau. -->
+  <div
+    v-if="tier !== 'desktop'"
+    class="adaptive-backdrop"
+    style="z-index: 109"
+    @click="handleClose"
+  ></div>
+
+  <div
+    class="side-panel"
+    :class="`tier-${tier}`"
+    :style="tier === 'mobile' ? sheetStyle : null"
+  >
+    <!-- Mobile: tay cầm kéo/tap (bottom sheet) -->
+    <div
+      v-if="tier === 'mobile'"
+      class="adaptive-sheet-handle"
+      @pointerdown="onSheetDragStart"
+    ></div>
+
     <!-- Nút đóng -->
     <button class="close-btn" @click="handleClose">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -136,6 +157,13 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
+import { useDeviceTier } from '~/composables/useDeviceTier'
+import { useBottomSheet } from '~/composables/useBottomSheet'
+
+const { tier } = useDeviceTier()
+// Mobile: mở gần full-screen ngay từ đầu (peek cao) vì đây là panel "con" người
+// dùng chủ động mở từ RoomDetailPanel, ít lý do để chỉ hé mở như FloorPanel.
+const { sheetStyle, onDragStart: onSheetDragStart } = useBottomSheet({ peek: 0.7, full: 0.94, onDismiss: () => handleClose() })
 
 const props = defineProps({
   roomId: { type: String, default: null },
@@ -273,10 +301,11 @@ watch(() => props.roomId, loadMachineList)
    Không còn overlay/backdrop mờ phủ toàn màn hình như bản modal cũ. */
 .side-panel {
   position: absolute;
-  top: 0;
+  /* [FIX] top:0 trước đây đè lên AppHeader (z:30) vì z-index:99 cao hơn. */
+  top: var(--header-h, 64px);
   right: 400px;
   width: 420px;
-  height: 100vh;
+  height: calc(100vh - var(--header-h, 64px));
   background-color: #0b1120;
   border-left: 1px solid #1f2d40;
   box-shadow: -4px 0 15px rgba(0, 0, 0, 0.5);
@@ -286,6 +315,31 @@ watch(() => props.roomId, loadMachineList)
   overflow: hidden;
   color: #e2e8f0;
   font-family: 'Inter', sans-serif;
+}
+
+/* ===== Tier: tablet (641–1024px) =====
+   Không đủ chỗ để dock cạnh RoomDetailPanel (vốn đã thu hẹp ở tier này) ->
+   phủ lên trên như 1 overlay riêng, có backdrop đậm hơn (render trong template). */
+.side-panel.tier-tablet {
+  right: 0;
+  width: min(400px, 92vw);
+  z-index: 110; /* Trên RoomDetailPanel (z:100) vì đang che nó */
+}
+
+/* ===== Tier: mobile (<=640px) =====
+   Bottom sheet riêng, z-index cao hơn RoomDetailPanel để "chồng" lên trên nó
+   (không cần ẩn RoomDetailPanel bên dưới vì sheet có nền đặc, che kín). */
+.side-panel.tier-mobile {
+  top: auto;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  border-left: none;
+  border-top: 1px solid #1f2d40;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+  z-index: 110;
 }
 .close-btn {
   position: absolute;
@@ -514,14 +568,4 @@ watch(() => props.roomId, loadMachineList)
   margin-top: 8px;
 }
 
-/* Màn hẹp: không đủ chỗ cho panel phòng (400px) + panel thiết bị (420px) cạnh
-   nhau -> panel thiết bị chuyển sang phủ toàn màn hình (giống hành vi modal cũ),
-   người dùng bấm "← QUAY LẠI DANH SÁCH"/nút đóng để quay về panel phòng. */
-@media (max-width: 900px) {
-  .side-panel {
-    right: 0;
-    width: 100%;
-    z-index: 101; /* Trên cả RoomDetailPanel vì giờ nó che toàn màn hình */
-  }
-}
 </style>
