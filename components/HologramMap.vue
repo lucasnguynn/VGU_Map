@@ -807,7 +807,10 @@ defineExpose({ goToRoom, closeRoomDetail })
 /* ================= Thanh tìm kiếm TOÀN CỤC (Mới) ================= */
 .global-search-container {
   position: absolute;
-  top: 24px;
+  /* Trước đây top:24px cố định -> đè lên AppHeader (cao ~64px, z-index:30) vì
+     70 > 30. Giờ neo dưới header qua biến --header-h (đặt ở layouts/default.vue)
+     để 2 lớp không còn chồng nhau ở bất kỳ kích thước header nào. */
+  top: calc(var(--header-h, 64px) + 12px);
   left: 50%;
   transform: translateX(-50%);
   z-index: 70;
@@ -1132,7 +1135,7 @@ defineExpose({ goToRoom, closeRoomDetail })
   .floor-bar { gap: 6px; padding: 6px 8px; max-width: 94vw; }
   .floor-btn { width: 34px; height: 34px; font-size: 11px; }
   
-  .global-search-container { width: 90vw; }
+  .global-search-container { width: 90vw; top: calc(var(--header-h-mobile, 54px) + 8px); }
   .global-search-input { font-size: 12px; }
 
   :deep(.room-marker-card) { min-width: 84px; max-width: 130px; padding: 4px 8px; }
