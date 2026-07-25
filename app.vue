@@ -1,10 +1,12 @@
 <template>
-  <!-- Vỏ tối giản: chỉ điều phối route qua <NuxtPage/>.
-       Trang chủ "/" -> pages/index.vue (bản đồ). "/equipment-<id>" -> trang thiết bị.
-       Trước đây app.vue render thẳng bản đồ và KHÔNG có <NuxtPage/>, nên mọi route
-       trong pages/ (kể cả equipment-[id]) đều không truy cập được. -->
+  <!-- Vỏ tối giản: chỉ điều phối route qua <NuxtPage/>, bọc trong <NuxtLayout/> để
+       mọi trang (map + equipment-[id]) đều đi qua layouts/default.vue -> có Header
+       nhất quán. Trước đây pages/index.vue tự vẽ header riêng, còn equipment-[id]
+       không có header/nav nào -> người dùng vào trang thiết bị bị "kẹt". -->
   <div class="app-root">
-    <NuxtPage />
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
   </div>
 </template>
 
