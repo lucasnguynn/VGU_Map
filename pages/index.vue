@@ -11,20 +11,9 @@
       />
     </ClientOnly>
 
-    <!-- Header HUD -->
-    <header class="app-header">
-      <div class="header-content">
-        <img src="/VGU-Logo.png" class="header-logo" alt="Logo VGU" />
-        <h1 class="header-title">
-          <span class="title-accent">VGU</span> MAP
-        </h1>
-      </div>
-      <div class="sys-status" role="status" aria-live="polite">
-        <span class="pulse-dot" aria-hidden="true"></span>
-        <span>ĐANG TẢI BẢN ĐỒ…</span>
-      </div>
-    </header>
-
+    <!-- Header giờ nằm ở layouts/default.vue (AppHeader.vue), dùng chung cho mọi trang.
+         Trang này chỉ còn giữ HUD context-panel riêng của bản đồ, đẩy xuống dưới
+         header (top: var(--header-h)) để không còn đè lên nhau. -->
     <div class="hud-bar">
       <div class="hud-context-panel">
         <span class="pulse-dot" aria-hidden="true"></span>
@@ -65,7 +54,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount, inject, watchEffect } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useMapStore } from '~/Stores/mapStores'
 import HologramMap from '~/components/HologramMap.vue'
@@ -80,6 +69,14 @@ const contextTitle = computed(() => {
   if (!selectedBuilding.value) return 'TIÊU ĐIỂM: TOÀN CẢNH KHUÔN VIÊN VGU'
   if (selectedRoom.value) return `PHÒNG: ${selectedRoom.value}`
   return `TOÀ: ${String(selectedBuilding.value).toUpperCase()} · TẦNG ${selectedFloor.value ?? '-'}`
+})
+
+// Bơm dòng trạng thái vào AppHeader (khai báo ở layouts/default.vue) mà không cần
+// layout biết gì về Pinia/HologramMap. Khi đang loading hiện "ĐANG TẢI…", sau đó
+// đồng bộ với contextTitle của chính trang map.
+const headerStatus = inject('header-status', ref(''))
+watchEffect(() => {
+  headerStatus.value = isLoading.value ? 'ĐANG TẢI BẢN ĐỒ…' : contextTitle.value
 })
 
 const handleRoomSelected = ({ roomId, buildingId, floor }) => {
@@ -134,41 +131,16 @@ onBeforeUnmount(() => {
   overflow: hidden;
 }
 
-/* Header HUD */
-.app-header {
+/* HUD Bar — nội dung riêng của trang map, đẩy xuống dưới AppHeader dùng chung
+   qua biến --header-h (khai báo ở layouts/default.vue) thay vì số cứng 68px
+   trước đây, để không vỡ layout nếu chiều cao header đổi. */
+.hud-bar {
   position: absolute;
-  top: 0; left: 0; right: 0;
+  top: calc(var(--header-h, 64px) + 4px);
+  left: 24px;
   z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 24px;
-  background: linear-gradient(180deg, rgba(5, 10, 15, 0.85) 0%, rgba(5, 10, 15, 0) 100%);
   pointer-events: none;
 }
-.header-content { display: flex; align-items: center; gap: 14px; }
-.header-logo { height: 36px; width: auto; filter: drop-shadow(0 0 6px rgba(0, 255, 204, 0.4)); }
-.header-title {
-  font-family: 'Be Vietnam Pro', sans-serif;
-  font-size: 18px; font-weight: 600; color: #fff; letter-spacing: 0.5px; margin: 0;
-}
-.title-accent { color: #EF5A24; }
-.sys-status {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 11px; letter-spacing: 1px; color: #00ffcc;
-}
-.pulse-dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: #00ffcc; box-shadow: 0 0 8px #00ffcc;
-  animation: pulse 1.6s ease-in-out infinite;
-}
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.7); }
-}
-
-/* HUD Bar */
-.hud-bar { position: absolute; top: 68px; left: 24px; z-index: 20; pointer-events: none; }
 .hud-context-panel {
   display: flex; align-items: center; gap: 10px;
   padding: 8px 16px;
@@ -180,9 +152,12 @@ onBeforeUnmount(() => {
   font-size: 12px; letter-spacing: 0.5px; color: #00ffcc;
 }
 
-/* Loading overlay */
+/* Loading overlay — z-index cao hơn RoomDetailPanel (z:100) và
+   MachineViewerModal (z:200) không quan trọng vì overlay chỉ hiện lúc mới vào,
+   nhưng trước đây trùng z:100 với RoomDetailPanel là một "hoà" dễ vỡ nếu sau
+   này thêm hiệu ứng — tách rõ ràng để loading luôn thắng khi đang hiện. */
 .loading-overlay {
-  position: absolute; inset: 0; z-index: 100;
+  position: absolute; inset: 0; z-index: 150;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 20px; background: #05080d; color: #00ffcc;
   font-family: 'Space Mono', monospace; font-size: 13px; letter-spacing: 1px;
@@ -214,9 +189,7 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 640px) {
-  .app-header { padding: 10px 14px; }
-  .header-title { font-size: 16px; }
-  .hud-bar { top: 58px; left: 14px; }
+  .hud-bar { top: calc(var(--header-h-mobile, 54px) + 4px); left: 14px; }
   .hud-context-panel { font-size: 11px; padding: 6px 12px; }
 }
 
