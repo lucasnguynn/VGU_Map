@@ -1,7 +1,33 @@
 <template>
-  <div class="floor-panel" :class="{ 'is-collapsed': isCollapsed }">
-    <!-- Nút Toggle thu gọn/mở rộng -->
-    <button class="toggle-btn" @click="isCollapsed = !isCollapsed" :title="isCollapsed ? 'Mở danh sách phòng' : 'Thu gọn'">
+  <!-- Tablet: nền mờ phía sau panel để tách khỏi bản đồ, bấm ra ngoài = thu gọn
+       (không đóng hẳn panel vì panel còn phụ thuộc building/floor đang chọn ở
+       trang cha — xem pages/index.vue). -->
+  <div
+    v-if="tier === 'tablet'"
+    class="adaptive-backdrop"
+    style="z-index: 89"
+    @click="isCollapsed = true"
+  ></div>
+
+  <div
+    class="floor-panel"
+    :class="[`tier-${tier}`, { 'is-collapsed': tier !== 'mobile' && isCollapsed }]"
+    :style="tier === 'mobile' ? sheetStyle : null"
+  >
+    <!-- Mobile: tay cầm kéo/tap thay cho nút thu gọn (bottom sheet) -->
+    <div
+      v-if="tier === 'mobile'"
+      class="adaptive-sheet-handle"
+      @pointerdown="onSheetDragStart"
+    ></div>
+
+    <!-- Desktop/tablet: nút thu gọn/mở rộng dạng tab bám cạnh -->
+    <button
+      v-else
+      class="toggle-btn"
+      @click="isCollapsed = !isCollapsed"
+      :title="isCollapsed ? 'Mở danh sách phòng' : 'Thu gọn'"
+    >
       <svg v-if="!isCollapsed" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
         <line x1="9" y1="3" x2="9" y2="21"></line>
@@ -69,6 +95,8 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
+import { useDeviceTier } from '~/composables/useDeviceTier'
+import { useBottomSheet } from '~/composables/useBottomSheet'
 
 const props = defineProps({
   buildingId: { type: String, default: null },
@@ -80,6 +108,10 @@ const props = defineProps({
 const emit = defineEmits(['select-room'])
 
 const { getRoomsByFloor } = useVguData()
+const { tier } = useDeviceTier()
+// Mobile: panel này là bottom sheet kéo-thả, mặc định "hé mở" (peek) để vẫn
+// thấy bản đồ phía sau, người dùng kéo/chạm tay cầm để xem toàn bộ danh sách.
+const { sheetStyle, onDragStart: onSheetDragStart, reset: resetSheet } = useBottomSheet({ peek: 0.4, full: 0.88 })
 
 const isLoading = ref(false)
 const loadError = ref('')
@@ -174,7 +206,8 @@ const loadRooms = async () => {
 
 watch(() => [props.buildingId, props.floor], () => {
   loadRooms()
-  isCollapsed.value = false 
+  isCollapsed.value = false
+  resetSheet() // mobile: mỗi lần đổi tầng, sheet quay về trạng thái hé mở
 }, { immediate: true })
 onMounted(loadRooms)
 
@@ -216,10 +249,13 @@ const handleSelectRoom = (room) => {
 <style scoped>
 .floor-panel {
   position: absolute;
-  top: 0;
+  /* [FIX] Trước đây top:0 + height:100vh với z-index:90 > AppHeader (z:30)
+     -> panel đè lên header. Giờ neo dưới header qua --header-h, đúng cho
+     mọi tier (desktop/tablet dùng chung khối này, mobile ghi đè bên dưới). */
+  top: var(--header-h, 64px);
   left: 0;
   width: 280px;
-  height: 100vh;
+  height: calc(100vh - var(--header-h, 64px));
   background-color: #0b1120;
   border-right: 1px solid #1f2d40;
   color: #e2e8f0;
@@ -232,6 +268,35 @@ const handleSelectRoom = (room) => {
 
 .floor-panel.is-collapsed {
   transform: translateX(-100%);
+}
+
+/* ===== Tier: tablet (641–1024px, xem useDeviceTier.js) =====
+   Vẫn là side-dock như desktop nhưng thu hẹp bề rộng theo màn hình, có
+   backdrop mờ phía sau (render riêng trong template) để tách khỏi bản đồ. */
+.floor-panel.tier-tablet {
+  width: min(320px, 88vw);
+}
+
+/* ===== Tier: mobile (<=640px) =====
+   Chuyển hẳn từ side-dock sang bottom sheet kéo-thả: neo đáy màn hình, bo góc
+   trên, chiều cao do useBottomSheet.js điều khiển qua style inline (sheetStyle).
+   is-collapsed không áp dụng ở tier này (xem điều kiện trong template). */
+.floor-panel.tier-mobile {
+  top: auto;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  border-right: none;
+  border-top: 1px solid #1f2d40;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.floor-panel.tier-mobile .panel-content-wrapper {
+  padding-top: 0;
 }
 
 .panel-content-wrapper {
