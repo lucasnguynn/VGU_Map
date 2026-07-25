@@ -49,6 +49,11 @@ body {
   font-family: var(--type-main);
   margin: 0;
   padding: 0;
+  /* [FIX-mobile-zoom] Safari/Chrome trên điện thoại tự phóng to chữ sau khi
+     xoay màn hình (orientation change) nếu không khai báo rõ text-size-adjust,
+     tạo cảm giác "tự nhiên bị zoom" dù không ai chạm vào màn hình. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 * {
@@ -87,6 +92,19 @@ body {
   font-family: 'Space Mono', monospace;
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
+  /* [FIX-mobile-zoom] Chặn hiệu ứng "bounce" kéo quá đà của Safari (kéo bản đồ/
+     panel chạm mép rồi bật lại) — dễ bị hiểu nhầm là app "giật/zoom" ngoài ý muốn. */
+  overscroll-behavior: none;
+}
+
+/* [FIX-mobile-zoom] Toàn bộ nút bấm/link dùng touch-action: manipulation để
+   trình duyệt bỏ qua độ trễ chờ double-tap và KHÔNG hiểu double-tap thành
+   "double-tap-to-zoom" — nguyên nhân chính của phản hồi "dễ bị thu phóng bất
+   ngờ" khi bấm nhanh vào thẻ phòng/nút tầng/nút tab trên điện thoại. Không áp
+   cho input/select vì vẫn cần hành vi chạm mặc định (con trỏ, chọn văn bản)
+   cho các ô đó. */
+a, button {
+  touch-action: manipulation;
 }
 
 .app-root {
