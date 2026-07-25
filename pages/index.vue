@@ -152,10 +152,11 @@ onBeforeUnmount(() => {
   font-size: 12px; letter-spacing: 0.5px; color: #00ffcc;
 }
 
-/* Loading overlay — z-index cao hơn RoomDetailPanel (z:100) và
-   MachineViewerModal (z:200) không quan trọng vì overlay chỉ hiện lúc mới vào,
-   nhưng trước đây trùng z:100 với RoomDetailPanel là một "hoà" dễ vỡ nếu sau
-   này thêm hiệu ứng — tách rõ ràng để loading luôn thắng khi đang hiện. */
+/* Loading overlay — z-index cao hơn RoomDetailPanel (z:100) và EquipmentSidePanel
+   (z:99, hoặc 101 khi màn hẹp phủ toàn màn hình — xem EquipmentSidePanel.vue)
+   không quan trọng vì overlay chỉ hiện lúc mới vào, nhưng trước đây trùng z:100
+   với RoomDetailPanel là một "hoà" dễ vỡ nếu sau này thêm hiệu ứng — tách rõ
+   ràng để loading luôn thắng khi đang hiện. */
 .loading-overlay {
   position: absolute; inset: 0; z-index: 150;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
