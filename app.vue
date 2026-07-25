@@ -103,4 +103,42 @@ body {
   background: #05080d; color: #00ffcc;
   font-family: 'Space Mono', monospace; letter-spacing: 1px;
 }
+
+/* ===== Hệ thống Adaptive dùng chung: backdrop (tier tablet) + tay cầm kéo
+   (tier mobile, xem composables/useDeviceTier.js + useBottomSheet.js).
+   Đặt ở đây (không scoped) để FloorPanel/RoomDetailPanel/EquipmentSidePanel
+   dùng chung 1 định nghĩa thay vì mỗi component tự viết lại. z-index do từng
+   nơi gọi tự set qua style inline vì còn phụ thuộc panel đang đứng ở lớp nào. */
+.adaptive-backdrop {
+  position: fixed;
+  top: var(--header-h, 64px);
+  left: 0; right: 0; bottom: 0;
+  background: rgba(5, 8, 13, 0.6);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  animation: adaptive-backdrop-in 0.2s ease;
+}
+@keyframes adaptive-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+
+.adaptive-sheet-handle {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 8px;
+  cursor: grab;
+  touch-action: none;
+  flex-shrink: 0;
+  background: inherit;
+}
+.adaptive-sheet-handle::before {
+  content: '';
+  width: 40px; height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.25);
+}
+.adaptive-sheet-handle:active { cursor: grabbing; }
+
+@media (prefers-reduced-motion: reduce) {
+  .adaptive-backdrop { animation: none; }
+}
 </style>
