@@ -51,16 +51,16 @@ export const useVguData = () => {
   }
 
   /**
-   * Alias của getRoomEquipment — tên gọi mà MachineViewerModal.vue mong đợi.
-   * Trả về danh sách bản ghi thiết bị thô (content/equipment/**), để
-   * MachineViewerModal tự chuẩn hoá qua normalizeMachine().
+   * Alias của getRoomEquipment — tên gọi mà EquipmentSidePanel.vue (trước đây là
+   * MachineViewerModal.vue) mong đợi. Trả về danh sách bản ghi thiết bị thô
+   * (content/equipment/**), để EquipmentSidePanel tự chuẩn hoá qua normalizeMachine().
    * @param {string} roomId
    */
   const getEquipmentListByRoom = async (roomId) => getRoomEquipment(roomId)
 
   /**
    * Lấy chi tiết đầy đủ 1 thiết bị theo id (trường `id` trong frontmatter,
-   * ví dụ "spectrometer-01"), dùng khi MachineViewerModal mở view chi tiết.
+   * ví dụ "spectrometer-01"), dùng khi EquipmentSidePanel mở view chi tiết.
    * @param {string} equipmentId
    */
   const getEquipmentInfo = async (equipmentId) => {
