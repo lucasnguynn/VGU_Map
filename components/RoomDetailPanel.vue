@@ -131,8 +131,10 @@
       <button class="action-btn" @click="showMachineModal = true">VIEW ALL MACHINES IN THIS ROOM</button>
     </div>
 
-    <!-- 7. Modal xem danh sách / 3D thiết bị trong phòng -->
-    <MachineViewerModal
+    <!-- 7. Panel dock xem danh sách / 3D thiết bị trong phòng — hiện SONG SONG bên
+         trái panel này (xem EquipmentSidePanel.vue), không còn che kín màn hình như
+         MachineViewerModal (modal) trước đây. -->
+    <EquipmentSidePanel
       v-if="showMachineModal"
       :room-id="roomId"
       :building-id="buildingId"
@@ -145,7 +147,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
-import MachineViewerModal from './MachineViewerModal.vue'
+import EquipmentSidePanel from './EquipmentSidePanel.vue'
 
 const showMachineModal = ref(false)
 
