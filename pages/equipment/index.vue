@@ -224,7 +224,9 @@ function thumbFor(eq) {
   outline: none;
   color: #fff;
   font-family: 'Space Mono', monospace;
-  font-size: 13px;
+  /* [FIX-mobile-zoom] < 16px khiến iOS Safari tự phóng to trang khi focus vào ô
+     này — đây là ngưỡng bắt buộc của trình duyệt, không phải lựa chọn thẩm mỹ. */
+  font-size: 16px;
 }
 .search-box input::placeholder { color: #6b7684; }
 
@@ -236,7 +238,8 @@ function thumbFor(eq) {
   border-radius: 6px;
   padding: 8px 10px;
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  /* [FIX-mobile-zoom] Cùng lý do như search input phía trên. */
+  font-size: 16px;
 }
 
 .result-count {
