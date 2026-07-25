@@ -842,7 +842,11 @@ defineExpose({ goToRoom, closeRoomDetail })
   background: rgba(11, 17, 32, 0.85);
   color: #fff;
   font-family: 'Space Mono', monospace;
-  font-size: 13px;
+  /* [FIX-mobile-zoom] iOS Safari tự động phóng to TOÀN TRANG khi focus vào 1
+     input có font-size < 16px, rồi không luôn zoom lại đúng — đây chính là
+     nguồn gốc chính của phản hồi "dễ bị thu phóng bất ngờ" mỗi khi bấm vào ô
+     tìm kiếm. Giữ 16px là NGƯỠNG BẮT BUỘC, không phải lựa chọn thẩm mỹ. */
+  font-size: 16px;
   outline: none;
   backdrop-filter: blur(8px);
   transition: all 0.2s ease;
@@ -948,7 +952,16 @@ defineExpose({ goToRoom, closeRoomDetail })
   border-radius: 999px;
   backdrop-filter: blur(10px);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  max-width: 100%;
 }
+/* [FIX-floor-select] Bar này neo ĐÁY màn hình — trên desktop/tablet không sao
+   vì FloorPanel/RoomDetailPanel ở đó là side-dock. Nhưng trên mobile 2 panel
+   đó biến thành BOTTOM SHEET (xem useBottomSheet.js) cũng neo đáy, z-index cao
+   hơn (90/100 > 60) -> che kín .floor-bar, khiến người dùng không bấm được nút
+   đổi tầng khi đang xem danh sách phòng/chi tiết phòng. Đây là nguyên nhân
+   chính của phản hồi "khó chọn các tầng lầu". Fix: đưa bar lên gắn ngay dưới
+   thanh tìm kiếm (luôn còn trống) và đặt z-index CAO HƠN mọi bottom sheet, xem
+   khối @media (max-width: 640px) bên dưới. */
 
 .floor-bar-label {
   font-family: 'Space Mono', monospace;
@@ -1132,11 +1145,45 @@ defineExpose({ goToRoom, closeRoomDetail })
 }
 
 @media (max-width: 640px) {
-  .floor-bar { gap: 6px; padding: 6px 8px; max-width: 94vw; }
-  .floor-btn { width: 34px; height: 34px; font-size: 11px; }
-  
+  /* [FIX-floor-select] Rời khỏi đáy màn hình (nơi FloorPanel/RoomDetailPanel
+     dạng bottom sheet cũng neo vào) -> chuyển lên thành 1 dải ngay dưới ô tìm
+     kiếm, nơi luôn trống bất kể sheet nào đang mở. z-index đặt cao hơn cả
+     RoomDetailPanel (100) để chắc chắn không bao giờ bị đè, kể cả khi sheet
+     kéo lên "full". Toà có tới 6 tầng (+ nút thoát + nhãn toà) nên thêm cuộn
+     ngang thay vì để vỡ/tràn ra ngoài màn hình như trước. */
+  .floor-bar {
+    top: calc(var(--header-h-mobile, 54px) + 64px);
+    bottom: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 110;
+    gap: 6px;
+    padding: 6px 8px;
+    max-width: 92vw;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .floor-bar::-webkit-scrollbar { display: none; }
+  .floor-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 11px;
+    flex-shrink: 0;
+    touch-action: manipulation;
+  }
+  .floor-bar-label { flex-shrink: 0; }
+  .exit-btn { flex-shrink: 0; }
+
+  /* Trước neo bottom:80px (ngay trên floor-bar cũ) — giờ floor-bar đã lên trên,
+     vùng đáy màn hình bị FloorPanel (bottom sheet) che gần hết, nên đưa thông
+     báo này lên cạnh floor-bar để không bị khuất phía sau sheet. */
+  .calib-notice { top: calc(var(--header-h-mobile, 54px) + 116px); bottom: auto; z-index: 61; }
+
   .global-search-container { width: 90vw; top: calc(var(--header-h-mobile, 54px) + 8px); }
-  .global-search-input { font-size: 12px; }
+  /* [FIX-mobile-zoom] KHÔNG thu nhỏ font-size ở đây nữa — phải giữ nguyên 16px
+     từ rule gốc phía trên, nếu không iOS lại tự zoom khi focus (xem giải thích
+     ở rule .global-search-input gốc). */
 
   :deep(.room-marker-card) { min-width: 84px; max-width: 130px; padding: 4px 8px; }
   :deep(.room-marker-id) { font-size: 9px; }
