@@ -138,7 +138,9 @@ defineProps({
   .pulse-dot { animation: none; }
 }
 
-@media (max-width: 760px) {
+/* Ngưỡng khớp với composables/useDeviceTier.js (BP_TABLET_MAX = 1024) để
+   header đổi cùng lúc với các panel chuyển sang chế độ tablet/mobile. */
+@media (max-width: 1024px) {
   .header-status { display: none; } /* Ưu tiên chỗ cho 2 nút nav trên màn hẹp */
 }
 @media (max-width: 640px) {
