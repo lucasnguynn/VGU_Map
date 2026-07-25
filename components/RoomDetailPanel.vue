@@ -1,5 +1,24 @@
 <template>
-  <div class="room-detail-panel">
+  <!-- Tablet: nền mờ phía sau panel, bấm ra ngoài = đóng panel. -->
+  <div
+    v-if="tier === 'tablet'"
+    class="adaptive-backdrop"
+    style="z-index: 99"
+    @click="closePanel"
+  ></div>
+
+  <div
+    class="room-detail-panel"
+    :class="`tier-${tier}`"
+    :style="tier === 'mobile' ? sheetStyle : null"
+  >
+    <!-- Mobile: tay cầm kéo/tap (bottom sheet) -->
+    <div
+      v-if="tier === 'mobile'"
+      class="adaptive-sheet-handle"
+      @pointerdown="onSheetDragStart"
+    ></div>
+
     <!-- Nút Đóng -->
     <button class="close-btn" @click="closePanel">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -148,6 +167,14 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import EquipmentSidePanel from './EquipmentSidePanel.vue'
+import { useDeviceTier } from '~/composables/useDeviceTier'
+import { useBottomSheet } from '~/composables/useBottomSheet'
+
+const { tier } = useDeviceTier()
+// Mobile: panel này thay bằng bottom sheet, mặc định mở rộng gần hết màn hình
+// (peek cao hơn FloorPanel) vì đây là nội dung người dùng chủ động bấm vào,
+// không phải ngữ cảnh nền như danh sách phòng.
+const { sheetStyle, onDragStart: onSheetDragStart } = useBottomSheet({ peek: 0.55, full: 0.92, onDismiss: () => closePanel() })
 
 const showMachineModal = ref(false)
 
@@ -295,10 +322,12 @@ const display = computed(() => {
 <style scoped>
 .room-detail-panel {
   position: absolute;
-  top: 0;
+  /* [FIX] Trước đây top:0 + height:100vh với z-index:100 -> đè lên AppHeader
+     (z:30). Neo dưới header qua --header-h cho mọi tier, mobile ghi đè bên dưới. */
+  top: var(--header-h, 64px);
   right: 0;
   width: 400px;
-  height: 100vh;
+  height: calc(100vh - var(--header-h, 64px));
   background-color: #0b1120;
   border-left: 1px solid #1f2d40;
   display: flex;
@@ -307,6 +336,27 @@ const display = computed(() => {
   font-family: 'Inter', sans-serif;
   box-shadow: -4px 0 15px rgba(0,0,0,0.5);
   z-index: 100;
+}
+
+/* ===== Tier: tablet (641–1024px) =====
+   Side-dock như desktop nhưng thu hẹp, có backdrop mờ (render trong template). */
+.room-detail-panel.tier-tablet {
+  width: min(360px, 90vw);
+}
+
+/* ===== Tier: mobile (<=640px) =====
+   Bottom sheet kéo-thả thay cho dock cố định 400px (vốn rộng hơn cả màn hình
+   trên điện thoại). Chiều cao do useBottomSheet.js set qua style inline. */
+.room-detail-panel.tier-mobile {
+  top: auto;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  border-left: none;
+  border-top: 1px solid #1f2d40;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
 }
 .close-btn {
   position: absolute;
