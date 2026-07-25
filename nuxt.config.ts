@@ -19,6 +19,11 @@ export default defineNuxtConfig({
         }
       ],
       meta: [
+        // Khai báo tường minh thay vì trông chờ mặc định của Nuxt: app dùng
+        // nhiều @media + composables/useDeviceTier.js dựa trên window.innerWidth,
+        // nếu thiếu viewport, mobile sẽ render theo virtual viewport ~980px
+        // (layout desktop) rồi zoom out -> mọi breakpoint phía trên vô nghĩa.
+        { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
         { name: 'theme-color', content: '#0F1E36' },
         { name: 'description', content: 'Bản đồ tương tác khuôn viên Trường Đại học Việt Đức (VGU).' }
       ]
