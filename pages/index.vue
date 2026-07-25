@@ -21,10 +21,16 @@
       </div>
     </div>
 
-    <!-- Panel danh sách phòng theo tầng (bên trái) -->
+    <!-- Panel danh sách phòng theo tầng (bên trái).
+         [FIX-mobile-sheets] Trên desktop/tablet đây là side-dock nên mở song
+         song với RoomDetailPanel không sao. Trên mobile, cả 2 panel này biến
+         thành bottom sheet cùng neo đáy màn hình -> mở đồng thời sẽ chồng lên
+         nhau, rối và khó thấy thông tin phòng thật sự cần xem. Nên trên mobile
+         chỉ hiện 1 sheet tại 1 thời điểm: ẩn FloorPanel khi đã có phòng được
+         chọn (RoomDetailPanel lúc đó là ưu tiên), hiện lại khi đóng chi tiết. -->
     <transition name="cyber-slide-left">
       <FloorPanel
-        v-if="selectedBuilding && selectedFloor != null"
+        v-if="selectedBuilding && selectedFloor != null && !(isMobile && selectedRoom)"
         :building-id="selectedBuilding"
         :cluster-label="String(selectedBuilding).toUpperCase()"
         :floor="selectedFloor"
@@ -57,10 +63,12 @@
 import { computed, ref, onMounted, onBeforeUnmount, inject, watchEffect } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useMapStore } from '~/Stores/mapStores'
+import { useDeviceTier } from '~/composables/useDeviceTier'
 import HologramMap from '~/components/HologramMap.vue'
 import RoomDetailPanel from '~/components/RoomDetailPanel.vue'
 import FloorPanel from '~/components/FloorPanel.vue'
 
+const { isMobile } = useDeviceTier()
 const mapStore = useMapStore()
 const { selectedRoom, selectedBuilding, selectedFloor, isLoading } = storeToRefs(mapStore)
 const hologramMapRef = ref(null)
