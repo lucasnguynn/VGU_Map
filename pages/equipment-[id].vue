@@ -40,6 +40,13 @@ function goBack() {
   inset: 0;
   overflow-y: auto;
   background: #070A12;
+  /* AppHeader (layouts/default.vue) là position:absolute đè trên mọi trang.
+     Trước khi có header dùng chung, trang này bắt đầu ngay từ top:0 nên h1/btn-close
+     (top:20px trong EquipmentDetail.vue) giờ sẽ bị header che nếu không chừa chỗ. */
+  padding-top: var(--header-h, 64px);
+}
+@media (max-width: 640px) {
+  .equipment-page { padding-top: var(--header-h-mobile, 54px); }
 }
 .eq-empty {
   display: flex;
