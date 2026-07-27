@@ -1,266 +1,200 @@
-<template>
-  <div class="map-page">
-    <!-- Luồng 3D chỉ chạy ở client -->
-    <ClientOnly fallback-tag="div" fallback-class="loading-overlay">
-      <HologramMap
-        ref="hologramMapRef"
-        @room-selected="handleRoomSelected"
-        @building-selected="handleBuildingSelected"
-        @floor-selected="handleFloorSelected"
-        @ready="onMapReady"
-      />
-    </ClientOnly>
+// composables/useVguData.js
+// Chỉ còn 2 hàm được UI dùng: getRoomInfo + getRoomEquipment (đọc từ Nuxt Content).
+// Đã bỏ syncAll/normalizeInfo/getFloorPlan/fetchJson: syncAll trước đây được gọi
+// trong app.vue lúc mounted, fetch 3 file JSON rồi VỨT ĐI (HologramMap tự nạp
+// dữ liệu riêng) — vừa thừa request vừa dễ 404. Việc "đồng bộ dữ liệu" giờ do
+// pipeline CI (scripts/sync_all_data.js) lo, không phải phía client.
 
-    <!-- Header giờ nằm ở layouts/default.vue (AppHeader.vue), dùng chung cho mọi trang.
-         Trang này chỉ còn giữ HUD context-panel riêng của bản đồ, đẩy xuống dưới
-         header (top: var(--header-h)) để không còn đè lên nhau. -->
-    <div class="hud-bar">
-      <div class="hud-context-panel">
-        <span class="pulse-dot" aria-hidden="true"></span>
-        <span>{{ contextTitle }}</span>
-      </div>
-    </div>
+export const useVguData = () => {
+  /**
+   * Lấy thông tin phòng từ Nuxt Content (content/Rooms/*.md).
+   * @param {string} roomId  ví dụ "AD-247"
+   */
+  const getRoomInfo = async (roomId) => {
+    try {
+      const { queryContent } = await import('#imports')
+      // LƯU Ý: @nuxt/content viết thường TẤT CẢ _path, nên content/Rooms -> /rooms.
+      // queryContent('Rooms') (chữ hoa) KHÔNG khớp -> luôn null (đây là lý do tên
+      // phòng không hiện). Lọc theo trường room_id (duy nhất ở file phòng) để
+      // không phụ thuộc hoa/thường của thư mục.
+      const room = await queryContent()
+        .where({ room_id: roomId })
+        .findOne()
+      // Chuẩn hoá về field name mà RoomDetailPanel.vue mong đợi (roomName,
+      // buildingId, rawRoomType, area, capacity, rawStatus…) — trước đây hàm
+      // này trả thẳng bản ghi thô (name, building_id, room_type, area_m2…),
+      // không khớp field RoomDetailPanel đọc, nên panel luôn hiện "N/A".
+      return room ? { ...normalizeRoom(room), roomFunction: '' } : null
+    } catch (error) {
+      console.error(`[useVguData] Không lấy được thông tin phòng ${roomId}:`, error)
+      return null
+    }
+  }
 
-    <!-- Panel danh sách phòng theo tầng (bên trái).
-         [FIX-mobile-sheets] Trên desktop/tablet đây là side-dock nên mở song
-         song với RoomDetailPanel không sao. Trên mobile, cả 2 panel này biến
-         thành bottom sheet cùng neo đáy màn hình -> mở đồng thời sẽ chồng lên
-         nhau, rối và khó thấy thông tin phòng thật sự cần xem. Nên trên mobile
-         chỉ hiện 1 sheet tại 1 thời điểm: ẩn FloorPanel khi đã có phòng được
-         chọn (RoomDetailPanel lúc đó là ưu tiên), hiện lại khi đóng chi tiết. -->
-    <transition name="cyber-slide-left">
-      <FloorPanel
-        v-if="selectedBuilding && selectedFloor != null && !(isMobile && selectedRoom)"
-        :building-id="selectedBuilding"
-        :cluster-label="String(selectedBuilding).toUpperCase()"
-        :floor="selectedFloor"
-        :selected-room-id="selectedRoom"
-        @select-room="handleFloorRoomSelect"
-      />
-    </transition>
+  /**
+   * Lấy danh sách thiết bị đặt trong phòng (content/equipment/**).
+   * Query cả cây /equipment rồi lọc theo location.room_id để không phụ thuộc
+   * vào phân biệt hoa/thường của thư mục con "Equipment".
+   * @param {string} roomId
+   */
+  const getRoomEquipment = async (roomId) => {
+    try {
+      const { queryContent } = await import('#imports')
+      const equipments = await queryContent('equipment')
+        .where({ 'location.room_id': roomId })
+        .find()
+      return equipments || []
+    } catch (error) {
+      console.error(`[useVguData] Không lấy được thiết bị của ${roomId}:`, error)
+      return []
+    }
+  }
 
-    <!-- Panel thông tin phòng (bên phải) -->
-    <transition name="cyber-slide">
-      <RoomDetailPanel
-        v-if="selectedRoom"
-        :room-id="selectedRoom"
-        :building-id="selectedBuilding"
-        @close="closePanel"
-      />
-    </transition>
+  /**
+   * Alias của getRoomEquipment — tên gọi mà EquipmentSidePanel.vue (trước đây là
+   * MachineViewerModal.vue) mong đợi. Trả về danh sách bản ghi thiết bị thô
+   * (content/equipment/**), để EquipmentSidePanel tự chuẩn hoá qua normalizeMachine().
+   * @param {string} roomId
+   */
+  const getEquipmentListByRoom = async (roomId) => getRoomEquipment(roomId)
 
-    <!-- Loading overlay: tắt khi bản đồ báo 'ready' (có timeout an toàn) -->
-    <transition name="fade">
-      <div v-if="isLoading" class="loading-overlay">
-        <div class="cyber-loader" aria-hidden="true"></div>
-        <p>ĐANG KHỞI TẠO HỆ THỐNG BẢN ĐỒ…</p>
-      </div>
-    </transition>
-  </div>
-</template>
+  /**
+   * Lấy chi tiết đầy đủ 1 thiết bị theo id (trường `id` trong frontmatter,
+   * ví dụ "spectrometer-01"), dùng khi EquipmentSidePanel mở view chi tiết.
+   * @param {string} equipmentId
+   */
+  const getEquipmentInfo = async (equipmentId) => {
+    try {
+      const { queryContent } = await import('#imports')
+      const equipment = await queryContent('equipment')
+        .where({ id: equipmentId })
+        .findOne()
+      return equipment || null
+    } catch (error) {
+      console.error(`[useVguData] Không lấy được chi tiết thiết bị ${equipmentId}:`, error)
+      return null
+    }
+  }
 
-<script setup>
-import { computed, ref, onMounted, onBeforeUnmount, inject, watchEffect } from 'vue'
-import { storeToRefs } from 'pinia'
-import { useRoute, useRouter } from 'vue-router'
-import { useMapStore } from '~/Stores/mapStores'
-import { useDeviceTier } from '~/composables/useDeviceTier'
-import HologramMap from '~/components/HologramMap.vue'
-import RoomDetailPanel from '~/components/RoomDetailPanel.vue'
-import FloorPanel from '~/components/FloorPanel.vue'
+  /**
+   * Lấy danh sách phòng của 1 tầng thuộc 1 tòa (content/Rooms/*.md), CHUẨN HOÁ
+   * field cho FloorPanel.vue dùng thẳng: id, roomNumber, roomName, roomType, status.
+   * (Trước đây FloorPanel gọi hàm này nhưng composable chưa có -> luôn báo lỗi
+   * "Không tải được dữ liệu phòng".)
+   * @param {string} buildingId ví dụ "AD"
+   * @param {string|number} floor ví dụ 3
+   */
+  const getRoomsByFloor = async (buildingId, floor) => {
+    if (!buildingId || floor == null) return []
+    try {
+      const { queryContent } = await import('#imports')
+      const floorNum = Number(floor)
+      const rooms = await queryContent()
+        .where({ building_id: buildingId, floor: floorNum })
+        .find()
+      return (rooms || []).map(normalizeRoom)
+    } catch (error) {
+      console.error(`[useVguData] Không lấy được danh sách phòng ${buildingId} tầng ${floor}:`, error)
+      throw error
+    }
+  }
 
-const route = useRoute()
-const router = useRouter()
-const { isMobile } = useDeviceTier()
-const mapStore = useMapStore()
-const { selectedRoom, selectedBuilding, selectedFloor, isLoading } = storeToRefs(mapStore)
-const hologramMapRef = ref(null)
+  /**
+   * Tìm phòng theo từ khoá (room_id hoặc tên phòng), dùng cho ô tìm kiếm phòng
+   * trên thanh điều hướng. Trả về danh sách rút gọn kèm buildingId/floor để
+   * điều hướng bản đồ tới đúng phòng.
+   * @param {string} query
+   * @param {number} limit
+   */
+  const searchRooms = async (query, limit = 8) => {
+    const q = (query || '').trim()
+    if (!q) return []
+    try {
+      const { queryContent } = await import('#imports')
+      const all = await queryContent().find()
+      const qLower = q.toLowerCase()
+      return (all || [])
+        .filter(r => r.room_id)
+        .filter(r =>
+          String(r.room_id).toLowerCase().includes(qLower) ||
+          String(r.name || '').toLowerCase().includes(qLower)
+        )
+        .slice(0, limit)
+        .map(normalizeRoom)
+    } catch (error) {
+      console.error(`[useVguData] Không tìm được phòng với từ khoá "${q}":`, error)
+      return []
+    }
+  }
 
-const contextTitle = computed(() => {
-  if (!selectedBuilding.value) return 'TIÊU ĐIỂM: TOÀN CẢNH KHUÔN VIÊN VGU'
-  if (selectedRoom.value) return `PHÒNG: ${selectedRoom.value}`
-  return `TOÀ: ${String(selectedBuilding.value).toUpperCase()} · TẦNG ${selectedFloor.value ?? '-'}`
-})
+  // Các nhóm phân loại phòng thật sự xuất hiện trong dữ liệu (room_type trong
+  // content/Rooms/*.md). Giá trị "___" (chưa cập nhật) và các giá trị hiếm gặp
+  // khác được gộp về "other" để không phá vỡ tab phân loại trên FloorPanel.
+  const ROOM_TYPE_MAP = {
+    'Administration': 'administration',
+    'Laboratory': 'laboratory',
+    'Workshop': 'workshop',
+    'Teaching': 'teaching',
+    'Other functions': 'other'
+  }
+  const normalizeRoomType = (raw) => ROOM_TYPE_MAP[raw] || 'other'
 
-// Bơm dòng trạng thái vào AppHeader (khai báo ở layouts/default.vue) mà không cần
-// layout biết gì về Pinia/HologramMap. Khi đang loading hiện "ĐANG TẢI…", sau đó
-// đồng bộ với contextTitle của chính trang map.
-const headerStatus = inject('header-status', ref(''))
-watchEffect(() => {
-  headerStatus.value = isLoading.value ? 'ĐANG TẢI BẢN ĐỒ…' : contextTitle.value
-})
+  const normalizeStatus = (raw) => {
+    const s = (raw || '').toLowerCase()
+    if (s === 'occupied' || s === 'active') return 'active'
+    if (s === 'vacant') return 'inactive'
+    return 'unknown'
+  }
 
-const handleRoomSelected = ({ roomId, buildingId, floor }) => {
-  mapStore.focusOnRoom(roomId, buildingId, floor)
-}
-const handleBuildingSelected = ({ buildingId, floor }) => {
-  mapStore.focusOnBuilding(buildingId, floor)
-}
-const handleFloorSelected = ({ floor }) => {
-  mapStore.setFloor(floor)
-}
-const closePanel = () => {
-  mapStore.clearSelection()
-  hologramMapRef.value?.closeRoomDetail?.()
-}
-// Nhấn phòng trong FloorPanel -> bay camera zoom vào đúng phòng trên map
-// (giống hệt bấm thẳng vào phòng), đồng thời mở RoomDetailPanel bên phải.
-// goToRoom() bên trong HologramMap tự emit 'room-selected' -> handleRoomSelected
-// ở trên sẽ cập nhật store, nên không cần gọi mapStore.focusOnRoom ở đây nữa.
-const handleFloorRoomSelect = ({ roomId, buildingId }) => {
-  const bId = buildingId ?? selectedBuilding.value
-  if (hologramMapRef.value?.goToRoom) {
-    hologramMapRef.value.goToRoom({ id: roomId, buildingId: bId, floor: selectedFloor.value })
-  } else {
-    // Dự phòng nếu ref chưa sẵn sàng (ví dụ map chưa mount xong)
-    mapStore.focusOnRoom(roomId, bId, selectedFloor.value)
+  // Chuẩn hoá 1 bản ghi phòng thô từ Nuxt Content về shape UI cần.
+  const normalizeRoom = (r) => ({
+    id: r.room_id,
+    roomNumber: r.room_id,
+    roomName: r.name || '',
+    roomType: normalizeRoomType(r.room_type),
+    rawRoomType: r.room_type || '',
+    status: normalizeStatus(r.status),
+    rawStatus: r.status || '',
+    buildingId: r.building_id || null,
+    floor: r.floor ?? null,
+    department: Array.isArray(r.departments) ? r.departments.join(', ') : (r.departments || ''),
+    area: r.area_m2 || '',
+    capacity: r.capacity || '',
+    occupants: r.head_of_lab?.name ? [r.head_of_lab.name] : []
+  })
+
+  /**
+   * Thống kê số phòng / số phòng lab theo từng toà, dùng cho dashboard
+   * "Toà nhà" (pages/buildings.vue). Query 1 lần toàn bộ content/Rooms rồi
+   * gộp nhóm theo building_id — rẻ hơn N lần gọi getRoomsByFloor cho từng tầng.
+   * @returns {Promise<Record<string, {roomCount:number, labCount:number}>>}
+   */
+  const getBuildingStats = async () => {
+    try {
+      const { queryContent } = await import('#imports')
+      const rooms = await queryContent().find()
+      const stats = {}
+      for (const r of rooms || []) {
+        const b = r.building_id
+        if (!b) continue
+        if (!stats[b]) stats[b] = { roomCount: 0, labCount: 0 }
+        stats[b].roomCount++
+        if ((r.room_type || '').toLowerCase() === 'laboratory') stats[b].labCount++
+      }
+      return stats
+    } catch (error) {
+      console.error('[useVguData] Không lấy được thống kê toà nhà:', error)
+      return {}
+    }
+  }
+
+  return {
+    getRoomInfo,
+    getRoomEquipment,
+    getEquipmentListByRoom,
+    getEquipmentInfo,
+    getRoomsByFloor,
+    searchRooms,
+    getBuildingStats
   }
 }
-
-// Đến từ pages/buildings.vue (dashboard "Toà nhà") qua router.push({ path:'/',
-// query:{ building: 'AD' } }) — chờ map phát 'ready' rồi mới bay vào toà, vì
-// selectBuilding() cần các layer/source đã addLayer xong (initRoomsLayer...).
-// Sau khi áp dụng, xoá query khỏi URL bằng replace() để không áp lại khi
-// người dùng tự điều hướng tiếp (vd bấm "Thoát khỏi toà nhà" rồi refresh).
-const onMapReady = () => {
-  isLoading.value = false
-  const pendingBuilding = route.query.building
-  if (pendingBuilding && hologramMapRef.value?.selectBuilding) {
-    hologramMapRef.value.selectBuilding(String(pendingBuilding).toUpperCase())
-    router.replace({ path: '/' })
-  }
-}
-
-// Đóng panel bằng phím Esc
-const onKey = (e) => { if (e.key === 'Escape' && selectedRoom.value) closePanel() }
-
-let safety
-onMounted(() => {
-  isLoading.value = true
-  // Nếu vì lý do nào đó bản đồ không phát 'ready', vẫn ẩn overlay sau 6s.
-  safety = setTimeout(() => { isLoading.value = false }, 6000)
-  window.addEventListener('keydown', onKey)
-})
-onBeforeUnmount(() => {
-  clearTimeout(safety)
-  window.removeEventListener('keydown', onKey)
-})
-</script>
-
-<style scoped>
-.map-page {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-}
-
-/* HUD Bar — nội dung riêng của trang map, đẩy xuống dưới AppHeader dùng chung
-   qua biến --header-h (khai báo ở layouts/default.vue) thay vì số cứng 68px
-   trước đây, để không vỡ layout nếu chiều cao header đổi. */
-.hud-bar {
-  position: absolute;
-  top: calc(var(--header-h, 64px) + 4px);
-  left: 24px;
-  z-index: 20;
-  pointer-events: none;
-}
-.hud-context-panel {
-  display: flex; align-items: center; gap: 10px;
-  padding: 8px 16px;
-  background: rgba(15, 30, 54, 0.75);
-  border: 1px solid rgba(0, 255, 204, 0.25);
-  border-radius: 4px;
-  backdrop-filter: blur(8px);
-  font-family: 'Space Mono', monospace;
-  font-size: 12px; letter-spacing: 0.5px; color: #00ffcc;
-}
-
-/* Loading overlay — z-index cao hơn RoomDetailPanel (z:100) và EquipmentSidePanel
-   (z:99, hoặc 101 khi màn hẹp phủ toàn màn hình — xem EquipmentSidePanel.vue)
-   không quan trọng vì overlay chỉ hiện lúc mới vào, nhưng trước đây trùng z:100
-   với RoomDetailPanel là một "hoà" dễ vỡ nếu sau này thêm hiệu ứng — tách rõ
-   ràng để loading luôn thắng khi đang hiện. */
-.loading-overlay {
-  position: absolute; inset: 0; z-index: 150;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 20px; background: #05080d; color: #00ffcc;
-  font-family: 'Space Mono', monospace; font-size: 13px; letter-spacing: 1px;
-}
-.cyber-loader {
-  width: 56px; height: 56px;
-  border: 3px solid rgba(0, 255, 204, 0.2); border-top-color: #00ffcc;
-  border-radius: 50%; animation: spin 1s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* Transitions */
-.fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
-.fade-enter-from, .fade-leave-to { opacity: 0; }
-.cyber-slide-enter-active, .cyber-slide-leave-active {
-  transition: transform 0.35s ease, opacity 0.35s ease;
-}
-.cyber-slide-enter-from, .cyber-slide-leave-to { transform: translateX(30px); opacity: 0; }
-.cyber-slide-left-enter-active, .cyber-slide-left-leave-active {
-  transition: transform 0.35s ease, opacity 0.35s ease;
-}
-.cyber-slide-left-enter-from, .cyber-slide-left-leave-to { transform: translateX(-30px); opacity: 0; }
-
-/* Tôn trọng người dùng tắt hiệu ứng chuyển động */
-@media (prefers-reduced-motion: reduce) {
-  .pulse-dot, .cyber-loader { animation: none; }
-  .fade-enter-active, .fade-leave-active,
-  .cyber-slide-enter-active, .cyber-slide-leave-active { transition: none; }
-}
-
-@media (max-width: 640px) {
-  .hud-bar { top: calc(var(--header-h-mobile, 54px) + 4px); left: 14px; }
-  .hud-context-panel { font-size: 11px; padding: 6px 12px; }
-}
-
-.shell {
-  background: linear-gradient(180deg, var(--surface-panel) 0%, var(--surface-root) 100%);
-  border-bottom: 1px solid var(--line-soft);
-}
-
-.brand-mark {
-  filter: none;
-  box-shadow: none;
-}
-
-.page-title {
-  color: var(--ink-strong);
-  font-family: var(--type-main);
-  text-transform: none;
-  letter-spacing: 0;
-}
-
-.page-title em {
-  color: var(--brand-accent);
-  font-style: normal;
-}
-
-.quick-indicator {
-  background: var(--brand-accent);
-}
-
-.quick-indicator::after {
-  background: var(--brand-accent);
-}
-
-.map-hud {
-  background: var(--surface-panel);
-  border: 1px solid var(--line-soft);
-}
-
-.map-hud__accent {
-  color: var(--brand-accent);
-}
-
-.map-frame {
-  background: var(--surface-root);
-}
-
-.loading-copy {
-  color: var(--ink-strong);
-}
-</style>
