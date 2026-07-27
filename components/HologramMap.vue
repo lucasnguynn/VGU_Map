@@ -774,7 +774,10 @@ onUnmounted(() => {
 // Cho phép component cha (pages/index.vue) gọi trực tiếp khi người dùng chọn
 // phòng từ danh sách trong FloorPanel, để bản đồ bay camera zoom vào đúng
 // phòng đó — giống hệt hành vi khi bấm thẳng vào phòng trên map.
-defineExpose({ goToRoom, closeRoomDetail })
+// selectBuilding thêm để pages/buildings.vue (dashboard danh sách toà) có thể
+// điều hướng thẳng vào 1 toà khi người dùng bấm "Vào toà nhà" từ trang khác,
+// qua query ?building=ID (xem watch ở pages/index.vue).
+defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
 </script>
 
 <style scoped>
