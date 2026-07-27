@@ -62,12 +62,15 @@
 <script setup>
 import { computed, ref, onMounted, onBeforeUnmount, inject, watchEffect } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useRoute, useRouter } from 'vue-router'
 import { useMapStore } from '~/Stores/mapStores'
 import { useDeviceTier } from '~/composables/useDeviceTier'
 import HologramMap from '~/components/HologramMap.vue'
 import RoomDetailPanel from '~/components/RoomDetailPanel.vue'
 import FloorPanel from '~/components/FloorPanel.vue'
 
+const route = useRoute()
+const router = useRouter()
 const { isMobile } = useDeviceTier()
 const mapStore = useMapStore()
 const { selectedRoom, selectedBuilding, selectedFloor, isLoading } = storeToRefs(mapStore)
@@ -114,7 +117,19 @@ const handleFloorRoomSelect = ({ roomId, buildingId }) => {
   }
 }
 
-const onMapReady = () => { isLoading.value = false }
+// Đến từ pages/buildings.vue (dashboard "Toà nhà") qua router.push({ path:'/',
+// query:{ building: 'AD' } }) — chờ map phát 'ready' rồi mới bay vào toà, vì
+// selectBuilding() cần các layer/source đã addLayer xong (initRoomsLayer...).
+// Sau khi áp dụng, xoá query khỏi URL bằng replace() để không áp lại khi
+// người dùng tự điều hướng tiếp (vd bấm "Thoát khỏi toà nhà" rồi refresh).
+const onMapReady = () => {
+  isLoading.value = false
+  const pendingBuilding = route.query.building
+  if (pendingBuilding && hologramMapRef.value?.selectBuilding) {
+    hologramMapRef.value.selectBuilding(String(pendingBuilding).toUpperCase())
+    router.replace({ path: '/' })
+  }
+}
 
 // Đóng panel bằng phím Esc
 const onKey = (e) => { if (e.key === 'Escape' && selectedRoom.value) closePanel() }
