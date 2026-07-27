@@ -27,6 +27,10 @@
         <NuxtLink to="/" class="nav-btn" exact-active-class="nav-btn--active">
           Bản đồ tương tác
         </NuxtLink>
+        <!-- pages/buildings.vue: dashboard danh sách toàn bộ toà nhà trong campus. -->
+        <NuxtLink to="/buildings" class="nav-btn" active-class="nav-btn--active">
+          Toà nhà
+        </NuxtLink>
         <!-- pages/equipment/index.vue: trang danh mục toàn bộ thiết bị (route /equipment,
              không đụng /equipment-:id của trang chi tiết vì khác tên file/segment). -->
         <NuxtLink to="/equipment" class="nav-btn" active-class="nav-btn--active">
