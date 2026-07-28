@@ -90,7 +90,7 @@
       <div class="detail-scroll">
         <div class="viewer-frame">
           <model-viewer
-            v-if="selectedMachine.modelUrl"
+            v-if="selectedMachine.modelUrl && !modelFailed"
             :key="selectedMachine.id"
             :src="selectedMachine.modelUrl"
             camera-controls
@@ -101,6 +101,8 @@
             interaction-prompt="none"
             :style="{ '--poster-color': 'transparent' }"
             class="model-viewer-el"
+            @error="onModelError"
+            @load="onModelLoad"
           >
             <div slot="progress-bar" class="model-progress"></div>
             <div slot="poster" class="model-loading">Đang tải mô hình 3D…</div>
@@ -156,7 +158,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useDeviceTier } from '~/composables/useDeviceTier'
 import { useBottomSheet } from '~/composables/useBottomSheet'
 
@@ -191,6 +193,42 @@ const { getEquipmentListByRoom, getEquipmentInfo } = useVguData()
 const isLoadingList = ref(false)
 const machines = ref([])
 const selectedMachine = ref(null)
+
+// Trước đây khi file .glb không tồn tại (404) hoặc lỗi, <model-viewer> không
+// tự báo gì -> khung "Đang tải mô hình 3D…" bị treo mãi mãi (giống như đang
+// tải rất lâu, dù thực ra là lỗi). Bắt sự kiện @error + đặt timeout dự phòng
+// để tự chuyển sang khung "Chưa có mô hình 3D" thay vì treo vô thời hạn.
+const modelFailed = ref(false)
+let modelTimeoutId = null
+const MODEL_LOAD_TIMEOUT_MS = 12000
+
+const clearModelTimeout = () => {
+  if (modelTimeoutId) { clearTimeout(modelTimeoutId); modelTimeoutId = null }
+}
+const onModelError = () => {
+  console.warn('[EquipmentSidePanel] Không tải được model 3D (file có thể không tồn tại):', selectedMachine.value?.modelUrl)
+  clearModelTimeout()
+  modelFailed.value = true
+}
+const onModelLoad = () => {
+  clearModelTimeout()
+}
+const armModelTimeout = () => {
+  clearModelTimeout()
+  modelFailed.value = false
+  modelTimeoutId = setTimeout(() => {
+    console.warn('[EquipmentSidePanel] Model 3D tải quá lâu, coi như lỗi:', selectedMachine.value?.modelUrl)
+    modelFailed.value = true
+  }, MODEL_LOAD_TIMEOUT_MS)
+}
+// Mỗi lần đổi sang 1 thiết bị khác (modelUrl đổi) -> reset lại trạng thái lỗi
+// và hẹn giờ mới cho model đó.
+watch(() => selectedMachine.value?.modelUrl, (url) => {
+  clearModelTimeout()
+  modelFailed.value = false
+  if (url) armModelTimeout()
+})
+onUnmounted(() => clearModelTimeout())
 
 const roomLabel = computed(() => {
   const parts = [props.buildingId, props.roomName || props.roomId].filter(Boolean)
@@ -296,13 +334,9 @@ onMounted(() => {
   if (props.initialEquipment) {
     selectMachine(normalizeMachine(props.initialEquipment))
   }
-  // Nạp web component <model-viewer> của Google khi cần (chỉ nạp 1 lần).
-  if (typeof window !== 'undefined' && !customElements.get('model-viewer')) {
-    const script = document.createElement('script')
-    script.type = 'module'
-    script.src = 'https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js'
-    document.head.appendChild(script)
-  }
+  // Không cần tự nạp <model-viewer> ở đây nữa — đã đăng ký sẵn lúc app khởi
+  // động qua plugins/model-viewer.client.ts (import từ package npm thật,
+  // không phụ thuộc CDN ngoài lúc runtime nữa).
 })
 
 // Nếu người dùng bấm sang khối thiết bị KHÁC trên map trong khi panel đang mở
