@@ -33,8 +33,8 @@
       </div>
     </div>
 
-    <!-- Panel danh sách phòng theo tầng (bên trái) -->
-    <transition name="cyber-slide-left">
+    <!-- Panel danh sách phòng theo tầng -->
+    <transition name="floor-panel-enter">
       <FloorPanel
         v-if="selectedBuilding && selectedFloor != null"
         :building-id="selectedBuilding"
@@ -218,31 +218,35 @@ onBeforeUnmount(() => {
   50% { opacity: 0.4; transform: scale(0.7); }
 }
 
-/* HUD Bar — nằm bên phải panel toà nhà (300px) + tab toggle (36px) */
+/* HUD Bar — bám theo --panels-left-width (set bởi usePanelLayout.js),
+   transition đồng bộ hoàn toàn với BuildingsPanel và FloorPanel */
 .hud-bar {
   position: absolute;
-  top: 68px;
-  /* 300px (panel) + 36px (tab) + 12px (gap) = 348px;
-     khi panel thu gọn: 0 + 36 + 12 = 48px — dùng CSS var để smooth */
-  left: calc(300px + 36px + 12px);
+  top: 76px;
+  left: calc(var(--panels-left-width, 336px) + 16px);
   z-index: 20;
   display: flex;
   align-items: center;
   gap: 8px;
   pointer-events: none;
-  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: left 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: left;
 }
 .hud-bar > * { pointer-events: auto; }
 
 .hud-context-panel {
   display: flex; align-items: center; gap: 10px;
-  padding: 8px 16px;
-  background: rgba(15, 30, 54, 0.75);
-  border: 1px solid rgba(0, 255, 204, 0.25);
-  border-radius: 4px;
-  backdrop-filter: blur(8px);
+  padding: 7px 14px;
+  background: rgba(7, 10, 18, 0.82);
+  border: 1px solid rgba(0, 255, 204, 0.22);
+  border-radius: 6px;
+  backdrop-filter: blur(10px);
   font-family: 'Space Mono', monospace;
-  font-size: 12px; letter-spacing: 0.5px; color: #00ffcc;
+  font-size: 11px; letter-spacing: 0.5px; color: #00ffcc;
+  white-space: nowrap;
+  max-width: 60vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Loading overlay */
@@ -262,14 +266,20 @@ onBeforeUnmount(() => {
 /* Transitions */
 .fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
+/* RoomDetailPanel — trượt từ phải */
 .cyber-slide-enter-active, .cyber-slide-leave-active {
-  transition: transform 0.35s ease, opacity 0.35s ease;
+  transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.38s ease;
 }
-.cyber-slide-enter-from, .cyber-slide-leave-to { transform: translateX(30px); opacity: 0; }
-.cyber-slide-left-enter-active, .cyber-slide-left-leave-active {
-  transition: transform 0.35s ease, opacity 0.35s ease;
+.cyber-slide-enter-from, .cyber-slide-leave-to { transform: translateX(24px); opacity: 0; }
+
+/* FloorPanel — fade + scale nhỏ (left đã animate riêng qua CSS var) */
+.floor-panel-enter-enter-active, .floor-panel-enter-leave-active {
+  transition: opacity 0.32s ease, transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.cyber-slide-left-enter-from, .cyber-slide-left-leave-to { transform: translateX(-30px); opacity: 0; }
+.floor-panel-enter-enter-from, .floor-panel-enter-leave-to {
+  opacity: 0;
+  transform: translateX(-12px);
+}
 
 /* Tôn trọng người dùng tắt hiệu ứng chuyển động */
 @media (prefers-reduced-motion: reduce) {
@@ -278,17 +288,17 @@ onBeforeUnmount(() => {
   .cyber-slide-enter-active, .cyber-slide-leave-active { transition: none; }
 }
 
-/* Tablet: panel hẹp hơn (280px) */
-@media (max-width: 1024px) {
-  .hud-bar { left: calc(280px + 36px + 12px); }
-}
-
-/* Mobile: panel là bottom sheet, HUD bar trở về góc trái trên */
+/* Mobile: panel là bottom sheet, HUD bar về góc trên trái */
 @media (max-width: 640px) {
   .app-header { padding: 10px 14px; }
   .header-title { font-size: 16px; }
-  .hud-bar { top: 58px; left: 14px; gap: 6px; }
-  .hud-context-panel { font-size: 11px; padding: 6px 12px; }
+  .hud-bar {
+    top: 58px;
+    left: 14px !important;  /* override CSS var — panel không chiếm cột trái */
+    gap: 6px;
+    transition: none;
+  }
+  .hud-context-panel { font-size: 10px; padding: 6px 10px; }
 }
 
 .shell {
