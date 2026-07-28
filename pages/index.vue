@@ -31,6 +31,23 @@
         <span class="pulse-dot" aria-hidden="true"></span>
         <span>{{ contextTitle }}</span>
       </div>
+
+      <!-- Nút mở Buildings Dashboard Panel -->
+      <button
+        class="buildings-toggle-btn"
+        :class="{ active: showBuildingsPanel }"
+        @click="showBuildingsPanel = !showBuildingsPanel"
+        :aria-expanded="showBuildingsPanel"
+        aria-controls="buildings-dashboard-panel"
+        title="Xem danh sách toà nhà"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 21h18" /><path d="M5 21V6a1 1 0 0 1 1-1h5v16" />
+          <path d="M15 21V10a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v11" />
+          <path d="M9 8h.01" /><path d="M9 12h.01" /><path d="M9 16h.01" />
+        </svg>
+        <span class="btn-label">Toà nhà</span>
+      </button>
     </div>
 
     <!-- Panel danh sách phòng theo tầng (bên trái) -->
@@ -56,6 +73,12 @@
       />
     </transition>
 
+    <!-- Buildings Dashboard Panel (overlay trên bản đồ) -->
+    <BuildingsDashboardPanel
+      v-model="showBuildingsPanel"
+      @select-building="handleBuildingFromPanel"
+    />
+
     <!-- Loading overlay: tắt khi bản đồ báo 'ready' (có timeout an toàn) -->
     <transition name="fade">
       <div v-if="isLoading" class="loading-overlay">
@@ -74,6 +97,7 @@ import { useMapStore } from '~/Stores/mapStores'
 import HologramMap from '~/components/HologramMap.vue'
 import RoomDetailPanel from '~/components/RoomDetailPanel.vue'
 import FloorPanel from '~/components/FloorPanel.vue'
+import BuildingsDashboardPanel from '~/components/BuildingsDashboardPanel.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -81,6 +105,9 @@ const mapStore = useMapStore()
 const { selectedRoom, selectedBuilding, selectedFloor, isLoading } = storeToRefs(mapStore)
 const hologramMapRef = ref(null)
 const roomDetailPanelRef = ref(null)
+
+// Trạng thái hiển thị Buildings Dashboard Panel
+const showBuildingsPanel = ref(false)
 
 const contextTitle = computed(() => {
   if (!selectedBuilding.value) return 'TIÊU ĐIỂM: TOÀN CẢNH KHUÔN VIÊN VGU'
@@ -98,6 +125,18 @@ const handleFloorSelected = ({ floor }) => {
   mapStore.setFloor(floor)
 }
 const closePanel = () => mapStore.clearSelection()
+
+// Người dùng chọn toà từ BuildingsDashboardPanel -> bay camera vào toà đó.
+// Panel đã tự đóng trước khi emit, nên chỉ cần gọi selectBuilding() ở đây.
+const handleBuildingFromPanel = async (buildingId) => {
+  await nextTick()
+  if (hologramMapRef.value?.selectBuilding) {
+    hologramMapRef.value.selectBuilding(String(buildingId))
+  } else {
+    // Dự phòng: nếu map chưa sẵn sàng, cập nhật store để FloorPanel hiện đúng toà
+    mapStore.focusOnBuilding(String(buildingId), 1)
+  }
+}
 // Nhấn phòng trong FloorPanel -> bay camera zoom vào đúng phòng trên map
 // (giống hệt bấm thẳng vào phòng), đồng thời mở RoomDetailPanel bên phải.
 // goToRoom() bên trong HologramMap tự emit 'room-selected' -> handleRoomSelected
@@ -196,7 +235,18 @@ onBeforeUnmount(() => {
 }
 
 /* HUD Bar */
-.hud-bar { position: absolute; top: 68px; left: 24px; z-index: 20; pointer-events: none; }
+.hud-bar {
+  position: absolute;
+  top: 68px;
+  left: 24px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.hud-bar > * { pointer-events: auto; }
+
 .hud-context-panel {
   display: flex; align-items: center; gap: 10px;
   padding: 8px 16px;
@@ -207,6 +257,38 @@ onBeforeUnmount(() => {
   font-family: 'Space Mono', monospace;
   font-size: 12px; letter-spacing: 0.5px; color: #00ffcc;
 }
+
+/* Nút mở Buildings Dashboard Panel */
+.buildings-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  background: rgba(15, 30, 54, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 4px;
+  backdrop-filter: blur(8px);
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  color: #B3BFCD;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+  white-space: nowrap;
+}
+.buildings-toggle-btn:hover {
+  color: #fff;
+  border-color: rgba(0, 255, 204, 0.5);
+  background: rgba(15, 30, 54, 0.95);
+}
+.buildings-toggle-btn.active {
+  color: #EF5A24;
+  border-color: #EF5A24;
+  background: rgba(239, 90, 36, 0.1);
+}
+.buildings-toggle-btn:focus-visible { outline: 2px solid #00ffcc; outline-offset: 2px; }
+.btn-label { text-transform: uppercase; }
+@media (max-width: 480px) { .btn-label { display: none; } }
 
 /* Loading overlay */
 .loading-overlay {
@@ -244,8 +326,9 @@ onBeforeUnmount(() => {
 @media (max-width: 640px) {
   .app-header { padding: 10px 14px; }
   .header-title { font-size: 16px; }
-  .hud-bar { top: 58px; left: 14px; }
+  .hud-bar { top: 58px; left: 14px; gap: 6px; }
   .hud-context-panel { font-size: 11px; padding: 6px 12px; }
+  .buildings-toggle-btn { padding: 6px 10px; font-size: 10px; }
 }
 
 .shell {
