@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'node:url'
+
 export default defineNuxtConfig({
   // Tắt SSR: app là bản đồ 3D chạy hoàn toàn phía client (đã bọc <ClientOnly>),
   // đồng thời né lỗi Nitro prerender không tôn trọng baseURL khi build cho GitHub Pages.
@@ -34,7 +36,17 @@ export default defineNuxtConfig({
     preset: 'github_pages', // dùng gạch dưới "github_pages"
     prerender: {
       routes: ['/']
-    }
+    },
+    // [FIX] Thư mục models/ (chứa các file .glb) nằm ở GỐC REPO, không phải
+    // trong public/ — Nuxt static generate mặc định CHỈ copy nội dung public/
+    // ra bản build, nên mọi file .glb trong models/ trước đây KHÔNG BAO GIỜ
+    // thực sự lên được trang deploy (404 vĩnh viễn), dù file có tồn tại và
+    // đúng tên trên GitHub. Khai báo thêm publicAssets để Nitro copy luôn
+    // models/ vào output, phục vụ tại đúng URL models/{code}.glb như code đang
+    // gọi (EquipmentSidePanel.vue) — không cần di chuyển/upload lại file nào.
+    publicAssets: [
+      { baseURL: 'models', dir: fileURLToPath(new URL('./models', import.meta.url)) }
+    ]
   },
 
   modules: [
