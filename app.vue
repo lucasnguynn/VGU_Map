@@ -19,6 +19,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
 
 :root {
+  /* Được usePanelLayout.js cập nhật runtime theo trạng thái panel.
+     Giá trị mặc định = BuildingsPanel (300px) + tab (36px). */
+  --panels-left-width: 336px;
+
   --brand-accent: #F58220;
   --brand-accent-soft: #F7A14C;
   --brand-accent-muted: #FAC08F;
