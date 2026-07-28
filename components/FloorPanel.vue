@@ -249,11 +249,9 @@ const handleSelectRoom = (room) => {
 <style scoped>
 .floor-panel {
   position: absolute;
-  /* [FIX] Trước đây top:0 + height:100vh với z-index:90 > AppHeader (z:30)
-     -> panel đè lên header. Giờ neo dưới header qua --header-h, đúng cho
-     mọi tier (desktop/tablet dùng chung khối này, mobile ghi đè bên dưới). */
+  /* Neo dưới header, bên phải BuildingsDashboardPanel (300px) + tab toggle (36px) */
   top: var(--header-h, 64px);
-  left: 0;
+  left: calc(300px + 36px);
   width: 280px;
   height: calc(100vh - var(--header-h, 64px));
   background-color: #0b1120;
@@ -274,7 +272,9 @@ const handleSelectRoom = (room) => {
    Vẫn là side-dock như desktop nhưng thu hẹp bề rộng theo màn hình, có
    backdrop mờ phía sau (render riêng trong template) để tách khỏi bản đồ. */
 .floor-panel.tier-tablet {
-  width: min(320px, 88vw);
+  /* Tablet: BuildingsPanel hẹp hơn (min(280px, 85vw)) — dùng left cố định đơn giản hơn */
+  left: calc(min(280px, 85vw) + 36px);
+  width: min(300px, 80vw);
 }
 
 /* ===== Tier: mobile (<=640px) =====
