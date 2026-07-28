@@ -293,7 +293,9 @@ onMounted(() => {
   map.on('click', 'vgu-equipment-fill', (e) => {
     const feature = e.features[0]
     const equipmentId = feature?.properties?.equipment_id
-    if (equipmentId) emit('equipment-selected', { equipmentId, roomId: currentRoomId.value })
+    // Gửi kèm toàn bộ properties (model_code, room_id, building_id, floor…)
+    // để nơi nhận có thể mở thẳng chi tiết máy mà không cần tra cứu lại.
+    if (equipmentId) emit('equipment-selected', { equipmentId, roomId: currentRoomId.value, properties: feature.properties })
   })
 })
 
