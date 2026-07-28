@@ -11,7 +11,6 @@
         @ready="onMapReady"
       />
     </ClientOnly>
-
     <!-- Header HUD -->
     <header class="app-header">
       <div class="header-content">
