@@ -14,3 +14,5 @@
 // tách khỏi bundle chính bằng plugin .client.ts để không ảnh hưởng thời gian
 // build/SSR của các trang khác.
 import '@google/model-viewer'
+
+export default defineNuxtPlugin(() => {})
