@@ -1,24 +1,5 @@
 <template>
-  <!-- Tablet: nền mờ phía sau panel, bấm ra ngoài = đóng panel. -->
-  <div
-    v-if="tier === 'tablet'"
-    class="adaptive-backdrop"
-    style="z-index: 99"
-    @click="closePanel"
-  ></div>
-
-  <div
-    class="room-detail-panel"
-    :class="`tier-${tier}`"
-    :style="tier === 'mobile' ? sheetStyle : null"
-  >
-    <!-- Mobile: tay cầm kéo/tap (bottom sheet) -->
-    <div
-      v-if="tier === 'mobile'"
-      class="adaptive-sheet-handle"
-      @pointerdown="onSheetDragStart"
-    ></div>
-
+  <div class="room-detail-panel">
     <!-- Nút Đóng -->
     <button class="close-btn" @click="closePanel">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -43,7 +24,8 @@
       <div v-if="isLoading" class="state-msg">Đang tải dữ liệu phòng…</div>
 
       <template v-else>
-        <!-- 2. Ảnh thực tế — Đã cấu hình để khung tự động co giãn ôm sát theo tỷ lệ ảnh -->
+        <!-- 2. Ảnh thực tế — luôn có khung (frame) cố định kích thước, không phụ
+             thuộc ảnh tải được hay không, để không bao giờ "biến mất" như trước -->
         <div class="photo-section">
           <div v-if="display.photos && display.photos.length > 0" class="photo-grid" :class="{'single-photo': display.photos.length === 1}">
             <div
@@ -58,9 +40,10 @@
 
               <!-- Ảnh thật -->
               <img
-                :class="['room-image', { 'is-loaded': photoStates[index] === 'loaded' }]"
+                v-show="photoStates[index] === 'loaded'"
                 :src="photo"
                 alt="Room Photo"
+                class="room-image"
                 @load="onImageLoad(index)"
                 @error="onImageError($event, index)"
               />
@@ -91,8 +74,8 @@
           </div>
         </div>
 
-        <!-- 3. Thông tin nhân sự -->
-        <div class="info-card" v-if="display.occupants.length > 0 || display.office || display.email">
+        <!-- 3. Thông tin nhân sự (Đã được xử lý để xuống dòng) -->
+  <div class="info-card" v-if="display.occupants.length > 0 || display.office || display.email">
           <h3 class="card-title highlight-title">ROOM INCHARGE</h3>
           <div class="card-body">
             <p v-for="(person, idx) in display.occupants" :key="idx" class="incharge-name">
@@ -102,13 +85,13 @@
               Office: {{ display.office }}
             </p>
             <p class="incharge-email">
-              <span class="contact-label">Contact:</span>
               <a :href="'mailto:' + display.email" v-if="display.email">{{ display.email }}</a>
               <span v-else>N/A</span>
             </p>
             <p class="incharge-phone" v-if="display.phone">Tel: {{ display.phone }}</p>
           </div>
         </div>
+
 
         <!-- 4. Thông tin mô tả -->
         <div class="info-card">
@@ -125,6 +108,7 @@
             </div>
           </div>
         </div>
+
 
         <!-- 5. Featured Facility / Instruments -->
         <div class="info-card">
@@ -150,16 +134,15 @@
       <button class="action-btn" @click="showMachineModal = true">VIEW ALL MACHINES IN THIS ROOM</button>
     </div>
 
-    <!-- 7. Panel dock xem danh sách / 3D thiết bị trong phòng — hiện SONG SONG bên
-         trái panel này (xem EquipmentSidePanel.vue), không còn che kín màn hình như
-         MachineViewerModal (modal) trước đây. -->
+    <!-- 7. Panel xem danh sách / 3D thiết bị trong phòng -->
     <EquipmentSidePanel
       v-if="showMachineModal"
       :room-id="roomId"
       :building-id="buildingId"
       :room-name="display.name"
       :instruments="display.instruments"
-      @close="showMachineModal = false"
+      :initial-equipment="initialEquipment"
+      @close="closeMachinePanel"
     />
   </div>
 </template>
@@ -167,16 +150,25 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import EquipmentSidePanel from './EquipmentSidePanel.vue'
-import { useDeviceTier } from '~/composables/useDeviceTier'
-import { useBottomSheet } from '~/composables/useBottomSheet'
-
-const { tier } = useDeviceTier()
-// Mobile: panel này thay bằng bottom sheet, mặc định mở rộng gần hết màn hình
-// (peek cao hơn FloorPanel) vì đây là nội dung người dùng chủ động bấm vào,
-// không phải ngữ cảnh nền như danh sách phòng.
-const { sheetStyle, onDragStart: onSheetDragStart } = useBottomSheet({ peek: 0.55, full: 0.92, onDismiss: () => closePanel() })
 
 const showMachineModal = ref(false)
+// Thiết bị được chọn thẳng từ khối trên bản đồ (bấm vào thiết bị -> mở panel
+// chi tiết máy đó ngay, bỏ qua bước danh sách). Xem openEquipment() bên dưới.
+const initialEquipment = ref(null)
+
+const closeMachinePanel = () => {
+  showMachineModal.value = false
+  initialEquipment.value = null
+}
+
+// Gọi từ pages/index.vue khi người dùng bấm vào 1 khối thiết bị trên bản đồ
+// (sự kiện 'equipment-selected' từ HologramMap.vue) — mở thẳng panel thiết bị
+// ở chế độ chi tiết, không cần bấm "VIEW ALL MACHINES..." trước.
+const openEquipment = (equipmentProps) => {
+  initialEquipment.value = equipmentProps
+  showMachineModal.value = true
+}
+defineExpose({ openEquipment })
 
 const props = defineProps({
   roomId: { type: String, default: null },
@@ -207,6 +199,9 @@ onMounted(async () => {
   }
 })
 
+// Trạng thái từng khung ảnh: 'loading' | 'loaded' | 'error'. Luôn có khung cố
+// định kích thước hiển thị (spinner/ảnh/icon lỗi) — không bao giờ "biến mất"
+// như cách làm cũ (ẩn <img> bằng display:none khiến cả khối co về 0).
 const photoStates = ref({})
 
 const onImageLoad = (index) => {
@@ -272,9 +267,6 @@ const display = computed(() => {
       department: '',
       photos: [],
       occupants: [],
-      office: '',
-      email: '',
-      phone: '',
       roomFunction: '',
       roomType: 'N/A',
       area: 'N/A',
@@ -306,9 +298,6 @@ const display = computed(() => {
     department: r.department,
     photos,
     occupants: occupantsList,
-    office: r.office || '',   
-    email: r.email || '',     
-    phone: r.phone || '',     
     roomFunction: r.roomFunction,
     roomType: r.rawRoomType || 'N/A',
     area: r.area || 'N/A',
@@ -322,12 +311,10 @@ const display = computed(() => {
 <style scoped>
 .room-detail-panel {
   position: absolute;
-  /* [FIX] Trước đây top:0 + height:100vh với z-index:100 -> đè lên AppHeader
-     (z:30). Neo dưới header qua --header-h cho mọi tier, mobile ghi đè bên dưới. */
-  top: var(--header-h, 64px);
+  top: 0;
   right: 0;
   width: 400px;
-  height: calc(100vh - var(--header-h, 64px));
+  height: 100vh;
   background-color: #0b1120;
   border-left: 1px solid #1f2d40;
   display: flex;
@@ -336,27 +323,6 @@ const display = computed(() => {
   font-family: 'Inter', sans-serif;
   box-shadow: -4px 0 15px rgba(0,0,0,0.5);
   z-index: 100;
-}
-
-/* ===== Tier: tablet (641–1024px) =====
-   Side-dock như desktop nhưng thu hẹp, có backdrop mờ (render trong template). */
-.room-detail-panel.tier-tablet {
-  width: min(360px, 90vw);
-}
-
-/* ===== Tier: mobile (<=640px) =====
-   Bottom sheet kéo-thả thay cho dock cố định 400px (vốn rộng hơn cả màn hình
-   trên điện thoại). Chiều cao do useBottomSheet.js set qua style inline. */
-.room-detail-panel.tier-mobile {
-  top: auto;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  border-left: none;
-  border-top: 1px solid #1f2d40;
-  border-radius: 16px 16px 0 0;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
 }
 .close-btn {
   position: absolute;
@@ -419,13 +385,10 @@ const display = computed(() => {
   color: #94a3b8;
   font-size: 13px;
 }
-
-/* [CẬP NHẬT] Đảm bảo phần hình ảnh không bị chèn ép */
 .photo-section {
   width: 100%;
   border-radius: 8px;
   overflow: hidden;
-  flex-shrink: 0; 
 }
 .photo-grid {
   display: grid;
@@ -435,12 +398,10 @@ const display = computed(() => {
 .photo-grid.single-photo {
   grid-template-columns: 1fr;
 }
-
-/* [CẬP NHẬT] Bỏ height cố định để tự động kéo dài/thu ngắn theo tỷ lệ ảnh thực tế */
 .photo-frame {
   position: relative;
   width: 100%;
-  min-height: 120px; /* Vẫn cần 1 khoảng nhỏ tối thiểu để hiện spinner xoay khi chờ load */
+  height: 160px;
   background-color: #1e293b;
   border: 1px solid #334155;
   border-radius: 6px;
@@ -449,21 +410,11 @@ const display = computed(() => {
   align-items: center;
   justify-content: center;
 }
-
-/* [CẬP NHẬT] Auto height và dùng contain để giữ nguyên vẹn hình ảnh bản vẽ */
 .room-image {
   width: 100%;
-  height: auto; 
-  max-height: 350px; /* Giới hạn độ dài tối đa tránh việc panel bị lấn chiếm toàn màn hình */
-  object-fit: contain; 
-  display: block; 
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  height: 100%;
+  object-fit: cover;
 }
-.room-image.is-loaded {
-  opacity: 1;
-}
-
 .frame-spinner {
   position: absolute;
   inset: 0;
@@ -523,21 +474,17 @@ const display = computed(() => {
   border: 1px solid #1e293b;
   border-radius: 8px;
   padding: 16px;
-  flex-shrink: 0; 
 }
 .card-title {
-  font-size: 10px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 800;
   color: #94a3b8;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   margin: 0 0 12px 0;
   text-transform: uppercase;
 }
 .highlight-title {
   color: #f97316;
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
 }
 .card-body p {
   margin: 0 0 6px 0;
@@ -556,13 +503,6 @@ const display = computed(() => {
 .incharge-position {
   color: #cbd5e1;
   margin-top: 8px !important;
-}
-.incharge-email {
-  color: #94a3b8;
-}
-.contact-label {
-  color: #94a3b8;
-  margin-right: 4px;
 }
 .incharge-email a {
   color: #0ea5e9;
@@ -620,5 +560,41 @@ const display = computed(() => {
 }
 .action-btn:hover {
   background-color: #ea580c;
+}
+
+.sheet {
+  background: var(--surface-root);
+  color: var(--ink-strong);
+  font-family: var(--type-main);
+}
+
+.sheet__crumb {
+  color: var(--brand-accent);
+}
+
+.info-box {
+  background: var(--surface-panel);
+  border: 1px solid var(--line-soft);
+}
+
+.primary-action {
+  background: var(--brand-accent);
+  color: var(--ink-strong);
+}
+
+.primary-action:hover {
+  background: var(--brand-accent-soft);
+}
+
+.sheet__spinner {
+  color: var(--brand-accent);
+}
+
+.mail-link {
+  color: #8092A9;
+}
+
+.close-control:hover {
+  color: var(--brand-accent);
 }
 </style>
