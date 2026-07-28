@@ -92,7 +92,7 @@
           <model-viewer
             v-if="selectedMachine.modelUrl && !modelFailed"
             :key="selectedMachine.id"
-            :src="selectedMachine.modelUrl"
+            :src="activeModelSrc"
             camera-controls
             auto-rotate
             shadow-intensity="1"
@@ -105,7 +105,7 @@
             @load="onModelLoad"
           >
             <div slot="progress-bar" class="model-progress"></div>
-            <div slot="poster" class="model-loading">Đang tải mô hình 3D…</div>
+            <div slot="poster" class="model-loading">{{ statusText }}</div>
           </model-viewer>
 
           <div v-else class="no-model-placeholder">
@@ -198,15 +198,40 @@ const selectedMachine = ref(null)
 // tự báo gì -> khung "Đang tải mô hình 3D…" bị treo mãi mãi (giống như đang
 // tải rất lâu, dù thực ra là lỗi). Bắt sự kiện @error + đặt timeout dự phòng
 // để tự chuyển sang khung "Chưa có mô hình 3D" thay vì treo vô thời hạn.
+//
+// [FIX] Thêm cơ chế THỬ LẠI 1 lần với đường dẫn phụ trước khi báo lỗi hẳn:
+// models/ đôi khi lệch quy ước đặt tên/thư mục giữa các môi trường deploy —
+// thay vì báo lỗi ngay ở lần thử đầu, thử thêm 1 đường dẫn phụ (models/models/)
+// trước, chỉ khi CẢ HAI đều thất bại mới coi là thực sự không có model.
 const modelFailed = ref(false)
+const triedFallback = ref(false)
+const statusText = ref('Đang tải mô hình 3D…')
+const activeModelSrc = ref('')
 let modelTimeoutId = null
 const MODEL_LOAD_TIMEOUT_MS = 12000
+
+// Đường dẫn phụ: thử models/models/{code}.glb (đề phòng cấu trúc thư mục
+// lệch trên 1 số môi trường deploy). Chỉ tính khi có modelUrl gốc.
+const fallbackModelSrc = computed(() => {
+  const primary = selectedMachine.value?.modelUrl
+  if (!primary) return ''
+  return primary.replace(/models\/([^/]+\.glb)$/, 'models/models/$1')
+})
 
 const clearModelTimeout = () => {
   if (modelTimeoutId) { clearTimeout(modelTimeoutId); modelTimeoutId = null }
 }
+
 const onModelError = () => {
-  console.warn('[EquipmentSidePanel] Không tải được model 3D (file có thể không tồn tại):', selectedMachine.value?.modelUrl)
+  if (!triedFallback.value && fallbackModelSrc.value) {
+    console.warn('[EquipmentSidePanel] Đường dẫn chính lỗi, thử đường dẫn phụ:', selectedMachine.value?.modelUrl, '->', fallbackModelSrc.value)
+    triedFallback.value = true
+    statusText.value = 'Đang thử lại đường dẫn phụ…'
+    activeModelSrc.value = fallbackModelSrc.value
+    armModelTimeout() // hẹn giờ lại cho lượt thử thứ 2
+    return
+  }
+  console.warn('[EquipmentSidePanel] Không tải được model 3D (cả 2 đường dẫn đều lỗi):', selectedMachine.value?.modelUrl, fallbackModelSrc.value)
   clearModelTimeout()
   modelFailed.value = true
 }
@@ -215,19 +240,21 @@ const onModelLoad = () => {
 }
 const armModelTimeout = () => {
   clearModelTimeout()
-  modelFailed.value = false
   modelTimeoutId = setTimeout(() => {
-    console.warn('[EquipmentSidePanel] Model 3D tải quá lâu, coi như lỗi:', selectedMachine.value?.modelUrl)
-    modelFailed.value = true
+    console.warn('[EquipmentSidePanel] Model 3D tải quá lâu, coi như lỗi:', activeModelSrc.value)
+    onModelError()
   }, MODEL_LOAD_TIMEOUT_MS)
 }
-// Mỗi lần đổi sang 1 thiết bị khác (modelUrl đổi) -> reset lại trạng thái lỗi
-// và hẹn giờ mới cho model đó.
+// Mỗi lần đổi sang 1 thiết bị khác (modelUrl đổi) -> reset lại toàn bộ trạng
+// thái thử/lỗi và bắt đầu lại từ đường dẫn chính.
 watch(() => selectedMachine.value?.modelUrl, (url) => {
   clearModelTimeout()
   modelFailed.value = false
+  triedFallback.value = false
+  statusText.value = 'Đang tải mô hình 3D…'
+  activeModelSrc.value = url || ''
   if (url) armModelTimeout()
-})
+}, { immediate: true })
 onUnmounted(() => clearModelTimeout())
 
 const roomLabel = computed(() => {
