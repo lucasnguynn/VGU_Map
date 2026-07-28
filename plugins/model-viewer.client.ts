@@ -14,3 +14,12 @@
 // tách khỏi bundle chính bằng plugin .client.ts để không ảnh hưởng thời gian
 // build/SSR của các trang khác.
 import '@google/model-viewer'
+
+// [FIX] File plugin bắt buộc phải có `export default defineNuxtPlugin(...)`
+// thì Nuxt mới nhận diện và đưa vào bundle khi build. Trước đây file chỉ có
+// dòng import ở trên (không export gì) -> Nuxt bỏ qua file này lúc build,
+// khiến @google/model-viewer KHÔNG BAO GIỜ thực sự nằm trong bundle deploy
+// (dù npm install đã cài đúng gói) -> <model-viewer> không được đăng ký làm
+// custom element -> gán src=... không có tác dụng gì, không có request .glb
+// nào được gửi, mọi thiết bị đều bị coi là "lỗi" sau 12s timeout.
+export default defineNuxtPlugin(() => {})
