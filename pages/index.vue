@@ -7,13 +7,25 @@
         @room-selected="handleRoomSelected"
         @building-selected="handleBuildingSelected"
         @floor-selected="handleFloorSelected"
+        @equipment-selected="handleEquipmentSelected"
         @ready="onMapReady"
       />
     </ClientOnly>
 
-    <!-- Header giờ nằm ở layouts/default.vue (AppHeader.vue), dùng chung cho mọi trang.
-         Trang này chỉ còn giữ HUD context-panel riêng của bản đồ, đẩy xuống dưới
-         header (top: var(--header-h)) để không còn đè lên nhau. -->
+    <!-- Header HUD -->
+    <header class="app-header">
+      <div class="header-content">
+        <img src="/VGU-Logo.png" class="header-logo" alt="Logo VGU" />
+        <h1 class="header-title">
+          <span class="title-accent">VGU</span> MAP
+        </h1>
+      </div>
+      <div class="sys-status" role="status" aria-live="polite">
+        <span class="pulse-dot" aria-hidden="true"></span>
+        <span>ĐANG TẢI BẢN ĐỒ…</span>
+      </div>
+    </header>
+
     <div class="hud-bar">
       <div class="hud-context-panel">
         <span class="pulse-dot" aria-hidden="true"></span>
@@ -21,16 +33,10 @@
       </div>
     </div>
 
-    <!-- Panel danh sách phòng theo tầng (bên trái).
-         [FIX-mobile-sheets] Trên desktop/tablet đây là side-dock nên mở song
-         song với RoomDetailPanel không sao. Trên mobile, cả 2 panel này biến
-         thành bottom sheet cùng neo đáy màn hình -> mở đồng thời sẽ chồng lên
-         nhau, rối và khó thấy thông tin phòng thật sự cần xem. Nên trên mobile
-         chỉ hiện 1 sheet tại 1 thời điểm: ẩn FloorPanel khi đã có phòng được
-         chọn (RoomDetailPanel lúc đó là ưu tiên), hiện lại khi đóng chi tiết. -->
+    <!-- Panel danh sách phòng theo tầng (bên trái) -->
     <transition name="cyber-slide-left">
       <FloorPanel
-        v-if="selectedBuilding && selectedFloor != null && !(isMobile && selectedRoom)"
+        v-if="selectedBuilding && selectedFloor != null"
         :building-id="selectedBuilding"
         :cluster-label="String(selectedBuilding).toUpperCase()"
         :floor="selectedFloor"
@@ -43,6 +49,7 @@
     <transition name="cyber-slide">
       <RoomDetailPanel
         v-if="selectedRoom"
+        ref="roomDetailPanelRef"
         :room-id="selectedRoom"
         :building-id="selectedBuilding"
         @close="closePanel"
@@ -60,34 +67,22 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, onBeforeUnmount, inject, watchEffect } from 'vue'
+import { computed, ref, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useRoute, useRouter } from 'vue-router'
 import { useMapStore } from '~/Stores/mapStores'
-import { useDeviceTier } from '~/composables/useDeviceTier'
 import HologramMap from '~/components/HologramMap.vue'
 import RoomDetailPanel from '~/components/RoomDetailPanel.vue'
 import FloorPanel from '~/components/FloorPanel.vue'
 
-const route = useRoute()
-const router = useRouter()
-const { isMobile } = useDeviceTier()
 const mapStore = useMapStore()
 const { selectedRoom, selectedBuilding, selectedFloor, isLoading } = storeToRefs(mapStore)
 const hologramMapRef = ref(null)
+const roomDetailPanelRef = ref(null)
 
 const contextTitle = computed(() => {
   if (!selectedBuilding.value) return 'TIÊU ĐIỂM: TOÀN CẢNH KHUÔN VIÊN VGU'
   if (selectedRoom.value) return `PHÒNG: ${selectedRoom.value}`
   return `TOÀ: ${String(selectedBuilding.value).toUpperCase()} · TẦNG ${selectedFloor.value ?? '-'}`
-})
-
-// Bơm dòng trạng thái vào AppHeader (khai báo ở layouts/default.vue) mà không cần
-// layout biết gì về Pinia/HologramMap. Khi đang loading hiện "ĐANG TẢI…", sau đó
-// đồng bộ với contextTitle của chính trang map.
-const headerStatus = inject('header-status', ref(''))
-watchEffect(() => {
-  headerStatus.value = isLoading.value ? 'ĐANG TẢI BẢN ĐỒ…' : contextTitle.value
 })
 
 const handleRoomSelected = ({ roomId, buildingId, floor }) => {
@@ -99,10 +94,7 @@ const handleBuildingSelected = ({ buildingId, floor }) => {
 const handleFloorSelected = ({ floor }) => {
   mapStore.setFloor(floor)
 }
-const closePanel = () => {
-  mapStore.clearSelection()
-  hologramMapRef.value?.closeRoomDetail?.()
-}
+const closePanel = () => mapStore.clearSelection()
 // Nhấn phòng trong FloorPanel -> bay camera zoom vào đúng phòng trên map
 // (giống hệt bấm thẳng vào phòng), đồng thời mở RoomDetailPanel bên phải.
 // goToRoom() bên trong HologramMap tự emit 'room-selected' -> handleRoomSelected
@@ -117,18 +109,19 @@ const handleFloorRoomSelect = ({ roomId, buildingId }) => {
   }
 }
 
-// Đến từ pages/buildings.vue (dashboard "Toà nhà") qua router.push({ path:'/',
-// query:{ building: 'AD' } }) — chờ map phát 'ready' rồi mới bay vào toà, vì
-// selectBuilding() cần các layer/source đã addLayer xong (initRoomsLayer...).
-// Sau khi áp dụng, xoá query khỏi URL bằng replace() để không áp lại khi
-// người dùng tự điều hướng tiếp (vd bấm "Thoát khỏi toà nhà" rồi refresh).
-const onMapReady = () => {
-  isLoading.value = false
-  const pendingBuilding = route.query.building
-  if (pendingBuilding && hologramMapRef.value?.selectBuilding) {
-    hologramMapRef.value.selectBuilding(String(pendingBuilding).toUpperCase())
-    router.replace({ path: '/' })
+const onMapReady = () => { isLoading.value = false }
+
+// Bấm vào 1 khối thiết bị trên map (layer vgu-equipment-fill trong HologramMap)
+// -> đảm bảo đúng phòng đang được chọn (bấm thiết bị thường xảy ra khi phòng
+// đã mở sẵn, nhưng vẫn phòng hờ trường hợp khác), rồi mở thẳng
+// EquipmentSidePanel ở chế độ chi tiết máy đó — bỏ qua nút
+// "VIEW ALL MACHINES..." + bước chọn từ danh sách.
+const handleEquipmentSelected = async ({ roomId, buildingId, properties }) => {
+  if (roomId && selectedRoom.value !== roomId) {
+    mapStore.focusOnRoom(roomId, buildingId ?? properties?.building_id ?? selectedBuilding.value, properties?.floor ?? selectedFloor.value)
+    await nextTick()
   }
+  roomDetailPanelRef.value?.openEquipment(properties)
 }
 
 // Đóng panel bằng phím Esc
@@ -154,16 +147,41 @@ onBeforeUnmount(() => {
   overflow: hidden;
 }
 
-/* HUD Bar — nội dung riêng của trang map, đẩy xuống dưới AppHeader dùng chung
-   qua biến --header-h (khai báo ở layouts/default.vue) thay vì số cứng 68px
-   trước đây, để không vỡ layout nếu chiều cao header đổi. */
-.hud-bar {
+/* Header HUD */
+.app-header {
   position: absolute;
-  top: calc(var(--header-h, 64px) + 4px);
-  left: 24px;
+  top: 0; left: 0; right: 0;
   z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  background: linear-gradient(180deg, rgba(5, 10, 15, 0.85) 0%, rgba(5, 10, 15, 0) 100%);
   pointer-events: none;
 }
+.header-content { display: flex; align-items: center; gap: 14px; }
+.header-logo { height: 36px; width: auto; filter: drop-shadow(0 0 6px rgba(0, 255, 204, 0.4)); }
+.header-title {
+  font-family: 'Be Vietnam Pro', sans-serif;
+  font-size: 18px; font-weight: 600; color: #fff; letter-spacing: 0.5px; margin: 0;
+}
+.title-accent { color: #EF5A24; }
+.sys-status {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; letter-spacing: 1px; color: #00ffcc;
+}
+.pulse-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #00ffcc; box-shadow: 0 0 8px #00ffcc;
+  animation: pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
+}
+
+/* HUD Bar */
+.hud-bar { position: absolute; top: 68px; left: 24px; z-index: 20; pointer-events: none; }
 .hud-context-panel {
   display: flex; align-items: center; gap: 10px;
   padding: 8px 16px;
@@ -175,13 +193,9 @@ onBeforeUnmount(() => {
   font-size: 12px; letter-spacing: 0.5px; color: #00ffcc;
 }
 
-/* Loading overlay — z-index cao hơn RoomDetailPanel (z:100) và EquipmentSidePanel
-   (z:99, hoặc 101 khi màn hẹp phủ toàn màn hình — xem EquipmentSidePanel.vue)
-   không quan trọng vì overlay chỉ hiện lúc mới vào, nhưng trước đây trùng z:100
-   với RoomDetailPanel là một "hoà" dễ vỡ nếu sau này thêm hiệu ứng — tách rõ
-   ràng để loading luôn thắng khi đang hiện. */
+/* Loading overlay */
 .loading-overlay {
-  position: absolute; inset: 0; z-index: 150;
+  position: absolute; inset: 0; z-index: 100;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 20px; background: #05080d; color: #00ffcc;
   font-family: 'Space Mono', monospace; font-size: 13px; letter-spacing: 1px;
@@ -213,7 +227,9 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 640px) {
-  .hud-bar { top: calc(var(--header-h-mobile, 54px) + 4px); left: 14px; }
+  .app-header { padding: 10px 14px; }
+  .header-title { font-size: 16px; }
+  .hud-bar { top: 58px; left: 14px; }
   .hud-context-panel { font-size: 11px; padding: 6px 12px; }
 }
 
