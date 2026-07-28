@@ -68,12 +68,15 @@
 
 <script setup>
 import { computed, ref, nextTick, onMounted, onBeforeUnmount } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useMapStore } from '~/Stores/mapStores'
 import HologramMap from '~/components/HologramMap.vue'
 import RoomDetailPanel from '~/components/RoomDetailPanel.vue'
 import FloorPanel from '~/components/FloorPanel.vue'
 
+const route = useRoute()
+const router = useRouter()
 const mapStore = useMapStore()
 const { selectedRoom, selectedBuilding, selectedFloor, isLoading } = storeToRefs(mapStore)
 const hologramMapRef = ref(null)
@@ -109,7 +112,19 @@ const handleFloorRoomSelect = ({ roomId, buildingId }) => {
   }
 }
 
-const onMapReady = () => { isLoading.value = false }
+const onMapReady = async () => {
+  isLoading.value = false
+  // Đọc ?building=ID từ URL (được buildings.vue bơm vào khi người dùng bấm
+  // "Vào toà nhà"). Gọi selectBuilding() ngay sau khi map báo ready để
+  // camera fly thẳng vào toà đó. Sau đó xoá query khỏi URL (replace thay
+  // push để không tạo thêm entry lịch sử điều hướng).
+  const targetBuilding = route.query.building
+  if (targetBuilding && hologramMapRef.value?.selectBuilding) {
+    await nextTick()
+    hologramMapRef.value.selectBuilding(String(targetBuilding))
+    router.replace({ path: '/', query: {} })
+  }
+}
 
 // Bấm vào 1 khối thiết bị trên map (layer vgu-equipment-fill trong HologramMap)
 // -> đảm bảo đúng phòng đang được chọn (bấm thiết bị thường xảy ra khi phòng
