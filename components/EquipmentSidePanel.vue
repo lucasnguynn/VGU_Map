@@ -89,8 +89,15 @@
 
       <div class="detail-scroll">
         <div class="viewer-frame">
+          <img
+            v-if="viewMode === 'photo' && selectedMachine.photos[activePhotoIndex]"
+            :src="selectedMachine.photos[activePhotoIndex]"
+            :alt="selectedMachine.title"
+            class="photo-viewer-el"
+          />
+
           <model-viewer
-            v-if="selectedMachine.modelUrl && !modelFailed"
+            v-else-if="selectedMachine.modelUrl && !modelFailed"
             :key="selectedMachine.id"
             :src="activeModelSrc"
             camera-controls
@@ -116,6 +123,40 @@
             </svg>
             <p>Chưa có mô hình 3D cho thiết bị này.</p>
           </div>
+        </div>
+
+        <!-- Dải thumbnail: ô đầu để quay lại xem model 3D, các ô sau là ảnh
+             thực tế của thiết bị (nếu có). Chỉ hiện khi có ít nhất 1 trong 2
+             (model hoặc ảnh) để tránh 1 dải rỗng vô nghĩa. -->
+        <div
+          v-if="(selectedMachine.modelUrl && !modelFailed) || selectedMachine.photos.length > 0"
+          class="media-thumbstrip"
+        >
+          <button
+            v-if="selectedMachine.modelUrl && !modelFailed"
+            class="thumb-btn"
+            :class="{ active: viewMode === 'model' }"
+            title="Xem model 3D"
+            @click="selectModelView"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+            <span>3D</span>
+          </button>
+
+          <button
+            v-for="(photo, idx) in selectedMachine.photos"
+            :key="idx"
+            class="thumb-btn thumb-photo"
+            :class="{ active: viewMode === 'photo' && activePhotoIndex === idx }"
+            title="Xem ảnh thực tế"
+            @click="selectPhoto(idx)"
+          >
+            <img :src="photo" :alt="`${selectedMachine.title} ảnh ${idx + 1}`" />
+          </button>
         </div>
 
         <div class="info-pane">
@@ -207,6 +248,13 @@ const modelFailed = ref(false)
 const triedFallback = ref(false)
 const statusText = ref('Đang tải mô hình 3D…')
 const activeModelSrc = ref('')
+// 'model' = đang xem model 3D, 'photo' = đang xem 1 ảnh thực tế trong
+// selectedMachine.photos[activePhotoIndex]. Bấm thumbnail ảnh -> 'photo';
+// bấm lại thumbnail "3D" -> quay về 'model'.
+const viewMode = ref('model')
+const activePhotoIndex = ref(0)
+const selectPhoto = (index) => { viewMode.value = 'photo'; activePhotoIndex.value = index }
+const selectModelView = () => { viewMode.value = 'model' }
 let modelTimeoutId = null
 const MODEL_LOAD_TIMEOUT_MS = 12000
 
@@ -303,6 +351,10 @@ const normalizeMachine = (raw) => {
     status: raw.status || '',
     story: raw.story || raw.description || '',
     thumbnail: raw.media?.images?.[0] || raw.thumbnail || '',
+    // Ảnh thực tế của thiết bị (nếu có) — dùng cho dải thumbnail bên dưới
+    // model 3D, cho phép xem ảnh thật thay vì chỉ model. Hỗ trợ cả field
+    // dạng mảng (media.images / photos) lẫn 1 ảnh đơn (thumbnail/image).
+    photos: raw.media?.images || raw.photos || (raw.thumbnail ? [raw.thumbnail] : (raw.image ? [raw.image] : [])),
     buildingId: loc.building_id || raw.buildingId || raw.building_id || props.buildingId,
     floor: loc.floor ?? raw.floor ?? null,
     roomId: loc.room_id || raw.roomId || raw.room_id || props.roomId,
@@ -333,6 +385,9 @@ const loadMachineList = async () => {
 }
 
 const selectMachine = async (m) => {
+  // Mỗi lần chọn (hoặc đổi sang) 1 thiết bị khác -> luôn bắt đầu ở view 3D.
+  viewMode.value = 'model'
+  activePhotoIndex.value = 0
   // Nếu có hàm lấy chi tiết đầy đủ (vd đọc lại file markdown thiết bị), gọi thêm
   // để bổ sung các trường chưa có trong danh sách rút gọn.
   if (typeof getEquipmentInfo === 'function' && m.id) {
@@ -377,20 +432,22 @@ watch(() => props.roomId, loadMachineList)
 </script>
 
 <style scoped>
-/* Panel dock: bám ngay bên trái RoomDetailPanel (right: 400px = đúng bề rộng
-   RoomDetailPanel — nếu đổi bề rộng panel phòng thì sửa luôn giá trị này).
-   Không còn overlay/backdrop mờ phủ toàn màn hình như bản modal cũ. */
+/* [ĐỔI] Trước đây panel này dock CẠNH TRÁI RoomDetailPanel (right:400px, rộng
+   thêm 420px riêng). Giờ LAYER ĐÈ LÊN ĐÚNG VỊ TRÍ/KÍCH THƯỚC RoomDetailPanel
+   (right:0, width:400px, cùng chiều cao) — bấm "VIEW ALL MACHINES" sẽ che
+   hẳn panel thông tin phòng bên dưới thay vì mở rộng thêm khoảng trống mới.
+   width phải LUÔN khớp .room-detail-panel trong RoomDetailPanel.vue. */
 .side-panel {
   position: absolute;
   /* [FIX] top:0 trước đây đè lên AppHeader (z:30) vì z-index:99 cao hơn. */
   top: var(--header-h, 64px);
-  right: 400px;
-  width: 420px;
+  right: 0;
+  width: 400px;
   height: calc(100vh - var(--header-h, 64px));
   background-color: #0b1120;
   border-left: 1px solid #1f2d40;
   box-shadow: -4px 0 15px rgba(0, 0, 0, 0.5);
-  z-index: 99; /* Ngay dưới RoomDetailPanel (z:100), vẫn trên map/floor-bar */
+  z-index: 101; /* Trên RoomDetailPanel (z:100) vì đang che nó */
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -398,13 +455,11 @@ watch(() => props.roomId, loadMachineList)
   font-family: 'Inter', sans-serif;
 }
 
-/* ===== Tier: tablet (641–1024px) =====
-   Không đủ chỗ để dock cạnh RoomDetailPanel (vốn đã thu hẹp ở tier này) ->
-   phủ lên trên như 1 overlay riêng, có backdrop đậm hơn (render trong template). */
+/* ===== Tier: tablet (641–1024px) ===== */
 .side-panel.tier-tablet {
   right: 0;
   width: min(400px, 92vw);
-  z-index: 110; /* Trên RoomDetailPanel (z:100) vì đang che nó */
+  z-index: 101;
 }
 
 /* ===== Tier: mobile (<=640px) =====
@@ -596,9 +651,61 @@ watch(() => props.roomId, loadMachineList)
   height: 100%;
   --progress-bar-color: #f97316;
 }
+.photo-viewer-el {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
 .model-loading {
   color: #94a3b8;
   font-size: 13px;
+}
+
+/* Dải thumbnail (3D + ảnh thực tế) ngay dưới viewer-frame */
+.media-thumbstrip {
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px;
+  overflow-x: auto;
+  flex-shrink: 0;
+  border-bottom: 1px solid #1f2d40;
+}
+.thumb-btn {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: 6px;
+  border: 2px solid #1e293b;
+  background: #0f172a;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: #94a3b8;
+  padding: 0;
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+.thumb-btn span {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.thumb-btn.active,
+.thumb-btn:hover {
+  border-color: #f97316;
+  color: #f97316;
+}
+.thumb-btn.thumb-photo {
+  padding: 0;
+}
+.thumb-btn.thumb-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .no-model-placeholder {
   color: #64748b;
