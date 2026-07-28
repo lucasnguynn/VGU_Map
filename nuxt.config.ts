@@ -95,7 +95,14 @@ content: {
     workbox: {
       // Cho phép điều hướng SPA fallback về index (deep-link /equipment-... khi offline)
       navigateFallback: '/VGU_Map/',
-      globPatterns: ['**/*.{js,css,html,png,svg,json,geojson,glb,woff2}'],
+      // [FIX] KHÔNG đưa "glb" vào danh sách precache: vite-plugin-pwa mặc định
+      // giới hạn 2MB/file để precache (tải sẵn lúc cài PWA), mà file .glb (mô
+      // hình 3D) hầu như luôn > 2MB -> build FAIL CỨNG (throw Error, không chỉ
+      // warning) ngay khi có 1 file .glb vượt ngưỡng. Bỏ "glb" khỏi globPatterns;
+      // rule runtimeCaching bên dưới (CacheFirst cho .glb) đã đủ để cache file
+      // này khi người dùng thực sự mở xem — không cần/không nên ép tải sẵn
+      // hàng chục MB mô hình 3D ngay lúc cài app.
+      globPatterns: ['**/*.{js,css,html,png,svg,json,geojson,woff2}'],
       runtimeCaching: [
         {
           // Dữ liệu phòng/toà: ưu tiên hiển thị nhanh từ cache rồi làm mới ngầm.
