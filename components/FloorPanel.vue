@@ -1,485 +1,166 @@
 <template>
-  <!-- Tablet: nền mờ phía sau panel để tách khỏi bản đồ, bấm ra ngoài = thu gọn
-       (không đóng hẳn panel vì panel còn phụ thuộc building/floor đang chọn ở
-       trang cha — xem pages/index.vue). -->
-  <div
-    v-if="tier === 'tablet'"
-    class="adaptive-backdrop"
-    style="z-index: 89"
-    @click="isCollapsed = true"
-  ></div>
-
-  <div
-    class="floor-panel"
-    :class="[`tier-${tier}`, { 'is-collapsed': tier !== 'mobile' && isCollapsed }]"
-    :style="tier === 'mobile' ? sheetStyle : null"
-  >
-    <!-- Mobile: tay cầm kéo/tap thay cho nút thu gọn (bottom sheet) -->
-    <div
-      v-if="tier === 'mobile'"
-      class="adaptive-sheet-handle"
-      @pointerdown="onSheetDragStart"
-    ></div>
-
-    <!-- Desktop/tablet: nút thu gọn/mở rộng dạng tab bám cạnh -->
-    <button
-      v-else
-      class="toggle-btn"
-      @click="isCollapsed = !isCollapsed"
-      :title="isCollapsed ? 'Mở danh sách phòng' : 'Thu gọn'"
-    >
-      <svg v-if="!isCollapsed" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-        <line x1="9" y1="3" x2="9" y2="21"></line>
-      </svg>
-      <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-        <line x1="15" y1="3" x2="15" y2="21"></line>
-      </svg>
-    </button>
-
-    <!-- Gói nội dung vào 1 wrapper để tránh bị tràn khi thu gọn -->
-    <div class="panel-content-wrapper">
-      <!-- Breadcrumb -->
-      <div class="breadcrumb">
-        <span class="crumb">CAMPUS</span>
-        <span class="sep">/</span>
-        <span class="crumb active">{{ clusterLabel }}</span>
-      </div>
-
-      <h2 class="floor-title">Floor {{ floor }} Rooms</h2>
-
-      <!-- [FIX] Tabs phân loại luôn hiển thị -->
-      <div class="type-tabs" v-if="roomTypes.length > 0">
-        <button
-          v-for="type in roomTypes"
-          :key="type"
-          class="type-tab"
-          :class="{ active: activeType === type }"
-          @click="activeType = type"
-        >
-          {{ typeLabel(type) }}
-          <span class="tab-count">{{ countByType(type) }}</span>
-        </button>
-      </div>
-
-      <!-- Danh sách phòng -->
-      <div class="room-list">
-        <div v-if="isLoading" class="state-msg">Đang tải danh sách phòng…</div>
-
-        <div v-else-if="loadError" class="state-msg error">{{ loadError }}</div>
-
-        <div v-else-if="filteredRooms.length === 0" class="state-msg">
-          Không có phòng nào thuộc loại này.
-        </div>
-
-        <button
-          v-for="room in filteredRooms"
-          :key="room.id"
-          class="room-card"
-          :class="{ selected: selectedRoomId === room.id }"
-          @click="handleSelectRoom(room)"
-        >
-          <div class="room-card-top">
-            <span class="room-number">{{ room.roomNumber }}</span>
-            <span class="room-status" :class="statusClass(room.status)">
-              {{ statusLabel(room.status) }}
-            </span>
-          </div>
-          <span class="room-name">{{ formatRoomName(room.roomName) }}</span>
-        </button>
-      </div>
-    </div>
+  <!-- Vỏ tối giản: chỉ điều phối route qua <NuxtPage/>, bọc trong <NuxtLayout/> để
+       mọi trang (map + equipment-[id]) đều đi qua layouts/default.vue -> có Header
+       nhất quán. Trước đây pages/index.vue tự vẽ header riêng, còn equipment-[id]
+       không có header/nav nào -> người dùng vào trang thiết bị bị "kẹt". -->
+  <div class="app-root">
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
-import { useDeviceTier } from '~/composables/useDeviceTier'
-import { useBottomSheet } from '~/composables/useBottomSheet'
-
-const props = defineProps({
-  buildingId: { type: String, default: null },
-  clusterLabel: { type: String, default: 'CLUSTER' },
-  floor: { type: [String, Number], default: null },
-  selectedRoomId: { type: String, default: null }
-})
-
-const emit = defineEmits(['select-room'])
-
-const { getRoomsByFloor } = useVguData()
-const { tier } = useDeviceTier()
-// Mobile: panel này là bottom sheet kéo-thả, mặc định "hé mở" (peek) để vẫn
-// thấy bản đồ phía sau, người dùng kéo/chạm tay cầm để xem toàn bộ danh sách.
-const { sheetStyle, onDragStart: onSheetDragStart, reset: resetSheet } = useBottomSheet({ peek: 0.4, full: 0.88 })
-
-const isLoading = ref(false)
-const loadError = ref('')
-const rooms = ref([])
-const activeType = ref('all')
-
-const isCollapsed = ref(false)
-
-const ROOM_TYPE_ORDER = ['administration', 'teaching', 'laboratory', 'workshop', 'other']
-const ROOM_TYPE_LABELS = {
-  administration: 'Administration',
-  teaching: 'Teaching',
-  laboratory: 'Laboratory',
-  workshop: 'Workshop',
-  other: 'Khác'
-}
-
-const formatRoomName = (name) => {
-  if (!name || typeof name !== 'string') return name
-  const parts = name.split(/\s*-\s*/)
-  if (parts.length > 1 && parts.length % 2 === 0) {
-    const halfIndex = parts.length / 2
-    const firstHalf = parts.slice(0, halfIndex).join(' - ')
-    const secondHalf = parts.slice(halfIndex).join(' - ')
-    if (firstHalf === secondHalf) return firstHalf
-  }
-  return name
-}
-
-// [FIX] Hàm trích xuất chính xác tầng từ Mã Phòng xử lý được chuẩn 101 và 2.CR1
-const getFloorFromRoomNumber = (roomNumber, buildingId) => {
-  if (!roomNumber) return null
-  let s = String(roomNumber).toUpperCase()
-  const b = (buildingId || '').toUpperCase()
-  
-  // Xóa tiền tố tòa nhà nếu có (VD: bỏ "AD-" trong "AD-101")
-  if (b && s.startsWith(b + '-')) {
-    s = s.substring(b.length + 1)
-  }
-  
-  // Lấy cụm số đứng ngay đầu (vd: "101", "2")
-  const match = s.match(/^(\d+)/)
-  if (!match) return null
-
-  const numStr = match[1]
-
-  // Nếu ngay sau số là dấu chấm (vd: "2.CR1"), tầng là số đó
-  if (s[numStr.length] === '.') {
-    return numStr
-  }
-
-  // Nếu là mã phòng chuẩn 3-4 số (vd: "101", "214"), bỏ 2 số cuối để lấy tầng
-  if (numStr.length >= 3) {
-    return numStr.slice(0, numStr.length - 2)
-  }
-
-  return numStr
-}
-
-const loadRooms = async () => {
-  if (!props.buildingId || props.floor == null) {
-    rooms.value = []
-    return
-  }
-  isLoading.value = true
-  loadError.value = ''
-  try {
-    const fetchedRooms = await getRoomsByFloor(props.buildingId, props.floor)
-    const expectedFloor = String(props.floor)
-
-    // Lọc các phòng sai tầng từ Data
-    rooms.value = fetchedRooms.filter(r => {
-      const dataFloor = String(r.floor)
-      const extractedFloor = getFloorFromRoomNumber(r.roomNumber, props.buildingId)
-      
-      // Nếu có thể trích xuất ra tầng từ mã phòng và nó khác với tầng đang xem -> Lọc bỏ
-      if (extractedFloor && extractedFloor !== expectedFloor) {
-        return false
-      }
-      return dataFloor === expectedFloor
-    })
-
-  } catch (err) {
-    console.error('[FloorPanel] Lỗi khi tải danh sách phòng theo tầng:', err)
-    loadError.value = 'Không tải được dữ liệu phòng. Vui lòng thử lại sau.'
-    rooms.value = []
-  } finally {
-    isLoading.value = false
-    activeType.value = 'all'
-  }
-}
-
-watch(() => [props.buildingId, props.floor], () => {
-  loadRooms()
-  isCollapsed.value = false
-  resetSheet() // mobile: mỗi lần đổi tầng, sheet quay về trạng thái hé mở
-}, { immediate: true })
-onMounted(loadRooms)
-
-// [FIX] Luôn luôn trả về mảng có tab 'all' để người dùng dễ chọn lại
-const roomTypes = computed(() => {
-  const present = new Set(rooms.value.map(r => r.roomType))
-  const ordered = ROOM_TYPE_ORDER.filter(t => present.has(t))
-  const extra = [...present].filter(t => !ROOM_TYPE_ORDER.includes(t))
-  const types = [...ordered, ...extra]
-  
-  return types.length > 0 ? ['all', ...types] : []
-})
-
-const typeLabel = (type) => (type === 'all' ? 'Tất cả' : (ROOM_TYPE_LABELS[type] || type))
-
-const countByType = (type) =>
-  type === 'all' ? rooms.value.length : rooms.value.filter(r => r.roomType === type).length
-
-const filteredRooms = computed(() => {
-  if (activeType.value === 'all' || !activeType.value) return rooms.value
-  return rooms.value.filter(r => r.roomType === activeType.value)
-})
-
-const statusClass = (status) => {
-  if (status === 'active') return 'is-active'
-  if (status === 'inactive') return 'is-inactive'
-  return 'is-unknown'
-}
-const statusLabel = (status) => {
-  const map = { active: 'ACTIVE', inactive: 'INACTIVE' }
-  return map[status] || (status || '').toUpperCase()
-}
-
-const handleSelectRoom = (room) => {
-  emit('select-room', { roomId: room.id, buildingId: props.buildingId })
-}
+// Không cần logic ở đây nữa — state dùng chung nằm ở Pinia store,
+// dữ liệu nằm ở composable/Content. Giữ vỏ này thật mỏng.
 </script>
 
-<style scoped>
-.floor-panel {
-  position: absolute;
-  /* Neo dưới header, bên phải BuildingsDashboardPanel (300px) + tab toggle (36px) */
-  top: var(--header-h, 64px);
-  left: calc(300px + 36px);
-  width: 280px;
-  height: calc(100vh - var(--header-h, 64px));
-  background-color: #0b1120;
-  border-right: 1px solid #1f2d40;
-  color: #e2e8f0;
-  font-family: 'Inter', sans-serif;
-  box-shadow: 4px 0 15px rgba(0,0,0,0.5);
-  z-index: 90;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: visible;
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  /* Được usePanelLayout.js cập nhật runtime theo trạng thái panel.
+     Giá trị mặc định = BuildingsPanel (300px) + tab (36px). */
+  --panels-left-width: 336px;
+
+  --brand-accent: #F58220;
+  --brand-accent-soft: #F7A14C;
+  --brand-accent-muted: #FAC08F;
+
+  --brand-deep: #002554;
+  --brand-deep-2: #001A3A;
+  --brand-deep-3: #002040;
+  --brand-deep-4: #002D5C;
+
+  --ink-strong: #FFFFFF;
+  --ink-soft: #B3BFCD;
+  --ink-dim: #6B7FA0;
+
+  --line-soft: rgba(255, 255, 255, 0.10);
+  --line-accent: rgba(245, 130, 32, 0.45);
+
+  --surface-root: var(--brand-deep-2);
+  --surface-panel: var(--brand-deep-3);
+  --surface-elevated: var(--brand-deep-4);
+  --type-main: 'Be Vietnam Pro', sans-serif;
+  --type-alt: 'Space Mono', monospace;
 }
 
-.floor-panel.is-collapsed {
-  transform: translateX(-100%);
+html,
+body {
+  background: var(--surface-root);
+  color: var(--ink-soft);
+  font-family: var(--type-main);
+  margin: 0;
+  padding: 0;
+  /* [FIX-mobile-zoom] Safari/Chrome trên điện thoại tự phóng to chữ sau khi
+     xoay màn hình (orientation change) nếu không khai báo rõ text-size-adjust,
+     tạo cảm giác "tự nhiên bị zoom" dù không ai chạm vào màn hình. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
-/* ===== Tier: tablet (641–1024px, xem useDeviceTier.js) =====
-   Vẫn là side-dock như desktop nhưng thu hẹp bề rộng theo màn hình, có
-   backdrop mờ phía sau (render riêng trong template) để tách khỏi bản đồ. */
-.floor-panel.tier-tablet {
-  /* Tablet: BuildingsPanel hẹp hơn (min(280px, 85vw)) — dùng left cố định đơn giản hơn */
-  left: calc(min(280px, 85vw) + 36px);
-  width: min(300px, 80vw);
+* {
+  box-sizing: border-box;
 }
 
-/* ===== Tier: mobile (<=640px) =====
-   Chuyển hẳn từ side-dock sang bottom sheet kéo-thả: neo đáy màn hình, bo góc
-   trên, chiều cao do useBottomSheet.js điều khiển qua style inline (sheetStyle).
-   is-collapsed không áp dụng ở tier này (xem điều kiện trong template). */
-.floor-panel.tier-mobile {
-  top: auto;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  border-right: none;
-  border-top: 1px solid #1f2d40;
-  border-radius: 16px 16px 0 0;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-.floor-panel.tier-mobile .panel-content-wrapper {
-  padding-top: 0;
+a,
+button,
+input,
+select,
+textarea {
+  font-family: var(--type-main);
 }
 
-.panel-content-wrapper {
-  display: flex;
-  flex-direction: column;
+.app-loader {
+  background: linear-gradient(180deg, #001A3A 0%, #002554 100%);
+}
+
+.app-loader__ring {
+  border-top-color: var(--brand-accent);
+}
+
+/* ===== Global reset & nền dùng chung toàn app ===== */
+* { box-sizing: border-box; }
+
+html, body, #__nuxt {
+  margin: 0;
+  padding: 0;
   width: 100%;
   height: 100%;
-  padding: 16px 16px 0;
+}
+
+body {
+  background: #05080d;
+  color: #e0e0e0;
+  font-family: 'Space Mono', monospace;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  /* [FIX-mobile-zoom] Chặn hiệu ứng "bounce" kéo quá đà của Safari (kéo bản đồ/
+     panel chạm mép rồi bật lại) — dễ bị hiểu nhầm là app "giật/zoom" ngoài ý muốn. */
+  overscroll-behavior: none;
+}
+
+/* [FIX-mobile-zoom] Toàn bộ nút bấm/link dùng touch-action: manipulation để
+   trình duyệt bỏ qua độ trễ chờ double-tap và KHÔNG hiểu double-tap thành
+   "double-tap-to-zoom" — nguyên nhân chính của phản hồi "dễ bị thu phóng bất
+   ngờ" khi bấm nhanh vào thẻ phòng/nút tầng/nút tab trên điện thoại. Không áp
+   cho input/select vì vẫn cần hành vi chạm mặc định (con trỏ, chọn văn bản)
+   cho các ô đó. */
+a, button {
+  touch-action: manipulation;
+}
+
+.app-root {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
   overflow: hidden;
 }
 
-/* NÚT TOGGLE */
-.toggle-btn {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 32px;
-  height: 32px;
-  background-color: transparent; 
-  border: none;
-  border-radius: 6px;
-  color: #94a3b8;
+/* Overlay dùng khi ClientOnly đang chờ (fallback-class="loading-overlay") */
+.loading-overlay {
+  position: absolute; inset: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: center;
+  background: #05080d; color: #00ffcc;
+  font-family: 'Space Mono', monospace; letter-spacing: 1px;
+}
+
+/* ===== Hệ thống Adaptive dùng chung: backdrop (tier tablet) + tay cầm kéo
+   (tier mobile, xem composables/useDeviceTier.js + useBottomSheet.js).
+   Đặt ở đây (không scoped) để FloorPanel/RoomDetailPanel/EquipmentSidePanel
+   dùng chung 1 định nghĩa thay vì mỗi component tự viết lại. z-index do từng
+   nơi gọi tự set qua style inline vì còn phụ thuộc panel đang đứng ở lớp nào. */
+.adaptive-backdrop {
+  position: fixed;
+  top: var(--header-h, 64px);
+  left: 0; right: 0; bottom: 0;
+  background: rgba(5, 8, 13, 0.6);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  animation: adaptive-backdrop-in 0.2s ease;
+}
+@keyframes adaptive-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+
+.adaptive-sheet-handle {
+  width: 100%;
   display: flex;
-  align-items: center;
   justify-content: center;
-  cursor: pointer;
-  z-index: 91;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.toggle-btn:hover {
-  color: #f1f5f9;
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.floor-panel.is-collapsed .toggle-btn {
-  right: -36px;
-  top: 80px;
-  width: 36px;
-  height: 36px;
-  background-color: #0b1120;
-  border: 1px solid #1f2d40;
-  border-left: none;
-  border-radius: 0 8px 8px 0;
-  box-shadow: 4px 0 10px rgba(0,0,0,0.3);
-}
-
-.breadcrumb {
-  font-size: 11px;
-  letter-spacing: 0.5px;
-  color: #64748b;
-  margin-bottom: 10px;
-  text-transform: uppercase;
+  padding: 10px 0 8px;
+  cursor: grab;
+  touch-action: none;
   flex-shrink: 0;
-  padding-right: 32px; 
+  background: inherit;
 }
-.breadcrumb .crumb.active {
-  color: #f1f5f9;
-  font-weight: 700;
+.adaptive-sheet-handle::before {
+  content: '';
+  width: 40px; height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.25);
 }
-.breadcrumb .sep {
-  margin: 0 6px;
-}
-.floor-title {
-  margin: 0 0 14px;
-  font-size: 18px;
-  font-weight: 700;
-  color: #fff;
-  flex-shrink: 0;
-  padding-right: 32px; 
-}
-.type-tabs {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 14px;
-  flex-wrap: wrap;
-  flex-shrink: 0;
-}
-.type-tab {
-  background: #0f172a;
-  border: 1px solid #1e293b;
-  color: #94a3b8;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  padding: 6px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.15s;
-}
-.type-tab:hover {
-  border-color: #f97316;
-  color: #f1f5f9;
-}
-.type-tab.active {
-  background: #1d4ed8;
-  border-color: #1d4ed8;
-  color: #fff;
-}
-.tab-count {
-  background: rgba(255,255,255,0.15);
-  border-radius: 4px;
-  padding: 0 5px;
-  font-size: 10px;
-}
-.room-list {
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding-bottom: 16px;
-}
-.room-list::-webkit-scrollbar { width: 6px; }
-.room-list::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 4px;
-}
-.state-msg {
-  text-align: center;
-  color: #94a3b8;
-  font-size: 12px;
-  padding: 24px 0;
-}
-.state-msg.error {
-  color: #f87171;
-}
-.room-card {
-  background-color: #101a2c;
-  border: 1px solid #1e293b;
-  border-left: 3px solid #1e293b;
-  border-radius: 6px;
-  padding: 10px 12px;
-  text-align: left;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  transition: border-color 0.15s, background-color 0.15s;
-}
-.room-card:hover {
-  border-color: #f97316;
-  border-left-color: #f97316;
-}
-.room-card.selected {
-  background-color: #1e293b;
-  border-left-color: #f97316;
-}
-.room-card-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.room-number {
-  font-size: 12px;
-  font-weight: 800;
-  color: #fff;
-  letter-spacing: 0.3px;
-}
-.room-status {
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-.room-status.is-active {
-  color: #22c55e;
-  background: rgba(34, 197, 94, 0.12);
-}
-.room-status.is-inactive {
-  color: #ef4444;
-  background: rgba(239, 68, 68, 0.12);
-}
-.room-status.is-unknown {
-  color: #94a3b8;
-  background: rgba(148, 163, 184, 0.12);
-}
-.room-name {
-  font-size: 12px;
-  color: #94a3b8;
+.adaptive-sheet-handle:active { cursor: grabbing; }
+
+@media (prefers-reduced-motion: reduce) {
+  .adaptive-backdrop { animation: none; }
 }
 </style>
