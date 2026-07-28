@@ -171,7 +171,11 @@ const props = defineProps({
   roomName: { type: String, default: '' },
   // Danh sách thiết bị đã có sẵn (nếu RoomDetailPanel truyền vào), dùng làm fallback
   // trong lúc chưa fetch được danh sách đầy đủ từ nguồn dữ liệu thiết bị.
-  instruments: { type: Array, default: () => [] }
+  instruments: { type: Array, default: () => [] },
+  // Bấm thẳng vào 1 khối thiết bị trên bản đồ (layer vgu-equipment-fill) ->
+  // properties của feature đó (equipment_id, model_code, room_id…) được truyền
+  // vào đây để mở thẳng view chi tiết, bỏ qua bước danh sách.
+  initialEquipment: { type: Object, default: null }
 })
 
 const emit = defineEmits(['close'])
@@ -218,24 +222,28 @@ const normalizeMachine = (raw) => {
   if (!raw) return null
   const id = raw.id || raw.equipment_id || raw.slug || raw.name
   const loc = raw.location || {}
+  // Quy ước đặt tên file model: thiết bị lấy từ khối vẽ trên bản đồ (geojson
+  // public/data/equipment/{roomId}.geojson) có model_code là mã ngắn khớp
+  // đúng tên file .glb trong models/ (vd "E16" -> models/E16.glb). equipment_id
+  // đầy đủ (vd "B5-105_E16") chỉ dùng để hiển thị/định danh, KHÔNG dùng làm
+  // tên file vì models/ không đặt tên theo tiền tố phòng.
+  const glbCode = raw.model_code || raw.modelCode || raw.model || id
   return {
     id,
-    title: raw.title || raw.name || id,
-    model: raw.model || '',
+    title: raw.title || raw.name || raw.model_code || id,
+    model: raw.model || raw.model_code || '',
     manufacturer: raw.manufacturer || '',
     departments: Array.isArray(raw.departments) ? raw.departments.join(', ') : (raw.departments || ''),
     category: raw.category || '',
     status: raw.status || '',
     story: raw.story || raw.description || '',
     thumbnail: raw.media?.images?.[0] || raw.thumbnail || '',
-    buildingId: loc.building_id || raw.buildingId || props.buildingId,
+    buildingId: loc.building_id || raw.buildingId || raw.building_id || props.buildingId,
     floor: loc.floor ?? raw.floor ?? null,
-    roomId: loc.room_id || raw.roomId || props.roomId,
+    roomId: loc.room_id || raw.roomId || raw.room_id || props.roomId,
     stationId: loc.station_id || raw.stationId || '',
-    // Quy ước đặt tên file model: /models/{id}.glb — điều chỉnh nếu nguồn dữ liệu
-    // thực tế đặt tên khác (vd theo station_id như "AD-431").
-    modelUrl: raw.modelUrl || (id ? `${base}models/${id}.glb` : ''),
-    has3DModel: !!(raw.modelUrl || raw.has3DModel || id)
+    modelUrl: raw.modelUrl || (glbCode ? `${base}models/${glbCode}.glb` : ''),
+    has3DModel: !!(raw.modelUrl || raw.has3DModel || glbCode)
   }
 }
 
@@ -283,6 +291,11 @@ const handleClose = () => {
 
 onMounted(() => {
   loadMachineList()
+  // Bấm thẳng từ khối thiết bị trên map -> mở luôn view chi tiết, không cần
+  // đợi/duyệt qua danh sách.
+  if (props.initialEquipment) {
+    selectMachine(normalizeMachine(props.initialEquipment))
+  }
   // Nạp web component <model-viewer> của Google khi cần (chỉ nạp 1 lần).
   if (typeof window !== 'undefined' && !customElements.get('model-viewer')) {
     const script = document.createElement('script')
@@ -290,6 +303,13 @@ onMounted(() => {
     script.src = 'https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js'
     document.head.appendChild(script)
   }
+})
+
+// Nếu người dùng bấm sang khối thiết bị KHÁC trên map trong khi panel đang mở
+// (RoomDetailPanel gọi lại openEquipment() với feature mới), cập nhật thẳng
+// view chi tiết theo thiết bị mới đó.
+watch(() => props.initialEquipment, (val) => {
+  if (val) selectMachine(normalizeMachine(val))
 })
 
 watch(() => props.roomId, loadMachineList)
@@ -353,6 +373,32 @@ watch(() => props.roomId, loadMachineList)
   transition: color 0.2s;
 }
 .close-btn:hover { color: #f87171; }
+
+/* Backdrop mờ dùng ở tier tablet/mobile (panel che RoomDetailPanel phía sau) */
+.adaptive-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 12, 0.6);
+  backdrop-filter: blur(2px);
+}
+
+/* Tay cầm kéo bottom-sheet trên mobile */
+.adaptive-sheet-handle {
+  width: 100%;
+  padding: 10px 0 6px;
+  display: flex;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: grab;
+  touch-action: none;
+}
+.adaptive-sheet-handle::before {
+  content: '';
+  width: 40px;
+  height: 4px;
+  border-radius: 999px;
+  background: #334155;
+}
 
 /* ---- List view ---- */
 .list-header {
