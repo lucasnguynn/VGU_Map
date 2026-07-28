@@ -311,10 +311,14 @@ const display = computed(() => {
 <style scoped>
 .room-detail-panel {
   position: absolute;
-  top: 0;
+  /* [FIX] top:0 trước đây đè lên .app-header (z-index:20) vì panel này có
+     z-index:100 cao hơn -> header bị che mất ở dải bên phải, tạo khoảng
+     trống đen vô nghĩa phía trên nội dung panel. Neo dưới header, khớp đúng
+     pattern đã dùng ở EquipmentSidePanel.vue. */
+  top: var(--header-h, 64px);
   right: 0;
   width: 400px;
-  height: 100vh;
+  height: calc(100vh - var(--header-h, 64px));
   background-color: #0b1120;
   border-left: 1px solid #1f2d40;
   display: flex;
