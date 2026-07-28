@@ -31,23 +31,6 @@
         <span class="pulse-dot" aria-hidden="true"></span>
         <span>{{ contextTitle }}</span>
       </div>
-
-      <!-- Nút mở Buildings Dashboard Panel -->
-      <button
-        class="buildings-toggle-btn"
-        :class="{ active: showBuildingsPanel }"
-        @click="showBuildingsPanel = !showBuildingsPanel"
-        :aria-expanded="showBuildingsPanel"
-        aria-controls="buildings-dashboard-panel"
-        title="Xem danh sách toà nhà"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M3 21h18" /><path d="M5 21V6a1 1 0 0 1 1-1h5v16" />
-          <path d="M15 21V10a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v11" />
-          <path d="M9 8h.01" /><path d="M9 12h.01" /><path d="M9 16h.01" />
-        </svg>
-        <span class="btn-label">Toà nhà</span>
-      </button>
     </div>
 
     <!-- Panel danh sách phòng theo tầng (bên trái) -->
@@ -107,7 +90,8 @@ const hologramMapRef = ref(null)
 const roomDetailPanelRef = ref(null)
 
 // Trạng thái hiển thị Buildings Dashboard Panel
-const showBuildingsPanel = ref(false)
+// Panel toà nhà luôn hiển thị khi vào trang
+const showBuildingsPanel = ref(true)
 
 const contextTitle = computed(() => {
   if (!selectedBuilding.value) return 'TIÊU ĐIỂM: TOÀN CẢNH KHUÔN VIÊN VGU'
@@ -234,16 +218,19 @@ onBeforeUnmount(() => {
   50% { opacity: 0.4; transform: scale(0.7); }
 }
 
-/* HUD Bar */
+/* HUD Bar — nằm bên phải panel toà nhà (300px) + tab toggle (36px) */
 .hud-bar {
   position: absolute;
   top: 68px;
-  left: 24px;
+  /* 300px (panel) + 36px (tab) + 12px (gap) = 348px;
+     khi panel thu gọn: 0 + 36 + 12 = 48px — dùng CSS var để smooth */
+  left: calc(300px + 36px + 12px);
   z-index: 20;
   display: flex;
   align-items: center;
   gap: 8px;
   pointer-events: none;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .hud-bar > * { pointer-events: auto; }
 
@@ -257,38 +244,6 @@ onBeforeUnmount(() => {
   font-family: 'Space Mono', monospace;
   font-size: 12px; letter-spacing: 0.5px; color: #00ffcc;
 }
-
-/* Nút mở Buildings Dashboard Panel */
-.buildings-toggle-btn {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  padding: 8px 14px;
-  background: rgba(15, 30, 54, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 4px;
-  backdrop-filter: blur(8px);
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  letter-spacing: 0.5px;
-  color: #B3BFCD;
-  cursor: pointer;
-  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
-  white-space: nowrap;
-}
-.buildings-toggle-btn:hover {
-  color: #fff;
-  border-color: rgba(0, 255, 204, 0.5);
-  background: rgba(15, 30, 54, 0.95);
-}
-.buildings-toggle-btn.active {
-  color: #EF5A24;
-  border-color: #EF5A24;
-  background: rgba(239, 90, 36, 0.1);
-}
-.buildings-toggle-btn:focus-visible { outline: 2px solid #00ffcc; outline-offset: 2px; }
-.btn-label { text-transform: uppercase; }
-@media (max-width: 480px) { .btn-label { display: none; } }
 
 /* Loading overlay */
 .loading-overlay {
@@ -323,12 +278,17 @@ onBeforeUnmount(() => {
   .cyber-slide-enter-active, .cyber-slide-leave-active { transition: none; }
 }
 
+/* Tablet: panel hẹp hơn (280px) */
+@media (max-width: 1024px) {
+  .hud-bar { left: calc(280px + 36px + 12px); }
+}
+
+/* Mobile: panel là bottom sheet, HUD bar trở về góc trái trên */
 @media (max-width: 640px) {
   .app-header { padding: 10px 14px; }
   .header-title { font-size: 16px; }
   .hud-bar { top: 58px; left: 14px; gap: 6px; }
   .hud-context-panel { font-size: 11px; padding: 6px 12px; }
-  .buildings-toggle-btn { padding: 6px 10px; font-size: 10px; }
 }
 
 .shell {
