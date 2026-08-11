@@ -208,12 +208,15 @@ const loadRooms = async () => {
   }
 }
 
+// AFTER — watch with immediate:true already fires on mount; onMounted call is redundant
 watch(() => [props.buildingId, props.floor], () => {
   loadRooms()
   isCollapsed.value = false
   resetSheet() // mobile: mỗi lần đổi tầng, sheet quay về trạng thái hé mở
 }, { immediate: true })
-onMounted(loadRooms)
+// M-4 FIX: removed onMounted(loadRooms) — the watch above with { immediate: true }
+// already executes loadRooms() synchronously before mount, making the onMounted
+// call a duplicate that fires a second parallel network request.
 
 // [FIX] Luôn luôn trả về mảng có tab 'all' để người dùng dễ chọn lại
 const roomTypes = computed(() => {
