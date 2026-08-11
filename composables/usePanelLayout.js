@@ -10,6 +10,9 @@ const FLOOR_WIDTH_TAB = 280
 const _buildingsVisible = ref(true)
 const _buildingsCollapsed = ref(false)
 const _floorVisible = ref(false)
+// NEW: when RoomDetailPanel is open the left-side drawers collapse to icon-only
+// so the map is visible between them. --panels-left-width drops to tab-only width.
+const _roomDetailVisible = ref(false)
 
 // ─── M-3: Module-scope resize listener with reference-count guard ─────────────
 let _listenerRefCount = 0
@@ -41,6 +44,13 @@ function _recalc(windowWidth) {
     return
   }
 
+  // When RoomDetailPanel is open, collapse everything left to tab-button only
+  // so the 3D map is visible between the left drawers and the right detail panel.
+  if (_roomDetailVisible.value) {
+    document.documentElement.style.setProperty('--panels-left-width', BUILDINGS_TAB_BTN + 'px')
+    return
+  }
+
   const bW = isTablet ? BUILDINGS_WIDTH_TAB : BUILDINGS_WIDTH
   const tabW = BUILDINGS_TAB_BTN
 
@@ -56,10 +66,11 @@ function _recalc(windowWidth) {
 }
 
 export function usePanelLayout() {
-  function setPanelState({ buildingsVisible, buildingsCollapsed, floorVisible } = {}) {
+  function setPanelState({ buildingsVisible, buildingsCollapsed, floorVisible, roomDetailVisible } = {}) {
     if (buildingsVisible !== undefined) _buildingsVisible.value = buildingsVisible
     if (buildingsCollapsed !== undefined) _buildingsCollapsed.value = buildingsCollapsed
     if (floorVisible !== undefined) _floorVisible.value = floorVisible
+    if (roomDetailVisible !== undefined) _roomDetailVisible.value = roomDetailVisible
     if (typeof window !== 'undefined') _recalc(window.innerWidth)
   }
 
@@ -79,5 +90,6 @@ export function usePanelLayout() {
     buildingsVisible: _buildingsVisible,
     buildingsCollapsed: _buildingsCollapsed,
     floorVisible: _floorVisible,
+    roomDetailVisible: _roomDetailVisible,
   }
 }
