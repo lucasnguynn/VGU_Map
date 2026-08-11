@@ -98,6 +98,9 @@ import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useDeviceTier } from '~/composables/useDeviceTier'
 import { useBottomSheet } from '~/composables/useBottomSheet'
 import { usePanelLayout } from '~/composables/usePanelLayout'
+// MOD-1: formatRoomName extracted to shared utility in useVguData.js.
+//         Replaces the previously duplicated local definition below.
+import { formatRoomName } from '~/composables/useVguData'
 
 const props = defineProps({
   buildingId: { type: String, default: null },
@@ -133,17 +136,8 @@ const ROOM_TYPE_LABELS = {
   other: 'Khác'
 }
 
-const formatRoomName = (name) => {
-  if (!name || typeof name !== 'string') return name
-  const parts = name.split(/\s*-\s*/)
-  if (parts.length > 1 && parts.length % 2 === 0) {
-    const halfIndex = parts.length / 2
-    const firstHalf = parts.slice(0, halfIndex).join(' - ')
-    const secondHalf = parts.slice(halfIndex).join(' - ')
-    if (firstHalf === secondHalf) return firstHalf
-  }
-  return name
-}
+// MOD-1: formatRoomName moved to ~/composables/useVguData.js (shared utility).
+//         Imported above — no local definition needed here.
 
 // [FIX] Hàm trích xuất chính xác tầng từ Mã Phòng xử lý được chuẩn 101 và 2.CR1
 const getFloorFromRoomNumber = (roomNumber, buildingId) => {
