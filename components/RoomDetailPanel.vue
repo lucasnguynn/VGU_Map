@@ -1,7 +1,21 @@
 <template>
-  <div class="room-detail-panel">
-    <!-- Nút Đóng -->
-    <button class="close-btn" @click="closePanel">
+  <!-- [MOBILE-FIX] On mobile this is a bottom sheet. sheetStyle controls height
+       via useBottomSheet. The root div gets class tier-mobile for CSS overrides. -->
+  <div
+    class="room-detail-panel"
+    :class="tier === 'mobile' ? 'tier-mobile' : ''"
+    :style="tier === 'mobile' ? sheetStyle : null"
+  >
+    <!-- [MOBILE-FIX] Drag handle — replaces close button as the top affordance on mobile.
+         On desktop the close-btn (×) remains the dismiss control. -->
+    <div
+      v-if="tier === 'mobile'"
+      class="adaptive-sheet-handle"
+      @pointerdown="onSheetDragStart"
+    ></div>
+
+    <!-- Nút Đóng — hidden on mobile (drag-down or back gesture dismisses) -->
+    <button class="close-btn" :class="{ 'is-mobile-hidden': tier === 'mobile' }" @click="closePanel">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <line x1="18" y1="6" x2="6" y2="18"></line>
         <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -150,6 +164,16 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import EquipmentSidePanel from './EquipmentSidePanel.vue'
+// [MOBILE-FIX] Convert RoomDetailPanel to a bottom sheet on mobile.
+// Previously it had NO mobile CSS — rendered as 400px right-side drawer
+// that completely covered the screen on phones.
+import { useDeviceTier } from '~/composables/useDeviceTier'
+import { useBottomSheet } from '~/composables/useBottomSheet'
+
+const { tier } = useDeviceTier()
+// safeTopPx=130: same safe zone as FloorPanel (header+search+gap).
+// peek 40% so room info is readable without obscuring the map entirely.
+const { sheetStyle, onDragStart: onSheetDragStart, setFull: openFullSheet } = useBottomSheet({ peek: 0.40, full: 0.88, safeTopPx: 130 })
 
 const showMachineModal = ref(false)
 // Thiết bị được chọn thẳng từ khối trên bản đồ (bấm vào thiết bị -> mở panel
@@ -600,5 +624,51 @@ const display = computed(() => {
 
 .close-control:hover {
   color: var(--brand-accent);
+}
+
+/* ===== [MOBILE-FIX] Tier: mobile (≤640px) — Bottom Sheet =====
+   RoomDetailPanel previously had ZERO mobile styles, rendering as a 400px
+   fixed right-side drawer that consumed the full phone screen width.
+   Fix: convert to a bottom sheet identical in pattern to FloorPanel.tier-mobile.
+   z-index: 105 — above FloorPanel (95) and BuildingsDashboard (88) so the room
+   detail is always on top when open, without fighting the floor-bar (115). */
+.room-detail-panel.tier-mobile {
+  position: fixed;
+  top: auto;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: auto;         /* height is driven by sheetStyle (useBottomSheet) */
+  border-left: none;
+  border-top: 1px solid rgba(239, 90, 36, 0.25);
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -6px 30px rgba(0, 0, 0, 0.6);
+  z-index: 105;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Hide the × close button on mobile — the drag handle + dragging down dismiss it.
+   Keeping a small icon-only button visible in the top-right for accessibility. */
+.close-btn.is-mobile-hidden {
+  /* Reposition to not clash with drag handle, keep it reachable for a11y */
+  top: 10px;
+  right: 12px;
+  opacity: 0.5;
+}
+
+@media (max-width: 640px) {
+  /* Give the panel-header some top padding so it clears the drag handle pill */
+  .room-detail-panel.tier-mobile .panel-header {
+    padding-top: 4px;
+  }
+  /* Ensure scrollable content area works inside the sheet height */
+  .room-detail-panel.tier-mobile .panel-content {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    flex: 1;
+  }
 }
 </style>
