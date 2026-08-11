@@ -19,6 +19,28 @@ const _getAllRooms = async () => {
 }
 // ────────────────────────────────────────────────────────────────────────────
 
+// ─── M-5: Module-level lazy singleton for drive_data.json ────────────────────
+// Vấn đề cũ: RoomDetailPanel.vue gọi $fetch('drive_data.json') trong onMounted
+// → mỗi lần mount (chuyển phòng) = 1 request mạng mới cho cùng 1 file tĩnh.
+// Fix: 1 Promise duy nhất ở module scope. Lần đầu gọi thì fetch; mọi lần sau
+// dùng lại kết quả đã có. Mọi caller chờ cùng 1 Promise → không bao giờ
+// fetch song song kể cả khi 2 component mount đồng thời.
+let _driveDataPromise = null
+
+const _getDriveData = (baseURL) => {
+  if (!_driveDataPromise) {
+    _driveDataPromise = $fetch(`${baseURL}data/drive_data.json`)
+      .catch((err) => {
+        // Nếu fetch thất bại, xoá Promise để lần sau có thể thử lại.
+        _driveDataPromise = null
+        console.error('[useVguData] Không thể load drive_data.json:', err)
+        return {}
+      })
+  }
+  return _driveDataPromise
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 export const useVguData = () => {
   /**
    * Lấy thông tin phòng từ Nuxt Content (content/Rooms/*.md).
@@ -179,6 +201,14 @@ export const useVguData = () => {
     }
   }
 
+  /**
+   * Lazy singleton fetch cho drive_data.json (ánh xạ room_id → Google Drive file ID).
+   * M-5: dùng cache module-scope để chỉ fetch 1 lần dù có N component mount.
+   * @param {string} baseURL  config.app.baseURL từ useRuntimeConfig()
+   * @returns {Promise<Record<string, string>>}
+   */
+  const getDriveData = (baseURL) => _getDriveData(baseURL)
+
   return {
     getRoomInfo,
     getRoomEquipment,
@@ -186,6 +216,7 @@ export const useVguData = () => {
     getEquipmentInfo,
     getRoomsByFloor,
     searchRooms,
-    getBuildingStats
+    getBuildingStats,
+    getDriveData
   }
 }
