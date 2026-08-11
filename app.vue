@@ -46,23 +46,12 @@
   --type-alt: 'Space Mono', monospace;
 }
 
-html,
-body {
-  background: var(--surface-root);
-  color: var(--ink-soft);
-  font-family: var(--type-main);
-  margin: 0;
-  padding: 0;
-  /* [FIX-mobile-zoom] Safari/Chrome trên điện thoại tự phóng to chữ sau khi
-     xoay màn hình (orientation change) nếu không khai báo rõ text-size-adjust,
-     tạo cảm giác "tự nhiên bị zoom" dù không ai chạm vào màn hình. */
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
-}
-
-* {
-  box-sizing: border-box;
-}
+/* MIN-4: The html/body block below (around line 70) is the canonical one —
+   it carries all the properties including the text-size-adjust fix.  The
+   duplicate partial block that used to live here (background + color +
+   font-family + margin/padding + text-size-adjust) has been removed to avoid
+   conflicting declarations.  The single * { box-sizing } rule further down
+   covers both declarations that were previously scattered in two places. */
 
 a,
 button,
@@ -70,6 +59,28 @@ input,
 select,
 textarea {
   font-family: var(--type-main);
+}
+
+/* MIN-2: Global keyboard-navigation accessibility.
+   :focus-visible fires only when the browser determines the element was reached
+   via keyboard (Tab, arrow keys, etc.) — NOT on mouse/touch clicks. This means
+   sighted mouse users never see the outline, while keyboard users always get a
+   clear, high-contrast indicator that meets WCAG 2.4.7 / 2.4.11.
+
+   Placement: after the font-family reset above so the specificity stays low and
+   component-level overrides remain possible. */
+:focus-visible {
+  outline: 2px solid var(--brand-accent);   /* #F58220 orange — brand-consistent */
+  outline-offset: 3px;                      /* small gap so outline doesn't sit flush on element edge */
+  border-radius: 3px;                       /* softens corners on rectangular controls */
+}
+
+/* Suppress the default browser :focus outline so it doesn't double-render
+   alongside our :focus-visible ring.  This is safe because :focus-visible
+   still fires for keyboard users — we are not removing focus indicators,
+   only replacing the always-on :focus outline with the smarter :focus-visible. */
+:focus:not(:focus-visible) {
+  outline: none;
 }
 
 .app-loader {
@@ -81,8 +92,23 @@ textarea {
 }
 
 /* ===== Global reset & nền dùng chung toàn app ===== */
+/* MIN-4: Single canonical * { box-sizing } rule.  The duplicate that previously
+   appeared earlier in this file (before the font-family reset block) has been
+   removed; this one covers the whole document. */
 * { box-sizing: border-box; }
 
+/* MIN-4: Merged html/body block.  Previously two separate html,body rules
+   existed — one earlier carrying background/color/font-family/margin/padding/
+   text-size-adjust, and this one carrying margin/padding/width/height/
+   overscroll-behavior.  Conflicting declarations (background, font-family, color)
+   have been resolved in favour of the design-system CSS-variable values so the
+   app theme is driven by :root tokens, not hardcoded hex literals.
+
+   Font-family resolution: the earlier block set font-family to var(--type-main)
+   (Be Vietnam Pro) while this block overrode it with 'Space Mono'. Components
+   that explicitly need Space Mono already set it locally.  The canonical body
+   font is therefore var(--type-main) — consistent with the font-family reset
+   applied to a/button/input/select/textarea above. */
 html, body, #__nuxt {
   margin: 0;
   padding: 0;
@@ -91,14 +117,17 @@ html, body, #__nuxt {
 }
 
 body {
-  background: #05080d;
-  color: #e0e0e0;
-  font-family: 'Space Mono', monospace;
+  background: var(--surface-root);         /* design-system token: #001A3A */
+  color: var(--ink-soft);                   /* design-system token: #B3BFCD */
+  font-family: var(--type-main);            /* Be Vietnam Pro — canonical body font */
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
   /* [FIX-mobile-zoom] Chặn hiệu ứng "bounce" kéo quá đà của Safari (kéo bản đồ/
      panel chạm mép rồi bật lại) — dễ bị hiểu nhầm là app "giật/zoom" ngoài ý muốn. */
   overscroll-behavior: none;
+  /* [FIX-mobile-zoom] Chặn Safari/Chrome tự phóng to chữ sau orientation change. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 /* [FIX-mobile-zoom] Toàn bộ nút bấm/link dùng touch-action: manipulation để
