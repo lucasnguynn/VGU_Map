@@ -437,7 +437,19 @@ onMounted(async () => {
     left: 0; right: 0; bottom: 0;
     width: 100%;
     flex-direction: column-reverse;
+    /* [MOBILE-FIX] z-index lowered to 88 (below FloorPanel:95, RoomDetail:105,
+       floor-bar:115). BuildingsDashboard is only needed at Stage 0 (no building
+       selected). Once a building is chosen it collapses automatically via
+       forceCollapse — the CSS below hides it entirely on mobile at that point. */
     z-index: 88;
+  }
+
+  /* [MOBILE-FIX] When forceCollapse is active on mobile (building is selected),
+     hide the panel completely rather than leaving a collapsed tab stub at the
+     bottom that conflicts with FloorPanel's drag handle. The user can still
+     trigger "back to buildings" by dismissing the FloorPanel (floor-bar exit). */
+  .buildings-panel.is-collapsed {
+    display: none;
   }
   .panel-body {
     width: 100%;
