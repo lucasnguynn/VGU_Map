@@ -11,6 +11,7 @@
         @ready="onMapReady"
       />
     </ClientOnly>
+
     <div class="hud-bar">
       <div class="hud-context-panel">
         <span class="pulse-dot" aria-hidden="true"></span>
@@ -18,7 +19,9 @@
       </div>
     </div>
 
-    <!-- Panel danh sách phòng theo tầng -->
+    <!-- Panel danh sách phòng theo tầng.
+         :force-collapse drives auto-collapse when RoomDetailPanel opens.
+         User can still manually toggle via the panel's own toggle-btn. -->
     <transition name="floor-panel-enter">
       <FloorPanel
         v-if="selectedBuilding && selectedFloor != null"
@@ -26,6 +29,7 @@
         :cluster-label="String(selectedBuilding).toUpperCase()"
         :floor="selectedFloor"
         :selected-room-id="selectedRoom"
+        :force-collapse="!!selectedRoom"
         @select-room="handleFloorRoomSelect"
       />
     </transition>
@@ -41,9 +45,11 @@
       />
     </transition>
 
-    <!-- Buildings Dashboard Panel (overlay trên bản đồ) -->
+    <!-- Buildings Dashboard Panel (overlay trên bản đồ).
+         Auto-collapses to tab when a building/floor/room is selected. -->
     <BuildingsDashboardPanel
       v-model="showBuildingsPanel"
+      :force-collapse="!!selectedBuilding"
       @select-building="handleBuildingFromPanel"
     />
 
@@ -58,10 +64,11 @@
 </template>
 
 <script setup>
-import { computed, ref, nextTick, onMounted, onBeforeUnmount } from 'vue'
+import { computed, ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useMapStore } from '~/Stores/mapStores'
+import { usePanelLayout } from '~/composables/usePanelLayout'
 import HologramMap from '~/components/HologramMap.vue'
 import RoomDetailPanel from '~/components/RoomDetailPanel.vue'
 import FloorPanel from '~/components/FloorPanel.vue'
@@ -74,9 +81,35 @@ const { selectedRoom, selectedBuilding, selectedFloor, isLoading } = storeToRefs
 const hologramMapRef = ref(null)
 const roomDetailPanelRef = ref(null)
 
-// Trạng thái hiển thị Buildings Dashboard Panel
-// Panel toà nhà luôn hiển thị khi vào trang
+// Panel layout orchestration
+const { setPanelState } = usePanelLayout()
+
+// BuildingsDashboardPanel is always mounted; its visibility is driven by v-model.
 const showBuildingsPanel = ref(true)
+
+// ─── Panel Stage Auto-collapse ────────────────────────────────────────────────
+// Stage 0: nothing selected   → BuildingsPanel OPEN,  FloorPanel hidden,    RoomDetail hidden
+// Stage 1: building selected  → BuildingsPanel COLLAPSED, FloorPanel OPEN,  RoomDetail hidden
+// Stage 2: room selected      → BuildingsPanel COLLAPSED, FloorPanel COLLAPSED, RoomDetail OPEN
+//
+// We drive this via the :force-collapse props passed into the child panels
+// (handled in template above), and by notifying usePanelLayout so it updates
+// --panels-left-width correctly for the HUD bar.
+
+watch(selectedRoom, (roomId) => {
+  // Tell usePanelLayout whether RoomDetailPanel is visible so it can collapse
+  // --panels-left-width to tab-only width, giving the map space on both sides.
+  setPanelState({ roomDetailVisible: !!roomId })
+}, { immediate: true })
+
+watch(selectedBuilding, (buildingId) => {
+  // When a building is first selected (and no room yet), keep RoomDetail closed
+  // and tell layout the FloorPanel will appear.
+  if (!buildingId) {
+    setPanelState({ roomDetailVisible: false })
+  }
+}, { immediate: true })
+// ─────────────────────────────────────────────────────────────────────────────
 
 const contextTitle = computed(() => {
   if (!selectedBuilding.value) return 'TIÊU ĐIỂM: TOÀN CẢNH KHUÔN VIÊN VGU'
@@ -93,39 +126,34 @@ const handleBuildingSelected = ({ buildingId, floor }) => {
 const handleFloorSelected = ({ floor }) => {
   mapStore.setFloor(floor)
 }
-const closePanel = () => mapStore.clearSelection()
+const closePanel = () => {
+  mapStore.clearSelection()
+  // clearSelection() only nulls selectedRoom, keeping building/floor intact
+  // so FloorPanel stays open. Layout watcher above will re-expand left panels.
+}
 
 // Người dùng chọn toà từ BuildingsDashboardPanel -> bay camera vào toà đó.
-// Panel đã tự đóng trước khi emit, nên chỉ cần gọi selectBuilding() ở đây.
 const handleBuildingFromPanel = async (buildingId) => {
   await nextTick()
   if (hologramMapRef.value?.selectBuilding) {
     hologramMapRef.value.selectBuilding(String(buildingId))
   } else {
-    // Dự phòng: nếu map chưa sẵn sàng, cập nhật store để FloorPanel hiện đúng toà
     mapStore.focusOnBuilding(String(buildingId), 1)
   }
 }
-// Nhấn phòng trong FloorPanel -> bay camera zoom vào đúng phòng trên map
-// (giống hệt bấm thẳng vào phòng), đồng thời mở RoomDetailPanel bên phải.
-// goToRoom() bên trong HologramMap tự emit 'room-selected' -> handleRoomSelected
-// ở trên sẽ cập nhật store, nên không cần gọi mapStore.focusOnRoom ở đây nữa.
+
+// Nhấn phòng trong FloorPanel -> bay camera zoom vào đúng phòng trên map.
 const handleFloorRoomSelect = ({ roomId, buildingId }) => {
   const bId = buildingId ?? selectedBuilding.value
   if (hologramMapRef.value?.goToRoom) {
     hologramMapRef.value.goToRoom({ id: roomId, buildingId: bId, floor: selectedFloor.value })
   } else {
-    // Dự phòng nếu ref chưa sẵn sàng (ví dụ map chưa mount xong)
     mapStore.focusOnRoom(roomId, bId, selectedFloor.value)
   }
 }
 
 const onMapReady = async () => {
   isLoading.value = false
-  // Đọc ?building=ID từ URL (được buildings.vue bơm vào khi người dùng bấm
-  // "Vào toà nhà"). Gọi selectBuilding() ngay sau khi map báo ready để
-  // camera fly thẳng vào toà đó. Sau đó xoá query khỏi URL (replace thay
-  // push để không tạo thêm entry lịch sử điều hướng).
   const targetBuilding = route.query.building
   if (targetBuilding && hologramMapRef.value?.selectBuilding) {
     await nextTick()
@@ -134,32 +162,33 @@ const onMapReady = async () => {
   }
 }
 
-// Bấm vào 1 khối thiết bị trên map (layer vgu-equipment-fill trong HologramMap)
-// -> đảm bảo đúng phòng đang được chọn (bấm thiết bị thường xảy ra khi phòng
-// đã mở sẵn, nhưng vẫn phòng hờ trường hợp khác), rồi mở thẳng
-// EquipmentSidePanel ở chế độ chi tiết máy đó — bỏ qua nút
-// "VIEW ALL MACHINES..." + bước chọn từ danh sách.
 const handleEquipmentSelected = async ({ roomId, buildingId, properties }) => {
   if (roomId && selectedRoom.value !== roomId) {
-    mapStore.focusOnRoom(roomId, buildingId ?? properties?.building_id ?? selectedBuilding.value, properties?.floor ?? selectedFloor.value)
-    // Q-2 FIX: RoomDetailPanel is gated behind v-if="selectedRoom", so it only
-    // enters the DOM after focusOnRoom() changes the store value. A single
-    // nextTick() lets the v-if re-evaluate and the element begin mounting, but
-    // the <transition> wrapper delays the actual ref attachment by one more
-    // tick. Two nextTick() calls guarantee the ref is live before we call into it.
+    mapStore.focusOnRoom(
+      roomId,
+      buildingId ?? properties?.building_id ?? selectedBuilding.value,
+      properties?.floor ?? selectedFloor.value
+    )
+    // Q-2 FIX: two nextTick() calls ensure ref is live after v-if + <transition> delay.
     await nextTick()
     await nextTick()
   }
   roomDetailPanelRef.value?.openEquipment(properties)
 }
 
-// Đóng panel bằng phím Esc
-const onKey = (e) => { if (e.key === 'Escape' && selectedRoom.value) closePanel() }
+// Keyboard: Esc closes room panel; second Esc clears building selection entirely.
+const onKey = (e) => {
+  if (e.key !== 'Escape') return
+  if (selectedRoom.value) {
+    closePanel()
+  } else if (selectedBuilding.value) {
+    mapStore.focusOnBuilding(null, null)
+  }
+}
 
 let safety
 onMounted(() => {
   isLoading.value = true
-  // Nếu vì lý do nào đó bản đồ không phát 'ready', vẫn ẩn overlay sau 6s.
   safety = setTimeout(() => { isLoading.value = false }, 6000)
   window.addEventListener('keydown', onKey)
 })
@@ -176,8 +205,9 @@ onBeforeUnmount(() => {
   overflow: hidden;
 }
 
-/* HUD Bar — bám theo --panels-left-width (set bởi usePanelLayout.js),
-   transition đồng bộ hoàn toàn với BuildingsPanel và FloorPanel */
+/* HUD Bar — bám theo --panels-left-width (set bởi usePanelLayout.js).
+   Khi RoomDetailPanel mở, usePanelLayout thu --panels-left-width về tab-only
+   (36px) nên HUD bar tự trượt sang trái, nhường chỗ cho bản đồ ở giữa. */
 .hud-bar {
   position: absolute;
   top: 76px;
@@ -241,7 +271,7 @@ onBeforeUnmount(() => {
 }
 .cyber-slide-enter-from, .cyber-slide-leave-to { transform: translateX(24px); opacity: 0; }
 
-/* FloorPanel — fade + scale nhỏ (left đã animate riêng qua CSS var) */
+/* FloorPanel — fade + slide từ trái */
 .floor-panel-enter-enter-active, .floor-panel-enter-leave-active {
   transition: opacity 0.32s ease, transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -261,7 +291,7 @@ onBeforeUnmount(() => {
 @media (max-width: 640px) {
   .hud-bar {
     top: 58px;
-    left: 14px !important;  /* override CSS var — panel không chiếm cột trái */
+    left: 14px !important;
     gap: 6px;
     transition: none;
   }
