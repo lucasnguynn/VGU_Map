@@ -89,6 +89,11 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 
+// MOD-1: formatRoomName is now a shared utility exported from useVguData.js.
+// Imported here directly (not via the composable return object) so it can also
+// be used outside of Vue reactive context (e.g. inside the marker-creation loop).
+import { formatRoomName } from '~/composables/useVguData'
+
 const { searchRooms } = useVguData()
 
 const config = useRuntimeConfig()
@@ -121,17 +126,8 @@ const floorCache = new Map()
 let buildingCenters = {}
 const roomNameMap = ref({})
 
-const formatRoomName = (name) => {
-  if (!name || typeof name !== 'string') return name
-  const parts = name.split(/\s*-\s*/)
-  if (parts.length > 1 && parts.length % 2 === 0) {
-    const halfIndex = parts.length / 2
-    const firstHalf = parts.slice(0, halfIndex).join(' - ')
-    const secondHalf = parts.slice(halfIndex).join(' - ')
-    if (firstHalf === secondHalf) return firstHalf
-  }
-  return name
-}
+// MOD-1: formatRoomName moved to ~/composables/useVguData.js (shared utility).
+//         Imported above — no local definition needed here.
 
 const BUILDING_AFFINE = {
   B1: {
@@ -752,16 +748,41 @@ function renderRoomMarkers(floorNumber) {
     const el = document.createElement('div')
     el.className = 'vgu-room-marker'
     el.style.cssText = 'position:relative;width:0;height:0;cursor:pointer;pointer-events:auto;'
-    el.innerHTML = `
-      <div class="room-dot">
-        <span class="room-ping"></span>
-        <span class="room-core"></span>
-      </div>
-      <div class="room-marker-card">
-        <div class="room-marker-id">${roomId}</div>
-        ${label ? `<div class="room-marker-name">${formatRoomName(label)}</div>` : ''}
-      </div>
-    `
+
+    // MIN-3: Replaced innerHTML template-string with explicit DOM API calls.
+    // The old approach interpolated roomId and label directly into innerHTML,
+    // which would execute any HTML/script injected via malicious GeoJSON data.
+    // Using textContent for every user-supplied value is injection-safe because
+    // the browser never parses it as markup — it is always treated as plain text.
+
+    // .room-dot  ── purely decorative ping/pulse animation, no user data
+    const dot = document.createElement('div')
+    dot.className = 'room-dot'
+    const ping = document.createElement('span')
+    ping.className = 'room-ping'
+    const core = document.createElement('span')
+    core.className = 'room-core'
+    dot.appendChild(ping)
+    dot.appendChild(core)
+
+    // .room-marker-card  ── contains user-supplied strings; use textContent only
+    const card = document.createElement('div')
+    card.className = 'room-marker-card'
+
+    const idEl = document.createElement('div')
+    idEl.className = 'room-marker-id'
+    idEl.textContent = roomId          // safe: never parsed as HTML
+    card.appendChild(idEl)
+
+    if (label) {
+      const nameEl = document.createElement('div')
+      nameEl.className = 'room-marker-name'
+      nameEl.textContent = formatRoomName(label)  // safe: never parsed as HTML
+      card.appendChild(nameEl)
+    }
+
+    el.appendChild(dot)
+    el.appendChild(card)
     el.addEventListener('click', (e) => {
       e.stopPropagation()
       selectRoom(roomId, centroid, room.properties)
