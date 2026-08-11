@@ -564,9 +564,13 @@ async function goToRoom(result) {
     selectFloor(result.floor)
   }
 
+  // M-6 FIX: currentBuildingGeojson may be null if the user searched before
+  // ever clicking a building on the map (selectBuilding was called above, but
+  // getBuildingRoomsData is async and may not have resolved yet for the
+  // same-building case that skips selectBuilding entirely).
   const feature = currentBuildingGeojson?.features?.find(
     f => f.properties?.room_id === result.id
-  )
+  ) ?? null
   const centroid = feature ? polygonCentroid(feature.geometry.coordinates) : null
   selectRoom(result.id, centroid, feature?.properties || { building_id: result.buildingId, floor: result.floor })
 }
