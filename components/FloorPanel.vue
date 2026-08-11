@@ -106,7 +106,10 @@ const props = defineProps({
   buildingId: { type: String, default: null },
   clusterLabel: { type: String, default: 'CLUSTER' },
   floor: { type: [String, Number], default: null },
-  selectedRoomId: { type: String, default: null }
+  selectedRoomId: { type: String, default: null },
+  // When true (e.g. RoomDetailPanel is open), panel collapses to its toggle-btn
+  // stub automatically. User can still re-expand manually via the toggle button.
+  forceCollapse: { type: Boolean, default: false }
 })
 
 const emit = defineEmits(['select-room'])
@@ -126,6 +129,10 @@ const rooms = ref([])
 const activeType = ref('all')
 
 const isCollapsed = ref(false)
+
+// Sync with parent-driven forceCollapse (e.g. RoomDetailPanel opened).
+// We only ever force TO collapsed; expanding is always the user's choice.
+watch(() => props.forceCollapse, (v) => { if (v) isCollapsed.value = true })
 
 const ROOM_TYPE_ORDER = ['administration', 'teaching', 'laboratory', 'workshop', 'other']
 const ROOM_TYPE_LABELS = {
