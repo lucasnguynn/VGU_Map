@@ -232,6 +232,31 @@ export const useVguData = () => {
     getRoomsByFloor,
     searchRooms,
     getBuildingStats,
-    getDriveData
+    getDriveData,
+    // MOD-1: Shared utility — previously duplicated in HologramMap.vue and FloorPanel.vue.
+    // Exported here so both components import from one authoritative source.
+    formatRoomName
   }
 }
+
+// ─── MOD-1: Shared formatRoomName utility ────────────────────────────────────
+// Extracted from HologramMap.vue and FloorPanel.vue where the identical logic
+// lived in two places. Any future changes to room-name display only need to
+// happen once, here.
+//
+// Logic: some room names are stored duplicated in the sheet, e.g.
+//   "Phòng học - Phòng học"  →  "Phòng học"
+// If the name splits on " - " into an even number of equal halves, return
+// just the first half.  Otherwise return the name unchanged.
+export const formatRoomName = (name) => {
+  if (!name || typeof name !== 'string') return name
+  const parts = name.split(/\s*-\s*/)
+  if (parts.length > 1 && parts.length % 2 === 0) {
+    const halfIndex = parts.length / 2
+    const firstHalf = parts.slice(0, halfIndex).join(' - ')
+    const secondHalf = parts.slice(halfIndex).join(' - ')
+    if (firstHalf === secondHalf) return firstHalf
+  }
+  return name
+}
+// ─────────────────────────────────────────────────────────────────────────────
