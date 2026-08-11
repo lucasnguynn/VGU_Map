@@ -1,10 +1,5 @@
 // composables/usePanelLayout.js
-//
-// Nguồn sự thật DUY NHẤT cho toàn bộ layout panel bên trái.
-// Tính toán tổng độ rộng cột trái và set vào CSS custom property --panels-left-width.
-
-// M-3 FIX: import chỉ còn ref — onMounted/onBeforeUnmount đã chuyển ra module scope.
-import { ref } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 
 const BUILDINGS_WIDTH = 300
 const BUILDINGS_WIDTH_TAB = 280
@@ -12,17 +7,11 @@ const BUILDINGS_TAB_BTN = 36
 const FLOOR_WIDTH = 280
 const FLOOR_WIDTH_TAB = 280
 
-// Singleton reactive state
 const _buildingsVisible = ref(true)
 const _buildingsCollapsed = ref(false)
 const _floorVisible = ref(false)
 
-// ─── M-3: Module-scope resize listener với reference-count guard ──────────────
-// Vấn đề cũ: mỗi component gọi usePanelLayout() lại đăng ký 1 listener riêng
-// bên trong onMounted() → N component = N listener chạy song song, gây tính
-// toán thừa và leak bộ nhớ khi component unmount không đúng thứ tự.
-// Fix: 1 listener duy nhất ở module scope, chỉ đăng ký khi ref-count đi từ 0→1
-// và chỉ gỡ khi ref-count về 0, bất kể bao nhiêu component dùng composable này.
+// ─── M-3: Module-scope resize listener with reference-count guard ─────────────
 let _listenerRefCount = 0
 let _onResize = null
 
@@ -74,20 +63,16 @@ export function usePanelLayout() {
     if (typeof window !== 'undefined') _recalc(window.innerWidth)
   }
 
-  // M-3 FIX: lifecycle hooks hợp lệ (được gọi trong setup() của component),
-  // nhưng listener thật chỉ được tạo/huỷ 1 lần ở module scope nhờ ref-count.
-  if (typeof window !== 'undefined') {
-    // Dùng import động để tránh lỗi SSR (onMounted không tồn tại ngoài component)
-    import('vue').then(({ onMounted, onBeforeUnmount }) => {
-      onMounted(() => {
-        _attachResizeListener()
-        _recalc(window.innerWidth)
-      })
-      onBeforeUnmount(() => {
-        _detachResizeListener()
-      })
-    })
-  }
+  // M-3 FIX: onMounted/onBeforeUnmount are called here in each component's setup(),
+  // but the actual listener is only ever created/destroyed once (ref-counted at
+  // module scope). N components calling usePanelLayout() = still only 1 listener.
+  onMounted(() => {
+    _attachResizeListener()
+    _recalc(window.innerWidth)
+  })
+  onBeforeUnmount(() => {
+    _detachResizeListener()
+  })
 
   return {
     setPanelState,
