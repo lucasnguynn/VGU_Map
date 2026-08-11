@@ -8,7 +8,11 @@
 // thái peek (hé mở) / full (mở rộng). Kéo xuống quá đà = gọi onDismiss (nếu có).
 import { ref, computed } from 'vue'
 
-export function useBottomSheet({ peek = 0.42, full = 0.9, onDismiss } = {}) {
+// [MOBILE-FIX] safeTopPx: the sheet's top edge must never go above this pixel
+// value so it never covers the global search bar.
+// On mobile: header(54) + searchBar(44) + gap(16) = 114px minimum safe top.
+// Pass a custom value per-component if the stacking context differs.
+export function useBottomSheet({ peek = 0.32, full = 0.88, safeTopPx = 120, onDismiss } = {}) {
   const state = ref('peek') // 'peek' | 'full'
   const dragOffsetPx = ref(0)
   const isDragging = ref(false)
@@ -22,7 +26,10 @@ export function useBottomSheet({ peek = 0.42, full = 0.9, onDismiss } = {}) {
 
   const heightPx = computed(() => {
     const h = baseHeightPx.value - dragOffsetPx.value
-    return Math.max(80, Math.min(h, snapPx(0.96)))
+    // [MOBILE-FIX] Cap height so the sheet top never rises above safeTopPx,
+    // which prevents it from covering the global search bar / header area.
+    const maxAllowed = (import.meta.client ? window.innerHeight : 800) - safeTopPx
+    return Math.max(80, Math.min(h, maxAllowed))
   })
 
   const sheetStyle = computed(() => ({
