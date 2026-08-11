@@ -1198,12 +1198,35 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
      RoomDetailPanel (100) để chắc chắn không bao giờ bị đè, kể cả khi sheet
      kéo lên "full". Toà có tới 6 tầng (+ nút thoát + nhãn toà) nên thêm cuộn
      ngang thay vì để vỡ/tràn ra ngoài màn hình như trước. */
+  /* [MOBILE-FIX] Search bar: header(54) + 8px gap = top:62px, height:44px → bottom edge: 106px.
+     floor-bar must start at least 8px below that → top: 114px minimum.
+     Using header + 76px gives 54+76=130px, a comfortable 24px gap below search. */
+  .global-search-container {
+    width: min(340px, 90vw);
+    top: calc(var(--header-h-mobile, 54px) + 8px);
+    /* M-1 FIX: on mobile the left panels are bottom sheets (no left-column offset),
+       so centre the search bar across the full viewport width. */
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  /* M-1 FIX: clamp results dropdown so it doesn't swallow the map on small screens */
+  .global-search-results {
+    max-height: 38vh;
+  }
+  /* [FIX-mobile-zoom] KHÔNG thu nhỏ font-size ở đây nữa — phải giữ nguyên 16px
+     từ rule gốc phía trên, nếu không iOS lại tự zoom khi focus (xem giải thích
+     ở rule .global-search-input gốc). */
+
+  /* [MOBILE-FIX] floor-bar: sits directly below the search bar (not overlapping).
+     top = header(54) + searchBar(44) + gap(16) = 114px. Use 76px offset from header.
+     z-index 115 ensures it stays above all bottom sheets (FloorPanel:95, RoomDetail:105,
+     BuildingsPanel:88) so floor buttons are always tappable regardless of sheet state. */
   .floor-bar {
-    top: calc(var(--header-h-mobile, 54px) + 64px);
+    top: calc(var(--header-h-mobile, 54px) + 76px);
     bottom: auto;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 110;
+    z-index: 115;
     gap: 6px;
     padding: 6px 8px;
     max-width: 92vw;
@@ -1222,26 +1245,13 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
   .floor-bar-label { flex-shrink: 0; }
   .exit-btn { flex-shrink: 0; }
 
-  /* Trước neo bottom:80px (ngay trên floor-bar cũ) — giờ floor-bar đã lên trên,
-     vùng đáy màn hình bị FloorPanel (bottom sheet) che gần hết, nên đưa thông
-     báo này lên cạnh floor-bar để không bị khuất phía sau sheet. */
-  .calib-notice { top: calc(var(--header-h-mobile, 54px) + 116px); bottom: auto; z-index: 61; }
-
-  .global-search-container {
-    width: min(340px, 90vw);
-    top: calc(var(--header-h-mobile, 54px) + 8px);
-    /* M-1 FIX: on mobile the left panels are bottom sheets (no left-column offset),
-       so centre the search bar across the full viewport width. */
-    left: 50%;
-    transform: translateX(-50%);
+  /* [MOBILE-FIX] calib-notice: follows floor-bar downward.
+     floor-bar top(130) + approx bar height(54) + 8px = ~192px. */
+  .calib-notice {
+    top: calc(var(--header-h-mobile, 54px) + 138px);
+    bottom: auto;
+    z-index: 61;
   }
-  /* M-1 FIX: clamp results dropdown so it doesn't swallow the map on small screens */
-  .global-search-results {
-    max-height: 40vh;
-  }
-  /* [FIX-mobile-zoom] KHÔNG thu nhỏ font-size ở đây nữa — phải giữ nguyên 16px
-     từ rule gốc phía trên, nếu không iOS lại tự zoom khi focus (xem giải thích
-     ở rule .global-search-input gốc). */
 
   :deep(.room-marker-card) { min-width: 84px; max-width: 130px; padding: 4px 8px; }
   :deep(.room-marker-id) { font-size: 9px; }
