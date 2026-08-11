@@ -298,7 +298,12 @@ const display = computed(() => {
     area: r.area || 'N/A',
     capacity: r.capacity || 'N/A',
     status: r.rawStatus,
-    instruments: []
+    // B-2 FIX: was hard-coded to [] — now reads from the room record so that
+    // FEATURED INSTRUMENTS actually lists what's in the Content frontmatter.
+    // Supports both array (instruments: [...]) and the legacy string form.
+    instruments: Array.isArray(r.instruments)
+      ? r.instruments
+      : (r.instruments ? [r.instruments] : [])
   }
 })
 </script>
