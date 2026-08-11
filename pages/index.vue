@@ -176,39 +176,6 @@ onBeforeUnmount(() => {
   overflow: hidden;
 }
 
-/* Header HUD */
-.app-header {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 24px;
-  background: linear-gradient(180deg, rgba(5, 10, 15, 0.85) 0%, rgba(5, 10, 15, 0) 100%);
-  pointer-events: none;
-}
-.header-content { display: flex; align-items: center; gap: 14px; }
-.header-logo { height: 36px; width: auto; filter: drop-shadow(0 0 6px rgba(0, 255, 204, 0.4)); }
-.header-title {
-  font-family: 'Be Vietnam Pro', sans-serif;
-  font-size: 18px; font-weight: 600; color: #fff; letter-spacing: 0.5px; margin: 0;
-}
-.title-accent { color: #EF5A24; }
-.sys-status {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 11px; letter-spacing: 1px; color: #00ffcc;
-}
-.pulse-dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: #00ffcc; box-shadow: 0 0 8px #00ffcc;
-  animation: pulse 1.6s ease-in-out infinite;
-}
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.7); }
-}
-
 /* HUD Bar — bám theo --panels-left-width (set bởi usePanelLayout.js),
    transition đồng bộ hoàn toàn với BuildingsPanel và FloorPanel */
 .hud-bar {
@@ -240,6 +207,16 @@ onBeforeUnmount(() => {
   text-overflow: ellipsis;
 }
 
+.pulse-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #00ffcc; box-shadow: 0 0 8px #00ffcc;
+  animation: pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
+}
+
 /* Loading overlay */
 .loading-overlay {
   position: absolute; inset: 0; z-index: 100;
@@ -257,6 +234,7 @@ onBeforeUnmount(() => {
 /* Transitions */
 .fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
+
 /* RoomDetailPanel — trượt từ phải */
 .cyber-slide-enter-active, .cyber-slide-leave-active {
   transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.38s ease;
@@ -281,8 +259,6 @@ onBeforeUnmount(() => {
 
 /* Mobile: panel là bottom sheet, HUD bar về góc trên trái */
 @media (max-width: 640px) {
-  .app-header { padding: 10px 14px; }
-  .header-title { font-size: 16px; }
   .hud-bar {
     top: 58px;
     left: 14px !important;  /* override CSS var — panel không chiếm cột trái */
@@ -291,3 +267,4 @@ onBeforeUnmount(() => {
   }
   .hud-context-panel { font-size: 10px; padding: 6px 10px; }
 }
+</style>
