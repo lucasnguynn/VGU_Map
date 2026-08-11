@@ -11,21 +11,6 @@
         @ready="onMapReady"
       />
     </ClientOnly>
-
-    <!-- Header HUD -->
-    <header class="app-header">
-      <div class="header-content">
-        <img src="/VGU-Logo.png" class="header-logo" alt="Logo VGU" />
-        <h1 class="header-title">
-          <span class="title-accent">VGU</span> MAP
-        </h1>
-      </div>
-      <div class="sys-status" role="status" aria-live="polite">
-        <span class="pulse-dot" aria-hidden="true"></span>
-        <span>ĐANG TẢI BẢN ĐỒ…</span>
-      </div>
-    </header>
-
     <div class="hud-bar">
       <div class="hud-context-panel">
         <span class="pulse-dot" aria-hidden="true"></span>
