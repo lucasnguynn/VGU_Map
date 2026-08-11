@@ -142,6 +142,12 @@ const onMapReady = async () => {
 const handleEquipmentSelected = async ({ roomId, buildingId, properties }) => {
   if (roomId && selectedRoom.value !== roomId) {
     mapStore.focusOnRoom(roomId, buildingId ?? properties?.building_id ?? selectedBuilding.value, properties?.floor ?? selectedFloor.value)
+    // Q-2 FIX: RoomDetailPanel is gated behind v-if="selectedRoom", so it only
+    // enters the DOM after focusOnRoom() changes the store value. A single
+    // nextTick() lets the v-if re-evaluate and the element begin mounting, but
+    // the <transition> wrapper delays the actual ref attachment by one more
+    // tick. Two nextTick() calls guarantee the ref is live before we call into it.
+    await nextTick()
     await nextTick()
   }
   roomDetailPanelRef.value?.openEquipment(properties)
