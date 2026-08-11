@@ -44,10 +44,25 @@ const _getDriveData = (baseURL) => {
 export const useVguData = () => {
   /**
    * Lấy thông tin phòng từ Nuxt Content (content/Rooms/*.md).
+   * Q-1 FIX: Kiểm tra cache chung _getAllRooms() trước — nếu cache đã có (tức
+   * FloorPanel hoặc searchRooms đã nạp rồi) thì trả về ngay mà không cần thêm
+   * round-trip queryContent. Chỉ fallback sang queryContent khi cache thực sự
+   * chưa sẵn sàng (ví dụ người dùng mở link /room trực tiếp trước khi FloorPanel mount).
    * @param {string} roomId  ví dụ "AD-247"
    */
   const getRoomInfo = async (roomId) => {
+    if (!roomId) return null
     try {
+      // Q-1: fast path — serve from the shared in-memory cache when available.
+      if (_allRoomsCache !== null) {
+        const cached = _allRoomsCache.find(r => r.room_id === roomId)
+        if (cached) return { ...normalizeRoom(cached), roomFunction: '' }
+        // Room not found in cache — could be a valid absence (no .md file for
+        // that room), so return null without hitting the network again.
+        return null
+      }
+      // Slow path: cache not yet populated — query directly (and the subsequent
+      // call to _getAllRooms() from any other function will populate the cache).
       const { queryContent } = await import('#imports')
       const room = await queryContent()
         .where({ room_id: roomId })
