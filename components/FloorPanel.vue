@@ -121,7 +121,10 @@ onMounted(() => setPanelState({ floorVisible: true }))
 onBeforeUnmount(() => setPanelState({ floorVisible: false }))
 // Mobile: panel này là bottom sheet kéo-thả, mặc định "hé mở" (peek) để vẫn
 // thấy bản đồ phía sau, người dùng kéo/chạm tay cầm để xem toàn bộ danh sách.
-const { sheetStyle, onDragStart: onSheetDragStart, reset: resetSheet } = useBottomSheet({ peek: 0.4, full: 0.88 })
+// [MOBILE-FIX] peek reduced to 0.32 (32vh). safeTopPx=130 ensures the sheet
+// can never rise above the search bar (header 54 + search 44 + gap 16 = 114px,
+// +16px breathing room = 130px). full stays 0.85 to leave the top strip visible.
+const { sheetStyle, onDragStart: onSheetDragStart, reset: resetSheet } = useBottomSheet({ peek: 0.32, full: 0.85, safeTopPx: 130 })
 
 const isLoading = ref(false)
 const loadError = ref('')
@@ -292,6 +295,11 @@ const handleSelectRoom = (room) => {
    trên, chiều cao do useBottomSheet.js điều khiển qua style inline (sheetStyle).
    is-collapsed không áp dụng ở tier này (xem điều kiện trong template). */
 .floor-panel.tier-mobile {
+  /* [MOBILE-FIX] position: fixed so the sheet is relative to the viewport, not
+     the parent .map-page, preventing it from being pushed off-screen by panel
+     layout shifts. z-index: 95 — above BuildingsDashboard (88) but below
+     RoomDetailPanel (105) so stacking order is always deterministic. */
+  position: fixed;
   top: auto;
   left: 0;
   right: 0;
@@ -301,6 +309,7 @@ const handleSelectRoom = (room) => {
   border-top: 1px solid #1f2d40;
   border-radius: 16px 16px 0 0;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+  z-index: 95;
   display: flex;
   flex-direction: column;
   overflow: hidden;
