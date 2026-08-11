@@ -148,7 +148,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import EquipmentSidePanel from './EquipmentSidePanel.vue'
 
 const showMachineModal = ref(false)
@@ -178,7 +178,7 @@ const props = defineProps({
 const emit = defineEmits(['close'])
 const closePanel = () => emit('close')
 
-const { getRoomInfo } = useVguData()
+const { getRoomInfo, getDriveData } = useVguData()
 
 const config = useRuntimeConfig()
 const base = config.app.baseURL
@@ -187,16 +187,11 @@ const isLoading = ref(false)
 const roomData = ref(null)
 const driveData = ref({})
 
-onMounted(async () => {
-  try {
-    const res = await $fetch(`${base}data/drive_data.json`)
-    if (res) {
-      driveData.value = res
-      console.log('[RoomDetailPanel] Đã load drive_data.json, số lượng phòng có ảnh:', Object.keys(res).length)
-    }
-  } catch (err) {
-    console.error('[RoomDetailPanel] Không thể load file drive_data.json:', err)
-  }
+// M-5 FIX: replaced per-mount $fetch with module-level singleton from useVguData.
+// Subsequent mounts resolve instantly from the already-settled Promise — no extra
+// network requests when the user navigates between rooms.
+getDriveData(base).then(res => {
+  if (res && Object.keys(res).length) driveData.value = res
 })
 
 // Trạng thái từng khung ảnh: 'loading' | 'loaded' | 'error'. Luôn có khung cố
