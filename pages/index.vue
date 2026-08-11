@@ -287,14 +287,13 @@ onBeforeUnmount(() => {
   .cyber-slide-enter-active, .cyber-slide-leave-active { transition: none; }
 }
 
-/* Mobile: panel là bottom sheet, HUD bar về góc trên trái */
+/* [MOBILE-FIX] Mobile: HUD bar occupies the top-left but on mobile the
+   floor-bar HUD (inside HologramMap) already shows "B3 / L1 L2…" context.
+   We hide the hud-bar on mobile to remove clutter in the narrow top strip.
+   The contextTitle info is still accessible via the floor-bar label. */
 @media (max-width: 640px) {
   .hud-bar {
-    top: 58px;
-    left: 14px !important;
-    gap: 6px;
-    transition: none;
+    display: none;
   }
-  .hud-context-panel { font-size: 10px; padding: 6px 10px; }
 }
 </style>
