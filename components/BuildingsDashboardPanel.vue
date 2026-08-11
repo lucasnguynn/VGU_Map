@@ -95,11 +95,24 @@ import { ref, onMounted, watch } from 'vue'
 import { usePanelLayout } from '~/composables/usePanelLayout'
 
 const props = defineProps({
-  modelValue: { type: Boolean, default: true }
+  modelValue: { type: Boolean, default: true },
+  // When true (building selected), panel auto-collapses to its tab stub.
+  // User can still re-expand manually via the toggle tab.
+  forceCollapse: { type: Boolean, default: false }
 })
 const emit = defineEmits(['update:modelValue', 'select-building'])
 
 const { setPanelState } = usePanelLayout()
+
+// Sync with parent-driven forceCollapse (e.g. a building was selected from
+// the map directly, so the list panel should step out of the way).
+// Only force TO collapsed; never override user's explicit expand action.
+watch(() => props.forceCollapse, (v) => {
+  if (v && !isCollapsed.value) {
+    isCollapsed.value = true
+    setPanelState({ buildingsCollapsed: true })
+  }
+})
 const { getBuildingStats } = useVguData()
 const config = useRuntimeConfig()
 const base = config.app.baseURL
