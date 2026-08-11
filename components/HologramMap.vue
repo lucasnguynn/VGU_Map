@@ -18,6 +18,7 @@
         :placeholder="currentBuildingId ? `Tìm phòng trong toà ${currentBuildingId}…` : 'Tìm phòng trên toàn Campus…'"
         @input="onSearchInput"
         @focus="onSearchInput"
+        @blur="onSearchBlur"
       />
     </div>
     
@@ -457,6 +458,7 @@ async function loadRoomNames() {
 }
 
 async function selectBuilding(buildingId) {
+  if (!map) return  // MOD-2 FIX: guard against unmount during async init
   if (buildingId === currentBuildingId.value) return
   currentBuildingId.value = buildingId
   currentRoomId.value = null
@@ -491,6 +493,7 @@ async function selectBuilding(buildingId) {
 }
 
 function selectFloor(floorNumber) {
+  if (!map) return  // MOD-2 FIX: guard against null map after unmount
   currentFloor.value = floorNumber
   currentRoomId.value = null
   updateRoomHighlightPaint()
@@ -537,6 +540,15 @@ function onSearchInput() {
       isSearching.value = false
     }
   }, 250)
+}
+
+// M-1 FIX: @blur fires before @click on touch devices (iOS in particular).
+// Delaying the clear by 200ms lets the result item's click event register first.
+function onSearchBlur() {
+  setTimeout(() => {
+    searchResults.value = []
+    searchQuery.value = ''
+  }, 200)
 }
 
 async function goToRoom(result) {
@@ -603,7 +615,8 @@ function selectRoom(roomId, centroid, propsObj = {}) {
     buildingId: propsObj.building_id || currentBuildingId.value,
     floor: propsObj.floor ?? currentFloor.value
   })
-  if (centroid && isLatLng(centroid)) {
+  // MOD-2 FIX: map could be null if component unmounted during the emit handler
+  if (map && centroid && isLatLng(centroid)) {
     map.flyTo({ center: centroid, zoom: 20.6, pitch: 30, bearing: 10, duration: 1200 })
   }
 }
@@ -615,6 +628,7 @@ function closeRoomDetail() {
 }
 
 function exitBuilding() {
+  if (!map) return  // MOD-2 FIX: guard against null map after unmount
   currentBuildingId.value = null
   currentFloor.value = null
   currentRoomId.value = null
@@ -658,7 +672,7 @@ const equipmentCache = new Map()
 // cho rooms) vì file này được sinh ra ở CÙNG hệ toạ độ mét cục bộ của building.
 // Nếu phòng chưa có file thiết bị (404) thì chỉ cần xoá layer, không phải lỗi.
 async function loadEquipmentForRoom(buildingId, roomId) {
-  if (!map.getSource('vgu-equipment')) return
+  if (!map || !map.getSource('vgu-equipment')) return  // MOD-2 FIX: check map first
   const cacheKey = `${buildingId}:${roomId}`
   try {
     let data = equipmentCache.get(cacheKey)
@@ -672,6 +686,8 @@ async function loadEquipmentForRoom(buildingId, roomId) {
       data = transformBuildingGeojson(buildingId, raw)
       equipmentCache.set(cacheKey, data)
     }
+    // MOD-2 FIX: map may have been destroyed while awaiting the fetch above
+    if (!map || !map.getSource('vgu-equipment')) return
     map.getSource('vgu-equipment').setData(data)
   } catch (error) {
     console.warn(`[HologramMap] Không tải được thiết bị cho phòng ${roomId}:`, error)
@@ -713,6 +729,7 @@ function updateMarkerVisibility() {
 }
 
 function renderRoomMarkers(floorNumber) {
+  if (!map) return  // MOD-2 FIX: guard against null map after unmount
   clearRoomMarkers()
   if (!isGeolocated.value || !currentBuildingGeojson) return
 
@@ -1185,7 +1202,18 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
      báo này lên cạnh floor-bar để không bị khuất phía sau sheet. */
   .calib-notice { top: calc(var(--header-h-mobile, 54px) + 116px); bottom: auto; z-index: 61; }
 
-  .global-search-container { width: 90vw; top: calc(var(--header-h-mobile, 54px) + 8px); }
+  .global-search-container {
+    width: min(340px, 90vw);
+    top: calc(var(--header-h-mobile, 54px) + 8px);
+    /* M-1 FIX: on mobile the left panels are bottom sheets (no left-column offset),
+       so centre the search bar across the full viewport width. */
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  /* M-1 FIX: clamp results dropdown so it doesn't swallow the map on small screens */
+  .global-search-results {
+    max-height: 40vh;
+  }
   /* [FIX-mobile-zoom] KHÔNG thu nhỏ font-size ở đây nữa — phải giữ nguyên 16px
      từ rule gốc phía trên, nếu không iOS lại tự zoom khi focus (xem giải thích
      ở rule .global-search-input gốc). */
