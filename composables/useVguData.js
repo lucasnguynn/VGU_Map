@@ -1,9 +1,23 @@
 // composables/useVguData.js
 // Chỉ còn 2 hàm được UI dùng: getRoomInfo + getRoomEquipment (đọc từ Nuxt Content).
-// Đã bỏ syncAll/normalizeInfo/getFloorPlan/fetchJson: syncAll trước đây được gọi
-// trong app.vue lúc mounted, fetch 3 file JSON rồi VỨT ĐI (HologramMap tự nạp
-// dữ liệu riêng) — vừa thừa request vừa dễ 404. Việc "đồng bộ dữ liệu" giờ do
-// pipeline CI (scripts/sync_all_data.js) lo, không phải phía client.
+// Đã bỏ syncAll/normalizeInfo/getFloorPlan/fetchJson.
+
+// ─── C-2: Module-level cache ────────────────────────────────────────────────
+// Tất cả các hàm "đọc toàn bộ danh sách phòng" (searchRooms, getBuildingStats,
+// getRoomsByFloor) đều dùng chung cache này.  Cache chỉ được nạp 1 lần duy nhất
+// trong phiên làm việc; không cần invalidate vì dữ liệu phòng không thay đổi
+// trong runtime.
+let _allRoomsCache = null   // null = chưa nạp; [] = đã nạp (có thể rỗng)
+
+const _getAllRooms = async () => {
+  if (_allRoomsCache !== null) return _allRoomsCache
+  const { queryContent } = await import('#imports')
+  const rows = await queryContent().find()
+  // Chỉ giữ các bản ghi có room_id (lọc bỏ equipment, news… nếu có trong content/)
+  _allRoomsCache = (rows || []).filter(r => r.room_id)
+  return _allRoomsCache
+}
+// ────────────────────────────────────────────────────────────────────────────
 
 export const useVguData = () => {
   /**
@@ -13,17 +27,9 @@ export const useVguData = () => {
   const getRoomInfo = async (roomId) => {
     try {
       const { queryContent } = await import('#imports')
-      // LƯU Ý: @nuxt/content viết thường TẤT CẢ _path, nên content/Rooms -> /rooms.
-      // queryContent('Rooms') (chữ hoa) KHÔNG khớp -> luôn null (đây là lý do tên
-      // phòng không hiện). Lọc theo trường room_id (duy nhất ở file phòng) để
-      // không phụ thuộc hoa/thường của thư mục.
       const room = await queryContent()
         .where({ room_id: roomId })
         .findOne()
-      // Chuẩn hoá về field name mà RoomDetailPanel.vue mong đợi (roomName,
-      // buildingId, rawRoomType, area, capacity, rawStatus…) — trước đây hàm
-      // này trả thẳng bản ghi thô (name, building_id, room_type, area_m2…),
-      // không khớp field RoomDetailPanel đọc, nên panel luôn hiện "N/A".
       return room ? { ...normalizeRoom(room), roomFunction: '' } : null
     } catch (error) {
       console.error(`[useVguData] Không lấy được thông tin phòng ${roomId}:`, error)
@@ -33,8 +39,6 @@ export const useVguData = () => {
 
   /**
    * Lấy danh sách thiết bị đặt trong phòng (content/equipment/**).
-   * Query cả cây /equipment rồi lọc theo location.room_id để không phụ thuộc
-   * vào phân biệt hoa/thường của thư mục con "Equipment".
    * @param {string} roomId
    */
   const getRoomEquipment = async (roomId) => {
@@ -50,17 +54,11 @@ export const useVguData = () => {
     }
   }
 
-  /**
-   * Alias của getRoomEquipment — tên gọi mà EquipmentSidePanel.vue (trước đây là
-   * MachineViewerModal.vue) mong đợi. Trả về danh sách bản ghi thiết bị thô
-   * (content/equipment/**), để EquipmentSidePanel tự chuẩn hoá qua normalizeMachine().
-   * @param {string} roomId
-   */
+  /** Alias của getRoomEquipment. */
   const getEquipmentListByRoom = async (roomId) => getRoomEquipment(roomId)
 
   /**
-   * Lấy chi tiết đầy đủ 1 thiết bị theo id (trường `id` trong frontmatter,
-   * ví dụ "spectrometer-01"), dùng khi EquipmentSidePanel mở view chi tiết.
+   * Lấy chi tiết đầy đủ 1 thiết bị theo id.
    * @param {string} equipmentId
    */
   const getEquipmentInfo = async (equipmentId) => {
@@ -77,22 +75,19 @@ export const useVguData = () => {
   }
 
   /**
-   * Lấy danh sách phòng của 1 tầng thuộc 1 tòa (content/Rooms/*.md), CHUẨN HOÁ
-   * field cho FloorPanel.vue dùng thẳng: id, roomNumber, roomName, roomType, status.
-   * (Trước đây FloorPanel gọi hàm này nhưng composable chưa có -> luôn báo lỗi
-   * "Không tải được dữ liệu phòng".)
-   * @param {string} buildingId ví dụ "AD"
-   * @param {string|number} floor ví dụ 3
+   * Lấy danh sách phòng của 1 tầng thuộc 1 tòa.
+   * C-2: dùng cache thay vì queryContent().find() mỗi lần.
+   * @param {string} buildingId
+   * @param {string|number} floor
    */
   const getRoomsByFloor = async (buildingId, floor) => {
     if (!buildingId || floor == null) return []
     try {
-      const { queryContent } = await import('#imports')
       const floorNum = Number(floor)
-      const rooms = await queryContent()
-        .where({ building_id: buildingId, floor: floorNum })
-        .find()
-      return (rooms || []).map(normalizeRoom)
+      // C-2: đọc từ cache, không gọi queryContent lần nữa
+      const all = await _getAllRooms()
+      const rooms = all.filter(r => r.building_id === buildingId && r.floor === floorNum)
+      return rooms.map(normalizeRoom)
     } catch (error) {
       console.error(`[useVguData] Không lấy được danh sách phòng ${buildingId} tầng ${floor}:`, error)
       throw error
@@ -100,9 +95,9 @@ export const useVguData = () => {
   }
 
   /**
-   * Tìm phòng theo từ khoá (room_id hoặc tên phòng), dùng cho ô tìm kiếm phòng
-   * trên thanh điều hướng. Trả về danh sách rút gọn kèm buildingId/floor để
-   * điều hướng bản đồ tới đúng phòng.
+   * Tìm phòng theo từ khoá.
+   * C-1: lọc trong JS sau khi đọc cache — không scan toàn bộ DB qua mạng nữa.
+   * C-2: dùng cache chung _getAllRooms().
    * @param {string} query
    * @param {number} limit
    */
@@ -110,11 +105,11 @@ export const useVguData = () => {
     const q = (query || '').trim()
     if (!q) return []
     try {
-      const { queryContent } = await import('#imports')
-      const all = await queryContent().find()
       const qLower = q.toLowerCase()
-      return (all || [])
-        .filter(r => r.room_id)
+      // C-1 FIX: trước đây gọi queryContent().find() không có where → scan toàn DB.
+      // Nay dùng cache: nếu cache chưa có thì nạp 1 lần, sau đó lọc trong bộ nhớ.
+      const all = await _getAllRooms()
+      return all
         .filter(r =>
           String(r.room_id).toLowerCase().includes(qLower) ||
           String(r.name || '').toLowerCase().includes(qLower)
@@ -127,9 +122,7 @@ export const useVguData = () => {
     }
   }
 
-  // Các nhóm phân loại phòng thật sự xuất hiện trong dữ liệu (room_type trong
-  // content/Rooms/*.md). Giá trị "___" (chưa cập nhật) và các giá trị hiếm gặp
-  // khác được gộp về "other" để không phá vỡ tab phân loại trên FloorPanel.
+  // Các nhóm phân loại phòng
   const ROOM_TYPE_MAP = {
     'Administration': 'administration',
     'Laboratory': 'laboratory',
@@ -146,7 +139,6 @@ export const useVguData = () => {
     return 'unknown'
   }
 
-  // Chuẩn hoá 1 bản ghi phòng thô từ Nuxt Content về shape UI cần.
   const normalizeRoom = (r) => ({
     id: r.room_id,
     roomNumber: r.room_id,
@@ -164,17 +156,16 @@ export const useVguData = () => {
   })
 
   /**
-   * Thống kê số phòng / số phòng lab theo từng toà, dùng cho dashboard
-   * "Toà nhà" (pages/buildings.vue). Query 1 lần toàn bộ content/Rooms rồi
-   * gộp nhóm theo building_id — rẻ hơn N lần gọi getRoomsByFloor cho từng tầng.
+   * Thống kê số phòng / số phòng lab theo từng toà.
+   * C-2: dùng cache thay vì queryContent().find() riêng.
    * @returns {Promise<Record<string, {roomCount:number, labCount:number}>>}
    */
   const getBuildingStats = async () => {
     try {
-      const { queryContent } = await import('#imports')
-      const rooms = await queryContent().find()
+      // C-2 FIX: dùng cache thay vì một lần fetch riêng
+      const rooms = await _getAllRooms()
       const stats = {}
-      for (const r of rooms || []) {
+      for (const r of rooms) {
         const b = r.building_id
         if (!b) continue
         if (!stats[b]) stats[b] = { roomCount: 0, labCount: 0 }
