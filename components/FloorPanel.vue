@@ -94,7 +94,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, onBeforeUnmount } from 'vue'
 import { useDeviceTier } from '~/composables/useDeviceTier'
 import { useBottomSheet } from '~/composables/useBottomSheet'
 import { usePanelLayout } from '~/composables/usePanelLayout'
