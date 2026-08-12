@@ -5,6 +5,13 @@ on:
     branches:
       - OMG # Đổi thành 'master' nếu nhánh chính của bạn tên là master
   workflow_dispatch:
+  workflow_run:
+    workflows:
+      - "Update Info Data (Google Sheets → site)"
+    types:
+      - completed
+    branches:
+      - OMG
 
 permissions:
   contents: read
@@ -17,10 +24,20 @@ concurrency:
 
 jobs:
   build:
+    # For workflow_run events, only proceed if the upstream workflow succeeded.
+    # push and workflow_dispatch events skip this check (github.event_name != 'workflow_run').
+    if: >
+      github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          # When triggered by workflow_run, the default ref is the commit that
+          # triggered THIS workflow, which may lag behind the data-sync commit.
+          # Pinning to the OMG branch head guarantees we always build the latest data.
+          ref: OMG
 
       - name: Enable Corepack
         run: corepack enable
