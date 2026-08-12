@@ -143,7 +143,8 @@ import { storeToRefs } from 'pinia'
 import { useMapStore } from '~/Stores/mapStores'
 import { useDeviceTier } from '~/composables/useDeviceTier'
 import { useBottomSheet } from '~/composables/useBottomSheet'
-import { formatRoomName } from '~/composables/useVguData'
+// FIX BUG-1: Đã thêm useVguData vào import
+import { useVguData, formatRoomName } from '~/composables/useVguData'
 
 const props = defineProps({
   buildingId:     { type: String, default: null },
