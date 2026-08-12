@@ -45,7 +45,10 @@
 
   <!-- ================= Thang máy chọn tầng (Elevator HUD) ================= -->
   <Transition name="hud-slide">
-    <div v-if="currentBuildingId" class="floor-bar" role="group" :aria-label="`Chọn tầng toà ${currentBuildingId}`">
+    <!-- ARCH-FIX: on mobile the floor-bar is rendered inside FloorPanel's
+         bottom sheet header. Hiding it here prevents the collision with
+         the search bar that previous CSS fixes failed to solve. -->
+    <div v-if="currentBuildingId && tier !== 'mobile'" class="floor-bar" role="group" :aria-label="`Chọn tầng toà ${currentBuildingId}`">
       <button class="floor-btn exit-btn" aria-label="Thoát khỏi toà nhà, về toàn cảnh" title="Thoát khỏi toà nhà" @click="exitBuilding">
         ✕
       </button>
@@ -72,7 +75,7 @@
 
   <!-- ================= Thông báo tòa chưa định vị GPS ================= -->
   <Transition name="fade">
-    <div v-if="currentBuildingId && !isGeolocated" class="calib-notice">
+    <div v-if="currentBuildingId && !isGeolocated && tier !== 'mobile'" class="calib-notice">
       <span class="calib-dot"></span>
       Sơ đồ phòng tòa <b>{{ currentBuildingId }}</b> chưa được định vị GPS — đang chờ hiệu chỉnh tọa độ.
     </div>
@@ -93,6 +96,14 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 // Imported here directly (not via the composable return object) so it can also
 // be used outside of Vue reactive context (e.g. inside the marker-creation loop).
 import { formatRoomName } from '~/composables/useVguData'
+
+// ARCH-FIX: HologramMap publishes floor meta to the store so FloorPanel
+// can render the mobile floor-bar without prop-drilling.
+import { useMapStore } from '~/Stores/mapStores'
+import { useDeviceTier } from '~/composables/useDeviceTier'
+
+const mapStore = useMapStore()
+const { tier } = useDeviceTier()
 
 const { searchRooms } = useVguData()
 
@@ -125,9 +136,6 @@ let floorsConfig = {}
 const floorCache = new Map()
 let buildingCenters = {}
 const roomNameMap = ref({})
-
-// MOD-1: formatRoomName moved to ~/composables/useVguData.js (shared utility).
-//         Imported above — no local definition needed here.
 
 const BUILDING_AFFINE = {
   B1: {
@@ -267,7 +275,6 @@ onMounted(() => {
   map.on('mouseenter', 'vgu-rooms-fill', setPointer(true))
   map.on('mouseleave', 'vgu-rooms-fill', setPointer(false))
 
-  // ===== Hover highlight cho từng khối thiết bị trong phòng =====
   map.on('mousemove', 'vgu-equipment-fill', (e) => {
     if (!e.features.length) return
     map.getCanvas().style.cursor = 'pointer'
@@ -290,8 +297,6 @@ onMounted(() => {
   map.on('click', 'vgu-equipment-fill', (e) => {
     const feature = e.features[0]
     const equipmentId = feature?.properties?.equipment_id
-    // Gửi kèm toàn bộ properties (model_code, room_id, building_id, floor…)
-    // để nơi nhận có thể mở thẳng chi tiết máy mà không cần tra cứu lại.
     if (equipmentId) emit('equipment-selected', { equipmentId, roomId: currentRoomId.value, properties: feature.properties })
   })
 })
@@ -377,9 +382,6 @@ async function initRoomsLayer() {
     paint: { 'line-color': '#00ffcc', 'line-width': 1.5, 'line-opacity': 0.8 }
   })
 
-  // ================= Layer thiết bị trong phòng =================
-  // Chỉ hiện khi có phòng đang được chọn (xem loadEquipmentForRoom / watch currentRoomId).
-  // `generateId: true` để MapLibre tự gán id số cho từng feature, cần cho feature-state (hover).
   map.addSource('vgu-equipment', {
     type: 'geojson',
     data: { type: 'FeatureCollection', features: [] },
@@ -393,8 +395,8 @@ async function initRoomsLayer() {
       'fill-color': [
         'case',
         ['boolean', ['feature-state', 'hover'], false],
-        '#00ffcc', // highlight xanh khi hover
-        '#38bdf8'  // màu mặc định của khối thiết bị
+        '#00ffcc', 
+        '#38bdf8'  
       ],
       'fill-opacity': [
         'case',
@@ -461,6 +463,12 @@ async function selectBuilding(buildingId) {
 
   const floors = floorsConfig[buildingId] || []
   availableFloors.value = [...floors].sort((a, b) => a - b)
+  
+  mapStore.setFloorMeta({
+    availableFloors:  availableFloors.value,
+    currentFloor:     currentFloor.value,
+    floorsWithDetail: [...floorsWithDetail.value],
+  })
 
   map.setFilter('vgu-buildings-3d', ['!=', ['get', 'building_id'], buildingId])
   map.setFilter('vgu-buildings-outline', ['!=', ['get', 'building_id'], buildingId])
@@ -491,6 +499,13 @@ async function selectBuilding(buildingId) {
 function selectFloor(floorNumber) {
   if (!map) return  // MOD-2 FIX: guard against null map after unmount
   currentFloor.value = floorNumber
+  
+  mapStore.setFloorMeta({
+    availableFloors:  availableFloors.value,
+    currentFloor:     floorNumber,
+    floorsWithDetail: [...floorsWithDetail.value],
+  })
+
   currentRoomId.value = null
   updateRoomHighlightPaint()
 
@@ -520,16 +535,13 @@ function onSearchInput() {
   searchDebounce = setTimeout(async () => {
     isSearching.value = true
     try {
-      // [FIX] Lấy nhiều kết quả hơn (VD: 50) để tự do lọc trên máy khách nếu đang ở trong 1 toà
       const rawResults = await searchRooms(q, 50)
       
       if (currentBuildingId.value) {
-        // Lọc kết quả thuộc toà đang xem, sau đó cắt lấy top 8
         searchResults.value = rawResults
           .filter(r => r.buildingId === currentBuildingId.value)
           .slice(0, 8)
       } else {
-        // Đang xem toàn trường
         searchResults.value = rawResults.slice(0, 8)
       }
     } finally {
@@ -538,8 +550,6 @@ function onSearchInput() {
   }, 250)
 }
 
-// M-1 FIX: @blur fires before @click on touch devices (iOS in particular).
-// Delaying the clear by 200ms lets the result item's click event register first.
 function onSearchBlur() {
   setTimeout(() => {
     searchResults.value = []
@@ -560,10 +570,6 @@ async function goToRoom(result) {
     selectFloor(result.floor)
   }
 
-  // M-6 FIX: currentBuildingGeojson may be null if the user searched before
-  // ever clicking a building on the map (selectBuilding was called above, but
-  // getBuildingRoomsData is async and may not have resolved yet for the
-  // same-building case that skips selectBuilding entirely).
   const feature = currentBuildingGeojson?.features?.find(
     f => f.properties?.room_id === result.id
   ) ?? null
@@ -571,9 +577,6 @@ async function goToRoom(result) {
   selectRoom(result.id, centroid, feature?.properties || { building_id: result.buildingId, floor: result.floor })
 }
 
-// ================= Làm nổi bật phòng đang chọn, làm mờ phòng xung quanh =================
-// Viền phòng được chọn dùng đúng màu theo loại phòng (giống màu fill mặc định),
-// tăng độ dày viền + độ đục fill để nổi bật; các phòng còn lại bị mờ đi.
 const ROOM_TYPE_COLOR_EXPR = ['match', ['get', 'type'],
   'laboratory', '#00ffcc',
   'corridor', '#334155',
@@ -615,7 +618,6 @@ function selectRoom(roomId, centroid, propsObj = {}) {
     buildingId: propsObj.building_id || currentBuildingId.value,
     floor: propsObj.floor ?? currentFloor.value
   })
-  // MOD-2 FIX: map could be null if component unmounted during the emit handler
   if (map && centroid && isLatLng(centroid)) {
     map.flyTo({ center: centroid, zoom: 20.6, pitch: 30, bearing: 10, duration: 1200 })
   }
@@ -628,7 +630,7 @@ function closeRoomDetail() {
 }
 
 function exitBuilding() {
-  if (!map) return  // MOD-2 FIX: guard against null map after unmount
+  if (!map) return  
   currentBuildingId.value = null
   currentFloor.value = null
   currentRoomId.value = null
@@ -636,7 +638,6 @@ function exitBuilding() {
   isGeolocated.value = false
   currentBuildingGeojson = null
   
-  // Dọn dẹp ô tìm kiếm
   searchQuery.value = ''
   searchResults.value = []
 
@@ -667,12 +668,8 @@ function exitBuilding() {
 let hoveredEquipmentId = null
 const equipmentCache = new Map()
 
-// Tải geojson thiết bị của 1 phòng (public/data/equipment/{roomId}.geojson), áp
-// CHUNG affine transform của building (giống hệt transformBuildingGeojson dùng
-// cho rooms) vì file này được sinh ra ở CÙNG hệ toạ độ mét cục bộ của building.
-// Nếu phòng chưa có file thiết bị (404) thì chỉ cần xoá layer, không phải lỗi.
 async function loadEquipmentForRoom(buildingId, roomId) {
-  if (!map || !map.getSource('vgu-equipment')) return  // MOD-2 FIX: check map first
+  if (!map || !map.getSource('vgu-equipment')) return  
   const cacheKey = `${buildingId}:${roomId}`
   try {
     let data = equipmentCache.get(cacheKey)
@@ -686,7 +683,6 @@ async function loadEquipmentForRoom(buildingId, roomId) {
       data = transformBuildingGeojson(buildingId, raw)
       equipmentCache.set(cacheKey, data)
     }
-    // MOD-2 FIX: map may have been destroyed while awaiting the fetch above
     if (!map || !map.getSource('vgu-equipment')) return
     map.getSource('vgu-equipment').setData(data)
   } catch (error) {
@@ -702,8 +698,6 @@ function clearEquipmentLayer() {
   }
 }
 
-// Chỉ hiện thiết bị khi có phòng đang được chọn — khớp đúng yêu cầu "thiết bị
-// của phòng chỉ hiện lên khi nhấn vào phòng đó".
 watch(currentRoomId, (roomId) => {
   if (!roomId || !currentBuildingId.value) {
     clearEquipmentLayer()
@@ -719,8 +713,6 @@ function clearRoomMarkers() {
   roomMarkers = []
 }
 
-// Khi có phòng đang được chọn, ẩn hết marker (chấm + thẻ tên) của các phòng
-// khác trên tầng, chỉ giữ lại marker của phòng đang chọn để nó thực sự nổi bật.
 function updateMarkerVisibility() {
   const selId = currentRoomId.value
   roomMarkers.forEach(({ el, roomId }) => {
@@ -729,7 +721,7 @@ function updateMarkerVisibility() {
 }
 
 function renderRoomMarkers(floorNumber) {
-  if (!map) return  // MOD-2 FIX: guard against null map after unmount
+  if (!map) return  
   clearRoomMarkers()
   if (!isGeolocated.value || !currentBuildingGeojson) return
 
@@ -749,13 +741,6 @@ function renderRoomMarkers(floorNumber) {
     el.className = 'vgu-room-marker'
     el.style.cssText = 'position:relative;width:0;height:0;cursor:pointer;pointer-events:auto;'
 
-    // MIN-3: Replaced innerHTML template-string with explicit DOM API calls.
-    // The old approach interpolated roomId and label directly into innerHTML,
-    // which would execute any HTML/script injected via malicious GeoJSON data.
-    // Using textContent for every user-supplied value is injection-safe because
-    // the browser never parses it as markup — it is always treated as plain text.
-
-    // .room-dot  ── purely decorative ping/pulse animation, no user data
     const dot = document.createElement('div')
     dot.className = 'room-dot'
     const ping = document.createElement('span')
@@ -765,19 +750,18 @@ function renderRoomMarkers(floorNumber) {
     dot.appendChild(ping)
     dot.appendChild(core)
 
-    // .room-marker-card  ── contains user-supplied strings; use textContent only
     const card = document.createElement('div')
     card.className = 'room-marker-card'
 
     const idEl = document.createElement('div')
     idEl.className = 'room-marker-id'
-    idEl.textContent = roomId          // safe: never parsed as HTML
+    idEl.textContent = roomId          
     card.appendChild(idEl)
 
     if (label) {
       const nameEl = document.createElement('div')
       nameEl.className = 'room-marker-name'
-      nameEl.textContent = formatRoomName(label)  // safe: never parsed as HTML
+      nameEl.textContent = formatRoomName(label)  
       card.appendChild(nameEl)
     }
 
@@ -815,12 +799,6 @@ onUnmounted(() => {
   if (map) { map.remove(); map = null }
 })
 
-// Cho phép component cha (pages/index.vue) gọi trực tiếp khi người dùng chọn
-// phòng từ danh sách trong FloorPanel, để bản đồ bay camera zoom vào đúng
-// phòng đó — giống hệt hành vi khi bấm thẳng vào phòng trên map.
-// selectBuilding thêm để pages/buildings.vue (dashboard danh sách toà) có thể
-// điều hướng thẳng vào 1 toà khi người dùng bấm "Vào toà nhà" từ trang khác,
-// qua query ?building=ID (xem watch ở pages/index.vue).
 defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
 </script>
 
@@ -833,7 +811,6 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
   left: 0;
 }
 
-/* Customize MapLibre controls */
 :deep(.maplibregl-ctrl) {
   background: rgba(15, 30, 54, 0.9);
   border: 1px solid rgba(239, 90, 36, 0.3);
@@ -850,13 +827,8 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
 }
 :deep(.maplibregl-popup-tip) { border-top-color: rgba(15, 30, 54, 0.95); }
 
-
-/* ================= Thanh tìm kiếm TOÀN CỤC (Mới) ================= */
 .global-search-container {
   position: absolute;
-  /* Trước đây top:24px cố định -> đè lên AppHeader (cao ~64px, z-index:30) vì
-     70 > 30. Giờ neo dưới header qua biến --header-h (đặt ở layouts/default.vue)
-     để 2 lớp không còn chồng nhau ở bất kỳ kích thước header nào. */
   top: calc(var(--header-h, 64px) + 12px);
   left: 50%;
   transform: translateX(-50%);
@@ -883,16 +855,12 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
 .global-search-input {
   width: 100%;
   height: 44px;
-  padding: 0 16px 0 40px; /* Nhường chỗ cho icon */
+  padding: 0 16px 0 40px; 
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(11, 17, 32, 0.85);
   color: #fff;
   font-family: 'Space Mono', monospace;
-  /* [FIX-mobile-zoom] iOS Safari tự động phóng to TOÀN TRANG khi focus vào 1
-     input có font-size < 16px, rồi không luôn zoom lại đúng — đây chính là
-     nguồn gốc chính của phản hồi "dễ bị thu phóng bất ngờ" mỗi khi bấm vào ô
-     tìm kiếm. Giữ 16px là NGƯỠNG BẮT BUỘC, không phải lựa chọn thẩm mỹ. */
   font-size: 16px;
   outline: none;
   backdrop-filter: blur(8px);
@@ -901,11 +869,7 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
 }
 
 .global-search-input::placeholder { color: rgba(255, 255, 255, 0.5); }
-
-.global-search-input:focus {
-  border-color: #EF5A24;
-  background: rgba(11, 17, 32, 0.95);
-}
+.global-search-input:focus { border-color: #EF5A24; background: rgba(11, 17, 32, 0.95); }
 
 .global-search-results {
   margin-top: 8px;
@@ -936,53 +900,20 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
   color: #e2e8f0;
   transition: background 0.15s;
 }
-
 .global-search-item:hover { background: rgba(239, 90, 36, 0.15); }
 
-.rs-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.rs-id {
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  font-weight: 700;
-  color: #EF5A24;
-}
-
-.rs-name { 
-  font-size: 11px; 
-  color: #94a3b8; 
-}
-
+.rs-info { display: flex; flex-direction: column; gap: 2px; }
+.rs-id { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: #EF5A24; }
+.rs-name { font-size: 11px; color: #94a3b8; }
 .rs-building {
-  font-size: 10px;
-  font-weight: 700;
-  color: #94a3b8;
-  background: rgba(255,255,255,0.1);
-  padding: 2px 6px;
-  border-radius: 4px;
-  margin-left: 10px;
+  font-size: 10px; font-weight: 700; color: #94a3b8;
+  background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; margin-left: 10px;
 }
+.room-search-empty { padding: 10px; font-size: 11px; color: #64748b; text-align: center; }
 
-.room-search-empty {
-  padding: 10px;
-  font-size: 11px;
-  color: #64748b;
-  text-align: center;
-}
-
-/* Scrollbar cho search results */
 .global-search-results::-webkit-scrollbar { width: 6px; }
-.global-search-results::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 4px;
-}
+.global-search-results::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
 
-
-/* ================= Thang máy chọn tầng ================= */
 .floor-bar {
   position: absolute;
   left: 50%;
@@ -1001,258 +932,81 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
   max-width: 100%;
 }
-/* [FIX-floor-select] Bar này neo ĐÁY màn hình — trên desktop/tablet không sao
-   vì FloorPanel/RoomDetailPanel ở đó là side-dock. Nhưng trên mobile 2 panel
-   đó biến thành BOTTOM SHEET (xem useBottomSheet.js) cũng neo đáy, z-index cao
-   hơn (90/100 > 60) -> che kín .floor-bar, khiến người dùng không bấm được nút
-   đổi tầng khi đang xem danh sách phòng/chi tiết phòng. Đây là nguyên nhân
-   chính của phản hồi "khó chọn các tầng lầu". Fix: đưa bar lên gắn ngay dưới
-   thanh tìm kiếm (luôn còn trống) và đặt z-index CAO HƠN mọi bottom sheet, xem
-   khối @media (max-width: 640px) bên dưới. */
 
 .floor-bar-label {
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: #EF5A24;
-  padding: 0 6px 0 4px;
+  font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700;
+  letter-spacing: 1px; color: #EF5A24; padding: 0 6px 0 4px;
   border-right: 1px solid rgba(239, 90, 36, 0.2);
 }
 
 .floor-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.7);
-  font-family: 'Space Mono', monospace;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.25s ease;
+  width: 40px; height: 40px; border-radius: 50%; display: flex;
+  align-items: center; justify-content: center; background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12); color: rgba(255, 255, 255, 0.7);
+  font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: all 0.25s ease;
 }
-.floor-btn:hover {
-  border-color: rgba(239, 90, 36, 0.6);
-  color: #fff;
-}
-
+.floor-btn:hover { border-color: rgba(239, 90, 36, 0.6); color: #fff; }
 .floor-btn.detail {
-  border-color: rgba(6, 182, 212, 0.6);
-  background: rgba(6, 182, 212, 0.08);
-  color: #06B6D4;
-  box-shadow: 0 0 8px rgba(6, 182, 212, 0.25);
+  border-color: rgba(6, 182, 212, 0.6); background: rgba(6, 182, 212, 0.08);
+  color: #06B6D4; box-shadow: 0 0 8px rgba(6, 182, 212, 0.25);
 }
 .floor-btn.detail:hover { color: #fff; border-color: #06B6D4; }
+.floor-btn.active { background: #EF5A24; border-color: #EF5A24; color: #fff; box-shadow: 0 0 12px #EF5A24; }
 
-.floor-btn.active {
-  background: #EF5A24;
-  border-color: #EF5A24;
-  color: #fff;
-  box-shadow: 0 0 12px #EF5A24;
-}
-
-.exit-btn {
-  margin-right: 4px;
-  color: #EF5A24;
-  border-color: rgba(239, 90, 36, 0.25);
-  font-size: 14px;
-}
+.exit-btn { margin-right: 4px; color: #EF5A24; border-color: rgba(239, 90, 36, 0.25); font-size: 14px; }
 .exit-btn:hover { background: rgba(239, 90, 36, 0.12); color: #fff; }
 
-
-/* ================= Thông báo chưa định vị ================= */
 .calib-notice {
-  position: absolute;
-  bottom: 80px; /* Đẩy lên một chút cho đỡ cấn thanh tầng */
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  max-width: 90vw;
-  padding: 10px 18px;
-  background: rgba(15, 30, 54, 0.92);
-  border: 1px solid rgba(239, 90, 36, 0.4);
-  border-radius: 6px;
-  backdrop-filter: blur(8px);
-  color: #e0e0e0;
-  font-family: 'Space Mono', monospace;
-  font-size: 12px;
-  line-height: 1.4;
+  position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%);
+  z-index: 20; display: flex; align-items: center; gap: 10px; max-width: 90vw;
+  padding: 10px 18px; background: rgba(15, 30, 54, 0.92);
+  border: 1px solid rgba(239, 90, 36, 0.4); border-radius: 6px;
+  backdrop-filter: blur(8px); color: #e0e0e0; font-family: 'Space Mono', monospace;
+  font-size: 12px; line-height: 1.4;
 }
 .calib-notice b { color: #EF5A24; }
 .calib-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #EF5A24;
-  box-shadow: 0 0 8px #EF5A24;
-  animation: calib-pulse 1.4s ease-in-out infinite;
-  flex-shrink: 0;
+  width: 8px; height: 8px; border-radius: 50%; background: #EF5A24;
+  box-shadow: 0 0 8px #EF5A24; animation: calib-pulse 1.4s ease-in-out infinite; flex-shrink: 0;
 }
-@keyframes calib-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.6); }
-}
+@keyframes calib-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.6); } }
 
-/* ================= Marker phòng ================= */
-:deep(.room-dot) {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  width: 14px;
-  height: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-:deep(.room-ping) {
-  position: absolute;
-  display: inline-flex;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: #EF5A24;
-  opacity: 0.75;
-  animation: room-ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
-}
-:deep(.room-core) {
-  position: relative;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #EF5A24;
-  box-shadow: 0 0 6px #EF5A24;
-}
-@keyframes room-ping {
-  75%, 100% { transform: scale(2); opacity: 0; }
-}
+:deep(.room-dot) { position: absolute; transform: translate(-50%, -50%); width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; }
+:deep(.room-ping) { position: absolute; display: inline-flex; width: 100%; height: 100%; border-radius: 50%; background: #EF5A24; opacity: 0.75; animation: room-ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite; }
+:deep(.room-core) { position: relative; width: 8px; height: 8px; border-radius: 50%; background: #EF5A24; box-shadow: 0 0 6px #EF5A24; }
+@keyframes room-ping { 75%, 100% { transform: scale(2); opacity: 0; } }
 :deep(.room-marker-card) {
-  position: absolute;
-  top: 14px;
-  left: 50%;
-  transform: translateX(-50%);
-  min-width: 96px;
-  max-width: 160px;
-  padding: 5px 10px;
-  text-align: center;
-  border-radius: 4px;
-  background: rgba(15, 30, 54, 0.95);
-  border: 1px solid rgba(239, 90, 36, 0.3);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(6px);
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+  min-width: 96px; max-width: 160px; padding: 5px 10px; text-align: center;
+  border-radius: 4px; background: rgba(15, 30, 54, 0.95);
+  border: 1px solid rgba(239, 90, 36, 0.3); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(6px); transition: transform 0.2s ease, border-color 0.2s ease;
 }
-:deep(.room-marker-card:hover) {
-  transform: translateX(-50%) scale(1.05);
-  border-color: #EF5A24;
-}
-:deep(.room-marker-id) {
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  color: #EF5A24;
-  text-transform: uppercase;
-}
-:deep(.room-marker-name) {
-  font-family: 'Be Vietnam Pro', sans-serif;
-  font-size: 9px;
-  line-height: 1.2;
-  color: rgba(255, 255, 255, 0.82);
-  margin-top: 2px;
-  display: -webkit-box;
-  line-clamp: 2;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
+:deep(.room-marker-card:hover) { transform: translateX(-50%) scale(1.05); border-color: #EF5A24; }
+:deep(.room-marker-id) { font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 800; letter-spacing: 0.5px; color: #EF5A24; text-transform: uppercase; }
+:deep(.room-marker-name) { font-family: 'Be Vietnam Pro', sans-serif; font-size: 9px; line-height: 1.2; color: rgba(255, 255, 255, 0.82); margin-top: 2px; display: -webkit-box; line-clamp: 2; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-/* ================= Transitions ================= */
-.hud-slide-enter-active, .hud-slide-leave-active {
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-.hud-slide-enter-from, .hud-slide-leave-to {
-  opacity: 0;
-  transform: translateY(-50%) translateX(-16px);
-}
+.hud-slide-enter-active, .hud-slide-leave-active { transition: opacity 0.3s ease, transform 0.3s ease; }
+.hud-slide-enter-from, .hud-slide-leave-to { opacity: 0; transform: translateY(-50%) translateX(-16px); }
 .fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
 
 @media (prefers-reduced-motion: reduce) {
   :deep(.room-ping) { animation: none; opacity: 0.4; }
   .calib-dot { animation: none; }
-  .hud-slide-enter-active, .hud-slide-leave-active,
-  .fade-enter-active, .fade-leave-active { transition: none; }
+  .hud-slide-enter-active, .hud-slide-leave-active, .fade-enter-active, .fade-leave-active { transition: none; }
 }
 
 @media (max-width: 640px) {
-  /* [FIX-floor-select] Rời khỏi đáy màn hình (nơi FloorPanel/RoomDetailPanel
-     dạng bottom sheet cũng neo vào) -> chuyển lên thành 1 dải ngay dưới ô tìm
-     kiếm, nơi luôn trống bất kể sheet nào đang mở. z-index đặt cao hơn cả
-     RoomDetailPanel (100) để chắc chắn không bao giờ bị đè, kể cả khi sheet
-     kéo lên "full". Toà có tới 6 tầng (+ nút thoát + nhãn toà) nên thêm cuộn
-     ngang thay vì để vỡ/tràn ra ngoài màn hình như trước. */
-  /* [MOBILE-FIX] Search bar: header(54) + 8px gap = top:62px, height:44px → bottom edge: 106px.
-     floor-bar must start at least 8px below that → top: 114px minimum.
-     Using header + 76px gives 54+76=130px, a comfortable 24px gap below search. */
-  .global-search-container {
-    width: min(340px, 90vw);
-    top: calc(var(--header-h-mobile, 54px) + 8px);
-    /* M-1 FIX: on mobile the left panels are bottom sheets (no left-column offset),
-       so centre the search bar across the full viewport width. */
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  /* M-1 FIX: clamp results dropdown so it doesn't swallow the map on small screens */
-  .global-search-results {
-    max-height: 38vh;
-  }
-  /* [FIX-mobile-zoom] KHÔNG thu nhỏ font-size ở đây nữa — phải giữ nguyên 16px
-     từ rule gốc phía trên, nếu không iOS lại tự zoom khi focus (xem giải thích
-     ở rule .global-search-input gốc). */
-
-  /* [MOBILE-FIX] floor-bar: sits directly below the search bar (not overlapping).
-     top = header(54) + searchBar(44) + gap(16) = 114px. Use 76px offset from header.
-     z-index 115 ensures it stays above all bottom sheets (FloorPanel:95, RoomDetail:105,
-     BuildingsPanel:88) so floor buttons are always tappable regardless of sheet state. */
-  .floor-bar {
-    top: calc(var(--header-h-mobile, 54px) + 76px);
-    bottom: auto;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 115;
-    gap: 6px;
-    padding: 6px 8px;
-    max-width: 92vw;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
+  .global-search-container { width: min(340px, 90vw); top: calc(var(--header-h-mobile, 54px) + 8px); left: 50%; transform: translateX(-50%); }
+  .global-search-results { max-height: 38vh; }
+  .floor-bar { top: calc(var(--header-h-mobile, 54px) + 76px); bottom: auto; left: 50%; transform: translateX(-50%); z-index: 115; gap: 6px; padding: 6px 8px; max-width: 92vw; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
   .floor-bar::-webkit-scrollbar { display: none; }
-  .floor-btn {
-    width: 38px;
-    height: 38px;
-    font-size: 11px;
-    flex-shrink: 0;
-    touch-action: manipulation;
-  }
+  .floor-btn { width: 38px; height: 38px; font-size: 11px; flex-shrink: 0; touch-action: manipulation; }
   .floor-bar-label { flex-shrink: 0; }
   .exit-btn { flex-shrink: 0; }
-
-  /* [MOBILE-FIX] calib-notice: follows floor-bar downward.
-     floor-bar top(130) + approx bar height(54) + 8px = ~192px. */
-  .calib-notice {
-    top: calc(var(--header-h-mobile, 54px) + 138px);
-    bottom: auto;
-    z-index: 61;
-  }
-
+  .calib-notice { top: calc(var(--header-h-mobile, 54px) + 138px); bottom: auto; z-index: 61; }
   :deep(.room-marker-card) { min-width: 84px; max-width: 130px; padding: 4px 8px; }
   :deep(.room-marker-id) { font-size: 9px; }
   :deep(.room-marker-name) { font-size: 8px; line-clamp: 1; -webkit-line-clamp: 1; }
