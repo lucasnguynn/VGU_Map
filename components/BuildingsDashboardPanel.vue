@@ -1,15 +1,30 @@
-<!-- components/BuildingsDashboardPanel.vue
-     Panel danh sách toà nhà — cố định bên trái bản đồ, mở mặc định khi vào trang.
-     Thu gọn bằng nút tab bám cạnh phải. Khi thu gọn: thông báo lên usePanelLayout
-     để toàn bộ layout cập nhật --panels-left-width đồng bộ. -->
+<!-- components/BuildingsDashboardPanel.vue -->
+<!--
+  ARCHITECTURE CHANGE: This component no longer receives a `forceCollapse` prop.
+  Instead it reads `activePanel` directly from the store.
+
+  DESKTOP: When activePanel !== 'buildings', the class `is-offscreen` is applied,
+  which slides the ENTIRE panel (body + tab) to translateX(-100%). This means
+  the panel's 300px footprint is completely gone from the visual layout and
+  --panels-left-width no longer needs to account for it.
+
+  The tab-only stub visible in 'floor'/'room' stages comes from FloorPanel's own
+  collapse stub — BuildingsDashboard is fully off-screen.
+
+  MOBILE: When activePanel !== 'buildings', the panel is display:none so it does
+  not fight the FloorPanel bottom sheet for z-index at the bottom of the screen.
+-->
 <template>
   <div
     class="buildings-panel"
-    :class="{ 'is-collapsed': isCollapsed }"
+    :class="{
+      'is-collapsed': isCollapsed,
+      'is-offscreen': activePanel !== 'buildings'
+    }"
     role="complementary"
     aria-label="Danh sách toà nhà"
   >
-    <!-- Nút toggle tab bám cạnh phải -->
+    <!-- Toggle tab -->
     <button
       class="toggle-tab"
       @click="toggleCollapse"
@@ -17,7 +32,6 @@
       :aria-label="isCollapsed ? 'Mở danh sách toà nhà' : 'Thu gọn'"
       :aria-expanded="!isCollapsed"
     >
-      <!-- Chevron đổi chiều theo trạng thái -->
       <svg
         class="tab-chevron"
         :class="{ flipped: isCollapsed }"
@@ -29,9 +43,7 @@
       </svg>
     </button>
 
-    <!-- Nội dung — clip khi thu gọn -->
     <div class="panel-body">
-      <!-- Header -->
       <div class="panel-head">
         <p class="eyebrow">[ CƠ SỞ DỮ LIỆU KHUÔN VIÊN ]</p>
         <h2 class="panel-title">Toàn bộ toà nhà</h2>
@@ -45,13 +57,11 @@
         <p class="sidebar-hint">Bấm vào một toà nhà để mở tầng &amp; phòng ngay trên bản đồ.</p>
       </div>
 
-      <!-- State loading -->
       <div v-if="isLoading" class="state-msg">
         <span class="pulse-dot"></span>
         Đang tải dữ liệu…
       </div>
 
-      <!-- Danh sách -->
       <div v-else class="building-list">
         <button
           v-for="b in buildings"
@@ -91,40 +101,27 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
-import { usePanelLayout } from '~/composables/usePanelLayout'
+import { ref, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useMapStore } from '~/Stores/mapStores'
 
-const props = defineProps({
-  modelValue: { type: Boolean, default: true },
-  // When true (building selected), panel auto-collapses to its tab stub.
-  // User can still re-expand manually via the toggle tab.
-  forceCollapse: { type: Boolean, default: false }
-})
-const emit = defineEmits(['update:modelValue', 'select-building'])
+// No props needed — activePanel drives everything.
+const emit = defineEmits(['select-building'])
 
-const { setPanelState } = usePanelLayout()
+const mapStore = useMapStore()
+const { activePanel } = storeToRefs(mapStore)
 
-// Sync with parent-driven forceCollapse (e.g. a building was selected from
-// the map directly, so the list panel should step out of the way).
-// Only force TO collapsed; never override user's explicit expand action.
-watch(() => props.forceCollapse, (v) => {
-  if (v && !isCollapsed.value) {
-    isCollapsed.value = true
-    setPanelState({ buildingsCollapsed: true })
-  }
-})
-const { getBuildingStats } = useVguData()
 const config = useRuntimeConfig()
-const base = config.app.baseURL
+const base   = config.app.baseURL
+const { getBuildingStats } = useVguData()
 
-const isLoading = ref(true)
-const buildings = ref([])
+const isLoading  = ref(true)
+const buildings  = ref([])
 const isCollapsed = ref(false)
-const activeId = ref(null)
+const activeId   = ref(null)
 
 function toggleCollapse() {
   isCollapsed.value = !isCollapsed.value
-  setPanelState({ buildingsCollapsed: isCollapsed.value })
 }
 
 function enterBuilding(id) {
@@ -133,7 +130,6 @@ function enterBuilding(id) {
 }
 
 onMounted(async () => {
-  setPanelState({ buildingsVisible: true, buildingsCollapsed: false })
   try {
     const [floorsRes, stats] = await Promise.all([
       fetch(`${base}data/floors-config.json`).then(r => r.json()),
@@ -154,22 +150,40 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/* === Layout === */
+/* ── Layout ── */
 .buildings-panel {
   position: absolute;
   top: var(--header-h, 64px);
   left: 0;
   bottom: 0;
-  z-index: 85;
-
-  /* Width animate bằng clip + transform — không animate width (layout thrash) */
+  z-index: var(--z-panel-buildings);
   width: 300px;
   display: flex;
   flex-direction: row;
-  overflow: visible;           /* cho tab thò ra ngoài */
+  overflow: visible;
+  /* Slide the ENTIRE panel off-screen when activePanel !== 'buildings'.
+     This is the key fix: translateX(-100%) removes the panel's 300px from
+     the visual layout, so --panels-left-width can be computed correctly
+     without waiting for any child component to call setPanelState(). */
+  transform: translateX(0);
+  transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
 }
 
-/* === Panel body (nội dung bên trong) === */
+/* is-offscreen: entire panel exits left (body AND tab disappear).
+   FloorPanel then sits at left:0 with no collision. */
+.buildings-panel.is-offscreen {
+  transform: translateX(-100%);
+  /* Keep pointer-events off while hidden so no ghost click targets linger */
+  pointer-events: none;
+}
+
+/* is-collapsed: only the body slides; the tab stub remains at left:0. */
+.buildings-panel.is-collapsed .panel-body {
+  transform: translateX(-100%);
+}
+
+/* ── Panel body ── */
 .panel-body {
   width: 300px;
   flex-shrink: 0;
@@ -178,21 +192,15 @@ onMounted(async () => {
   overflow: hidden;
   background: #070A12;
   border-right: 1px solid rgba(0, 255, 204, 0.1);
-  /* Trượt vào/ra bằng translateX, không ảnh hưởng layout */
   transform: translateX(0);
   transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform;
 }
 
-.buildings-panel.is-collapsed .panel-body {
-  transform: translateX(-100%);
-}
-
-/* === Tab toggle bám cạnh phải === */
+/* ── Toggle tab ── */
 .toggle-tab {
   position: absolute;
   top: 20px;
-  /* Khi mở: ngay sát cạnh phải panel-body */
   left: 300px;
   width: 36px;
   height: 64px;
@@ -208,221 +216,91 @@ onMounted(async () => {
   z-index: 1;
   transition:
     left 0.38s cubic-bezier(0.4, 0, 0.2, 1),
-    color 0.15s,
-    background 0.15s,
-    border-color 0.15s;
+    color 0.15s, background 0.15s, border-color 0.15s;
   will-change: left;
 }
-
-/* Khi thu gọn: tab trượt về vị trí 0 */
 .buildings-panel.is-collapsed .toggle-tab {
   left: 0;
   border-color: rgba(0, 255, 204, 0.28);
   background: #0F1E36;
 }
+.toggle-tab:hover { color: #fff; background: #1a2f4e; border-color: rgba(0, 255, 204, 0.5); }
+.toggle-tab:focus-visible { outline: 2px solid #00ffcc; outline-offset: 2px; }
 
-.toggle-tab:hover {
-  color: #fff;
-  background: #1a2f4e;
-  border-color: rgba(0, 255, 204, 0.5);
-}
-.toggle-tab:focus-visible {
-  outline: 2px solid #00ffcc;
-  outline-offset: 2px;
-}
+.tab-chevron { transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1); }
+.tab-chevron.flipped { transform: rotate(180deg); }
 
-/* Chevron xoay 180° khi thu gọn */
-.tab-chevron {
-  transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.tab-chevron.flipped {
-  transform: rotate(180deg);
-}
-
-/* === Header === */
-.panel-head {
-  padding: 18px 18px 14px;
-  flex-shrink: 0;
-}
+/* ── Header ── */
+.panel-head { padding: 18px 18px 14px; flex-shrink: 0; }
 .eyebrow {
   font-family: 'Space Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 1.5px;
-  color: #00ffcc;
-  margin: 0 0 6px;
+  font-size: 9px; letter-spacing: 1.5px; color: #00ffcc; margin: 0 0 6px;
 }
 .panel-title {
   margin: 0 0 4px;
   font-family: 'Be Vietnam Pro', sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-  color: #fff;
-  line-height: 1.2;
+  font-size: 20px; font-weight: 700; color: #fff; line-height: 1.2;
 }
-.panel-sub {
-  margin: 0;
-  font-size: 11px;
-  color: #6b7a8d;
-  line-height: 1.5;
-}
+.panel-sub { margin: 0; font-size: 11px; color: #6b7a8d; line-height: 1.5; }
+.panel-divider { height: 1px; background: rgba(0, 255, 204, 0.08); margin: 0 18px; flex-shrink: 0; }
+.sidebar-meta { padding: 12px 18px 8px; flex-shrink: 0; }
+.sidebar-title { margin: 0 0 4px; font-size: 12px; font-weight: 700; color: #F58220; text-transform: uppercase; letter-spacing: 0.5px; }
+.sidebar-hint { margin: 0; font-size: 11px; line-height: 1.5; color: #6b7a8d; }
 
-.panel-divider {
-  height: 1px;
-  background: rgba(0, 255, 204, 0.08);
-  margin: 0 18px;
-  flex-shrink: 0;
-}
-
-.sidebar-meta {
-  padding: 12px 18px 8px;
-  flex-shrink: 0;
-}
-.sidebar-title {
-  margin: 0 0 4px;
-  font-size: 12px;
-  font-weight: 700;
-  color: #F58220;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-.sidebar-hint {
-  margin: 0;
-  font-size: 11px;
-  line-height: 1.5;
-  color: #6b7a8d;
-}
-
-/* === Loading === */
+/* ── Loading / List ── */
 .state-msg {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  display: flex; align-items: center; gap: 8px;
   color: #6b7a8d;
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  padding: 16px 18px;
+  font-family: 'Space Mono', monospace; font-size: 11px; padding: 16px 18px;
 }
-
-/* === Danh sách === */
 .building-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 6px 10px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  scrollbar-width: thin;
-  scrollbar-color: #1f2d40 transparent;
+  flex: 1; overflow-y: auto; padding: 6px 10px 20px;
+  display: flex; flex-direction: column; gap: 6px;
+  scrollbar-width: thin; scrollbar-color: #1f2d40 transparent;
 }
 .building-list::-webkit-scrollbar { width: 4px; }
 .building-list::-webkit-scrollbar-thumb { background: #1f2d40; border-radius: 4px; }
 
-/* === Card === */
+/* ── Card ── */
 .building-card {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  text-align: left;
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; text-align: left;
   background: rgba(255,255,255,0.02);
   border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 10px;
-  padding: 10px 11px;
-  cursor: pointer;
-  color: inherit;
-  font-family: inherit;
-  transition:
-    border-color 0.18s,
-    background 0.18s,
-    transform 0.18s;
+  border-radius: 10px; padding: 10px 11px;
+  cursor: pointer; color: inherit; font-family: inherit;
+  transition: border-color 0.18s, background 0.18s, transform 0.18s;
 }
-.building-card:hover {
-  border-color: rgba(239, 90, 36, 0.55);
-  background: rgba(239, 90, 36, 0.07);
-  transform: translateX(3px);
-}
-.building-card.is-active {
-  border-color: #EF5A24;
-  background: rgba(239, 90, 36, 0.13);
-}
-.building-card:focus-visible {
-  outline: 2px solid #00ffcc;
-  outline-offset: 2px;
-}
+.building-card:hover { border-color: rgba(239, 90, 36, 0.55); background: rgba(239, 90, 36, 0.07); transform: translateX(3px); }
+.building-card.is-active { border-color: #EF5A24; background: rgba(239, 90, 36, 0.13); }
+.building-card:focus-visible { outline: 2px solid #00ffcc; outline-offset: 2px; }
 
-.card-icon {
-  flex-shrink: 0;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 7px;
-  background: rgba(239, 90, 36, 0.1);
-  color: #F58220;
-}
+.card-icon { flex-shrink: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 7px; background: rgba(239, 90, 36, 0.1); color: #F58220; }
+.card-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.card-eyebrow { display: flex; align-items: center; gap: 5px; font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 0.5px; color: #00ffcc; }
+.card-name { font-size: 13px; font-weight: 700; color: #fff; }
+.card-stats { flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 1px; font-family: 'Space Mono', monospace; font-size: 9px; color: #6b7a8d; }
+.card-stats b { color: #c9d4e0; font-size: 10px; }
 
-.card-main {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.card-eyebrow {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-family: 'Space Mono', monospace;
-  font-size: 8px;
-  letter-spacing: 0.5px;
-  color: #00ffcc;
-}
-.card-name {
-  font-size: 13px;
-  font-weight: 700;
-  color: #fff;
-}
-
-.card-stats {
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 1px;
-  font-family: 'Space Mono', monospace;
-  font-size: 9px;
-  color: #6b7a8d;
-}
-.card-stats b {
-  color: #c9d4e0;
-  font-size: 10px;
-}
-
-/* === Pulse dot === */
+/* ── Pulse dot ── */
 .pulse-dot {
-  display: inline-block;
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: #00ffcc;
-  box-shadow: 0 0 6px #00ffcc;
-  animation: pulse 1.8s ease-in-out infinite;
-  flex-shrink: 0;
+  display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  background: #00ffcc; box-shadow: 0 0 6px #00ffcc;
+  animation: pulse 1.8s ease-in-out infinite; flex-shrink: 0;
 }
 .pulse-dot.sm { width: 5px; height: 5px; }
-
 @keyframes pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.35; transform: scale(0.65); }
 }
+
+/* ── Motion preferences ── */
 @media (prefers-reduced-motion: reduce) {
   .pulse-dot { animation: none; }
-  .panel-body { transition: none; }
-  .toggle-tab { transition: color 0.15s, background 0.15s; }
-  .tab-chevron { transition: none; }
+  .buildings-panel, .panel-body, .toggle-tab, .tab-chevron { transition: none; }
 }
 
-/* === Tablet (<= 1024px) === */
+/* ── Tablet (641–1024px) ── */
 @media (max-width: 1024px) {
   .buildings-panel { width: 280px; }
   .panel-body { width: 280px; }
@@ -430,26 +308,26 @@ onMounted(async () => {
   .buildings-panel.is-collapsed .toggle-tab { left: 0; }
 }
 
-/* === Mobile (<= 640px): bottom sheet === */
+/* ── Mobile (≤640px): bottom sheet ──
+   On mobile this panel is only ever shown when activePanel === 'buildings'.
+   When activePanel changes away, is-offscreen is applied, and on mobile we
+   use display:none instead of translateX so there is zero z-index interference
+   with FloorPanel's bottom sheet. */
 @media (max-width: 640px) {
   .buildings-panel {
     top: auto;
     left: 0; right: 0; bottom: 0;
     width: 100%;
     flex-direction: column-reverse;
-    /* [MOBILE-FIX] z-index lowered to 88 (below FloorPanel:95, RoomDetail:105,
-       floor-bar:115). BuildingsDashboard is only needed at Stage 0 (no building
-       selected). Once a building is chosen it collapses automatically via
-       forceCollapse — the CSS below hides it entirely on mobile at that point. */
-    z-index: 88;
+    z-index: var(--z-panel-buildings);
+    /* Override the translateX transition with max-height for mobile sheet */
+    transform: none !important;
+    transition: none;
   }
-
-  /* [MOBILE-FIX] When forceCollapse is active on mobile (building is selected),
-     hide the panel completely rather than leaving a collapsed tab stub at the
-     bottom that conflicts with FloorPanel's drag handle. The user can still
-     trigger "back to buildings" by dismissing the FloorPanel (floor-bar exit). */
-  .buildings-panel.is-collapsed {
+  /* When off-screen on mobile: just hide entirely, no translateX */
+  .buildings-panel.is-offscreen {
     display: none;
+    pointer-events: none;
   }
   .panel-body {
     width: 100%;
@@ -457,6 +335,7 @@ onMounted(async () => {
     transform: none !important;
     border-right: none;
     border-top: 1px solid rgba(0, 255, 204, 0.12);
+    transition: max-height 0.32s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .buildings-panel.is-collapsed .panel-body {
     max-height: 0;
@@ -474,20 +353,10 @@ onMounted(async () => {
   }
   .building-list {
     flex-direction: row;
-    overflow-x: auto;
-    overflow-y: hidden;
+    overflow-x: auto; overflow-y: hidden;
     padding: 8px 10px 10px;
   }
-  .building-card {
-    flex-direction: column;
-    align-items: flex-start;
-    min-width: 140px;
-    flex-shrink: 0;
-  }
-  .card-stats {
-    flex-direction: row;
-    gap: 8px;
-    margin-top: 4px;
-  }
+  .building-card { flex-direction: column; align-items: flex-start; min-width: 140px; flex-shrink: 0; }
+  .card-stats { flex-direction: row; gap: 8px; margin-top: 4px; }
 }
 </style>
