@@ -7,7 +7,12 @@
     @click="handleClose"
   ></div>
 
-  <!-- ── Root panel ── -->
+  <!-- ══════════════════════════════════════════════════════════════
+       ROOT PANEL — TRUE FULL-BLEED OVERLAY
+       position:absolute + inset:0 ensures it completely covers the
+       RoomDetailPanel's scrollable body. z-index:100 sits above all
+       room content. The solid background makes the parent invisible.
+  ══════════════════════════════════════════════════════════════ -->
   <div
     class="esp"
     :class="`tier-${tier}`"
@@ -24,14 +29,14 @@
          VIEW 1 — EQUIPMENT LIST
          ================================================================ -->
     <template v-if="!selectedMachine">
-      <!-- Header row: breadcrumb + close -->
-      <header class="esp-header">
+      <!-- ── Sticky Glassmorphism Header ── -->
+      <header class="esp-header esp-header--sticky">
         <div class="esp-header__breadcrumb">
           <span class="esp-header__eyebrow">{{ roomLabel }}</span>
           <h2 class="esp-header__title">Thiết bị phòng học</h2>
         </div>
         <button class="esp-icon-btn" aria-label="Đóng" @click="handleClose">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
         </button>
@@ -47,7 +52,7 @@
 
         <!-- Empty -->
         <div v-else-if="machines.length === 0" class="esp-state esp-state--empty">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.35">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" opacity="0.25">
             <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
             <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
           </svg>
@@ -60,7 +65,7 @@
             <button class="esp-machine-card" @click="selectMachine(m)">
               <div class="esp-machine-card__thumb">
                 <img v-if="m.thumbnail" :src="m.thumbnail" :alt="m.title" />
-                <svg v-else width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" opacity="0.4">
+                <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" opacity="0.35">
                   <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
                   <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
                 </svg>
@@ -83,16 +88,23 @@
          VIEW 2 — EQUIPMENT DETAIL
          ================================================================ -->
     <template v-else>
-      <!-- Detail header: back + close — ONE combined header, no double buttons -->
-      <header class="esp-header esp-header--detail">
-        <button class="esp-back-btn" @click="selectedMachine = null">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="15 18 9 12 15 6"/>
+      <!-- ── Single Sticky Glassmorphism Header with SVG Back Arrow ── -->
+      <header class="esp-header esp-header--sticky esp-header--detail">
+        <button class="esp-back-btn" @click="selectedMachine = null" aria-label="Quay lại">
+          <!-- Elegant SVG arrow — no browser default button appearance -->
+          <svg class="esp-back-btn__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="11 18 5 12 11 6"/>
           </svg>
-          <span>Quay lại</span>
+          <span class="esp-back-btn__label">Danh sách</span>
         </button>
+
+        <div class="esp-header__title-wrap">
+          <span class="esp-header__title esp-header__title--detail" :title="selectedMachine.title">{{ selectedMachine.title }}</span>
+        </div>
+
         <button class="esp-icon-btn" aria-label="Đóng" @click="handleClose">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
         </button>
@@ -101,7 +113,7 @@
       <!-- Scrollable detail content -->
       <div class="esp-detail-scroll">
 
-        <!-- ── Media Viewer ── -->
+        <!-- ── Premium 3D Viewer Frame ── -->
         <div class="esp-viewer-wrap">
           <img
             v-if="viewMode === 'photo' && selectedMachine.photos[activePhotoIndex]"
@@ -132,15 +144,18 @@
             </div>
           </model-viewer>
 
-          <!-- Compact no-model state — not a dark void -->
+          <!-- Premium empty state — centered via flex -->
           <div v-else class="esp-viewer-empty">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" opacity="0.3">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" opacity="0.25">
               <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
               <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
             </svg>
             <span>Chưa có mô hình 3D</span>
           </div>
 
+          <!-- Scan line overlay for digital-twin feel -->
+          <div class="esp-viewer-scanline" aria-hidden="true"></div>
+          <!-- Bottom gradient bleeds info up over viewer -->
           <div class="esp-viewer-gradient"></div>
         </div>
 
@@ -156,7 +171,7 @@
             title="Xem model 3D"
             @click="selectModelView"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
               <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
               <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
             </svg>
@@ -175,8 +190,10 @@
           </button>
         </div>
 
-        <!-- ── Info pane ── -->
+        <!-- ── Info pane — generous 24px content padding ── -->
         <div class="esp-info">
+
+          <!-- Identity block -->
           <div class="esp-info__identity">
             <span v-if="selectedMachine.departments" class="esp-info__dept">{{ selectedMachine.departments }}</span>
             <h2 class="esp-info__name">{{ selectedMachine.title }}</h2>
@@ -189,6 +206,7 @@
             </div>
           </div>
 
+          <!-- Metadata rows -->
           <dl class="esp-meta">
             <div class="esp-meta__row">
               <dt>MÔ TẢ</dt>
@@ -502,58 +520,71 @@ watch(() => props.roomId, loadMachineList)
 
 <style scoped>
 /* ============================================================
-   EQUIPMENT SIDE PANEL — Premium Dark-Mode "Digital Twin" Styles
+   EQUIPMENT SIDE PANEL — Premium "Digital Twin" Full-Bleed Overlay
    Namespace prefix: .esp  (avoids all collisions with global CSS)
-   Z-index layers: desktop 105, tablet/mobile 109
+
+   ARCHITECTURE FIX:
+   The root .esp uses position:absolute; inset:0 to completely
+   cover its nearest positioned ancestor (RoomDetailPanel, which
+   is position:absolute). This is the TRUE full-bleed overlay
+   pattern — no stacked headers, no bleeding through.
    ============================================================ */
 
 /* ── Scoped design tokens ── */
 .esp {
-  --esp-bg:         #03111f;
-  --esp-surface:    #071828;
-  --esp-card:       rgba(255, 255, 255, 0.04);
-  --esp-card-hover: rgba(245, 130, 32, 0.07);
-  --esp-border:     rgba(255, 255, 255, 0.08);
-  --esp-border-acc: rgba(245, 130, 32, 0.40);
-  --esp-accent:     #F58220;
-  --esp-ink-hi:     #FFFFFF;
-  --esp-ink-mid:    #B3BFCD;
-  --esp-ink-lo:     #56677F;
-  --esp-radius:     12px;
-  --esp-font:       'Be Vietnam Pro', sans-serif;
-  --esp-mono:       'Space Mono', monospace;
+  --esp-bg:           #03111f;
+  --esp-surface:      #071828;
+  --esp-glass-bg:     rgba(3, 17, 31, 0.82);
+  --esp-glass-border: rgba(255, 255, 255, 0.08);
+  --esp-card:         rgba(255, 255, 255, 0.035);
+  --esp-card-hover:   rgba(245, 130, 32, 0.07);
+  --esp-border:       rgba(255, 255, 255, 0.08);
+  --esp-border-acc:   rgba(245, 130, 32, 0.40);
+  --esp-accent:       #F58220;
+  --esp-accent-dim:   rgba(245, 130, 32, 0.15);
+  --esp-ink-hi:       #FFFFFF;
+  --esp-ink-mid:      #B3BFCD;
+  --esp-ink-lo:       #56677F;
+  --esp-radius:       12px;
+  --esp-font:         'Be Vietnam Pro', sans-serif;
+  --esp-mono:         'Space Mono', monospace;
 }
 
-/* ── Root panel container ── */
+/* ══════════════════════════════════════════════════════════════
+   ROOT — TRUE FULL-BLEED OVERLAY
+   position:absolute + inset:0 covers the entire RoomDetailPanel
+   (its nearest positioned ancestor). Solid background ensures
+   no parent content bleeds through. z-index:100 sits on top.
+   overflow-y:auto enables the overlay itself to scroll on short
+   viewports — but the sticky header always stays in view.
+   ══════════════════════════════════════════════════════════════ */
 .esp {
   position: absolute;
-  top: var(--header-h, 64px);
+  top: 0;
+  left: 0;
   right: 0;
-  width: 420px;
-  height: calc(100vh - var(--header-h, 64px));
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
   background: var(--esp-bg);
-  border-left: 1px solid var(--esp-border);
-  box-shadow: -8px 0 40px rgba(0, 0, 0, 0.65);
   display: flex;
   flex-direction: column;
   font-family: var(--esp-font);
   color: var(--esp-ink-mid);
-  z-index: 105;
-  overflow: hidden;
-  animation: esp-slide-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  overflow-y: auto;
+  /* Entrance animation: slide up softly from the bottom */
+  animation: esp-reveal 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-@keyframes esp-slide-in {
-  from { transform: translateX(28px); opacity: 0; }
-  to   { transform: translateX(0);    opacity: 1; }
+@keyframes esp-reveal {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0);    }
 }
 
-/* ── Tier overrides ── */
+/* ── Tier overrides for tablet/mobile bottom-sheet behaviour ── */
 .esp.tier-tablet {
   position: fixed;
-  left: 0;
-  width: 100%;
-  border-left: none;
   z-index: 109;
 }
 
@@ -561,39 +592,52 @@ watch(() => props.roomId, loadMachineList)
   position: fixed;
   top: auto;
   bottom: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
   height: auto;
-  border-left: none;
   border-top: 1px solid var(--esp-border);
   border-radius: 18px 18px 0 0;
   z-index: 109;
   padding-bottom: env(safe-area-inset-bottom, 0px);
+  /* Mobile overrides overflow — the bottom sheet itself controls height */
+  overflow-y: hidden;
 }
 
 /* ============================================================
-   SHARED HEADER (one per view, never doubled)
+   STICKY GLASSMORPHISM HEADER
+   Single header per view. position:sticky + top:0 keeps it
+   anchored while the content scrolls beneath it. backdrop-filter
+   blur gives the frosted-glass effect over scrolling content.
    ============================================================ */
+.esp-header--sticky {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  /* Glassmorphism: semi-transparent bg + blur */
+  background: var(--esp-glass-bg);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: 1px solid var(--esp-glass-border);
+  /* Prevent content from shining through on sharp scroll */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
 .esp-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
-  padding: 18px 18px 16px;
-  border-bottom: 1px solid var(--esp-border);
+  padding: 18px 20px 16px;
   flex-shrink: 0;
-  background: var(--esp-bg);
 }
 
 .esp-header--detail {
-  padding: 12px 14px;
+  padding: 14px 16px;
+  gap: 10px;
 }
 
 .esp-header__breadcrumb {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
   min-width: 0;
   flex: 1;
 }
@@ -601,7 +645,7 @@ watch(() => props.roomId, loadMachineList)
 .esp-header__eyebrow {
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 1.5px;
+  letter-spacing: 1.6px;
   text-transform: uppercase;
   color: var(--esp-accent);
   font-family: var(--esp-mono);
@@ -615,6 +659,19 @@ watch(() => props.roomId, loadMachineList)
   font-size: 15px;
   font-weight: 700;
   color: var(--esp-ink-hi);
+}
+
+/* Title in detail header — truncated, fills available space */
+.esp-header__title-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.esp-header__title--detail {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--esp-ink-mid);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -641,30 +698,45 @@ watch(() => props.roomId, loadMachineList)
   color: #f87171;
 }
 
-/* ── Back button (← Quay lại) ── */
+/* ── Elegant SVG Back Button — no browser default styling ── */
 .esp-back-btn {
+  /* Reset all browser button defaults */
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0;
+  padding: 8px 14px 8px 10px;
+  /* Our design */
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 7px 14px 7px 10px;
-  background: transparent;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--esp-border);
-  border-radius: 8px;
+  border-radius: 10px;
   color: var(--esp-ink-lo);
-  font-size: 12px;
-  font-weight: 600;
-  font-family: var(--esp-font);
   cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+  transition: background 0.18s, color 0.18s, border-color 0.18s, transform 0.18s;
   white-space: nowrap;
 }
 .esp-back-btn:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.20);
-  color: var(--esp-ink-mid);
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: var(--esp-ink-hi);
+  transform: translateX(-1px);
 }
-.esp-back-btn svg { transition: transform 0.15s; }
-.esp-back-btn:hover svg { transform: translateX(-2px); }
+.esp-back-btn:hover .esp-back-btn__arrow {
+  transform: translateX(-3px);
+}
+.esp-back-btn__arrow {
+  flex-shrink: 0;
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.esp-back-btn__label {
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--esp-font);
+  letter-spacing: 0.2px;
+}
 
 /* ============================================================
    SHARED STATE (spinner / empty)
@@ -674,23 +746,23 @@ watch(() => props.roomId, loadMachineList)
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 14px;
-  padding: 56px 24px;
+  gap: 16px;
+  padding: 64px 24px;
   color: var(--esp-ink-lo);
   font-size: 13px;
   text-align: center;
-  line-height: 1.6;
+  line-height: 1.65;
 }
 .esp-state p { margin: 0; }
 
 .esp-state__spinner {
   display: inline-block;
-  width: 22px;
-  height: 22px;
-  border: 2px solid rgba(245, 130, 32, 0.18);
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(245, 130, 32, 0.15);
   border-top-color: var(--esp-accent);
   border-radius: 50%;
-  animation: esp-spin 0.75s linear infinite;
+  animation: esp-spin 0.7s linear infinite;
   flex-shrink: 0;
 }
 .esp-state__spinner--sm {
@@ -704,14 +776,8 @@ watch(() => props.roomId, loadMachineList)
    ============================================================ */
 .esp-list-body {
   flex: 1;
-  overflow-y: auto;
-  padding: 14px;
+  padding: 24px 20px;
   overscroll-behavior: contain;
-}
-.esp-list-body::-webkit-scrollbar { width: 4px; }
-.esp-list-body::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.10);
-  border-radius: 4px;
 }
 
 .esp-machine-list {
@@ -720,16 +786,16 @@ watch(() => props.roomId, loadMachineList)
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 8px;
 }
 
 /* ── Machine card ── */
 .esp-machine-card {
   display: flex;
   align-items: center;
-  gap: 13px;
+  gap: 14px;
   width: 100%;
-  padding: 11px 13px;
+  padding: 14px 15px;
   background: var(--esp-card);
   border: 1px solid var(--esp-border);
   border-radius: var(--esp-radius);
@@ -740,22 +806,24 @@ watch(() => props.roomId, loadMachineList)
   transition:
     background 0.15s,
     border-color 0.18s,
-    transform 0.14s cubic-bezier(0.22, 1, 0.36, 1);
+    transform 0.16s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.18s;
 }
 .esp-machine-card:hover {
   background: var(--esp-card-hover);
   border-color: var(--esp-border-acc);
-  transform: translateX(3px);
+  transform: translateX(4px);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
 }
 
 .esp-machine-card__thumb {
   position: relative;
   flex-shrink: 0;
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
+  width: 52px;
+  height: 52px;
+  border-radius: 9px;
   overflow: hidden;
-  background: rgba(0, 37, 84, 0.55);
+  background: rgba(0, 37, 84, 0.50);
   border: 1px solid var(--esp-border);
   display: flex;
   align-items: center;
@@ -776,9 +844,10 @@ watch(() => props.roomId, loadMachineList)
   font-family: var(--esp-mono);
   background: var(--esp-accent);
   color: #fff;
-  padding: 1px 4px;
+  padding: 2px 4px;
   border-radius: 3px;
-  line-height: 1.5;
+  line-height: 1.4;
+  letter-spacing: 0.3px;
 }
 
 .esp-machine-card__meta {
@@ -786,7 +855,7 @@ watch(() => props.roomId, loadMachineList)
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
 }
 
 .esp-machine-card__name {
@@ -815,7 +884,7 @@ watch(() => props.roomId, loadMachineList)
 }
 .esp-machine-card:hover .esp-machine-card__chevron {
   opacity: 1;
-  transform: translateX(2px);
+  transform: translateX(3px);
 }
 
 /* ============================================================
@@ -823,26 +892,26 @@ watch(() => props.roomId, loadMachineList)
    ============================================================ */
 .esp-detail-scroll {
   flex: 1;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
   overscroll-behavior: contain;
-}
-.esp-detail-scroll::-webkit-scrollbar { width: 4px; }
-.esp-detail-scroll::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.10);
-  border-radius: 4px;
+  /* No overflow here — the root .esp handles scrolling */
 }
 
-/* ── Media viewer ── */
+/* ── Premium 3D Viewer Frame ── */
 .esp-viewer-wrap {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 10;
+  /* 16/9 aspect — enforced, non-negotiable */
+  aspect-ratio: 16 / 9;
   background: #020c16;
   overflow: hidden;
   flex-shrink: 0;
-  border-radius: 0;          /* flush against header above */
+  /* High-end digital twin viewport styling */
+  border-radius: 0;               /* flush against sticky header */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  /* Inner shadow for depth */
+  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255,255,255,0.04);
 }
 
 .esp-viewer-img {
@@ -859,7 +928,7 @@ watch(() => props.roomId, loadMachineList)
   --poster-color: transparent;
 }
 
-/* Compact no-model fallback — tight, not a yawning void */
+/* Premium empty state — perfectly centered via Flexbox */
 .esp-viewer-empty {
   position: absolute;
   inset: 0;
@@ -867,11 +936,26 @@ watch(() => props.roomId, loadMachineList)
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
   color: var(--esp-ink-lo);
   font-size: 11px;
   font-family: var(--esp-mono);
-  letter-spacing: 0.6px;
+  letter-spacing: 0.8px;
+}
+
+/* Subtle horizontal scanline — signature digital-twin aesthetic element */
+.esp-viewer-scanline {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.04) 2px,
+    rgba(0, 0, 0, 0.04) 4px
+  );
+  pointer-events: none;
+  mix-blend-mode: overlay;
 }
 
 /* Bottom gradient bleeds info up over viewer */
@@ -880,13 +964,14 @@ watch(() => props.roomId, loadMachineList)
   bottom: 0;
   left: 0;
   right: 0;
-  height: 64px;
+  height: 72px;
   background: linear-gradient(to bottom, transparent, var(--esp-bg));
   pointer-events: none;
 }
 
 .esp-model-progress { display: none; }
 
+/* Loading poster — centered via Flexbox */
 .esp-model-loading {
   display: flex;
   align-items: center;
@@ -896,31 +981,32 @@ watch(() => props.roomId, loadMachineList)
   font-size: 12px;
   font-family: var(--esp-mono);
   color: var(--esp-ink-lo);
+  letter-spacing: 0.5px;
 }
 
 /* ── Thumbnail strip ── */
 .esp-thumbstrip {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  background: rgba(0, 0, 0, 0.30);
+  gap: 7px;
+  padding: 10px 24px;
+  background: rgba(0, 0, 0, 0.25);
   border-bottom: 1px solid var(--esp-border);
   overflow-x: auto;
   flex-shrink: 0;
 }
-.esp-thumbstrip::-webkit-scrollbar { height: 3px; }
+.esp-thumbstrip::-webkit-scrollbar { height: 2px; }
 .esp-thumbstrip::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.10);
   border-radius: 2px;
 }
 
 .esp-thumb {
   flex-shrink: 0;
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   border: 2px solid transparent;
-  border-radius: 7px;
+  border-radius: 8px;
   background: rgba(255,255,255,0.05);
   color: var(--esp-ink-lo);
   display: flex;
@@ -930,32 +1016,37 @@ watch(() => props.roomId, loadMachineList)
   gap: 3px;
   cursor: pointer;
   overflow: hidden;
-  transition: border-color 0.15s, background 0.15s;
+  transition: border-color 0.15s, background 0.15s, transform 0.15s;
 }
 .esp-thumb span {
   font-size: 8px;
   font-weight: 700;
   font-family: var(--esp-mono);
   line-height: 1;
+  letter-spacing: 0.3px;
 }
 .esp-thumb--photo { padding: 0; }
 .esp-thumb--photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.esp-thumb:hover { border-color: rgba(245,130,32,0.50); }
+.esp-thumb:hover {
+  border-color: rgba(245,130,32,0.45);
+  transform: translateY(-1px);
+}
 .esp-thumb--active {
   border-color: var(--esp-accent);
   background: rgba(245,130,32,0.08);
 }
 
-/* ── Info pane ── */
+/* ── Info pane — 24px generous content padding ── */
 .esp-info {
   display: flex;
   flex-direction: column;
-  padding: 22px 20px 36px;
+  padding: 24px 24px 40px;
+  gap: 0;
 }
 
-/* Identity block: name / model / status */
+/* Identity block: dept / name / model / status */
 .esp-info__identity {
-  padding-bottom: 20px;
+  padding-bottom: 24px;
   border-bottom: 1px solid var(--esp-border);
   margin-bottom: 0;
 }
@@ -964,41 +1055,43 @@ watch(() => props.roomId, loadMachineList)
   display: block;
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 1.5px;
+  letter-spacing: 1.8px;
   text-transform: uppercase;
   color: var(--esp-accent);
   font-family: var(--esp-mono);
-  margin-bottom: 7px;
+  margin-bottom: 8px;
 }
 
 .esp-info__name {
-  margin: 0 0 5px;
-  font-size: 19px;
+  margin: 0 0 6px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--esp-ink-hi);
   line-height: 1.25;
+  letter-spacing: -0.3px;
 }
 
 .esp-info__sub {
-  margin: 0 0 12px;
+  margin: 0 0 14px;
   font-size: 12px;
   color: var(--esp-ink-lo);
   font-family: var(--esp-mono);
+  letter-spacing: 0.3px;
 }
 
 /* Status pill */
 .esp-status {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 10px 4px 8px;
+  gap: 7px;
+  padding: 5px 12px 5px 9px;
   border-radius: 999px;
   border: 1px solid transparent;
   width: fit-content;
 }
-.esp-status--operational { background: rgba(34,197,94,0.08);  border-color: rgba(34,197,94,0.25); }
-.esp-status--maintenance  { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.25); }
-.esp-status--offline      { background: rgba(248,113,113,0.08);border-color: rgba(248,113,113,0.25); }
+.esp-status--operational { background: rgba(34,197,94,0.07);  border-color: rgba(34,197,94,0.22); }
+.esp-status--maintenance  { background: rgba(245,158,11,0.07); border-color: rgba(245,158,11,0.22); }
+.esp-status--offline      { background: rgba(248,113,113,0.07);border-color: rgba(248,113,113,0.22); }
 
 .esp-status__dot {
   width: 6px;
@@ -1006,17 +1099,18 @@ watch(() => props.roomId, loadMachineList)
   border-radius: 50%;
   flex-shrink: 0;
 }
-.esp-status--operational .esp-status__dot { background: #22c55e; box-shadow: 0 0 5px rgba(34,197,94,0.7); }
-.esp-status--maintenance  .esp-status__dot { background: #f59e0b; box-shadow: 0 0 5px rgba(245,158,11,0.7); }
-.esp-status--offline      .esp-status__dot { background: #f87171; box-shadow: 0 0 5px rgba(248,113,113,0.7); }
+.esp-status--operational .esp-status__dot { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.7); }
+.esp-status--maintenance  .esp-status__dot { background: #f59e0b; box-shadow: 0 0 6px rgba(245,158,11,0.7); }
+.esp-status--offline      .esp-status__dot { background: #f87171; box-shadow: 0 0 6px rgba(248,113,113,0.7); }
 
 .esp-status__label {
   font-size: 11px;
   font-weight: 600;
   color: var(--esp-ink-mid);
+  letter-spacing: 0.2px;
 }
 
-/* ── Metadata rows (<dl>) ── */
+/* ── Metadata rows (<dl>) — generous spacing, clear hierarchy ── */
 .esp-meta {
   margin: 0;
   display: flex;
@@ -1024,43 +1118,48 @@ watch(() => props.roomId, loadMachineList)
 }
 
 .esp-meta__row {
-  padding: 16px 0;
+  padding: 20px 0;
   border-bottom: 1px solid var(--esp-border);
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  /* Distinct gap between muted label and bright value */
+  gap: 8px;
 }
 .esp-meta__row:last-child { border-bottom: none; }
 
+/* Muted small uppercase labels */
 .esp-meta__row dt {
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 1.5px;
+  letter-spacing: 1.8px;
   text-transform: uppercase;
   color: var(--esp-ink-lo);
   font-family: var(--esp-mono);
 }
 
+/* Bright bold values */
 .esp-meta__row dd {
   margin: 0;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.65;
   color: var(--esp-ink-mid);
+  font-weight: 400;
 }
 
 .esp-meta__placeholder {
   font-style: italic;
   color: var(--esp-ink-lo) !important;
+  font-size: 13px !important;
 }
 
 /* Footer note */
 .esp-footer-note {
-  margin: 18px 0 0;
-  padding: 11px 13px;
-  border: 1px dashed rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
+  margin: 24px 0 0;
+  padding: 13px 15px;
+  border: 1px dashed rgba(255, 255, 255, 0.07);
+  border-radius: 9px;
   font-size: 11px;
-  line-height: 1.65;
+  line-height: 1.7;
   color: var(--esp-ink-lo);
   font-style: italic;
 }
@@ -1069,9 +1168,11 @@ watch(() => props.roomId, loadMachineList)
    REDUCED MOTION
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
-  .esp                         { animation: none; }
-  .esp-machine-card            { transition: background 0.15s, border-color 0.15s; }
-  .esp-back-btn svg            { transition: none; }
-  .esp-state__spinner          { animation: none; opacity: 0.5; }
+  .esp                  { animation: none; }
+  .esp-machine-card     { transition: background 0.15s, border-color 0.15s; }
+  .esp-back-btn         { transition: background 0.15s, color 0.15s, border-color 0.15s; }
+  .esp-back-btn__arrow  { transition: none; }
+  .esp-state__spinner   { animation: none; opacity: 0.5; }
+  .esp-thumb            { transition: border-color 0.15s, background 0.15s; }
 }
 </style>
