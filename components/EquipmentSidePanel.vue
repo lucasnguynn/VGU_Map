@@ -1,7 +1,5 @@
 <template>
-  <!-- Tablet/mobile: panel này che RoomDetailPanel (không dock cạnh nữa vì
-       không đủ chỗ) nên cần backdrop riêng, đậm hơn 1 chút vì đang là lớp
-       trên cùng. Bấm ra ngoài = đóng, quay lại panel phòng phía sau. -->
+  <!-- ── Backdrop: tablet/mobile only — click outside to close ── -->
   <div
     v-if="tier !== 'desktop'"
     class="adaptive-backdrop"
@@ -9,89 +7,109 @@
     @click="handleClose"
   ></div>
 
+  <!-- ── Root panel ── -->
   <div
-    class="side-panel"
+    class="esp"
     :class="`tier-${tier}`"
     :style="tier === 'mobile' ? sheetStyle : null"
   >
-    <!-- Mobile: tay cầm kéo/tap (bottom sheet) -->
+    <!-- Mobile drag handle -->
     <div
       v-if="tier === 'mobile'"
       class="adaptive-sheet-handle"
       @pointerdown="onSheetDragStart"
     ></div>
 
-    <!-- Nút đóng -->
-    <button class="close-btn" @click="handleClose">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
-      </svg>
-    </button>
-
-    <!-- ============ VIEW 1: DANH SÁCH THIẾT BỊ TRONG PHÒNG ============ -->
+    <!-- ================================================================
+         VIEW 1 — EQUIPMENT LIST
+         ================================================================ -->
     <template v-if="!selectedMachine">
-      <div class="list-header">
-        <span class="eyebrow">{{ roomLabel }}</span>
-        <h2>TẤT CẢ THIẾT BỊ TRONG PHÒNG</h2>
-      </div>
+      <!-- Header row: breadcrumb + close -->
+      <header class="esp-header">
+        <div class="esp-header__breadcrumb">
+          <span class="esp-header__eyebrow">{{ roomLabel }}</span>
+          <h2 class="esp-header__title">Thiết bị phòng học</h2>
+        </div>
+        <button class="esp-icon-btn" aria-label="Đóng" @click="handleClose">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </header>
 
-      <div class="list-body">
-        <div v-if="isLoadingList" class="state-msg">Đang tải danh sách thiết bị…</div>
+      <!-- List body -->
+      <div class="esp-list-body">
+        <!-- Loading -->
+        <div v-if="isLoadingList" class="esp-state">
+          <span class="esp-state__spinner"></span>
+          <p>Đang tải danh sách thiết bị…</p>
+        </div>
 
-        <div v-else-if="machines.length === 0" class="empty-state">
+        <!-- Empty -->
+        <div v-else-if="machines.length === 0" class="esp-state esp-state--empty">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.35">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
+          </svg>
           <p>Chưa có thiết bị nào được ghi nhận cho phòng này.</p>
         </div>
 
-        <div v-else class="machine-grid">
-          <button
-            v-for="m in machines"
-            :key="m.id"
-            class="machine-card"
-            @click="selectMachine(m)"
-          >
-            <div class="machine-thumb">
-              <img v-if="m.thumbnail" :src="m.thumbnail" :alt="m.title" />
-              <div v-else class="thumb-placeholder">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                  <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                  <line x1="12" y1="22.08" x2="12" y2="12"></line>
+        <!-- Machine cards -->
+        <ul v-else class="esp-machine-list">
+          <li v-for="m in machines" :key="m.id">
+            <button class="esp-machine-card" @click="selectMachine(m)">
+              <div class="esp-machine-card__thumb">
+                <img v-if="m.thumbnail" :src="m.thumbnail" :alt="m.title" />
+                <svg v-else width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" opacity="0.4">
+                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                  <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
                 </svg>
+                <span v-if="m.has3DModel" class="esp-badge-3d">3D</span>
               </div>
-              <span v-if="m.has3DModel" class="badge-3d">3D</span>
-            </div>
-            <div class="machine-meta">
-              <span class="machine-name">{{ m.title }}</span>
-              <span class="machine-model" v-if="m.model">{{ m.model }}</span>
-            </div>
-          </button>
-        </div>
+              <div class="esp-machine-card__meta">
+                <span class="esp-machine-card__name">{{ m.title }}</span>
+                <span v-if="m.model" class="esp-machine-card__model">{{ m.model }}</span>
+              </div>
+              <svg class="esp-machine-card__chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
+            </button>
+          </li>
+        </ul>
       </div>
     </template>
 
-    <!-- ============ VIEW 2: CHI TIẾT 1 THIẾT BỊ (xếp dọc: ảnh/3D trên, info dưới) ============ -->
+    <!-- ================================================================
+         VIEW 2 — EQUIPMENT DETAIL
+         ================================================================ -->
     <template v-else>
-      <button class="back-btn" @click="selectedMachine = null">
-        ← QUAY LẠI DANH SÁCH
-      </button>
+      <!-- Detail header: back + close — ONE combined header, no double buttons -->
+      <header class="esp-header esp-header--detail">
+        <button class="esp-back-btn" @click="selectedMachine = null">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+          <span>Quay lại</span>
+        </button>
+        <button class="esp-icon-btn" aria-label="Đóng" @click="handleClose">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </header>
 
-      <div class="detail-scroll">
-        <div class="viewer-frame">
+      <!-- Scrollable detail content -->
+      <div class="esp-detail-scroll">
+
+        <!-- ── Media Viewer ── -->
+        <div class="esp-viewer-wrap">
           <img
             v-if="viewMode === 'photo' && selectedMachine.photos[activePhotoIndex]"
             :src="selectedMachine.photos[activePhotoIndex]"
             :alt="selectedMachine.title"
-            class="photo-viewer-el"
+            class="esp-viewer-img"
           />
 
-          <!--
-            [FIX-3] v-else-if now guards on a non-empty modelUrl AND modelFailed=false.
-            activeModelSrc is the single source of truth for the <src> attribute;
-            it starts as modelUrl and is swapped to the fallback path on first error.
-            The :key forces a full remount when the user switches to a different machine
-            so stale error/load state from the previous model cannot bleed through.
-          -->
           <model-viewer
             v-else-if="selectedMachine.modelUrl && !modelFailed"
             :key="selectedMachine.id + '-' + activeModelSrc"
@@ -103,42 +121,44 @@
             touch-action="pan-y"
             interaction-prompt="none"
             :style="{ '--poster-color': 'transparent' }"
-            class="model-viewer-el"
+            class="esp-viewer-model"
             @error="onModelError"
             @load="onModelLoad"
           >
-            <div slot="progress-bar" class="model-progress"></div>
-            <div slot="poster" class="model-loading">{{ statusText }}</div>
+            <div slot="progress-bar" class="esp-model-progress"></div>
+            <div slot="poster" class="esp-model-loading">
+              <span class="esp-state__spinner esp-state__spinner--sm"></span>
+              <span>{{ statusText }}</span>
+            </div>
           </model-viewer>
 
-          <div v-else class="no-model-placeholder">
-            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+          <!-- Compact no-model state — not a dark void -->
+          <div v-else class="esp-viewer-empty">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" opacity="0.3">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
             </svg>
-            <p>Chưa có mô hình 3D cho thiết bị này.</p>
+            <span>Chưa có mô hình 3D</span>
           </div>
+
+          <div class="esp-viewer-gradient"></div>
         </div>
 
-        <!-- Dải thumbnail: ô đầu để quay lại xem model 3D, các ô sau là ảnh
-             thực tế của thiết bị (nếu có). Chỉ hiện khi có ít nhất 1 trong 2
-             (model hoặc ảnh) để tránh 1 dải rỗng vô nghĩa. -->
+        <!-- ── Thumbnail strip ── -->
         <div
           v-if="(selectedMachine.modelUrl && !modelFailed) || selectedMachine.photos.length > 0"
-          class="media-thumbstrip"
+          class="esp-thumbstrip"
         >
           <button
             v-if="selectedMachine.modelUrl && !modelFailed"
-            class="thumb-btn"
-            :class="{ active: viewMode === 'model' }"
+            class="esp-thumb"
+            :class="{ 'esp-thumb--active': viewMode === 'model' }"
             title="Xem model 3D"
             @click="selectModelView"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
-              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
             </svg>
             <span>3D</span>
           </button>
@@ -146,48 +166,48 @@
           <button
             v-for="(photo, idx) in selectedMachine.photos"
             :key="idx"
-            class="thumb-btn thumb-photo"
-            :class="{ active: viewMode === 'photo' && activePhotoIndex === idx }"
-            title="Xem ảnh thực tế"
+            class="esp-thumb esp-thumb--photo"
+            :class="{ 'esp-thumb--active': viewMode === 'photo' && activePhotoIndex === idx }"
+            :title="`Ảnh ${idx + 1}`"
             @click="selectPhoto(idx)"
           >
             <img :src="photo" :alt="`${selectedMachine.title} ảnh ${idx + 1}`" />
           </button>
         </div>
 
-        <div class="info-pane">
-          <span class="eyebrow" v-if="selectedMachine.departments">
-            {{ selectedMachine.departments }}
-          </span>
-          <h2 class="machine-title">{{ selectedMachine.title }}</h2>
-          <p class="machine-sub" v-if="selectedMachine.model || selectedMachine.manufacturer">
-            {{ selectedMachine.model }}<template v-if="selectedMachine.model && selectedMachine.manufacturer"> · </template>{{ selectedMachine.manufacturer }}
+        <!-- ── Info pane ── -->
+        <div class="esp-info">
+          <div class="esp-info__identity">
+            <span v-if="selectedMachine.departments" class="esp-info__dept">{{ selectedMachine.departments }}</span>
+            <h2 class="esp-info__name">{{ selectedMachine.title }}</h2>
+            <p v-if="selectedMachine.model || selectedMachine.manufacturer" class="esp-info__sub">
+              {{ selectedMachine.model }}<template v-if="selectedMachine.model && selectedMachine.manufacturer"> · </template>{{ selectedMachine.manufacturer }}
+            </p>
+            <div v-if="selectedMachine.status" class="esp-status" :class="`esp-status--${selectedMachine.status}`">
+              <span class="esp-status__dot"></span>
+              <span class="esp-status__label">{{ statusLabel(selectedMachine.status) }}</span>
+            </div>
+          </div>
+
+          <dl class="esp-meta">
+            <div class="esp-meta__row">
+              <dt>MÔ TẢ</dt>
+              <dd v-if="selectedMachine.story">{{ selectedMachine.story }}</dd>
+              <dd v-else class="esp-meta__placeholder">Thông tin chi tiết sẽ được cập nhật sau.</dd>
+            </div>
+            <div v-if="selectedMachine.category" class="esp-meta__row">
+              <dt>PHÂN LOẠI</dt>
+              <dd>{{ selectedMachine.category }}</dd>
+            </div>
+            <div class="esp-meta__row">
+              <dt>VỊ TRÍ</dt>
+              <dd>{{ locationLabel(selectedMachine) }}</dd>
+            </div>
+          </dl>
+
+          <p class="esp-footer-note">
+            Thông số kỹ thuật, quy trình vận hành và lịch bảo trì sẽ được cập nhật trong phiên bản tiếp theo.
           </p>
-
-          <div class="status-row" v-if="selectedMachine.status">
-            <span class="status-dot" :class="selectedMachine.status"></span>
-            <span class="status-text">{{ statusLabel(selectedMachine.status) }}</span>
-          </div>
-
-          <div class="info-block">
-            <h4>MÔ TẢ</h4>
-            <p v-if="selectedMachine.story">{{ selectedMachine.story }}</p>
-            <p v-else class="placeholder-text">Thông tin chi tiết sẽ được cập nhật sau.</p>
-          </div>
-
-          <div class="info-block" v-if="selectedMachine.category">
-            <h4>PHÂN LOẠI</h4>
-            <p>{{ selectedMachine.category }}</p>
-          </div>
-
-          <div class="info-block">
-            <h4>VỊ TRÍ</h4>
-            <p>{{ locationLabel(selectedMachine) }}</p>
-          </div>
-
-          <div class="placeholder-note">
-            Các thông tin kỹ thuật khác (thông số, quy trình, bảo trì…) sẽ được cập nhật sau.
-          </div>
         </div>
       </div>
     </template>
@@ -479,477 +499,579 @@ watch(() => props.initialEquipment, (val) => {
 watch(() => props.roomId, loadMachineList)
 </script>
 
+
 <style scoped>
 /* ============================================================
-   EQUIPMENT SIDE PANEL — SCOPED STYLES
-   Overlays the RoomDetailPanel (z-index: 100) at z-index: 105.
-   Desktop: absolute panel docked to the right, same width as
-   RoomDetailPanel. Tablet/mobile: full-width bottom sheet.
+   EQUIPMENT SIDE PANEL — Premium Dark-Mode "Digital Twin" Styles
+   Namespace prefix: .esp  (avoids all collisions with global CSS)
+   Z-index layers: desktop 105, tablet/mobile 109
    ============================================================ */
 
+/* ── Scoped design tokens ── */
+.esp {
+  --esp-bg:         #03111f;
+  --esp-surface:    #071828;
+  --esp-card:       rgba(255, 255, 255, 0.04);
+  --esp-card-hover: rgba(245, 130, 32, 0.07);
+  --esp-border:     rgba(255, 255, 255, 0.08);
+  --esp-border-acc: rgba(245, 130, 32, 0.40);
+  --esp-accent:     #F58220;
+  --esp-ink-hi:     #FFFFFF;
+  --esp-ink-mid:    #B3BFCD;
+  --esp-ink-lo:     #56677F;
+  --esp-radius:     12px;
+  --esp-font:       'Be Vietnam Pro', sans-serif;
+  --esp-mono:       'Space Mono', monospace;
+}
+
 /* ── Root panel container ── */
-.side-panel {
+.esp {
   position: absolute;
   top: var(--header-h, 64px);
   right: 0;
   width: 420px;
   height: calc(100vh - var(--header-h, 64px));
-  background-color: var(--surface-panel, #002040);
-  border-left: 1px solid var(--line-soft, rgba(255,255,255,0.10));
-  box-shadow: -6px 0 24px rgba(0,0,0,0.55);
+  background: var(--esp-bg);
+  border-left: 1px solid var(--esp-border);
+  box-shadow: -8px 0 40px rgba(0, 0, 0, 0.65);
   display: flex;
   flex-direction: column;
-  color: var(--ink-soft, #B3BFCD);
-  font-family: var(--type-main, 'Be Vietnam Pro', sans-serif);
+  font-family: var(--esp-font);
+  color: var(--esp-ink-mid);
   z-index: 105;
   overflow: hidden;
-  animation: panel-slide-in 0.22s ease;
+  animation: esp-slide-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-@keyframes panel-slide-in {
-  from { transform: translateX(30px); opacity: 0; }
+@keyframes esp-slide-in {
+  from { transform: translateX(28px); opacity: 0; }
   to   { transform: translateX(0);    opacity: 1; }
 }
 
-/* ── Tablet tier: full-width overlay over everything ── */
-.side-panel.tier-tablet {
+/* ── Tier overrides ── */
+.esp.tier-tablet {
   position: fixed;
-  top: var(--header-h, 64px);
   left: 0;
-  right: 0;
   width: 100%;
-  height: calc(100vh - var(--header-h, 64px));
   border-left: none;
   z-index: 109;
 }
 
-/* ── Mobile tier: bottom sheet ── */
-.side-panel.tier-mobile {
+.esp.tier-mobile {
   position: fixed;
+  top: auto;
+  bottom: 0;
   left: 0;
   right: 0;
-  bottom: 0;
-  top: auto;
   width: 100%;
-  height: auto; /* driven by sheetStyle from useBottomSheet */
+  height: auto;
   border-left: none;
-  border-top: 1px solid var(--line-soft);
+  border-top: 1px solid var(--esp-border);
   border-radius: 18px 18px 0 0;
   z-index: 109;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* ── Close button (×) — top-right corner ── */
-.close-btn {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  z-index: 2;
+/* ============================================================
+   SHARED HEADER (one per view, never doubled)
+   ============================================================ */
+.esp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 18px 16px;
+  border-bottom: 1px solid var(--esp-border);
+  flex-shrink: 0;
+  background: var(--esp-bg);
+}
+
+.esp-header--detail {
+  padding: 12px 14px;
+}
+
+.esp-header__breadcrumb {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.esp-header__eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--esp-accent);
+  font-family: var(--esp-mono);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.esp-header__title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--esp-ink-hi);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Icon close button (×) ── */
+.esp-icon-btn {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 34px;
   height: 34px;
   background: transparent;
-  border: none;
+  border: 1px solid var(--esp-border);
   border-radius: 8px;
-  color: var(--ink-dim, #6B7FA0);
+  color: var(--esp-ink-lo);
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
-.close-btn:hover {
-  background: rgba(255, 255, 255, 0.07);
+.esp-icon-btn:hover {
+  background: rgba(248, 113, 113, 0.10);
+  border-color: rgba(248, 113, 113, 0.35);
   color: #f87171;
 }
 
-/* ============================================================
-   VIEW 1 — MACHINE LIST
-   ============================================================ */
+/* ── Back button (← Quay lại) ── */
+.esp-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px 7px 10px;
+  background: transparent;
+  border: 1px solid var(--esp-border);
+  border-radius: 8px;
+  color: var(--esp-ink-lo);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--esp-font);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.esp-back-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.20);
+  color: var(--esp-ink-mid);
+}
+.esp-back-btn svg { transition: transform 0.15s; }
+.esp-back-btn:hover svg { transform: translateX(-2px); }
 
-/* ── List header ── */
-.list-header {
-  padding: 22px 20px 14px;
-  border-bottom: 1px solid var(--line-soft);
+/* ============================================================
+   SHARED STATE (spinner / empty)
+   ============================================================ */
+.esp-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 56px 24px;
+  color: var(--esp-ink-lo);
+  font-size: 13px;
+  text-align: center;
+  line-height: 1.6;
+}
+.esp-state p { margin: 0; }
+
+.esp-state__spinner {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  border: 2px solid rgba(245, 130, 32, 0.18);
+  border-top-color: var(--esp-accent);
+  border-radius: 50%;
+  animation: esp-spin 0.75s linear infinite;
   flex-shrink: 0;
 }
-
-.eyebrow {
-  display: block;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--brand-accent, #F58220);
-  margin-bottom: 6px;
+.esp-state__spinner--sm {
+  width: 15px;
+  height: 15px;
 }
+@keyframes esp-spin { to { transform: rotate(360deg); } }
 
-.list-header h2 {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--ink-strong, #FFFFFF);
-  letter-spacing: 0.4px;
-}
-
-/* ── List body (scrollable) ── */
-.list-body {
+/* ============================================================
+   VIEW 1 — EQUIPMENT LIST
+   ============================================================ */
+.esp-list-body {
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
+  padding: 14px;
+  overscroll-behavior: contain;
 }
-.list-body::-webkit-scrollbar { width: 5px; }
-.list-body::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.12);
+.esp-list-body::-webkit-scrollbar { width: 4px; }
+.esp-list-body::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.10);
   border-radius: 4px;
 }
 
-/* ── State messages ── */
-.state-msg {
-  padding: 32px 0;
-  text-align: center;
-  color: var(--ink-dim, #6B7FA0);
-  font-size: 13px;
-}
-
-.empty-state {
-  padding: 32px 0;
-  text-align: center;
-  color: var(--ink-dim, #6B7FA0);
-  font-size: 13px;
-}
-
-/* ── Machine card grid ── */
-.machine-grid {
+.esp-machine-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 7px;
 }
 
-.machine-card {
+/* ── Machine card ── */
+.esp-machine-card {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 12px 14px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--line-soft);
-  border-radius: 10px;
-  cursor: pointer;
-  text-align: left;
-  color: inherit;
-  font-family: inherit;
-  transition: background 0.15s, border-color 0.15s;
+  gap: 13px;
   width: 100%;
+  padding: 11px 13px;
+  background: var(--esp-card);
+  border: 1px solid var(--esp-border);
+  border-radius: var(--esp-radius);
+  color: inherit;
+  font-family: var(--esp-font);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.18s,
+    transform 0.14s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.machine-card:hover {
-  background: rgba(245, 130, 32, 0.08);
-  border-color: var(--line-accent, rgba(245,130,32,0.45));
+.esp-machine-card:hover {
+  background: var(--esp-card-hover);
+  border-color: var(--esp-border-acc);
+  transform: translateX(3px);
 }
 
-/* ── Thumbnail cell ── */
-.machine-thumb {
+.esp-machine-card__thumb {
   position: relative;
   flex-shrink: 0;
-  width: 52px;
-  height: 52px;
+  width: 48px;
+  height: 48px;
   border-radius: 8px;
   overflow: hidden;
-  background: rgba(0, 37, 84, 0.6);
-  border: 1px solid var(--line-soft);
+  background: rgba(0, 37, 84, 0.55);
+  border: 1px solid var(--esp-border);
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.machine-thumb img {
+.esp-machine-card__thumb img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-.thumb-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--ink-dim);
-}
-.badge-3d {
+
+.esp-badge-3d {
   position: absolute;
   bottom: 3px;
   right: 3px;
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 700;
-  font-family: var(--type-alt, 'Space Mono', monospace);
-  background: var(--brand-accent);
+  font-family: var(--esp-mono);
+  background: var(--esp-accent);
   color: #fff;
   padding: 1px 4px;
   border-radius: 3px;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
-/* ── Machine text meta ── */
-.machine-meta {
+.esp-machine-card__meta {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 3px;
-  min-width: 0;
 }
-.machine-name {
-  font-size: 14px;
+
+.esp-machine-card__name {
+  font-size: 13px;
   font-weight: 600;
-  color: var(--ink-strong, #FFFFFF);
+  color: var(--esp-ink-hi);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.machine-model {
+
+.esp-machine-card__model {
   font-size: 11px;
-  color: var(--ink-dim, #6B7FA0);
-  font-family: var(--type-alt, 'Space Mono', monospace);
+  color: var(--esp-ink-lo);
+  font-family: var(--esp-mono);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.esp-machine-card__chevron {
+  flex-shrink: 0;
+  color: var(--esp-ink-lo);
+  opacity: 0;
+  transition: opacity 0.15s, transform 0.15s;
+}
+.esp-machine-card:hover .esp-machine-card__chevron {
+  opacity: 1;
+  transform: translateX(2px);
 }
 
 /* ============================================================
    VIEW 2 — EQUIPMENT DETAIL
    ============================================================ */
-
-/* ── Back button ── */
-.back-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin: 14px 16px 0;
-  padding: 6px 12px 6px 8px;
-  background: transparent;
-  border: 1px solid var(--line-soft);
-  border-radius: 8px;
-  color: var(--ink-dim, #6B7FA0);
-  font-size: 11px;
-  font-weight: 700;
-  font-family: var(--type-alt, 'Space Mono', monospace);
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
-  flex-shrink: 0;
-  width: fit-content;
-}
-.back-btn:hover {
-  background: rgba(255,255,255,0.06);
-  color: var(--ink-soft, #B3BFCD);
-  border-color: rgba(255,255,255,0.2);
-}
-
-/* ── Scrollable detail area ── */
-.detail-scroll {
+.esp-detail-scroll {
   flex: 1;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  overscroll-behavior: contain;
 }
-.detail-scroll::-webkit-scrollbar { width: 5px; }
-.detail-scroll::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.12);
+.esp-detail-scroll::-webkit-scrollbar { width: 4px; }
+.esp-detail-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.10);
   border-radius: 4px;
 }
 
-/* ── 3D / photo viewer frame ── */
-.viewer-frame {
-  flex-shrink: 0;
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  background: #05080d;
+/* ── Media viewer ── */
+.esp-viewer-wrap {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background: #020c16;
   overflow: hidden;
+  flex-shrink: 0;
+  border-radius: 0;          /* flush against header above */
 }
 
-.photo-viewer-el {
+.esp-viewer-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-.model-viewer-el {
+.esp-viewer-model {
   width: 100%;
   height: 100%;
   display: block;
   --poster-color: transparent;
 }
 
-.model-progress {
-  /* Hide the default model-viewer progress bar */
-  display: none;
-}
-.model-loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  font-size: 12px;
-  color: var(--ink-dim);
-  font-family: var(--type-alt);
-}
-
-.no-model-placeholder {
+/* Compact no-model fallback — tight, not a yawning void */
+.esp-viewer-empty {
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  color: var(--ink-dim);
-  padding: 24px;
-  text-align: center;
-}
-.no-model-placeholder p {
-  margin: 0;
-  font-size: 13px;
+  gap: 8px;
+  color: var(--esp-ink-lo);
+  font-size: 11px;
+  font-family: var(--esp-mono);
+  letter-spacing: 0.6px;
 }
 
-/* ── Media thumbnail strip ── */
-.media-thumbstrip {
+/* Bottom gradient bleeds info up over viewer */
+.esp-viewer-gradient {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: linear-gradient(to bottom, transparent, var(--esp-bg));
+  pointer-events: none;
+}
+
+.esp-model-progress { display: none; }
+
+.esp-model-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 100%;
+  font-size: 12px;
+  font-family: var(--esp-mono);
+  color: var(--esp-ink-lo);
+}
+
+/* ── Thumbnail strip ── */
+.esp-thumbstrip {
   display: flex;
   align-items: center;
   gap: 6px;
   padding: 8px 14px;
-  background: rgba(0,0,0,0.25);
-  border-bottom: 1px solid var(--line-soft);
+  background: rgba(0, 0, 0, 0.30);
+  border-bottom: 1px solid var(--esp-border);
   overflow-x: auto;
   flex-shrink: 0;
 }
-.media-thumbstrip::-webkit-scrollbar { height: 3px; }
-.media-thumbstrip::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.15);
+.esp-thumbstrip::-webkit-scrollbar { height: 3px; }
+.esp-thumbstrip::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.12);
   border-radius: 2px;
 }
 
-.thumb-btn {
+.esp-thumb {
   flex-shrink: 0;
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
   border: 2px solid transparent;
-  border-radius: 8px;
-  background: rgba(255,255,255,0.06);
-  color: var(--ink-dim);
+  border-radius: 7px;
+  background: rgba(255,255,255,0.05);
+  color: var(--esp-ink-lo);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 3px;
   cursor: pointer;
   overflow: hidden;
   transition: border-color 0.15s, background 0.15s;
 }
-.thumb-btn span {
-  font-size: 9px;
+.esp-thumb span {
+  font-size: 8px;
   font-weight: 700;
-  font-family: var(--type-alt);
+  font-family: var(--esp-mono);
   line-height: 1;
 }
-.thumb-btn.thumb-photo {
-  padding: 0;
-}
-.thumb-btn.thumb-photo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-.thumb-btn:hover {
-  border-color: rgba(245,130,32,0.5);
-  background: rgba(245,130,32,0.06);
-}
-.thumb-btn.active {
-  border-color: var(--brand-accent, #F58220);
-  background: rgba(245,130,32,0.10);
+.esp-thumb--photo { padding: 0; }
+.esp-thumb--photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.esp-thumb:hover { border-color: rgba(245,130,32,0.50); }
+.esp-thumb--active {
+  border-color: var(--esp-accent);
+  background: rgba(245,130,32,0.08);
 }
 
 /* ── Info pane ── */
-.info-pane {
-  padding: 18px 18px 28px;
+.esp-info {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  padding: 22px 20px 36px;
 }
 
-.info-pane .eyebrow {
-  margin-bottom: 4px;
+/* Identity block: name / model / status */
+.esp-info__identity {
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--esp-border);
+  margin-bottom: 0;
 }
 
-.machine-title {
-  margin: 0 0 4px;
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--ink-strong, #FFFFFF);
-  line-height: 1.3;
-}
-
-.machine-sub {
-  margin: 0 0 10px;
-  font-size: 12px;
-  color: var(--ink-dim, #6B7FA0);
-  font-family: var(--type-alt, 'Space Mono', monospace);
-}
-
-/* ── Status badge row ── */
-.status-row {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  margin-bottom: 14px;
-}
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.status-dot.operational { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.6); }
-.status-dot.maintenance  { background: #f59e0b; box-shadow: 0 0 6px rgba(245,158,11,0.6); }
-.status-dot.offline      { background: #f87171; box-shadow: 0 0 6px rgba(248,113,113,0.6); }
-.status-text {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--ink-soft);
-}
-
-/* ── Info blocks (MÔ TẢ / PHÂN LOẠI / VỊ TRÍ) ── */
-.info-block {
-  margin-top: 14px;
-  padding-top: 14px;
-  border-top: 1px solid var(--line-soft);
-}
-.info-block h4 {
-  margin: 0 0 6px;
+.esp-info__dept {
+  display: block;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 1.5px;
   text-transform: uppercase;
-  color: var(--brand-accent, #F58220);
-  font-family: var(--type-alt, 'Space Mono', monospace);
+  color: var(--esp-accent);
+  font-family: var(--esp-mono);
+  margin-bottom: 7px;
 }
-.info-block p {
+
+.esp-info__name {
+  margin: 0 0 5px;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--esp-ink-hi);
+  line-height: 1.25;
+}
+
+.esp-info__sub {
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: var(--esp-ink-lo);
+  font-family: var(--esp-mono);
+}
+
+/* Status pill */
+.esp-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 8px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  width: fit-content;
+}
+.esp-status--operational { background: rgba(34,197,94,0.08);  border-color: rgba(34,197,94,0.25); }
+.esp-status--maintenance  { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.25); }
+.esp-status--offline      { background: rgba(248,113,113,0.08);border-color: rgba(248,113,113,0.25); }
+
+.esp-status__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.esp-status--operational .esp-status__dot { background: #22c55e; box-shadow: 0 0 5px rgba(34,197,94,0.7); }
+.esp-status--maintenance  .esp-status__dot { background: #f59e0b; box-shadow: 0 0 5px rgba(245,158,11,0.7); }
+.esp-status--offline      .esp-status__dot { background: #f87171; box-shadow: 0 0 5px rgba(248,113,113,0.7); }
+
+.esp-status__label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--esp-ink-mid);
+}
+
+/* ── Metadata rows (<dl>) ── */
+.esp-meta {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.esp-meta__row {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--esp-border);
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.esp-meta__row:last-child { border-bottom: none; }
+
+.esp-meta__row dt {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--esp-ink-lo);
+  font-family: var(--esp-mono);
+}
+
+.esp-meta__row dd {
   margin: 0;
   font-size: 13px;
   line-height: 1.65;
-  color: var(--ink-soft, #B3BFCD);
+  color: var(--esp-ink-mid);
 }
-.info-block .placeholder-text {
-  color: var(--ink-dim, #6B7FA0);
+
+.esp-meta__placeholder {
+  font-style: italic;
+  color: var(--esp-ink-lo) !important;
+}
+
+/* Footer note */
+.esp-footer-note {
+  margin: 18px 0 0;
+  padding: 11px 13px;
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  font-size: 11px;
+  line-height: 1.65;
+  color: var(--esp-ink-lo);
   font-style: italic;
 }
 
-/* ── Placeholder footer note ── */
-.placeholder-note {
-  margin-top: 18px;
-  padding: 10px 12px;
-  border: 1px dashed rgba(255,255,255,0.1);
-  border-radius: 8px;
-  font-size: 11px;
-  color: var(--ink-dim, #6B7FA0);
-  line-height: 1.5;
-  font-style: italic;
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .esp                         { animation: none; }
+  .esp-machine-card            { transition: background 0.15s, border-color 0.15s; }
+  .esp-back-btn svg            { transition: none; }
+  .esp-state__spinner          { animation: none; opacity: 0.5; }
 }
 </style>
