@@ -414,6 +414,10 @@ const display = computed(() => {
   font-size: 13px;
 }
 .photo-section {
+  /* Prevent this block from being squashed when .panel-content (flex column)
+     distributes leftover space to the info-cards below. Without flex-shrink:0
+     the browser is free to compress this element toward zero height. */
+  flex-shrink: 0;
   width: 100%;
   border-radius: 8px;
   overflow: hidden;
@@ -429,7 +433,11 @@ const display = computed(() => {
 .photo-frame {
   position: relative;
   width: 100%;
-  height: 160px;
+  /* aspect-ratio is the source of truth for height so the frame always renders
+     even before the image loads. The explicit min-height is a belt-and-suspenders
+     fallback for any browser that ignores aspect-ratio inside a grid cell. */
+  aspect-ratio: 3 / 2;
+  min-height: 160px;
   background-color: #1e293b;
   border: 1px solid #334155;
   border-radius: 6px;
@@ -437,11 +445,23 @@ const display = computed(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Guarantee the frame itself never shrinks inside any outer flex context */
+  flex-shrink: 0;
 }
 .room-image {
+  /* Fill the frame completely. position:absolute pins it to the
+     frame's padding box so it never affects the frame's own layout size,
+     which could otherwise create a circular sizing dependency. */
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* border-radius matches the frame so the image is clipped cleanly
+     at the rounded corners — overflow:hidden alone isn't enough in all
+     browsers when the child is absolutely positioned. */
+  border-radius: 6px;
+  display: block;
 }
 .frame-spinner {
   position: absolute;
