@@ -1,14 +1,3 @@
-<!-- components/EquipmentSidePanel.vue
-     Trước đây là components/MachineViewerModal.vue: overlay cố định che kín toàn màn
-     hình (position:fixed, backdrop mờ, z-index:200) mỗi khi bấm "VIEW ALL MACHINES IN
-     THIS ROOM" từ RoomDetailPanel.vue -> mất hết ngữ cảnh phòng đang xem, giống "văng"
-     sang trang khác. Đổi tên + đổi cách hiển thị: giờ đây là 1 panel DOCK ngay bên
-     trái RoomDetailPanel (right: 400px = đúng bề rộng RoomDetailPanel), cả 2 cùng hiện
-     song song — người dùng vẫn thấy thông tin phòng trong lúc xem danh sách/chi tiết
-     thiết bị. Logic tải dữ liệu (2 view: danh sách <-> chi tiết 1 thiết bị) giữ nguyên,
-     chỉ đổi phần khung/CSS bao ngoài.
-     Bố cục chi tiết máy đổi từ 2 cột (viewer trái, thông tin phải — cần màn rộng) sang
-     xếp DỌC (ảnh/3D trên, thông tin cuộn bên dưới) vì panel chỉ rộng ~420px. -->
 <template>
   <!-- Tablet/mobile: panel này che RoomDetailPanel (không dock cạnh nữa vì
        không đủ chỗ) nên cần backdrop riêng, đậm hơn 1 chút vì đang là lớp
@@ -96,9 +85,16 @@
             class="photo-viewer-el"
           />
 
+          <!--
+            [FIX-3] v-else-if now guards on a non-empty modelUrl AND modelFailed=false.
+            activeModelSrc is the single source of truth for the <src> attribute;
+            it starts as modelUrl and is swapped to the fallback path on first error.
+            The :key forces a full remount when the user switches to a different machine
+            so stale error/load state from the previous model cannot bleed through.
+          -->
           <model-viewer
             v-else-if="selectedMachine.modelUrl && !modelFailed"
-            :key="selectedMachine.id"
+            :key="selectedMachine.id + '-' + activeModelSrc"
             :src="activeModelSrc"
             camera-controls
             auto-rotate
@@ -204,53 +200,51 @@ import { useDeviceTier } from '~/composables/useDeviceTier'
 import { useBottomSheet } from '~/composables/useBottomSheet'
 
 const { tier } = useDeviceTier()
-// Mobile: mở gần full-screen ngay từ đầu (peek cao) vì đây là panel "con" người
-// dùng chủ động mở từ RoomDetailPanel, ít lý do để chỉ hé mở như FloorPanel.
 const { sheetStyle, onDragStart: onSheetDragStart } = useBottomSheet({ peek: 0.7, full: 0.94, onDismiss: () => handleClose() })
 
 const props = defineProps({
   roomId: { type: String, default: null },
   buildingId: { type: String, default: null },
   roomName: { type: String, default: '' },
-  // Danh sách thiết bị đã có sẵn (nếu RoomDetailPanel truyền vào), dùng làm fallback
-  // trong lúc chưa fetch được danh sách đầy đủ từ nguồn dữ liệu thiết bị.
   instruments: { type: Array, default: () => [] },
-  // Bấm thẳng vào 1 khối thiết bị trên bản đồ (layer vgu-equipment-fill) ->
-  // properties của feature đó (equipment_id, model_code, room_id…) được truyền
-  // vào đây để mở thẳng view chi tiết, bỏ qua bước danh sách.
   initialEquipment: { type: Object, default: null }
 })
 
 const emit = defineEmits(['close'])
 
 const config = useRuntimeConfig()
-const base = config.app.baseURL
 
-// getEquipmentListByRoom / getEquipmentInfo được kỳ vọng đến từ cùng composable
-// useVguData() đang dùng ở RoomDetailPanel.vue. Nếu composable chưa có các hàm
-// này, phần fallback bên dưới vẫn hiển thị được danh sách cơ bản từ `instruments`.
+// ---------------------------------------------------------------------------
+// [FIX-1] Robust base-URL helper.
+// useRuntimeConfig().app.baseURL is '/VGU_Map/' in production, but could be
+// '/' in dev or missing a trailing slash in edge cases. Always normalise to
+// have exactly one trailing slash so path concatenation is safe everywhere.
+// ---------------------------------------------------------------------------
+const base = computed(() => {
+  const raw = config.app.baseURL || '/'
+  return raw.endsWith('/') ? raw : raw + '/'
+})
+
+// ---------------------------------------------------------------------------
+// [FIX-2] Model URL builder using the normalised base.
+// Using withBase from #app would work too, but base.value is simpler here
+// since the value is stable after hydration.
+// ---------------------------------------------------------------------------
+const resolveModel = (glbCode) => {
+  if (!glbCode) return ''
+  return `${base.value}models/${glbCode}.glb`
+}
+
 const { getEquipmentListByRoom, getEquipmentInfo } = useVguData()
 
 const isLoadingList = ref(false)
 const machines = ref([])
 const selectedMachine = ref(null)
 
-// Trước đây khi file .glb không tồn tại (404) hoặc lỗi, <model-viewer> không
-// tự báo gì -> khung "Đang tải mô hình 3D…" bị treo mãi mãi (giống như đang
-// tải rất lâu, dù thực ra là lỗi). Bắt sự kiện @error + đặt timeout dự phòng
-// để tự chuyển sang khung "Chưa có mô hình 3D" thay vì treo vô thời hạn.
-//
-// [FIX] Thêm cơ chế THỬ LẠI 1 lần với đường dẫn phụ trước khi báo lỗi hẳn:
-// models/ đôi khi lệch quy ước đặt tên/thư mục giữa các môi trường deploy —
-// thay vì báo lỗi ngay ở lần thử đầu, thử thêm 1 đường dẫn phụ (models/models/)
-// trước, chỉ khi CẢ HAI đều thất bại mới coi là thực sự không có model.
 const modelFailed = ref(false)
 const triedFallback = ref(false)
 const statusText = ref('Đang tải mô hình 3D…')
 const activeModelSrc = ref('')
-// 'model' = đang xem model 3D, 'photo' = đang xem 1 ảnh thực tế trong
-// selectedMachine.photos[activePhotoIndex]. Bấm thumbnail ảnh -> 'photo';
-// bấm lại thumbnail "3D" -> quay về 'model'.
 const viewMode = ref('model')
 const activePhotoIndex = ref(0)
 const selectPhoto = (index) => { viewMode.value = 'photo'; activePhotoIndex.value = index }
@@ -258,11 +252,15 @@ const selectModelView = () => { viewMode.value = 'model' }
 let modelTimeoutId = null
 const MODEL_LOAD_TIMEOUT_MS = 12000
 
-// Đường dẫn phụ: thử models/models/{code}.glb (đề phòng cấu trúc thư mục
-// lệch trên 1 số môi trường deploy). Chỉ tính khi có modelUrl gốc.
+// ---------------------------------------------------------------------------
+// [FIX-3] Fallback model path: swap models/{code}.glb → models/models/{code}.glb.
+// Only computed from the active primary modelUrl, not from `base` again, so
+// it can't produce a double-base prefix.
+// ---------------------------------------------------------------------------
 const fallbackModelSrc = computed(() => {
   const primary = selectedMachine.value?.modelUrl
   if (!primary) return ''
+  // Replace the last occurrence of "models/{file}.glb" with "models/models/{file}.glb"
   return primary.replace(/models\/([^/]+\.glb)$/, 'models/models/$1')
 })
 
@@ -271,30 +269,31 @@ const clearModelTimeout = () => {
 }
 
 const onModelError = () => {
-  if (!triedFallback.value && fallbackModelSrc.value) {
-    console.warn('[EquipmentSidePanel] Đường dẫn chính lỗi, thử đường dẫn phụ:', selectedMachine.value?.modelUrl, '->', fallbackModelSrc.value)
+  if (!triedFallback.value && fallbackModelSrc.value && fallbackModelSrc.value !== activeModelSrc.value) {
+    console.warn('[EquipmentSidePanel] Primary path failed, trying fallback:',
+      selectedMachine.value?.modelUrl, '->', fallbackModelSrc.value)
     triedFallback.value = true
     statusText.value = 'Đang thử lại đường dẫn phụ…'
     activeModelSrc.value = fallbackModelSrc.value
-    armModelTimeout() // hẹn giờ lại cho lượt thử thứ 2
+    armModelTimeout()
     return
   }
-  console.warn('[EquipmentSidePanel] Không tải được model 3D (cả 2 đường dẫn đều lỗi):', selectedMachine.value?.modelUrl, fallbackModelSrc.value)
+  console.warn('[EquipmentSidePanel] Both model paths failed:',
+    selectedMachine.value?.modelUrl, '|', fallbackModelSrc.value)
   clearModelTimeout()
   modelFailed.value = true
 }
-const onModelLoad = () => {
-  clearModelTimeout()
-}
+
+const onModelLoad = () => { clearModelTimeout() }
+
 const armModelTimeout = () => {
   clearModelTimeout()
   modelTimeoutId = setTimeout(() => {
-    console.warn('[EquipmentSidePanel] Model 3D tải quá lâu, coi như lỗi:', activeModelSrc.value)
+    console.warn('[EquipmentSidePanel] Model load timed out:', activeModelSrc.value)
     onModelError()
   }, MODEL_LOAD_TIMEOUT_MS)
 }
-// Mỗi lần đổi sang 1 thiết bị khác (modelUrl đổi) -> reset lại toàn bộ trạng
-// thái thử/lỗi và bắt đầu lại từ đường dẫn chính.
+
 watch(() => selectedMachine.value?.modelUrl, (url) => {
   clearModelTimeout()
   modelFailed.value = false
@@ -303,6 +302,7 @@ watch(() => selectedMachine.value?.modelUrl, (url) => {
   activeModelSrc.value = url || ''
   if (url) armModelTimeout()
 }, { immediate: true })
+
 onUnmounted(() => clearModelTimeout())
 
 const roomLabel = computed(() => {
@@ -311,11 +311,7 @@ const roomLabel = computed(() => {
 })
 
 const statusLabel = (status) => {
-  const map = {
-    operational: 'Đang hoạt động',
-    maintenance: 'Đang bảo trì',
-    offline: 'Ngưng hoạt động'
-  }
+  const map = { operational: 'Đang hoạt động', maintenance: 'Đang bảo trì', offline: 'Ngưng hoạt động' }
   return map[status] || status
 }
 
@@ -329,21 +325,50 @@ const locationLabel = (m) => {
   return parts.length ? parts.join(' / ') : 'N/A'
 }
 
-// Chuẩn hoá 1 bản ghi thiết bị (dù đến từ frontmatter markdown như spectrometer-01.md
-// hay từ object rút gọn trong danh sách "instruments" của phòng).
+// ---------------------------------------------------------------------------
+// [FIX-4] normalizeMachine: handle the { equipmentId, roomId, properties:{} }
+// wrapper shape emitted by HologramMap when the user clicks an equipment polygon.
+//
+// ROOT CAUSE of the original bug:
+//   HologramMap emits: { equipmentId, roomId, properties: { equipment_id, model_code, ... } }
+//   RoomDetailPanel stores that object verbatim in initialEquipment.
+//   EquipmentSidePanel calls normalizeMachine(props.initialEquipment).
+//   normalizeMachine reads raw.model_code — which is UNDEFINED because the real
+//   data is nested one level deeper inside raw.properties.
+//   → glbCode = undefined → modelUrl = '' → v-else-if condition is falsy
+//   → "Chưa có mô hình 3D" fallback shown immediately for EVERY equipment,
+//     even those that have a valid .glb file on the server.
+//
+// FIX: if the incoming raw object has a `.properties` sub-object but is missing
+// the flat equipment fields (equipment_id / model_code), merge properties UP into
+// raw so every downstream lookup finds the right values at the top level.
+// ---------------------------------------------------------------------------
 const normalizeMachine = (raw) => {
   if (!raw) return null
+
+  // Unwrap GeoJSON feature-properties wrapper: { equipmentId, roomId, properties: {...} }
+  // Guard: only flatten when properties has the equipment shape AND the flat
+  // fields are absent, so we never overwrite a legitimately flat object that
+  // happens to also carry a `properties` key for some other reason.
+  if (
+    raw.properties &&
+    typeof raw.properties === 'object' &&
+    !raw.equipment_id &&
+    !raw.model_code &&
+    !raw.id
+  ) {
+    raw = { ...raw, ...raw.properties }
+  }
+
   const id = raw.id || raw.equipment_id || raw.slug || raw.name
-  const loc = raw.location || {}
-  // Quy ước đặt tên file model: thiết bị lấy từ khối vẽ trên bản đồ (geojson
-  // public/data/equipment/{roomId}.geojson) có model_code là mã ngắn khớp
-  // đúng tên file .glb trong models/ (vd "E16" -> models/E16.glb). equipment_id
-  // đầy đủ (vd "B5-105_E16") chỉ dùng để hiển thị/định danh, KHÔNG dùng làm
-  // tên file vì models/ không đặt tên theo tiền tố phòng.
+
+  // model_code is the short identifier that matches the .glb filename (e.g. "E16").
+  // equipment_id is the fully-qualified id (e.g. "B5-105_E16") — do NOT use as filename.
   const glbCode = raw.model_code || raw.modelCode || raw.model || id
+
   return {
     id,
-    title: raw.title || raw.name || raw.model_code || id,
+    title: raw.title || raw.name || raw.model_code || raw.equipment_id || id,
     model: raw.model || raw.model_code || '',
     manufacturer: raw.manufacturer || '',
     departments: Array.isArray(raw.departments) ? raw.departments.join(', ') : (raw.departments || ''),
@@ -351,33 +376,65 @@ const normalizeMachine = (raw) => {
     status: raw.status || '',
     story: raw.story || raw.description || '',
     thumbnail: raw.media?.images?.[0] || raw.thumbnail || '',
-    // Ảnh thực tế của thiết bị (nếu có) — dùng cho dải thumbnail bên dưới
-    // model 3D, cho phép xem ảnh thật thay vì chỉ model. Hỗ trợ cả field
-    // dạng mảng (media.images / photos) lẫn 1 ảnh đơn (thumbnail/image).
     photos: raw.media?.images || raw.photos || (raw.thumbnail ? [raw.thumbnail] : (raw.image ? [raw.image] : [])),
-    buildingId: loc.building_id || raw.buildingId || raw.building_id || props.buildingId,
-    floor: loc.floor ?? raw.floor ?? null,
-    roomId: loc.room_id || raw.roomId || raw.room_id || props.roomId,
-    stationId: loc.station_id || raw.stationId || '',
-    modelUrl: raw.modelUrl || (glbCode ? `${base}models/${glbCode}.glb` : ''),
+    buildingId: raw.location?.building_id || raw.buildingId || raw.building_id || props.buildingId,
+    floor: raw.location?.floor ?? raw.floor ?? null,
+    roomId: raw.location?.room_id || raw.roomId || raw.room_id || props.roomId,
+    stationId: raw.location?.station_id || raw.stationId || '',
+    // [FIX-2] Use resolveModel() so the URL is always built against the correct
+    // GitHub Pages base path. raw.modelUrl is respected if already absolute
+    // (e.g. from a Nuxt Content markdown file that stores the full URL).
+    modelUrl: raw.modelUrl || resolveModel(glbCode),
+    // has3DModel: true when a model_code exists (indicating a .glb is intended).
+    // The viewer + error/timeout flow handles missing files gracefully.
     has3DModel: !!(raw.modelUrl || raw.has3DModel || glbCode)
   }
 }
 
+// ---------------------------------------------------------------------------
+// [FIX-5] loadMachineList: add GeoJSON as primary data source.
+//
+// The original code only queried Nuxt Content (content/equipment/) which has
+// almost no entries (only one test markdown file). The actual equipment data
+// for rooms like B5-105 lives in public/data/equipment/{roomId}.geojson —
+// exactly the same files HologramMap uses to draw the equipment layer on the
+// map. Adding a $fetch for that file ensures the machine list in the panel
+// matches what the user sees drawn on the floor plan.
+// ---------------------------------------------------------------------------
 const loadMachineList = async () => {
   if (!props.roomId) return
   isLoadingList.value = true
   try {
     let list = []
+
+    // 1) Nuxt Content: markdown-defined equipment (rich metadata, few entries)
     if (typeof getEquipmentListByRoom === 'function') {
       list = await getEquipmentListByRoom(props.roomId)
     }
+
+    // 2) GeoJSON equipment file: the canonical map-layer source for room equipment
+    if (!list || list.length === 0) {
+      try {
+        const geojson = await $fetch(
+          `${base.value}data/equipment/${props.roomId}.geojson`
+        )
+        if (geojson?.features?.length > 0) {
+          // Each feature.properties has: equipment_id, model_code, room_id, building_id, floor
+          list = geojson.features.map(f => f.properties || f)
+        }
+      } catch (_) {
+        // No GeoJSON for this room — that is expected for rooms without mapped equipment
+      }
+    }
+
+    // 3) instruments prop: legacy fallback from room markdown's instruments list
     if ((!list || list.length === 0) && props.instruments.length > 0) {
       list = props.instruments
     }
+
     machines.value = (list || []).map(normalizeMachine).filter(Boolean)
   } catch (err) {
-    console.error('[EquipmentSidePanel] Không thể tải danh sách thiết bị của phòng:', err)
+    console.error('[EquipmentSidePanel] Cannot load equipment list for room:', err)
     machines.value = props.instruments.map(normalizeMachine).filter(Boolean)
   } finally {
     isLoadingList.value = false
@@ -385,11 +442,9 @@ const loadMachineList = async () => {
 }
 
 const selectMachine = async (m) => {
-  // Mỗi lần chọn (hoặc đổi sang) 1 thiết bị khác -> luôn bắt đầu ở view 3D.
   viewMode.value = 'model'
   activePhotoIndex.value = 0
-  // Nếu có hàm lấy chi tiết đầy đủ (vd đọc lại file markdown thiết bị), gọi thêm
-  // để bổ sung các trường chưa có trong danh sách rút gọn.
+  // Attempt to enrich from Nuxt Content (e.g. the spectrometer-01.md file)
   if (typeof getEquipmentInfo === 'function' && m.id) {
     try {
       const full = await getEquipmentInfo(m.id)
@@ -398,7 +453,7 @@ const selectMachine = async (m) => {
         return
       }
     } catch (err) {
-      console.warn('[EquipmentSidePanel] Không lấy được chi tiết thiết bị, dùng dữ liệu rút gọn:', err)
+      console.warn('[EquipmentSidePanel] Could not fetch full equipment detail, using summary:', err)
     }
   }
   selectedMachine.value = m
@@ -411,375 +466,15 @@ const handleClose = () => {
 
 onMounted(() => {
   loadMachineList()
-  // Bấm thẳng từ khối thiết bị trên map -> mở luôn view chi tiết, không cần
-  // đợi/duyệt qua danh sách.
   if (props.initialEquipment) {
+    // normalizeMachine now handles the { equipmentId, roomId, properties:{} } wrapper
     selectMachine(normalizeMachine(props.initialEquipment))
   }
-  // Không cần tự nạp <model-viewer> ở đây nữa — đã đăng ký sẵn lúc app khởi
-  // động qua plugins/model-viewer.client.ts (import từ package npm thật,
-  // không phụ thuộc CDN ngoài lúc runtime nữa).
 })
 
-// Nếu người dùng bấm sang khối thiết bị KHÁC trên map trong khi panel đang mở
-// (RoomDetailPanel gọi lại openEquipment() với feature mới), cập nhật thẳng
-// view chi tiết theo thiết bị mới đó.
 watch(() => props.initialEquipment, (val) => {
   if (val) selectMachine(normalizeMachine(val))
 })
 
 watch(() => props.roomId, loadMachineList)
 </script>
-
-<style scoped>
-/* [ĐỔI] Trước đây panel này dock CẠNH TRÁI RoomDetailPanel (right:400px, rộng
-   thêm 420px riêng). Giờ LAYER ĐÈ LÊN ĐÚNG VỊ TRÍ/KÍCH THƯỚC RoomDetailPanel
-   (right:0, width:400px, cùng chiều cao) — bấm "VIEW ALL MACHINES" sẽ che
-   hẳn panel thông tin phòng bên dưới thay vì mở rộng thêm khoảng trống mới.
-   width phải LUÔN khớp .room-detail-panel trong RoomDetailPanel.vue. */
-.side-panel {
-  position: absolute;
-  /* [FIX] top:0 trước đây đè lên AppHeader (z:30) vì z-index:99 cao hơn. */
-  top: var(--header-h, 64px);
-  right: 0;
-  width: 400px;
-  height: calc(100vh - var(--header-h, 64px));
-  background-color: #0b1120;
-  border-left: 1px solid #1f2d40;
-  box-shadow: -4px 0 15px rgba(0, 0, 0, 0.5);
-  z-index: 101; /* Trên RoomDetailPanel (z:100) vì đang che nó */
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  color: #e2e8f0;
-  font-family: 'Inter', sans-serif;
-}
-
-/* ===== Tier: tablet (641–1024px) ===== */
-.side-panel.tier-tablet {
-  right: 0;
-  width: min(400px, 92vw);
-  z-index: 101;
-}
-
-/* ===== Tier: mobile (<=640px) =====
-   Bottom sheet riêng, z-index cao hơn RoomDetailPanel để "chồng" lên trên nó
-   (không cần ẩn RoomDetailPanel bên dưới vì sheet có nền đặc, che kín). */
-.side-panel.tier-mobile {
-  top: auto;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  border-left: none;
-  border-top: 1px solid #1f2d40;
-  border-radius: 16px 16px 0 0;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
-  z-index: 110;
-}
-.close-btn {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  background: transparent;
-  border: none;
-  color: #64748b;
-  cursor: pointer;
-  z-index: 5;
-  transition: color 0.2s;
-}
-.close-btn:hover { color: #f87171; }
-
-/* Backdrop mờ dùng ở tier tablet/mobile (panel che RoomDetailPanel phía sau) */
-.adaptive-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(2, 6, 12, 0.6);
-  backdrop-filter: blur(2px);
-}
-
-/* Tay cầm kéo bottom-sheet trên mobile */
-.adaptive-sheet-handle {
-  width: 100%;
-  padding: 10px 0 6px;
-  display: flex;
-  justify-content: center;
-  flex-shrink: 0;
-  cursor: grab;
-  touch-action: none;
-}
-.adaptive-sheet-handle::before {
-  content: '';
-  width: 40px;
-  height: 4px;
-  border-radius: 999px;
-  background: #334155;
-}
-
-/* ---- List view ---- */
-.list-header {
-  padding: 22px 24px 14px;
-  border-bottom: 1px dashed #1f2d40;
-  flex-shrink: 0;
-}
-.eyebrow {
-  font-size: 10px;
-  font-weight: 700;
-  color: #f97316;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  display: block;
-  margin-bottom: 6px;
-}
-.list-header h2 {
-  margin: 0;
-  font-size: 17px;
-  color: #fff;
-}
-.list-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 18px 20px;
-}
-.state-msg, .empty-state {
-  text-align: center;
-  color: #94a3b8;
-  padding: 40px 0;
-  font-size: 13px;
-}
-.machine-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-.machine-card {
-  background-color: #0f172a;
-  border: 1px solid #1e293b;
-  border-radius: 8px;
-  padding: 10px;
-  cursor: pointer;
-  text-align: left;
-  color: inherit;
-  transition: border-color 0.2s, transform 0.2s;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.machine-card:hover {
-  border-color: #f97316;
-  transform: translateY(-2px);
-}
-.machine-thumb {
-  position: relative;
-  width: 100%;
-  height: 90px;
-  background-color: #1e293b;
-  border-radius: 6px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.machine-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.thumb-placeholder { color: #64748b; }
-.badge-3d {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  background: #f97316;
-  color: #fff;
-  font-size: 9px;
-  font-weight: 800;
-  padding: 2px 6px;
-  border-radius: 4px;
-  letter-spacing: 0.5px;
-}
-.machine-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.machine-name {
-  font-size: 12px;
-  font-weight: 700;
-  color: #fff;
-}
-.machine-model {
-  font-size: 10px;
-  color: #94a3b8;
-}
-
-/* ---- Detail view: xếp DỌC (viewer trên, info dưới), toàn bộ panel cuộn chung ---- */
-.back-btn {
-  flex-shrink: 0;
-  margin: 14px 20px 0;
-  align-self: flex-start;
-  background: rgba(15, 23, 42, 0.8);
-  border: 1px solid #1f2d40;
-  color: #e2e8f0;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-.back-btn:hover { border-color: #f97316; color: #f97316; }
-
-.detail-scroll {
-  flex: 1;
-  overflow-y: auto;
-}
-.viewer-frame {
-  position: relative;
-  height: 220px;
-  margin: 14px 20px 0;
-  border-radius: 8px;
-  overflow: hidden;
-  background: #05070d;
-  border: 1px solid #1f2d40;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.model-viewer-el {
-  width: 100%;
-  height: 100%;
-  --progress-bar-color: #f97316;
-}
-.photo-viewer-el {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  background: #000;
-}
-.model-loading {
-  color: #94a3b8;
-  font-size: 13px;
-}
-
-/* Dải thumbnail (3D + ảnh thực tế) ngay dưới viewer-frame */
-.media-thumbstrip {
-  display: flex;
-  gap: 8px;
-  padding: 10px 16px;
-  overflow-x: auto;
-  flex-shrink: 0;
-  border-bottom: 1px solid #1f2d40;
-}
-.thumb-btn {
-  flex-shrink: 0;
-  width: 52px;
-  height: 52px;
-  border-radius: 6px;
-  border: 2px solid #1e293b;
-  background: #0f172a;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  color: #94a3b8;
-  padding: 0;
-  overflow: hidden;
-  transition: border-color 0.15s;
-}
-.thumb-btn span {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
-.thumb-btn.active,
-.thumb-btn:hover {
-  border-color: #f97316;
-  color: #f97316;
-}
-.thumb-btn.thumb-photo {
-  padding: 0;
-}
-.thumb-btn.thumb-photo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.no-model-placeholder {
-  color: #64748b;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 0 16px;
-}
-.no-model-placeholder p {
-  margin: 0;
-  font-weight: 600;
-  color: #94a3b8;
-  font-size: 13px;
-}
-
-.info-pane {
-  padding: 20px;
-}
-.machine-title {
-  margin: 4px 0 2px;
-  font-size: 18px;
-  color: #fff;
-}
-.machine-sub {
-  margin: 0 0 12px;
-  font-size: 13px;
-  color: #94a3b8;
-}
-.status-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #64748b;
-}
-.status-dot.operational { background: #22c55e; }
-.status-dot.maintenance { background: #eab308; }
-.status-dot.offline { background: #ef4444; }
-.status-text {
-  font-size: 12px;
-  color: #cbd5e1;
-}
-.info-block {
-  margin-bottom: 16px;
-}
-.info-block h4 {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: #94a3b8;
-  margin: 0 0 6px;
-  text-transform: uppercase;
-}
-.info-block p {
-  font-size: 13px;
-  line-height: 1.6;
-  margin: 0;
-  color: #e2e8f0;
-}
-.placeholder-text { color: #64748b; font-style: italic; }
-.placeholder-note {
-  font-size: 11px;
-  color: #64748b;
-  font-style: italic;
-  border-top: 1px dashed #1f2d40;
-  padding-top: 12px;
-  margin-top: 8px;
-}
-
-</style>
