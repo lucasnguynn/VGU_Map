@@ -24,7 +24,7 @@ const FLOOR_W             = 280
 // Reference-count guard so the single resize listener survives multiple
 // components calling usePanelLayout() in the same page.
 let _refCount = 0
-let _onResize: (() => void) | null = null
+let _onResize = null
 
 export function usePanelLayout() {
   const mapStore    = useMapStore()
