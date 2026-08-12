@@ -1,6 +1,7 @@
+<!-- pages/index.vue -->
 <template>
   <div class="map-page">
-    <!-- Luồng 3D chỉ chạy ở client -->
+    <!-- 3D map — runs client-side only -->
     <ClientOnly fallback-tag="div" fallback-class="loading-overlay">
       <HologramMap
         ref="hologramMapRef"
@@ -12,6 +13,7 @@
       />
     </ClientOnly>
 
+    <!-- HUD context badge — follows --panels-left-width via CSS -->
     <div class="hud-bar">
       <div class="hud-context-panel">
         <span class="pulse-dot" aria-hidden="true"></span>
@@ -19,25 +21,48 @@
       </div>
     </div>
 
-    <!-- Panel danh sách phòng theo tầng.
-         :force-collapse drives auto-collapse when RoomDetailPanel opens.
-         User can still manually toggle via the panel's own toggle-btn. -->
-    <transition name="floor-panel-enter">
+    <!--
+      ═══════════════════════════════════════════════════════════════════
+        PANEL RENDERING — driven entirely by store.activePanel
+        'buildings' → BuildingsDashboardPanel visible
+        'floor'     → FloorPanel visible (BuildingsDashboard is CSS-hidden)
+        'room'      → RoomDetailPanel visible (Floor behind it, collapsed)
+
+        Desktop: panels are side-dock drawers, controlled by CSS classes.
+        Mobile:  panels are bottom sheets, controlled by useBottomSheet.js.
+
+        NO forceCollapse props. NO usePanelLayout calls scattered here.
+        Just render the right component; the store + CSS handle everything.
+      ═══════════════════════════════════════════════════════════════════
+    -->
+
+    <!-- ── Buildings Dashboard ── -->
+    <!-- Always mounted so its building list stays cached between nav.
+         CSS class 'is-offscreen' slides it to translateX(-100%) when
+         activePanel !== 'buildings'. -->
+    <BuildingsDashboardPanel
+      @select-building="handleBuildingFromPanel"
+    />
+
+    <!-- ── Floor Panel ── -->
+    <!-- Mounted only when a building + floor are selected.
+         On desktop it slides in from the left at position left:var(--panels-left-width).
+         On mobile it's a bottom sheet. -->
+    <transition name="panel-slide">
       <FloorPanel
-        v-if="selectedBuilding && selectedFloor != null"
+        v-if="activePanel === 'floor' || activePanel === 'room'"
         :building-id="selectedBuilding"
-        :cluster-label="String(selectedBuilding).toUpperCase()"
+        :cluster-label="String(selectedBuilding ?? '').toUpperCase()"
         :floor="selectedFloor"
         :selected-room-id="selectedRoom"
-        :force-collapse="!!selectedRoom"
         @select-room="handleFloorRoomSelect"
       />
     </transition>
 
-    <!-- Panel thông tin phòng (bên phải) -->
+    <!-- ── Room Detail Panel ── -->
     <transition name="cyber-slide">
       <RoomDetailPanel
-        v-if="selectedRoom"
+        v-if="activePanel === 'room'"
         ref="roomDetailPanelRef"
         :room-id="selectedRoom"
         :building-id="selectedBuilding"
@@ -45,15 +70,7 @@
       />
     </transition>
 
-    <!-- Buildings Dashboard Panel (overlay trên bản đồ).
-         Auto-collapses to tab when a building/floor/room is selected. -->
-    <BuildingsDashboardPanel
-      v-model="showBuildingsPanel"
-      :force-collapse="!!selectedBuilding"
-      @select-building="handleBuildingFromPanel"
-    />
-
-    <!-- Loading overlay: tắt khi bản đồ báo 'ready' (có timeout an toàn) -->
+    <!-- Loading overlay -->
     <transition name="fade">
       <div v-if="isLoading" class="loading-overlay">
         <div class="cyber-loader" aria-hidden="true"></div>
@@ -64,7 +81,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
+import { computed, ref, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useMapStore } from '~/Stores/mapStores'
@@ -74,49 +91,24 @@ import RoomDetailPanel from '~/components/RoomDetailPanel.vue'
 import FloorPanel from '~/components/FloorPanel.vue'
 import BuildingsDashboardPanel from '~/components/BuildingsDashboardPanel.vue'
 
-const route = useRoute()
-const router = useRouter()
-const mapStore = useMapStore()
-const { selectedRoom, selectedBuilding, selectedFloor, isLoading } = storeToRefs(mapStore)
-const hologramMapRef = ref(null)
+const route         = useRoute()
+const router        = useRouter()
+const mapStore      = useMapStore()
+const { selectedRoom, selectedBuilding, selectedFloor, isLoading, activePanel } = storeToRefs(mapStore)
+const hologramMapRef    = ref(null)
 const roomDetailPanelRef = ref(null)
 
-// Panel layout orchestration
-const { setPanelState } = usePanelLayout()
+// Initialise CSS variable subscriber (watches activePanel, sets --panels-left-width)
+usePanelLayout()
 
-// BuildingsDashboardPanel is always mounted; its visibility is driven by v-model.
-const showBuildingsPanel = ref(true)
-
-// ─── Panel Stage Auto-collapse ────────────────────────────────────────────────
-// Stage 0: nothing selected   → BuildingsPanel OPEN,  FloorPanel hidden,    RoomDetail hidden
-// Stage 1: building selected  → BuildingsPanel COLLAPSED, FloorPanel OPEN,  RoomDetail hidden
-// Stage 2: room selected      → BuildingsPanel COLLAPSED, FloorPanel COLLAPSED, RoomDetail OPEN
-//
-// We drive this via the :force-collapse props passed into the child panels
-// (handled in template above), and by notifying usePanelLayout so it updates
-// --panels-left-width correctly for the HUD bar.
-
-watch(selectedRoom, (roomId) => {
-  // Tell usePanelLayout whether RoomDetailPanel is visible so it can collapse
-  // --panels-left-width to tab-only width, giving the map space on both sides.
-  setPanelState({ roomDetailVisible: !!roomId })
-}, { immediate: true })
-
-watch(selectedBuilding, (buildingId) => {
-  // When a building is first selected (and no room yet), keep RoomDetail closed
-  // and tell layout the FloorPanel will appear.
-  if (!buildingId) {
-    setPanelState({ roomDetailVisible: false })
-  }
-}, { immediate: true })
-// ─────────────────────────────────────────────────────────────────────────────
-
+// ── Context HUD title ──────────────────────────────────────────────────────────
 const contextTitle = computed(() => {
-  if (!selectedBuilding.value) return 'TIÊU ĐIỂM: TOÀN CẢNH KHUÔN VIÊN VGU'
-  if (selectedRoom.value) return `PHÒNG: ${selectedRoom.value}`
-  return `TOÀ: ${String(selectedBuilding.value).toUpperCase()} · TẦNG ${selectedFloor.value ?? '-'}`
+  if (activePanel.value === 'room')     return `PHÒNG: ${selectedRoom.value}`
+  if (activePanel.value === 'floor')    return `TOÀ: ${String(selectedBuilding.value).toUpperCase()} · TẦNG ${selectedFloor.value ?? '-'}`
+  return 'TIÊU ĐIỂM: TOÀN CẢNH KHUÔN VIÊN VGU'
 })
 
+// ── Event handlers from HologramMap ───────────────────────────────────────────
 const handleRoomSelected = ({ roomId, buildingId, floor }) => {
   mapStore.focusOnRoom(roomId, buildingId, floor)
 }
@@ -126,13 +118,14 @@ const handleBuildingSelected = ({ buildingId, floor }) => {
 const handleFloorSelected = ({ floor }) => {
   mapStore.setFloor(floor)
 }
+
 const closePanel = () => {
+  // clearSelection() nulls selectedRoom only → activePanel goes 'room' → 'floor'
+  // FloorPanel stays open; RoomDetailPanel unmounts.
   mapStore.clearSelection()
-  // clearSelection() only nulls selectedRoom, keeping building/floor intact
-  // so FloorPanel stays open. Layout watcher above will re-expand left panels.
 }
 
-// Người dùng chọn toà từ BuildingsDashboardPanel -> bay camera vào toà đó.
+// User clicks a building card inside BuildingsDashboardPanel → fly camera in.
 const handleBuildingFromPanel = async (buildingId) => {
   await nextTick()
   if (hologramMapRef.value?.selectBuilding) {
@@ -142,7 +135,7 @@ const handleBuildingFromPanel = async (buildingId) => {
   }
 }
 
-// Nhấn phòng trong FloorPanel -> bay camera zoom vào đúng phòng trên map.
+// User taps a room card inside FloorPanel → fly camera to room.
 const handleFloorRoomSelect = ({ roomId, buildingId }) => {
   const bId = buildingId ?? selectedBuilding.value
   if (hologramMapRef.value?.goToRoom) {
@@ -169,14 +162,13 @@ const handleEquipmentSelected = async ({ roomId, buildingId, properties }) => {
       buildingId ?? properties?.building_id ?? selectedBuilding.value,
       properties?.floor ?? selectedFloor.value
     )
-    // Q-2 FIX: two nextTick() calls ensure ref is live after v-if + <transition> delay.
     await nextTick()
     await nextTick()
   }
   roomDetailPanelRef.value?.openEquipment(properties)
 }
 
-// Keyboard: Esc closes room panel; second Esc clears building selection entirely.
+// Keyboard: Esc → close room panel; second Esc → exit building entirely.
 const onKey = (e) => {
   if (e.key !== 'Escape') return
   if (selectedRoom.value) {
@@ -186,14 +178,14 @@ const onKey = (e) => {
   }
 }
 
-let safety
+let safetyTimer
 onMounted(() => {
   isLoading.value = true
-  safety = setTimeout(() => { isLoading.value = false }, 6000)
+  safetyTimer = setTimeout(() => { isLoading.value = false }, 6000)
   window.addEventListener('keydown', onKey)
 })
 onBeforeUnmount(() => {
-  clearTimeout(safety)
+  clearTimeout(safetyTimer)
   window.removeEventListener('keydown', onKey)
 })
 </script>
@@ -205,14 +197,14 @@ onBeforeUnmount(() => {
   overflow: hidden;
 }
 
-/* HUD Bar — bám theo --panels-left-width (set bởi usePanelLayout.js).
-   Khi RoomDetailPanel mở, usePanelLayout thu --panels-left-width về tab-only
-   (36px) nên HUD bar tự trượt sang trái, nhường chỗ cho bản đồ ở giữa. */
+/* ── HUD bar ──
+   Follows --panels-left-width (updated by usePanelLayout when activePanel changes).
+   Transitions smoothly as panels open/close. */
 .hud-bar {
   position: absolute;
   top: 76px;
   left: calc(var(--panels-left-width, 336px) + 16px);
-  z-index: 20;
+  z-index: var(--z-hud);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -244,12 +236,12 @@ onBeforeUnmount(() => {
 }
 @keyframes pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.7); }
+  50%       { opacity: 0.4; transform: scale(0.7); }
 }
 
-/* Loading overlay */
+/* ── Loading overlay ── */
 .loading-overlay {
-  position: absolute; inset: 0; z-index: 100;
+  position: absolute; inset: 0; z-index: var(--z-overlay);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 20px; background: #05080d; color: #00ffcc;
   font-family: 'Space Mono', monospace; font-size: 13px; letter-spacing: 1px;
@@ -261,39 +253,37 @@ onBeforeUnmount(() => {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Transitions */
+/* ── Panel transitions ── */
 .fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
 
-/* RoomDetailPanel — trượt từ phải */
+/* RoomDetailPanel — slides in from the right on desktop */
 .cyber-slide-enter-active, .cyber-slide-leave-active {
   transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.38s ease;
 }
-.cyber-slide-enter-from, .cyber-slide-leave-to { transform: translateX(24px); opacity: 0; }
+.cyber-slide-enter-from, .cyber-slide-leave-to {
+  transform: translateX(24px);
+  opacity: 0;
+}
 
-/* FloorPanel — fade + slide từ trái */
-.floor-panel-enter-enter-active, .floor-panel-enter-leave-active {
+/* FloorPanel — slides up from below on mobile, fades in on desktop */
+.panel-slide-enter-active, .panel-slide-leave-active {
   transition: opacity 0.32s ease, transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.floor-panel-enter-enter-from, .floor-panel-enter-leave-to {
+.panel-slide-enter-from, .panel-slide-leave-to {
   opacity: 0;
   transform: translateX(-12px);
 }
 
-/* Tôn trọng người dùng tắt hiệu ứng chuyển động */
 @media (prefers-reduced-motion: reduce) {
   .pulse-dot, .cyber-loader { animation: none; }
   .fade-enter-active, .fade-leave-active,
-  .cyber-slide-enter-active, .cyber-slide-leave-active { transition: none; }
+  .cyber-slide-enter-active, .cyber-slide-leave-active,
+  .panel-slide-enter-active, .panel-slide-leave-active { transition: none; }
 }
 
-/* [MOBILE-FIX] Mobile: HUD bar occupies the top-left but on mobile the
-   floor-bar HUD (inside HologramMap) already shows "B3 / L1 L2…" context.
-   We hide the hud-bar on mobile to remove clutter in the narrow top strip.
-   The contextTitle info is still accessible via the floor-bar label. */
+/* Mobile: HUD bar is replaced by the floor-bar inside FloorPanel's sheet header */
 @media (max-width: 640px) {
-  .hud-bar {
-    display: none;
-  }
+  .hud-bar { display: none; }
 }
 </style>
