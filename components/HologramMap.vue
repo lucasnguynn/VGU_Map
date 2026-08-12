@@ -706,6 +706,17 @@ watch(currentRoomId, (roomId) => {
   loadEquipmentForRoom(currentBuildingId.value, roomId)
 })
 
+// FIX BUG-2 & BUG-3: Theo dõi selectedFloor từ store để cập nhật map và currentFloor
+watch(
+  () => mapStore.selectedFloor,
+  (newFloor) => {
+    if (newFloor == null) return
+    if (newFloor === currentFloor.value) return
+    if (!currentBuildingId.value) return
+    selectFloor(newFloor)
+  }
+)
+
 let roomMarkers = []
 
 function clearRoomMarkers() {
