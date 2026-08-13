@@ -23,9 +23,30 @@ const DRIVE_PATH = path.join(ROOT, 'public', 'data', 'drive_data.json');
 const ROOMS_DIR  = path.join(ROOT, 'content', 'Rooms');
 
 // ─── Tunables ────────────────────────────────────────────────────────────────
-const FETCH_TIMEOUT_MS = 25_000;   // 25 s — Apps Script cold-starts can be slow
-const MAX_RETRIES      = 3;        // Retry on transient 5xx / network errors
-const RETRY_BASE_MS    = 3_000;    // 3 s → 6 s → 12 s (exponential backoff)
+//
+// FETCH_TIMEOUT_MS: GAS cold-start can hold the TCP connection open for 30-45 s
+//   before sending the first byte. 25 s was too aggressive and caused spurious
+//   AbortErrors. 50 s gives the instance time to boot without letting truly
+//   hung requests block the CI job indefinitely.
+const FETCH_TIMEOUT_MS = 50_000;   // 50 s
+
+// MAX_RETRIES: total attempts (1 initial + 4 retries). Five attempts with
+//   exponential backoff covers: 1 cold-start miss + 1 transient 5xx + slack.
+const MAX_RETRIES      = 5;
+
+// RETRY_BASE_MS: first delay. Sequence (without jitter): 4 s → 8 s → 16 s → 32 s.
+//   Total worst-case blocking time ≈ 60 s of delay + 5×50 s of I/O ≈ 4.3 min —
+//   well within the Actions job timeout of 10 min.
+const RETRY_BASE_MS    = 4_000;
+
+// JITTER_MS: random milliseconds added to each delay to de-synchronise
+//   concurrent workflow runs and avoid a thundering-herd effect on GAS.
+const JITTER_MS        = 2_000;
+
+// HTTP status codes that warrant a retry (transient by nature).
+// 408 Request Timeout, 429 Too Many Requests, 5xx server errors.
+// 4xx that are NOT in this set are configuration bugs → fail immediately.
+const RETRYABLE_HTTP_CODES = new Set([408, 429, 500, 502, 503, 504]);
 
 // ─── Env ─────────────────────────────────────────────────────────────────────
 const APPS_SCRIPT_URL = (process.env.APPS_SCRIPT_URL || '').trim();
@@ -36,6 +57,12 @@ const APPS_SCRIPT_URL = (process.env.APPS_SCRIPT_URL || '').trim();
 function log(...args)  { console.log('[sync]', ...args); }
 function warn(...args) { console.warn('[sync] ⚠', ...args); }
 
+/** Milliseconds to sleep. */
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/** Random jitter in [0, JITTER_MS) to spread out concurrent retries. */
+const jitter = () => Math.floor(Math.random() * JITTER_MS);
+
 /**
  * Print a clear, actionable error and exit 1.
  * Never leaks the full secret URL — shows only the safe prefix.
@@ -44,6 +71,74 @@ function fail(msg, hint = '') {
   console.error('\n[sync] ✖ ' + msg);
   if (hint) console.error('[sync]   →', hint);
   console.error('');
+  process.exit(1);
+}
+
+/**
+ * Dump the full forensic context of a failed HTTP exchange to stderr, then exit.
+ *
+ * Directive 3: "the script must console.error the exact HTTP status code,
+ * headers, and the raw response text before exiting with code 1."
+ *
+ * @param {Response|null} res        - The last fetch Response object (may be null on network error).
+ * @param {string|null}   rawBody    - The response body already read as text (may be null).
+ * @param {Error|null}    err        - The last JavaScript Error (network / abort / parse).
+ * @param {number}        attempts   - Total attempts made.
+ */
+function dumpFailureAndExit(res, rawBody, err, attempts) {
+  const divider = '─'.repeat(60);
+
+  console.error(`\n[sync] ✖ Tất cả ${attempts} lần thử đều thất bại.`);
+  console.error(`[sync]   ${divider}`);
+
+  // ── Last JS-level error ──────────────────────────────────────────────────
+  if (err) {
+    console.error(`[sync]   Error type    : ${err.name}`);
+    console.error(`[sync]   Error message : ${err.message}`);
+    if (err.cause) {
+      console.error(`[sync]   Error cause   : ${err.cause}`);
+    }
+  }
+
+  // ── Last HTTP response meta ──────────────────────────────────────────────
+  if (res) {
+    console.error(`[sync]   HTTP Status   : ${res.status} ${res.statusText}`);
+    console.error(`[sync]   Response URL  : ${res.url}`);
+
+    // Dump ALL response headers — they often contain rate-limit context,
+    // Retry-After values, Google error codes, or CORS hints.
+    console.error(`[sync]   Response Headers:`);
+    try {
+      for (const [key, value] of res.headers.entries()) {
+        console.error(`[sync]     ${key}: ${value}`);
+      }
+    } catch {
+      console.error(`[sync]     (headers not iterable)`);
+    }
+  } else {
+    console.error(`[sync]   HTTP Response : none (request never completed)`);
+  }
+
+  // ── Raw response body ────────────────────────────────────────────────────
+  // Cap at 2 000 chars: enough to see an HTML login page header, a GAS error
+  // JSON, or a truncated 502 proxy message — without flooding the CI log.
+  if (rawBody !== null && rawBody !== undefined) {
+    const preview = rawBody.length > 2_000
+      ? rawBody.slice(0, 2_000) + `\n… [truncated ${rawBody.length - 2_000} chars]`
+      : rawBody;
+    console.error(`[sync]   Raw Response Body (${rawBody.length} chars):`);
+    console.error(preview);
+  } else {
+    console.error(`[sync]   Raw Response Body : (not captured)`);
+  }
+
+  console.error(`[sync]   ${divider}`);
+  console.error(`[sync]   Hints:`);
+  console.error(`[sync]     • GAS cold-start timeout? Increase FETCH_TIMEOUT_MS.`);
+  console.error(`[sync]     • Persistent 429? GAS quota exceeded — reduce cron frequency.`);
+  console.error(`[sync]     • HTML body? Web App is not public ("Anyone" access required).`);
+  console.error(`[sync]     • Network error? Check GitHub Actions runner connectivity.\n`);
+
   process.exit(1);
 }
 
@@ -72,7 +167,7 @@ function roomIdFrom(roomNumber) {
 }
 
 function floorFrom(roomId) {
-  const m = roomId.match(/(?:AD-|B\d-)?\d{0,2}(\d)\d{2}/)
+  const m = roomId.match(/(?:AD-|B\d-)?\\d{0,2}(\d)\d{2}/)
          || roomId.match(/^(\d)\./);
   return m ? parseInt(m[1], 10) : 1;
 }
@@ -153,10 +248,18 @@ function validateUrl(url) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Robust fetch: timeout + retry + content-type guard
+// Network layer
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** Single fetch attempt with AbortController timeout. */
+/**
+ * Single fetch attempt with an AbortController-based hard timeout.
+ *
+ * Directive 2: "Explicitly set a generous timeout (e.g., 30 to 60 seconds)."
+ * FETCH_TIMEOUT_MS is set to 50 000 ms (50 s) — see Tunables above.
+ *
+ * @returns {Promise<Response>}
+ * @throws  {Error} with name 'AbortError' on timeout, or a TypeError on DNS/TCP failure.
+ */
 async function fetchOnce(url) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
@@ -170,27 +273,59 @@ async function fetchOnce(url) {
     return res;
   } catch (err) {
     if (err.name === 'AbortError') {
-      throw new Error(`Request timed out after ${FETCH_TIMEOUT_MS / 1000}s`);
+      throw Object.assign(
+        new Error(`Request timed out after ${FETCH_TIMEOUT_MS / 1000} s (GAS cold-start?)`),
+        { name: 'AbortError' }
+      );
     }
-    throw err;
+    throw err; // re-throw DNS / TCP / TLS errors verbatim
   } finally {
     clearTimeout(timer);
   }
 }
 
 /**
- * Fetch with exponential-backoff retry.
- * Retries only on network errors and 5xx — 4xx are bugs, not transients.
+ * Fetch with exponential-backoff retry and full forensic logging on exhaustion.
+ *
+ * Directive 1: "Wrap the fetch call in a robust retry loop (up to 3–5 attempts
+ *              with increasing delays) to gracefully handle Google's transient errors."
+ * Directive 3: "console.error the exact HTTP status code, headers, and the raw
+ *              response text before exiting with code 1."
+ *
+ * Retry policy:
+ *   • RETRYABLE_HTTP_CODES (408, 429, 500, 502, 503, 504) → retry after backoff.
+ *   • 429 additionally inspects the Retry-After header and respects it.
+ *   • Network / timeout errors → retry after backoff.
+ *   • 401, 403, 404, other 4xx → configuration bug, fail immediately (no retry).
+ *
+ * @returns {Promise<Response>} A 2xx Response whose body has NOT been consumed.
  */
 async function fetchWithRetry(url) {
-  let lastErr;
+  /** Last JavaScript Error (network/abort). Updated on every failed attempt. */
+  let lastErr = null;
+
+  /**
+   * Last HTTP Response object. Kept so dumpFailureAndExit can read its status,
+   * URL, and headers even after the body has been consumed.
+   * NOTE: The body of this object IS consumed (read into lastRawBody) so it
+   *       must NOT be used for JSON parsing — only for metadata.
+   */
+  let lastResponse = null;
+
+  /**
+   * Raw response body captured on retryable HTTP errors (5xx / 429).
+   * For successful 2xx paths the body is left unconsumed for the caller.
+   */
+  let lastRawBody  = null;
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-    log(`Lần thử ${attempt}/${MAX_RETRIES}…`);
+    log(`Lần thử ${attempt}/${MAX_RETRIES} (timeout: ${FETCH_TIMEOUT_MS / 1000}s)…`);
+
     try {
       const res = await fetchOnce(url);
+      lastResponse = res; // keep reference (body not yet consumed)
 
-      // ── 4xx: configuration error — no point retrying ──────────────────────
+      // ── Permanent 4xx: configuration bugs — never retry ─────────────────
       if (res.status === 404) {
         fail(
           `Apps Script trả HTTP 404 Not Found.`,
@@ -216,52 +351,114 @@ async function fetchWithRetry(url) {
         );
       }
 
-      // ── 5xx: transient server error — retry ───────────────────────────────
-      if (res.status >= 500) {
-        warn(`HTTP ${res.status} ${res.statusText} — có thể thử lại.`);
-        lastErr = new Error(`HTTP ${res.status}`);
-        // fall through to retry logic below
-      } else if (!res.ok) {
-        fail(`Apps Script trả HTTP ${res.status} ${res.statusText}.`);
-      } else {
-        // ── 2xx: check we actually got JSON, not an HTML login redirect ───────
-        const contentType = res.headers.get('content-type') || '';
-        if (!contentType.includes('application/json') && !contentType.includes('text/plain')) {
-          // Read the body to detect an HTML login page
-          const body = await res.text();
-          const isHtml = body.trimStart().startsWith('<!') || body.trimStart().startsWith('<html');
-          if (isHtml) {
-            fail(
-              `Apps Script trả về trang HTML (${res.status}) thay vì JSON.`,
-              'Đây là trang đăng nhập Google — Web App chưa được mở public.\n' +
-              '  FIX: Apps Script → Deploy → Manage deployments → Edit\n' +
-              '    → Who has access → "Anyone" → Re-deploy\n' +
-              '    → Copy URL mới và cập nhật APPS_SCRIPT_URL.\n' +
-              '  Content-Type nhận được: ' + contentType
-            );
-          }
-          warn(`Content-Type không phải JSON: ${contentType} — vẫn thử parse.`);
-          // Return a synthetic Response wrapping the already-read text
-          return { ok: true, _text: body };
-        }
-        return res;
-      }
-    } catch (err) {
-      warn(`Lần thử ${attempt} thất bại: ${err.message}`);
-      lastErr = err;
-    }
+      // ── HTTP 429 Too Many Requests: rate-limited — retry with backoff ────
+      //
+      // GAS enforces per-user and per-script quotas. A 429 is transient and
+      // *must* be retried, not failed immediately. Respect Retry-After when
+      // Google provides it.
+      if (res.status === 429) {
+        lastRawBody = await res.text().catch(() => '(body unreadable)');
+        lastErr     = new Error(`HTTP 429 Too Many Requests`);
 
-    if (attempt < MAX_RETRIES) {
-      const delay = RETRY_BASE_MS * Math.pow(2, attempt - 1);
-      log(`Chờ ${delay / 1000}s trước khi thử lại…`);
-      await new Promise(r => setTimeout(r, delay));
+        const retryAfterHeader = res.headers.get('retry-after');
+        let delayMs;
+        if (retryAfterHeader) {
+          const seconds = parseInt(retryAfterHeader, 10);
+          delayMs = (isNaN(seconds) ? RETRY_BASE_MS : seconds * 1_000) + jitter();
+          warn(`HTTP 429 — Retry-After: ${retryAfterHeader}s → chờ ${Math.round(delayMs / 1_000)}s…`);
+        } else {
+          delayMs = RETRY_BASE_MS * Math.pow(2, attempt - 1) + jitter();
+          warn(`HTTP 429 (no Retry-After header) → backoff ${Math.round(delayMs / 1_000)}s…`);
+        }
+
+        if (attempt < MAX_RETRIES) {
+          await sleep(delayMs);
+          continue; // next attempt
+        }
+        break; // exhausted
+      }
+
+      // ── 5xx Transient server errors: retry with exponential backoff ──────
+      //
+      // 500 Internal Server Error  — GAS script crash
+      // 502 Bad Gateway            — proxy / load balancer hiccup
+      // 503 Service Unavailable    — GAS overloaded
+      // 504 Gateway Timeout        — GAS took too long to respond to the proxy
+      if (RETRYABLE_HTTP_CODES.has(res.status)) {
+        // Consume the body NOW so we can log it on final failure.
+        // The response object is then only useful for its metadata.
+        lastRawBody = await res.text().catch(() => '(body unreadable)');
+        lastErr     = new Error(`HTTP ${res.status} ${res.statusText}`);
+
+        warn(`HTTP ${res.status} ${res.statusText} — lỗi tạm thời, sẽ thử lại.`);
+        if (lastRawBody) {
+          // Log a short preview immediately so each attempt's error is visible
+          // in the CI log stream, not just the final dump.
+          warn(`  Body preview: ${lastRawBody.slice(0, 200)}`);
+        }
+
+        if (attempt < MAX_RETRIES) {
+          const delayMs = RETRY_BASE_MS * Math.pow(2, attempt - 1) + jitter();
+          log(`Chờ ${Math.round(delayMs / 1_000)}s trước khi thử lại…`);
+          await sleep(delayMs);
+          continue; // next attempt
+        }
+        break; // exhausted — fall through to dumpFailureAndExit
+      }
+
+      // ── Other non-ok, non-retryable 4xx ─────────────────────────────────
+      if (!res.ok) {
+        lastRawBody = await res.text().catch(() => '(body unreadable)');
+        fail(
+          `Apps Script trả HTTP ${res.status} ${res.statusText}.`,
+          `Body: ${lastRawBody.slice(0, 500)}`
+        );
+      }
+
+      // ── 2xx Success ───────────────────────────────────────────────────────
+      // Detect an HTML login-redirect masquerading as 200 OK.
+      // GAS returns 200 + HTML when "Who has access" is not set to "Anyone".
+      const contentType = res.headers.get('content-type') || '';
+      if (!contentType.includes('application/json') && !contentType.includes('text/plain')) {
+        const body = await res.text();
+        const isHtml = body.trimStart().startsWith('<!') || body.trimStart().toLowerCase().startsWith('<html');
+        if (isHtml) {
+          fail(
+            `Apps Script trả về trang HTML (${res.status}) thay vì JSON.`,
+            'Đây là trang đăng nhập Google — Web App chưa được mở public.\n' +
+            '  FIX: Apps Script → Deploy → Manage deployments → Edit\n' +
+            '    → Who has access → "Anyone" → Re-deploy\n' +
+            '    → Copy URL mới và cập nhật APPS_SCRIPT_URL.\n' +
+            '  Content-Type nhận được: ' + contentType
+          );
+        }
+        warn(`Content-Type không phải JSON: ${contentType} — vẫn thử parse.`);
+        // Wrap the already-read text in a synthetic object so the caller can
+        // read it uniformly via res._text.
+        return { ok: true, status: res.status, statusText: res.statusText,
+                 headers: res.headers, url: res.url, _text: body };
+      }
+
+      // Clean 2xx with JSON content-type — return without consuming the body.
+      return res;
+
+    } catch (err) {
+      // Network-level errors (DNS failure, TCP reset, AbortError from timeout).
+      lastErr = err;
+      warn(`Lần thử ${attempt}/${MAX_RETRIES} thất bại [${err.name}]: ${err.message}`);
+
+      if (attempt < MAX_RETRIES) {
+        const delayMs = RETRY_BASE_MS * Math.pow(2, attempt - 1) + jitter();
+        log(`Chờ ${Math.round(delayMs / 1_000)}s trước khi thử lại…`);
+        await sleep(delayMs);
+        // continue to next iteration (implicit at end of for loop)
+      }
     }
   }
 
-  fail(
-    `Tất cả ${MAX_RETRIES} lần thử đều thất bại: ${lastErr?.message || 'unknown error'}`,
-    'Kiểm tra kết nối mạng của runner hoặc trạng thái Apps Script.'
-  );
+  // ── All attempts exhausted ────────────────────────────────────────────────
+  // Directive 3: dump HTTP status, ALL headers, raw body, then exit 1.
+  dumpFailureAndExit(lastResponse, lastRawBody, lastErr, MAX_RETRIES);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -275,7 +472,7 @@ async function fetchRooms() {
 
   let payload;
   try {
-    // Handle the synthetic response from the HTML-detection path
+    // Handle the synthetic response from the HTML-detection / non-JSON path
     const raw = res._text !== undefined ? res._text : await res.text();
     payload = JSON.parse(raw);
   } catch (e) {
@@ -360,6 +557,7 @@ Hệ thống cảm biến và dữ liệu telemetry đang được đồng bộ.
 (async () => {
   log('─── Bắt đầu đồng bộ dữ liệu ───────────────────────────────────────────');
   log(`Node ${process.version} | ${new Date().toISOString()}`);
+  log(`Config: timeout=${FETCH_TIMEOUT_MS / 1_000}s | retries=${MAX_RETRIES} | base-delay=${RETRY_BASE_MS / 1_000}s | jitter=${JITTER_MS / 1_000}s`);
 
   const rooms     = await fetchRooms();
   const driveData = readJsonSafe(DRIVE_PATH, {});
