@@ -18,7 +18,7 @@
         <span class="header-title">
           <span class="title-accent">VGU</span> MAP
         </span>
-        <span class="header-subtitle">DIGITAL TWIN V1.0</span>
+        <span class="header-subtitle">DIGITAL MAP V3.1</span>
       </span>
     </NuxtLink>
 
