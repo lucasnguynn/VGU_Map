@@ -276,15 +276,19 @@ const handleSelectRoom = (room) => {
 
 <style scoped>
 /* ── Desktop / Tablet base ───────────────────────────────────────────────────
-   CHANGED: left is now fixed at 36px (the buildings tab stub width).
-   BuildingsDashboard is fully translated off-screen when FloorPanel is shown,
-   so there is no dynamic --panels-left-width offset needed here any more.
-   This eliminates the race condition between usePanelLayout and the forceCollapse
-   prop that caused the side-by-side bug. */
+   FIX: left is now 0. BuildingsDashboardPanel uses translateX(-100%) to exit,
+   meaning its entire 300px footprint — including the toggle-tab stub — is fully
+   off-screen when FloorPanel is shown. The previous left: 36px was compensating
+   for a tab stub that no longer exists in the visual layout, creating a phantom
+   36px gap. Setting left: 0 eliminates it.
+
+   HANDOFF SYNC: transition duration and cubic-bezier EXACTLY match
+   BuildingsDashboardPanel's .buildings-panel transition so both panels move as
+   a single choreographed unit — one pushing the other out. */
 .floor-panel {
   position: absolute;
   top: var(--header-h, 64px);
-  left: 36px;     /* = BUILDINGS_TAB_W: the tab stub that remains on desktop */
+  left: 0;         /* FIX: was 36px — BuildingsDashboard is fully off-screen; no stub remains */
   width: 280px;
   height: calc(100vh - var(--header-h, 64px));
   background-color: #0b1120;
@@ -293,7 +297,8 @@ const handleSelectRoom = (room) => {
   font-family: 'Inter', sans-serif;
   box-shadow: 4px 0 15px rgba(0,0,0,0.5);
   z-index: var(--z-panel-floor);
-  transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+  /* SYNC: identical duration + cubic-bezier as .buildings-panel for the handoff */
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
   overflow: visible;
   will-change: transform;
 }
