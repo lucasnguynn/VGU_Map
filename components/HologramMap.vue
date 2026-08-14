@@ -3,31 +3,31 @@
   <div ref="mapContainer" class="map-container"></div>
 
   <!-- ================= Thanh tìm kiếm toàn cục (Global Search) ================= -->
-  <!-- Unified control pill: context badge + search input in one cohesive component -->
   <div class="global-search-container">
-    <div class="search-wrapper" :class="{ 'has-context': currentBuildingId }">
+    <div class="search-wrapper">
 
-      <!-- Context badge — only renders when inside a building, flush-left inside the pill -->
+      <!-- LEFT SEGMENT: context badge. A true flex child — fills height automatically,
+           separated by a border-right. Removed when no building is active. -->
       <Transition name="ctx-badge">
-        <div v-if="currentBuildingId" class="search-context-badge">
+        <div v-if="currentBuildingId" class="search-context-badge" aria-label="Vị trí hiện tại">
           <span class="ctx-building">{{ currentBuildingId }}</span>
           <span v-if="currentFloor != null" class="ctx-sep">·</span>
           <span v-if="currentFloor != null" class="ctx-floor">L{{ currentFloor }}</span>
         </div>
       </Transition>
 
-      <!-- Search icon — shifts right when badge is present -->
-      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <!-- MIDDLE SEGMENT: search icon, a plain flex child with fixed width -->
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <circle cx="11" cy="11" r="8"></circle>
         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
       </svg>
 
+      <!-- RIGHT SEGMENT: naked input, flex: 1 fills all remaining space -->
       <input
         v-model="searchQuery"
         type="text"
         class="global-search-input"
-        :class="{ 'with-badge': currentBuildingId }"
-        :placeholder="currentBuildingId ? `Tìm phòng…` : 'Tìm phòng trên Campus…'"
+        :placeholder="currentBuildingId ? `Tìm phòng trong ${currentBuildingId}…` : 'Tìm phòng trên Campus…'"
         @input="onSearchInput"
         @focus="onSearchInput"
         @blur="onSearchBlur"
@@ -43,10 +43,8 @@
       >
         <div class="rs-info">
           <span class="rs-id">{{ r.roomNumber }}</span>
-          <!-- Hàm lọc lặp tên vẫn được giữ nguyên -->
           <span class="rs-name">{{ formatRoomName(r.roomName) }}</span>
         </div>
-        <!-- Chỉ hiện thẻ tên Toà nếu đang tìm ở chế độ Campus -->
         <span v-if="!currentBuildingId" class="rs-building">{{ r.buildingId }}</span>
       </button>
     </div>
@@ -850,134 +848,124 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
 }
 :deep(.maplibregl-popup-tip) { border-top-color: rgba(15, 30, 54, 0.95); }
 
-/* ── Global Search Container ── */
+/* ═══════════════════════════════════════════
+   GLOBAL SEARCH — TRUE UNIFIED PILL
+   Layout model: pure flex row, zero absolute positioning.
+   .search-wrapper   → the pill shell (border + bg + border-radius)
+   .search-context-badge → left flex child  (tinted, separator right border)
+   .search-icon      → middle flex child (fixed 40px slot)
+   .global-search-input  → right flex child (flex:1, transparent, naked)
+   ═══════════════════════════════════════════ */
+
 .global-search-container {
   position: absolute;
   top: calc(var(--header-h, 64px) + 12px);
   left: 50%;
   transform: translateX(-50%);
   z-index: 70;
-  width: 320px;
-  max-width: 90vw;
+  width: 340px;
+  max-width: 92vw;
 }
 
-/* ── Search Wrapper: the pill itself ── */
+/* THE PILL — every visual chrome lives HERE and only here */
 .search-wrapper {
-  position: relative;
   width: 100%;
-  display: flex;
-  align-items: center;
   height: 44px;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;        /* children fill the full 44px height */
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(11, 17, 32, 0.85);
   backdrop-filter: blur(8px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  overflow: hidden;
-  transition: border-color 0.2s ease, background 0.2s ease;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+  overflow: hidden;            /* clips badge tint flush to the rounded ends */
+  transition: border-color 0.2s ease;
 }
 
 .search-wrapper:focus-within {
   border-color: #EF5A24;
-  background: rgba(11, 17, 32, 0.95);
 }
 
-/* ── Context Badge (flush-left inside the pill) ── */
+/* ── Left segment: context badge ── */
 .search-context-badge {
+  /* flex child — height is inherited from align-items:stretch */
   display: flex;
   align-items: center;
   gap: 5px;
   flex-shrink: 0;
-  height: 100%;
-  padding: 0 10px 0 14px;
-  border-right: 1px solid rgba(239, 90, 36, 0.25);
-  background: rgba(239, 90, 36, 0.08);
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+  padding: 0 16px;
+  background: rgba(239, 90, 36, 0.1);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
   white-space: nowrap;
   pointer-events: none;
   user-select: none;
 }
 
 .ctx-building {
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
   color: #EF5A24;
   text-transform: uppercase;
 }
 
 .ctx-sep {
-  color: rgba(239, 90, 36, 0.45);
-  font-size: 9px;
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.25);
 }
 
 .ctx-floor {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 10px;
-  font-weight: 600;
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.55);
 }
 
-/* ── Search icon ── */
+/* ── Middle segment: magnifier icon ── */
 .search-icon {
-  position: absolute;
-  /* Default: no badge present */
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
+  /* flex child — NOT position:absolute */
+  flex-shrink: 0;
+  align-self: center;
   width: 15px;
   height: 15px;
-  color: #94a3b8;
-  pointer-events: none;
-  flex-shrink: 0;
-  z-index: 1;
-}
-
-/* When badge is present, icon anchors just after the badge.
-   We measure via the input's left padding shift. */
-.search-wrapper.has-context .search-icon {
-  /* Badge is ~80px wide; position icon inside the input area */
-  left: auto;
-  right: 14px;
+  margin: 0 10px 0 14px;
   color: #64748b;
+  pointer-events: none;
 }
 
-/* ── Text input ── */
+/* ── Right segment: naked text input ── */
 .global-search-input {
-  flex: 1 1 auto;
+  flex: 1;
   min-width: 0;
   height: 100%;
-  /* Default: magnifier on left */
-  padding: 0 16px 0 40px;
-  border: none;
+  padding: 0 16px 0 0;
   background: transparent;
+  border: none;
+  outline: none;
   color: #fff;
   font-family: 'Space Mono', monospace;
   font-size: 13px;
-  outline: none;
-  transition: padding 0.2s ease;
-}
-
-/* When badge is shown: icon moves to the right, so padding swaps */
-.global-search-input.with-badge {
-  padding: 0 36px 0 12px;
+  line-height: 1;
 }
 
 .global-search-input::placeholder {
-  color: rgba(255, 255, 255, 0.38);
-  font-size: 12px;
+  color: rgba(255, 255, 255, 0.35);
 }
 
-/* Badge enter/leave animation */
+/* Badge slide-in/out — animates max-width so the pill reflows smoothly */
 .ctx-badge-enter-active,
 .ctx-badge-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease, max-width 0.25s ease;
+  transition: max-width 0.25s ease, opacity 0.2s ease, padding 0.25s ease;
+  max-width: 200px;
   overflow: hidden;
 }
 .ctx-badge-enter-from,
 .ctx-badge-leave-to {
-  opacity: 0;
-  transform: translateX(-6px);
   max-width: 0;
+  opacity: 0;
   padding-left: 0;
   padding-right: 0;
 }
@@ -1111,7 +1099,10 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
 
 @media (max-width: 640px) {
   .global-search-container { width: min(360px, 94vw); top: calc(var(--header-h-mobile, 54px) + 8px); left: 50%; transform: translateX(-50%); }
-  .search-context-badge { padding: 0 8px 0 12px; font-size: 10px; }
+  .search-wrapper { height: 40px; }
+  .search-context-badge { padding: 0 10px; }
+  .ctx-building, .ctx-sep, .ctx-floor { font-size: 11px; }
+  .search-icon { margin: 0 8px 0 10px; }
   .global-search-input { font-size: 12px; }
   .global-search-results { max-height: 38vh; }
   .floor-bar { top: calc(var(--header-h-mobile, 54px) + 76px); bottom: auto; left: 50%; transform: translateX(-50%); z-index: 115; gap: 6px; padding: 6px 8px; max-width: 92vw; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
