@@ -291,20 +291,15 @@ onMounted(() => {
   map.on('mouseleave', 'vgu-rooms-fill', setPointer(false))
 
   // ── HTML marker zoom-declutter ────────────────────────────────────────────
-  // HTML markers (renderRoomMarkers) are vanilla DOM nodes — MapLibre has no
-  // authority over their visibility. We imperatively toggle opacity +
-  // pointerEvents so they only appear when zoomed deep into a building.
-  //
-  // Threshold rationale:
-  //   z17.5 ≈ 50–100 m scale → markers visible too early, severe clutter
-  //   z19.0 ≈ 5–10 m scale  → correct: user must be inside a building floor
-  //
-  // updateRoomMarkerZoomVisibility() is defined at module scope (below) and
-  // called in two places:
-  //   1. map.on('zoom', …) — keeps state correct while panning/zooming
-  //   2. renderRoomMarkers() → requestAnimationFrame — fixes the init bug
-  //      where markers were visible on first render at campus-overview zoom
-  map.on('zoom', updateRoomMarkerZoomVisibility)
+  // HTML markers are vanilla DOM nodes — MapLibre cannot control them natively.
+  // Strategy: toggle the CSS class `hidden-by-zoom` on each marker element.
+  // The class uses `!important` in the stylesheet, so it wins over any inline
+  // style set by updateMarkerVisibility() (display) or any other JS path.
+  // The two concerns are now strictly separated:
+  //   syncZoomVisibility   → adds/removes .hidden-by-zoom (zoom gate, CSS class)
+  //   updateMarkerVisibility → sets display:none/'' (floor/room filter, inline)
+  // They cannot conflict because they touch different CSS properties.
+  map.on('zoom', syncZoomVisibility)
 
   // ── Hover: cursor + feature-state ────────────────────────────────────────
   // mouseenter/mouseleave are simpler than mousemove and avoid per-pixel
@@ -868,21 +863,19 @@ watch(
 
 let roomMarkers = []
 
-// ── Zoom-visibility constant ──────────────────────────────────────────────────
-// z19.0 ≈ 5–10 m scale: the user must be deeply zoomed into a building floor
-// before the rectangular HTML marker cards appear. At z17.5 (the old value,
-// ≈50–100 m) all markers stacked on top of each other at campus overview.
-const ROOM_MARKER_MINZOOM = 19.0
+// ── Zoom-gate: CSS-class strategy ────────────────────────────────────────────
+// ROOM_MARKER_MINZOOM = 18.5 ≈ 10–20 m scale.
+// We toggle the class `hidden-by-zoom` instead of writing inline opacity/
+// pointerEvents. The class carries `!important` in the stylesheet, which
+// guarantees it overrides anything updateMarkerVisibility() writes to `display`.
+// The two functions now own completely different CSS properties and cannot race.
+const ROOM_MARKER_MINZOOM = 18.5
 
-// Called by: (1) map.on('zoom', …) and (2) renderRoomMarkers() via rAF.
-// Keeping it at module scope avoids a closure over the map.on callback and
-// allows renderRoomMarkers() to call it without a circular dependency.
-function updateRoomMarkerZoomVisibility() {
+function syncZoomVisibility() {
   if (!map) return
-  const visible = map.getZoom() >= ROOM_MARKER_MINZOOM
+  const zoomedOut = map.getZoom() < ROOM_MARKER_MINZOOM
   roomMarkers.forEach(({ el }) => {
-    el.style.opacity       = visible ? '1' : '0'
-    el.style.pointerEvents = visible ? 'auto' : 'none'
+    el.classList.toggle('hidden-by-zoom', zoomedOut)
   })
 }
 
@@ -954,17 +947,13 @@ function renderRoomMarkers(floorNumber) {
     roomMarkers.push({ marker, el, roomId })
   })
 
-  // Fix init bug: markers are in the DOM now but the zoom.on listener has
-  // never fired (it only fires on subsequent zoom events). Without this call,
-  // markers are visible at whatever zoom the map happened to load at —
-  // typically a campus-overview level where they hopelessly overlap.
-  // requestAnimationFrame defers one paint tick so MapLibre has finished
-  // positioning the Marker elements before we read / write their style.
-  requestAnimationFrame(() => {
-    updateRoomMarkerZoomVisibility()
-  })
+  // Init fix: zoom listener only fires on subsequent zoom events, so newly
+  // created markers would be unconstrained until the user zooms. Call
+  // syncZoomVisibility() immediately — classList.toggle is safe to call the
+  // moment the element exists; no rAF needed because we are not reading layout.
+  syncZoomVisibility()
 
-  // Separately apply the selected-room display filter (unchanged logic).
+  // Apply the floor/room selection filter (touches display only, not opacity).
   updateMarkerVisibility()
 }
 
@@ -1216,8 +1205,18 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding, highlightEquipment })
 }
 @keyframes calib-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.6); } }
 
-/* Smooth fade-in/out when zoom crosses the ROOM_MARKER_MINZOOM threshold */
-:deep(.vgu-room-marker) { transition: opacity 0.35s ease; }
+/* Base transition so the zoom fade-in/out is smooth */
+:deep(.vgu-room-marker) { transition: opacity 0.3s ease; }
+
+/* Zoom gate — toggled by syncZoomVisibility() via classList.toggle.
+   !important is intentional: this class must win over any inline style
+   that updateMarkerVisibility() (or any other JS path) writes to the element.
+   The two functions own different properties (opacity vs display) so they
+   cannot conflict, but !important is the belt-and-suspenders guarantee. */
+:deep(.vgu-room-marker.hidden-by-zoom) {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
 
 :deep(.room-dot) { position: absolute; transform: translate(-50%, -50%); width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; }
 :deep(.room-ping) { position: absolute; display: inline-flex; width: 100%; height: 100%; border-radius: 50%; background: #EF5A24; opacity: 0.75; animation: room-ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite; }
