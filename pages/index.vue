@@ -13,14 +13,6 @@
       />
     </ClientOnly>
 
-    <!-- HUD context badge — follows --panels-left-width via CSS -->
-    <div class="hud-bar">
-      <div class="hud-context-panel">
-        <span class="pulse-dot" aria-hidden="true"></span>
-        <span>{{ contextTitle }}</span>
-      </div>
-    </div>
-
     <!--
       ═══════════════════════════════════════════════════════════════════
         PANEL RENDERING — driven entirely by store.activePanel
@@ -81,7 +73,7 @@
 </template>
 
 <script setup>
-import { computed, ref, nextTick, onMounted, onBeforeUnmount } from 'vue'
+import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useMapStore } from '~/Stores/mapStores'
@@ -100,13 +92,6 @@ const roomDetailPanelRef = ref(null)
 
 // Initialise CSS variable subscriber (watches activePanel, sets --panels-left-width)
 usePanelLayout()
-
-// ── Context HUD title ──────────────────────────────────────────────────────────
-const contextTitle = computed(() => {
-  if (activePanel.value === 'room')     return `PHÒNG: ${selectedRoom.value}`
-  if (activePanel.value === 'floor')    return `TOÀ: ${String(selectedBuilding.value).toUpperCase()} · TẦNG ${selectedFloor.value ?? '-'}`
-  return 'TIÊU ĐIỂM: TOÀN CẢNH KHUÔN VIÊN VGU'
-})
 
 // ── Event handlers from HologramMap ───────────────────────────────────────────
 const handleRoomSelected = ({ roomId, buildingId, floor }) => {
@@ -197,48 +182,6 @@ onBeforeUnmount(() => {
   overflow: hidden;
 }
 
-/* ── HUD bar ──
-   Follows --panels-left-width (updated by usePanelLayout when activePanel changes).
-   Transitions smoothly as panels open/close. */
-.hud-bar {
-  position: absolute;
-  top: 76px;
-  left: calc(var(--panels-left-width, 336px) + 16px);
-  z-index: var(--z-hud);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  pointer-events: none;
-  transition: left 0.38s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: left;
-}
-.hud-bar > * { pointer-events: auto; }
-
-.hud-context-panel {
-  display: flex; align-items: center; gap: 10px;
-  padding: 7px 14px;
-  background: rgba(7, 10, 18, 0.82);
-  border: 1px solid rgba(0, 255, 204, 0.22);
-  border-radius: 6px;
-  backdrop-filter: blur(10px);
-  font-family: 'Space Mono', monospace;
-  font-size: 11px; letter-spacing: 0.5px; color: #00ffcc;
-  white-space: nowrap;
-  max-width: 60vw;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.pulse-dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: #00ffcc; box-shadow: 0 0 8px #00ffcc;
-  animation: pulse 1.6s ease-in-out infinite;
-}
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.4; transform: scale(0.7); }
-}
-
 /* ── Loading overlay ── */
 .loading-overlay {
   position: absolute; inset: 0; z-index: var(--z-overlay);
@@ -276,14 +219,11 @@ onBeforeUnmount(() => {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pulse-dot, .cyber-loader { animation: none; }
+  .cyber-loader { animation: none; }
   .fade-enter-active, .fade-leave-active,
   .cyber-slide-enter-active, .cyber-slide-leave-active,
   .panel-slide-enter-active, .panel-slide-leave-active { transition: none; }
 }
 
-/* Mobile: HUD bar is replaced by the floor-bar inside FloorPanel's sheet header */
-@media (max-width: 640px) {
-  .hud-bar { display: none; }
-}
+
 </style>
