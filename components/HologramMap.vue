@@ -238,7 +238,7 @@ onMounted(() => {
   })
 
   map.addControl(new maplibregl.NavigationControl(), 'top-right')
-  map.addControl(new maplibregl.ScaleControl(), 'bottom-left')
+  map.addControl(new maplibregl.ScaleControl({ maxWidth: 120, unit: 'metric' }), 'bottom-right')
 
   map.on('load', async () => {
     console.log('[HologramMap] Map loaded successfully')
@@ -289,6 +289,20 @@ onMounted(() => {
   map.on('mouseleave', 'vgu-buildings-3d', setPointer(false))
   map.on('mouseenter', 'vgu-rooms-fill', setPointer(true))
   map.on('mouseleave', 'vgu-rooms-fill', setPointer(false))
+
+  // ── HTML marker zoom-declutter ────────────────────────────────────────────
+  // The MapLibre symbol layer (vgu-rooms-labels) handles minzoom natively.
+  // HTML markers created by renderRoomMarkers() are vanilla DOM nodes, so we
+  // must hide/show them with a zoom listener to match the z17.5 threshold.
+  const ROOM_MARKER_MINZOOM = 17.5
+  const syncMarkerVisibilityByZoom = () => {
+    const visible = map.getZoom() >= ROOM_MARKER_MINZOOM
+    roomMarkers.forEach(({ el }) => {
+      el.style.opacity  = visible ? '1' : '0'
+      el.style.pointerEvents = visible ? 'auto' : 'none'
+    })
+  }
+  map.on('zoom', syncMarkerVisibilityByZoom)
 
   // ── Hover: cursor + feature-state ────────────────────────────────────────
   // mouseenter/mouseleave are simpler than mousemove and avoid per-pixel
@@ -422,6 +436,41 @@ async function initRoomsLayer() {
     paint: { 'line-color': '#00ffcc', 'line-width': 1.5, 'line-opacity': 0.8 }
   })
 
+  // ── Room label symbol layer ────────────────────────────────────────────────
+  // Uses the same vgu-rooms source so labels track polygon centroids and update
+  // automatically when floor / building data changes.
+  // DECLUTTER: minzoom:17.5 keeps labels hidden at campus-overview zoom levels.
+  // The interpolated text-opacity fades them in over the next half-step so
+  // text doesn't snap into view violently.
+  map.addLayer({
+    id: 'vgu-rooms-labels',
+    type: 'symbol',
+    source: 'vgu-rooms',
+    minzoom: 17.5, // STRICT DIRECTIVE: Hide room labels when zoomed out
+    layout: {
+      'text-field': ['coalesce', ['get', 'room_id'], ''],
+      'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+      'text-size': 10,
+      'text-anchor': 'center',
+      'text-allow-overlap': false,     // let MapLibre suppress genuine collisions
+      'text-ignore-placement': false,
+      'symbol-placement': 'point'
+    },
+    paint: {
+      'text-color': '#EF5A24',
+      'text-halo-color': '#001224',
+      'text-halo-width': 1.5,
+      // FADE-IN: smooth opacity ramp at the minzoom boundary
+      'text-opacity': [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        17.5, 0,   // fully invisible at the minzoom threshold
+        18,   1    // fully visible half a zoom level deeper
+      ]
+    }
+  })
+
   map.addSource('vgu-equipment', {
     type: 'geojson',
     data: { type: 'FeatureCollection', features: [] },
@@ -477,10 +526,13 @@ async function initRoomsLayer() {
   // ── Symbol label layer: text centred on each equipment polygon ─────────────
   // Attached to the same `vgu-equipment` source so labels auto-update with data.
   // Rendered after the fill layer so text sits on top in the draw order.
+  // DECLUTTER: minzoom:18.5 hides labels when zoomed out; interpolated
+  // text-opacity fades them in smoothly between z18.5→19 to avoid a hard snap.
   map.addLayer({
     id: 'vgu-equipment-labels',
     type: 'symbol',
     source: 'vgu-equipment',
+    minzoom: 18.5, // STRICT DIRECTIVE: Hide equipment labels when zoomed out
     layout: {
       // Display the short code (e.g. "E18") — falls back to equipment_id
       'text-field': [
@@ -504,7 +556,15 @@ async function initRoomsLayer() {
       ],
       'text-halo-color': '#001A3A',
       'text-halo-width': 1.5,
-      'text-opacity': 0.95
+      // FADE-IN: interpolate opacity at the minzoom boundary so labels
+      // ease in rather than snapping on abruptly.
+      'text-opacity': [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        18.5, 0,   // fully invisible at the minzoom threshold
+        19,   1    // fully visible one zoom level deeper
+      ]
     }
   })
 }
@@ -967,6 +1027,28 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding, highlightEquipment })
 :deep(.maplibregl-popup-tip) { border-top-color: rgba(15, 30, 54, 0.95); }
 
 /* ═══════════════════════════════════════════
+   SCALE CONTROL — Dark-theme override
+   Relocated to bottom-right; styled to match
+   the --surface-panel dark aesthetic with the
+   VGU brand accent (#F58220) border.
+   ═══════════════════════════════════════════ */
+:deep(.maplibregl-ctrl-scale) {
+  background-color: rgba(0, 32, 64, 0.8) !important; /* matches --surface-panel */
+  color: #FFFFFF !important;
+  border: 1px solid #F58220 !important;              /* VGU brand accent */
+  border-top: none !important;
+  padding: 2px 8px !important;
+  border-radius: 0 0 4px 4px !important;
+  font-family: 'Space Mono', monospace, sans-serif !important;
+  font-weight: 500 !important;
+  font-size: 10px !important;
+  letter-spacing: 0.03em !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+  /* Prevent the generic .maplibregl-ctrl border from overriding ours */
+  border-top-color: transparent !important;
+}
+
+/* ═══════════════════════════════════════════
    GLOBAL SEARCH — SINGLE GLASSMORPHISM PILL
    .search-wrapper        → pill shell (border + bg + border-radius)
    .search-icon           → fixed-width icon, left-anchored
@@ -1134,6 +1216,9 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding, highlightEquipment })
   box-shadow: 0 0 8px #EF5A24; animation: calib-pulse 1.4s ease-in-out infinite; flex-shrink: 0;
 }
 @keyframes calib-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.6); } }
+
+/* Smooth fade-in/out when zoom crosses the ROOM_MARKER_MINZOOM threshold */
+:deep(.vgu-room-marker) { transition: opacity 0.35s ease; }
 
 :deep(.room-dot) { position: absolute; transform: translate(-50%, -50%); width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; }
 :deep(.room-ping) { position: absolute; display: inline-flex; width: 100%; height: 100%; border-radius: 50%; background: #EF5A24; opacity: 0.75; animation: room-ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite; }
