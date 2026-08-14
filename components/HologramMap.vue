@@ -290,14 +290,14 @@ onMounted(() => {
   map.on('mouseenter', 'vgu-rooms-fill', setPointer(true))
   map.on('mouseleave', 'vgu-rooms-fill', setPointer(false))
 
-  map.on('mousemove', 'vgu-equipment-fill', (e) => {
-    if (!e.features.length) return
+  // ── Hover: cursor + feature-state ────────────────────────────────────────
+  // mouseenter/mouseleave are simpler than mousemove and avoid per-pixel
+  // overhead. feature-state 'hover' drives fill-opacity in the paint expression.
+  map.on('mouseenter', 'vgu-equipment-fill', (e) => {
     map.getCanvas().style.cursor = 'pointer'
+    if (!e.features.length) return
     const id = e.features[0].id
-    if (hoveredEquipmentId !== null && hoveredEquipmentId !== id) {
-      map.setFeatureState({ source: 'vgu-equipment', id: hoveredEquipmentId }, { hover: false })
-    }
-    if (id !== undefined && hoveredEquipmentId !== id) {
+    if (id !== undefined) {
       hoveredEquipmentId = id
       map.setFeatureState({ source: 'vgu-equipment', id }, { hover: true })
     }
@@ -309,28 +309,35 @@ onMounted(() => {
       hoveredEquipmentId = null
     }
   })
+
+  // ── Click: select equipment + emit to Vue parent ──────────────────────────
   map.on('click', 'vgu-equipment-fill', (e) => {
-    const feature = e.features[0]
-    if (!feature) return
+    try {
+      if (!e.features || e.features.length === 0) return
 
-    const props = feature.properties
-    const equipmentId = props?.equipment_id
-    if (!equipmentId) return
+      const feature = e.features[0]
+      const props = feature.properties
+      // equipment_id is the canonical key; fall back to numeric feature id for safety
+      const equipmentId = props.equipment_id || props.id
+      if (!equipmentId) return
 
-    // ── Update map highlight state ────────────────────────────────────────────
-    // The watcher on selectedEquipmentId triggers updateEquipmentHighlight().
-    selectedEquipmentId.value = equipmentId
+      console.log('[MapLibre] Equipment clicked:', equipmentId, props)
 
-    // ── Emit with a fully-populated, reliable payload ─────────────────────────
-    // room_id comes directly from the GeoJSON feature — more authoritative than
-    // currentRoomId.value which may not be set yet if the user clicked equipment
-    // without first selecting the room from the panel.
-    emit('equipment-selected', {
-      equipmentId,
-      roomId:     props.room_id     || currentRoomId.value,
-      buildingId: props.building_id || currentBuildingId.value,
-      properties: props
-    })
+      // Setting selectedEquipmentId triggers the watcher → updateEquipmentHighlight()
+      selectedEquipmentId.value = equipmentId
+
+      // room_id and building_id are embedded in every equipment GeoJSON feature.
+      // Reading them from feature.properties is more reliable than currentRoomId.value,
+      // which may not be set yet if the user clicks equipment before selecting the room.
+      emit('equipment-selected', {
+        equipmentId,
+        roomId:     props.room_id     || currentRoomId.value,
+        buildingId: props.building_id || currentBuildingId.value,
+        properties: props
+      })
+    } catch (err) {
+      console.error('[MapLibre] Error in equipment click handler:', err)
+    }
   })
 })
 
@@ -421,24 +428,23 @@ async function initRoomsLayer() {
     generateId: true
   })
 
-  // ── 3D fill-extrusion layer for equipment polygons ─────────────────────────
-  // Uses a `case` expression so the selected equipment glows in brand accent
-  // (#F58220) while unselected items remain a dimmed slate blue (#B3BFCD).
-  // Hover state (feature-state) is layered on top via the opacity expression.
+  // ── 2D fill layer for equipment polygons ──────────────────────────────────
+  // Must be type:'fill' (not fill-extrusion) — consistent with vgu-rooms-fill
+  // so click hitboxes, queryRenderedFeatures, and z-plane all behave correctly.
+  // Color is managed by updateEquipmentHighlight() via setPaintProperty so
+  // the initial expression here uses '' as a no-match placeholder.
   map.addLayer({
     id: 'vgu-equipment-fill',
-    type: 'fill-extrusion',
+    type: 'fill',
     source: 'vgu-equipment',
     paint: {
-      'fill-extrusion-color': [
+      'fill-color': [
         'case',
-        ['==', ['get', 'equipment_id'], ''],  // placeholder; updated by updateEquipmentHighlight()
+        ['==', ['get', 'equipment_id'], ''],  // placeholder; replaced by updateEquipmentHighlight()
         '#F58220',
         '#B3BFCD'
       ],
-      'fill-extrusion-height': 0.6,   // ~60 cm tall blocks — visible at room zoom
-      'fill-extrusion-base': 0,
-      'fill-extrusion-opacity': [
+      'fill-opacity': [
         'case',
         ['boolean', ['feature-state', 'hover'], false],
         0.92,
@@ -470,7 +476,7 @@ async function initRoomsLayer() {
 
   // ── Symbol label layer: text centred on each equipment polygon ─────────────
   // Attached to the same `vgu-equipment` source so labels auto-update with data.
-  // Rendered AFTER the fill-extrusion so it sits on top in the draw order.
+  // Rendered after the fill layer so text sits on top in the draw order.
   map.addLayer({
     id: 'vgu-equipment-labels',
     type: 'symbol',
@@ -776,12 +782,12 @@ function updateEquipmentHighlight() {
 
   const selId = selectedEquipmentId.value || ''
 
-  // 3D block colour: selected → brand accent, unselected → dimmed slate
-  map.setPaintProperty('vgu-equipment-fill', 'fill-extrusion-color', [
+  // fill-color (not fill-extrusion-color) — layer is type:'fill'
+  map.setPaintProperty('vgu-equipment-fill', 'fill-color', [
     'case',
     ['==', ['get', 'equipment_id'], selId],
     '#F58220',   // VGU brand accent — selected
-    '#B3BFCD'    // Dimmed default — unselected
+    '#B3BFCD'    // Dimmed slate — unselected
   ])
 
   // Label text colour: selected equipment gets the same accent highlight
