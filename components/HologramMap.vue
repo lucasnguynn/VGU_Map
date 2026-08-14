@@ -495,7 +495,7 @@ async function initRoomsLayer() {
     id: 'vgu-equipment-labels',
     type: 'symbol',
     source: 'vgu-equipment',
-    minzoom: 19.5, // Deeper than room markers (19.0) so equipment detail appears last
+    minzoom: 19.2, // Deeper than room markers (19.0) so equipment detail appears last
     layout: {
       // Display the short code (e.g. "E18") — falls back to equipment_id
       'text-field': [
@@ -527,8 +527,8 @@ async function initRoomsLayer() {
         'interpolate',
         ['linear'],
         ['zoom'],
-        19.5, 0,   // fully invisible at the minzoom threshold
-        19.8, 1    // fully visible 0.3 zoom units deeper
+        19.6, 0,   // fully invisible at the minzoom threshold
+        19.9, 1    // fully visible 0.3 zoom units deeper
       ]
     }
   })
@@ -869,7 +869,7 @@ let roomMarkers = []
 // pointerEvents. The class carries `!important` in the stylesheet, which
 // guarantees it overrides anything updateMarkerVisibility() writes to `display`.
 // The two functions now own completely different CSS properties and cannot race.
-const ROOM_MARKER_MINZOOM = 10.5
+const ROOM_MARKER_MINZOOM = 18.5
 
 function syncZoomVisibility() {
   if (!map) return
