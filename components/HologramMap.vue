@@ -732,19 +732,7 @@ function selectRoom(roomId, centroid, propsObj = {}) {
 
 // closeRoomDetail() is called when the RoomDetailPanel UI is dismissed.
 //
-// CRITICAL: do NOT clear currentRoomId or call updateRoomHighlightPaint() here.
-// Room highlight + camera position are spatial map state — they belong to the
-// map viewport, not to the panel's open/closed state. Wiping them here caused
-// the highlight to vanish the instant the panel closed.
-//
-// Panel visibility is driven solely by mapStore.selectedRoom → activePanel
-// computed. When the user presses ×, index.vue calls mapStore.clearSelection()
-// which nulls selectedRoom → panel unmounts via v-if. The watcher on
-// mapStore.selectedRoom (below) handles the map-side consequence of a true
-// full deselect (e.g. navigating away), keeping the two concerns separate.
-//
-// The only safe side-effect here: refresh marker display so floor-plan markers
-// remain consistent with whatever room is currently active.
+// Watcher handles resetting room state and camera fly-back.
 function closeRoomDetail() {
   updateMarkerVisibility()
 }
@@ -856,39 +844,34 @@ watch(currentRoomId, (roomId) => {
 })
 
 // ── Sync selectedEquipmentId → MapLibre paint ─────────────────────────────
-// Fires whenever the selected equipment changes — whether from a map click
-// (which sets selectedEquipmentId directly) or from the side panel calling
-// highlightEquipment() (which also sets selectedEquipmentId).
 watch(selectedEquipmentId, () => {
   updateEquipmentHighlight()
 })
 
-// ── Sync store room deselect → map highlight ──────────────────────────────
-// mapStore.selectedRoom is the panel-layer's source of truth. It becomes null
-// when the user performs a FULL deselect: switching floors (selectFloor clears
-// it), exiting the building (exitBuilding clears it), or Esc-to-building.
-//
-// It also becomes null when the user presses × to close the RoomDetailPanel —
-// but in that case we want to KEEP the map highlight, so we must not blindly
-// mirror the store null into currentRoomId.
-//
-// The two cases are disambiguated by currentBuildingId:
-//   • If the building is still selected when selectedRoom → null, the user just
-//     closed the panel. Preserve currentRoomId and the highlight.
-//   • If the building is also being cleared (exitBuilding) or was never set,
-//     this is a genuine full navigation reset — clear the map state too.
-//
-// selectFloor() already calls currentRoomId.value = null + updateRoomHighlightPaint()
-// directly (before this watcher runs), so the floor-switch path is also correct.
+// ── Sync store room deselect → map highlight & camera fly-back ────────────
+// Khi selectedRoom = null (dù là đóng panel hay exit building), luôn clear highlight,
+// reset marker và fly về góc nhìn tổng quan tòa nhà.
 watch(
   () => mapStore.selectedRoom,
   (roomId) => {
     if (roomId !== null) return          // selection set — selectRoom() already handled this
-    if (currentBuildingId.value) return  // building still active = panel close only, keep highlight
-    // Building gone too → genuine full reset; clear residual highlight
+
     currentRoomId.value = null
     updateRoomHighlightPaint()
     updateMarkerVisibility()
+
+    // Nếu vẫn đang ở trong tòa nhà → fly về tổng quan tòa nhà
+    if (currentBuildingId.value && map) {
+      const center = buildingCenters[currentBuildingId.value] || props.initialCenter
+      map.flyTo({
+        center,
+        zoom: 19.2,
+        pitch: 0,
+        bearing: 0,
+        duration: 800,
+        easing: t => t < 0.5 ? 2*t*t : -1+(4-2*t)*t
+      })
+    }
   }
 )
 
@@ -906,11 +889,6 @@ watch(
 let roomMarkers = []
 
 // ── Zoom-gate: CSS-class strategy ────────────────────────────────────────────
-// ROOM_MARKER_MINZOOM = 18.5 ≈ 10–20 m scale.
-// We toggle the class `hidden-by-zoom` instead of writing inline opacity/
-// pointerEvents. The class carries `!important` in the stylesheet, which
-// guarantees it overrides anything updateMarkerVisibility() writes to `display`.
-// The two functions now own completely different CSS properties and cannot race.
 const ROOM_MARKER_MINZOOM = 18.5
 
 function syncZoomVisibility() {
@@ -989,13 +967,7 @@ function renderRoomMarkers(floorNumber) {
     roomMarkers.push({ marker, el, roomId })
   })
 
-  // Init fix: zoom listener only fires on subsequent zoom events, so newly
-  // created markers would be unconstrained until the user zooms. Call
-  // syncZoomVisibility() immediately — classList.toggle is safe to call the
-  // moment the element exists; no rAF needed because we are not reading layout.
   syncZoomVisibility()
-
-  // Apply the floor/room selection filter (touches display only, not opacity).
   updateMarkerVisibility()
 }
 
@@ -1019,13 +991,8 @@ onUnmounted(() => {
   if (map) { map.remove(); map = null }
 })
 
-// ── highlightEquipment: callable by index.vue so side-panel → map sync works ──
-// When a user selects equipment from the list in EquipmentSidePanel, index.vue
-// should call hologramMapRef.value.highlightEquipment(equipmentId) to mirror
-// the selection state on the map without emitting a full round-trip event.
 function highlightEquipment(equipmentId) {
   selectedEquipmentId.value = equipmentId ?? null
-  // updateEquipmentHighlight() fires automatically via the watcher above
 }
 
 defineExpose({ goToRoom, closeRoomDetail, selectBuilding, highlightEquipment })
@@ -1056,16 +1023,10 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding, highlightEquipment })
 }
 :deep(.maplibregl-popup-tip) { border-top-color: rgba(15, 30, 54, 0.95); }
 
-/* ═══════════════════════════════════════════
-   SCALE CONTROL — Dark-theme override
-   Relocated to bottom-right; styled to match
-   the --surface-panel dark aesthetic with the
-   VGU brand accent (#F58220) border.
-   ═══════════════════════════════════════════ */
 :deep(.maplibregl-ctrl-scale) {
-  background-color: rgba(0, 32, 64, 0.8) !important; /* matches --surface-panel */
+  background-color: rgba(0, 32, 64, 0.8) !important;
   color: #FFFFFF !important;
-  border: 1px solid #F58220 !important;              /* VGU brand accent */
+  border: 1px solid #F58220 !important;
   border-top: none !important;
   padding: 2px 8px !important;
   border-radius: 0 0 4px 4px !important;
@@ -1074,16 +1035,8 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding, highlightEquipment })
   font-size: 10px !important;
   letter-spacing: 0.03em !important;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
-  /* Prevent the generic .maplibregl-ctrl border from overriding ours */
   border-top-color: transparent !important;
 }
-
-/* ═══════════════════════════════════════════
-   GLOBAL SEARCH — SINGLE GLASSMORPHISM PILL
-   .search-wrapper        → pill shell (border + bg + border-radius)
-   .search-icon           → fixed-width icon, left-anchored
-   .global-search-input   → flex:1, transparent, naked input
-   ═══════════════════════════════════════════ */
 
 .global-search-container {
   position: absolute;
@@ -1095,7 +1048,6 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding, highlightEquipment })
   max-width: 92vw;
 }
 
-/* THE PILL */
 .search-wrapper {
   width: 100%;
   height: 44px;
@@ -1114,9 +1066,7 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding, highlightEquipment })
   border-color: #EF5A24;
 }
 
-/* ── Magnifier icon ── */
 .search-icon {
-  /* flex child — NOT position:absolute */
   flex-shrink: 0;
   align-self: center;
   width: 15px;
@@ -1126,7 +1076,6 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding, highlightEquipment })
   pointer-events: none;
 }
 
-/* ── Right segment: naked text input ── */
 .global-search-input {
   flex: 1;
   min-width: 0;
@@ -1144,7 +1093,6 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding, highlightEquipment })
 .global-search-input::placeholder {
   color: rgba(255, 255, 255, 0.35);
 }
-
 
 .global-search-results {
   margin-top: 8px;
@@ -1247,14 +1195,8 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding, highlightEquipment })
 }
 @keyframes calib-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.6); } }
 
-/* Base transition so the zoom fade-in/out is smooth */
 :deep(.vgu-room-marker) { transition: opacity 0.3s ease; }
 
-/* Zoom gate — toggled by syncZoomVisibility() via classList.toggle.
-   !important is intentional: this class must win over any inline style
-   that updateMarkerVisibility() (or any other JS path) writes to the element.
-   The two functions own different properties (opacity vs display) so they
-   cannot conflict, but !important is the belt-and-suspenders guarantee. */
 :deep(.vgu-room-marker.hidden-by-zoom) {
   opacity: 0 !important;
   pointer-events: none !important;
