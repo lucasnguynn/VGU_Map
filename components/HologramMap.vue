@@ -869,7 +869,7 @@ let roomMarkers = []
 // pointerEvents. The class carries `!important` in the stylesheet, which
 // guarantees it overrides anything updateMarkerVisibility() writes to `display`.
 // The two functions now own completely different CSS properties and cannot race.
-const ROOM_MARKER_MINZOOM = 18.5
+const ROOM_MARKER_MINZOOM = 10.5
 
 function syncZoomVisibility() {
   if (!map) return
