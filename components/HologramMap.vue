@@ -527,8 +527,8 @@ async function initRoomsLayer() {
         'interpolate',
         ['linear'],
         ['zoom'],
-        19.8, 0,   // fully invisible at the minzoom threshold
-        20.2, 1    // fully visible 0.3 zoom units deeper
+        19.5, 0,   // fully invisible at the minzoom threshold
+        19.8, 1    // fully visible 0.3 zoom units deeper
       ]
     }
   })
@@ -730,9 +730,22 @@ function selectRoom(roomId, centroid, propsObj = {}) {
   }
 }
 
+// closeRoomDetail() is called when the RoomDetailPanel UI is dismissed.
+//
+// CRITICAL: do NOT clear currentRoomId or call updateRoomHighlightPaint() here.
+// Room highlight + camera position are spatial map state — they belong to the
+// map viewport, not to the panel's open/closed state. Wiping them here caused
+// the highlight to vanish the instant the panel closed.
+//
+// Panel visibility is driven solely by mapStore.selectedRoom → activePanel
+// computed. When the user presses ×, index.vue calls mapStore.clearSelection()
+// which nulls selectedRoom → panel unmounts via v-if. The watcher on
+// mapStore.selectedRoom (below) handles the map-side consequence of a true
+// full deselect (e.g. navigating away), keeping the two concerns separate.
+//
+// The only safe side-effect here: refresh marker display so floor-plan markers
+// remain consistent with whatever room is currently active.
 function closeRoomDetail() {
-  currentRoomId.value = null
-  updateRoomHighlightPaint()
   updateMarkerVisibility()
 }
 
@@ -850,6 +863,35 @@ watch(selectedEquipmentId, () => {
   updateEquipmentHighlight()
 })
 
+// ── Sync store room deselect → map highlight ──────────────────────────────
+// mapStore.selectedRoom is the panel-layer's source of truth. It becomes null
+// when the user performs a FULL deselect: switching floors (selectFloor clears
+// it), exiting the building (exitBuilding clears it), or Esc-to-building.
+//
+// It also becomes null when the user presses × to close the RoomDetailPanel —
+// but in that case we want to KEEP the map highlight, so we must not blindly
+// mirror the store null into currentRoomId.
+//
+// The two cases are disambiguated by currentBuildingId:
+//   • If the building is still selected when selectedRoom → null, the user just
+//     closed the panel. Preserve currentRoomId and the highlight.
+//   • If the building is also being cleared (exitBuilding) or was never set,
+//     this is a genuine full navigation reset — clear the map state too.
+//
+// selectFloor() already calls currentRoomId.value = null + updateRoomHighlightPaint()
+// directly (before this watcher runs), so the floor-switch path is also correct.
+watch(
+  () => mapStore.selectedRoom,
+  (roomId) => {
+    if (roomId !== null) return          // selection set — selectRoom() already handled this
+    if (currentBuildingId.value) return  // building still active = panel close only, keep highlight
+    // Building gone too → genuine full reset; clear residual highlight
+    currentRoomId.value = null
+    updateRoomHighlightPaint()
+    updateMarkerVisibility()
+  }
+)
+
 // FIX BUG-2 & BUG-3: Theo dõi selectedFloor từ store để cập nhật map và currentFloor
 watch(
   () => mapStore.selectedFloor,
@@ -869,7 +911,7 @@ let roomMarkers = []
 // pointerEvents. The class carries `!important` in the stylesheet, which
 // guarantees it overrides anything updateMarkerVisibility() writes to `display`.
 // The two functions now own completely different CSS properties and cannot race.
-const ROOM_MARKER_MINZOOM = 19.5
+const ROOM_MARKER_MINZOOM = 18.5
 
 function syncZoomVisibility() {
   if (!map) return
