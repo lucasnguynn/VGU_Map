@@ -291,14 +291,16 @@ onMounted(() => {
   map.on('mouseleave', 'vgu-rooms-fill', setPointer(false))
 
   // ── HTML marker zoom-declutter ────────────────────────────────────────────
-  // The MapLibre symbol layer (vgu-rooms-labels) handles minzoom natively.
-  // HTML markers created by renderRoomMarkers() are vanilla DOM nodes, so we
-  // must hide/show them with a zoom listener to match the z17.5 threshold.
+  // HTML markers (renderRoomMarkers) are vanilla DOM nodes — MapLibre has no
+  // authority over their visibility. We track the zoom event and toggle
+  // opacity + pointerEvents directly on the element so they disappear at
+  // campus-overview zoom levels and reappear as the user zooms into a building.
+  // The CSS transition on .vgu-room-marker turns this into a smooth fade.
   const ROOM_MARKER_MINZOOM = 17.5
   const syncMarkerVisibilityByZoom = () => {
     const visible = map.getZoom() >= ROOM_MARKER_MINZOOM
     roomMarkers.forEach(({ el }) => {
-      el.style.opacity  = visible ? '1' : '0'
+      el.style.opacity       = visible ? '1' : '0'
       el.style.pointerEvents = visible ? 'auto' : 'none'
     })
   }
@@ -434,41 +436,6 @@ async function initRoomsLayer() {
     type: 'line',
     source: 'vgu-rooms',
     paint: { 'line-color': '#00ffcc', 'line-width': 1.5, 'line-opacity': 0.8 }
-  })
-
-  // ── Room label symbol layer ────────────────────────────────────────────────
-  // Uses the same vgu-rooms source so labels track polygon centroids and update
-  // automatically when floor / building data changes.
-  // DECLUTTER: minzoom:17.5 keeps labels hidden at campus-overview zoom levels.
-  // The interpolated text-opacity fades them in over the next half-step so
-  // text doesn't snap into view violently.
-  map.addLayer({
-    id: 'vgu-rooms-labels',
-    type: 'symbol',
-    source: 'vgu-rooms',
-    minzoom: 17.5, // STRICT DIRECTIVE: Hide room labels when zoomed out
-    layout: {
-      'text-field': ['coalesce', ['get', 'room_id'], ''],
-      'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-      'text-size': 10,
-      'text-anchor': 'center',
-      'text-allow-overlap': false,     // let MapLibre suppress genuine collisions
-      'text-ignore-placement': false,
-      'symbol-placement': 'point'
-    },
-    paint: {
-      'text-color': '#EF5A24',
-      'text-halo-color': '#001224',
-      'text-halo-width': 1.5,
-      // FADE-IN: smooth opacity ramp at the minzoom boundary
-      'text-opacity': [
-        'interpolate',
-        ['linear'],
-        ['zoom'],
-        17.5, 0,   // fully invisible at the minzoom threshold
-        18,   1    // fully visible half a zoom level deeper
-      ]
-    }
   })
 
   map.addSource('vgu-equipment', {
