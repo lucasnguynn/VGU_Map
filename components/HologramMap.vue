@@ -6,28 +6,23 @@
   <div class="global-search-container">
     <div class="search-wrapper">
 
-      <!-- LEFT SEGMENT: context badge. A true flex child — fills height automatically,
-           separated by a border-right. Removed when no building is active. -->
-      <Transition name="ctx-badge">
-        <div v-if="currentBuildingId" class="search-context-badge" aria-label="Vị trí hiện tại">
-          <span class="ctx-building">{{ currentBuildingId }}</span>
-          <span v-if="currentFloor != null" class="ctx-sep">·</span>
-          <span v-if="currentFloor != null" class="ctx-floor">L{{ currentFloor }}</span>
-        </div>
-      </Transition>
-
-      <!-- MIDDLE SEGMENT: search icon, a plain flex child with fixed width -->
-      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <circle cx="11" cy="11" r="8"></circle>
         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
       </svg>
 
-      <!-- RIGHT SEGMENT: naked input, flex: 1 fills all remaining space -->
       <input
         v-model="searchQuery"
         type="text"
         class="global-search-input"
-        :placeholder="currentBuildingId ? `Tìm phòng trong ${currentBuildingId}…` : 'Tìm phòng trên Campus…'"
+        :placeholder="
+          currentBuildingId && currentFloor != null
+            ? `Tìm phòng trong Toà ${currentBuildingId} - Tầng ${currentFloor}...`
+            : currentBuildingId
+              ? `Tìm phòng trong Toà ${currentBuildingId}...`
+              : 'Tìm phòng trên toàn Campus...'
+        "
         @input="onSearchInput"
         @focus="onSearchInput"
         @blur="onSearchBlur"
@@ -849,12 +844,7 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
 :deep(.maplibregl-popup-tip) { border-top-color: rgba(15, 30, 54, 0.95); }
 
 /* ═══════════════════════════════════════════
-   GLOBAL SEARCH — TRUE UNIFIED PILL
-   Layout model: pure flex row, zero absolute positioning.
-   .search-wrapper   → the pill shell (border + bg + border-radius)
-   .search-context-badge → left flex child  (tinted, separator right border)
-   .search-icon      → middle flex child (fixed 40px slot)
-   .global-search-input  → right flex child (flex:1, transparent, naked)
+   GLOBAL SEARCH — SINGLE GLASSMORPHISM PILL
    ═══════════════════════════════════════════ */
 
 .global-search-container {
@@ -867,19 +857,18 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
   max-width: 92vw;
 }
 
-/* THE PILL — every visual chrome lives HERE and only here */
+/* The pill — all chrome in one element */
 .search-wrapper {
+  position: relative;
   width: 100%;
   height: 44px;
   display: flex;
-  flex-direction: row;
-  align-items: stretch;        /* children fill the full 44px height */
+  align-items: center;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(11, 17, 32, 0.85);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
-  overflow: hidden;            /* clips badge tint flush to the rounded ends */
   transition: border-color 0.2s ease;
 }
 
@@ -887,61 +876,25 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
   border-color: #EF5A24;
 }
 
-/* ── Left segment: context badge ── */
-.search-context-badge {
-  /* flex child — height is inherited from align-items:stretch */
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  flex-shrink: 0;
-  padding: 0 16px;
-  background: rgba(239, 90, 36, 0.1);
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
-  white-space: nowrap;
-  pointer-events: none;
-  user-select: none;
-}
-
-.ctx-building {
-  font-family: 'Space Mono', monospace;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  color: #EF5A24;
-  text-transform: uppercase;
-}
-
-.ctx-sep {
-  font-family: 'Space Mono', monospace;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.25);
-}
-
-.ctx-floor {
-  font-family: 'Space Mono', monospace;
-  font-size: 13px;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.55);
-}
-
-/* ── Middle segment: magnifier icon ── */
+/* Magnifier icon — absolutely positioned at left: 14px */
 .search-icon {
-  /* flex child — NOT position:absolute */
-  flex-shrink: 0;
-  align-self: center;
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
   width: 15px;
   height: 15px;
-  margin: 0 10px 0 14px;
   color: #64748b;
   pointer-events: none;
+  flex-shrink: 0;
 }
 
-/* ── Right segment: naked text input ── */
+/* Input — left padding clears the icon */
 .global-search-input {
   flex: 1;
   min-width: 0;
   height: 100%;
-  padding: 0 16px 0 0;
+  padding: 0 16px 0 40px;   /* 14px icon-left + 15px icon-width + ~11px gap */
   background: transparent;
   border: none;
   outline: none;
@@ -949,25 +902,11 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
   font-family: 'Space Mono', monospace;
   font-size: 13px;
   line-height: 1;
+  border-radius: 999px;      /* keeps focus-ring clipped to pill shape */
 }
 
 .global-search-input::placeholder {
-  color: rgba(255, 255, 255, 0.35);
-}
-
-/* Badge slide-in/out — animates max-width so the pill reflows smoothly */
-.ctx-badge-enter-active,
-.ctx-badge-leave-active {
-  transition: max-width 0.25s ease, opacity 0.2s ease, padding 0.25s ease;
-  max-width: 200px;
-  overflow: hidden;
-}
-.ctx-badge-enter-from,
-.ctx-badge-leave-to {
-  max-width: 0;
-  opacity: 0;
-  padding-left: 0;
-  padding-right: 0;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .global-search-results {
@@ -1100,9 +1039,7 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
 @media (max-width: 640px) {
   .global-search-container { width: min(360px, 94vw); top: calc(var(--header-h-mobile, 54px) + 8px); left: 50%; transform: translateX(-50%); }
   .search-wrapper { height: 40px; }
-  .search-context-badge { padding: 0 10px; }
-  .ctx-building, .ctx-sep, .ctx-floor { font-size: 11px; }
-  .search-icon { margin: 0 8px 0 10px; }
+  /* .search-icon left stays at 14px — no change needed */
   .global-search-input { font-size: 12px; }
   .global-search-results { max-height: 38vh; }
   .floor-bar { top: calc(var(--header-h-mobile, 54px) + 76px); bottom: auto; left: 50%; transform: translateX(-50%); z-index: 115; gap: 6px; padding: 6px 8px; max-width: 92vw; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
