@@ -209,6 +209,7 @@ function polygonCentroid(coordinates) {
 const currentBuildingId = ref(null)
 const currentFloor = ref(null)
 const currentRoomId = ref(null)
+const selectedEquipmentId = ref(null) // NEW: tracks the active equipment for map highlight
 const availableFloors = ref([])
 const isGeolocated = ref(false)
 let currentBuildingGeojson = null
@@ -297,7 +298,11 @@ onMounted(() => {
   map.on('click', 'vgu-equipment-fill', (e) => {
     const feature = e.features[0]
     const equipmentId = feature?.properties?.equipment_id
-    if (equipmentId) emit('equipment-selected', { equipmentId, roomId: currentRoomId.value, properties: feature.properties })
+    if (equipmentId) {
+      // Update Vue state → triggers watcher → updates map paint
+      selectedEquipmentId.value = equipmentId
+      emit('equipment-selected', { equipmentId, roomId: currentRoomId.value, properties: feature.properties })
+    }
   })
 })
 
@@ -387,25 +392,34 @@ async function initRoomsLayer() {
     data: { type: 'FeatureCollection', features: [] },
     generateId: true
   })
+
+  // ── 3D fill-extrusion layer for equipment polygons ─────────────────────────
+  // Uses a `case` expression so the selected equipment glows in brand accent
+  // (#F58220) while unselected items remain a dimmed slate blue (#B3BFCD).
+  // Hover state (feature-state) is layered on top via the opacity expression.
   map.addLayer({
     id: 'vgu-equipment-fill',
-    type: 'fill',
+    type: 'fill-extrusion',
     source: 'vgu-equipment',
     paint: {
-      'fill-color': [
+      'fill-extrusion-color': [
         'case',
-        ['boolean', ['feature-state', 'hover'], false],
-        '#00ffcc', 
-        '#38bdf8'  
+        ['==', ['get', 'equipment_id'], ''],  // placeholder; updated by updateEquipmentHighlight()
+        '#F58220',
+        '#B3BFCD'
       ],
-      'fill-opacity': [
+      'fill-extrusion-height': 0.6,   // ~60 cm tall blocks — visible at room zoom
+      'fill-extrusion-base': 0,
+      'fill-extrusion-opacity': [
         'case',
         ['boolean', ['feature-state', 'hover'], false],
-        0.75,
-        0.4
+        0.92,
+        0.72
       ]
     }
   })
+
+  // ── Outline layer stays as a 2-D line drawn around each block ──────────────
   map.addLayer({
     id: 'vgu-equipment-outline',
     type: 'line',
@@ -421,8 +435,42 @@ async function initRoomsLayer() {
         'case',
         ['boolean', ['feature-state', 'hover'], false],
         2.5,
-        1.2
+        1.0
       ]
+    }
+  })
+
+  // ── Symbol label layer: text centred on each equipment polygon ─────────────
+  // Attached to the same `vgu-equipment` source so labels auto-update with data.
+  // Rendered AFTER the fill-extrusion so it sits on top in the draw order.
+  map.addLayer({
+    id: 'vgu-equipment-labels',
+    type: 'symbol',
+    source: 'vgu-equipment',
+    layout: {
+      // Display the short code (e.g. "E18") — falls back to equipment_id
+      'text-field': [
+        'coalesce',
+        ['get', 'model_code'],
+        ['get', 'equipment_id']
+      ],
+      'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+      'text-size': 11,
+      'text-anchor': 'center',
+      'text-allow-overlap': true,   // always show even when crowded
+      'text-ignore-placement': true
+    },
+    paint: {
+      'text-color': [
+        'case',
+        // Selected equipment gets accent-coloured text for extra pop
+        ['==', ['get', 'equipment_id'], ''],  // placeholder; updated by updateEquipmentHighlight()
+        '#F58220',
+        '#FFFFFF'
+      ],
+      'text-halo-color': '#001A3A',
+      'text-halo-width': 1.5,
+      'text-opacity': 0.95
     }
   })
 }
@@ -691,8 +739,37 @@ async function loadEquipmentForRoom(buildingId, roomId) {
   }
 }
 
+// ── Equipment highlight: data-driven paint driven by selectedEquipmentId ──────
+// Called whenever selectedEquipmentId changes. Uses MapLibre's `case` expression
+// so only the matching feature gets the accent colour; all others stay dimmed.
+// Also updates the label layer's text-color to echo the selection state.
+function updateEquipmentHighlight() {
+  if (!map || !map.getLayer('vgu-equipment-fill')) return
+
+  const selId = selectedEquipmentId.value || ''
+
+  // 3D block colour: selected → brand accent, unselected → dimmed slate
+  map.setPaintProperty('vgu-equipment-fill', 'fill-extrusion-color', [
+    'case',
+    ['==', ['get', 'equipment_id'], selId],
+    '#F58220',   // VGU brand accent — selected
+    '#B3BFCD'    // Dimmed default — unselected
+  ])
+
+  // Label text colour: selected equipment gets the same accent highlight
+  if (map.getLayer('vgu-equipment-labels')) {
+    map.setPaintProperty('vgu-equipment-labels', 'text-color', [
+      'case',
+      ['==', ['get', 'equipment_id'], selId],
+      '#F58220',
+      '#FFFFFF'
+    ])
+  }
+}
+
 function clearEquipmentLayer() {
   hoveredEquipmentId = null
+  selectedEquipmentId.value = null
   if (map?.getSource('vgu-equipment')) {
     map.getSource('vgu-equipment').setData({ type: 'FeatureCollection', features: [] })
   }
@@ -704,6 +781,14 @@ watch(currentRoomId, (roomId) => {
     return
   }
   loadEquipmentForRoom(currentBuildingId.value, roomId)
+})
+
+// ── Sync selectedEquipmentId → MapLibre paint ─────────────────────────────
+// Fires whenever the selected equipment changes — whether from a map click
+// (which sets selectedEquipmentId directly) or from the side panel calling
+// highlightEquipment() (which also sets selectedEquipmentId).
+watch(selectedEquipmentId, () => {
+  updateEquipmentHighlight()
 })
 
 // FIX BUG-2 & BUG-3: Theo dõi selectedFloor từ store để cập nhật map và currentFloor
@@ -810,7 +895,16 @@ onUnmounted(() => {
   if (map) { map.remove(); map = null }
 })
 
-defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
+// ── highlightEquipment: callable by index.vue so side-panel → map sync works ──
+// When a user selects equipment from the list in EquipmentSidePanel, index.vue
+// should call hologramMapRef.value.highlightEquipment(equipmentId) to mirror
+// the selection state on the map without emitting a full round-trip event.
+function highlightEquipment(equipmentId) {
+  selectedEquipmentId.value = equipmentId ?? null
+  // updateEquipmentHighlight() fires automatically via the watcher above
+}
+
+defineExpose({ goToRoom, closeRoomDetail, selectBuilding, highlightEquipment })
 </script>
 
 <style scoped>
