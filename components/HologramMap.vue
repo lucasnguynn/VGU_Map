@@ -2,52 +2,6 @@
 <template>
   <div ref="mapContainer" class="map-container"></div>
 
-  <!-- ================= Thanh tìm kiếm toàn cục (Global Search) ================= -->
-  <div class="global-search-container">
-    <div class="search-wrapper">
-
-      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="11" cy="11" r="8"></circle>
-        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-      </svg>
-
-      <input
-        v-model="searchQuery"
-        type="text"
-        class="global-search-input"
-        :placeholder="
-          currentBuildingId && currentFloor != null
-            ? `Tìm phòng trong Toà ${currentBuildingId} - Tầng ${currentFloor}...`
-            : currentBuildingId
-              ? `Tìm phòng trong Toà ${currentBuildingId}...`
-              : 'Tìm phòng trên toàn Campus...'
-        "
-        @input="onSearchInput"
-        @focus="onSearchInput"
-        @blur="onSearchBlur"
-      />
-    </div>
-
-    <div v-if="searchResults.length > 0" class="global-search-results">
-      <button
-        v-for="r in searchResults"
-        :key="r.id"
-        class="global-search-item"
-        @click="goToRoom(r)"
-      >
-        <div class="rs-info">
-          <span class="rs-id">{{ r.roomNumber }}</span>
-          <span class="rs-name">{{ formatRoomName(r.roomName) }}</span>
-        </div>
-        <span v-if="!currentBuildingId" class="rs-building">{{ r.buildingId }}</span>
-      </button>
-    </div>
-    <div v-else-if="searchQuery.trim() && !isSearching" class="global-search-results">
-      <div class="room-search-empty">Không tìm thấy phòng phù hợp.</div>
-    </div>
-  </div>
-
   <!-- ================= Thang máy chọn tầng (Elevator HUD) ================= -->
   <Transition name="hud-slide">
     <!-- ARCH-FIX: on mobile the floor-bar is rendered inside FloorPanel's
@@ -110,7 +64,6 @@ import { useDeviceTier } from '~/composables/useDeviceTier'
 const mapStore = useMapStore()
 const { tier } = useDeviceTier()
 
-const { searchRooms } = useVguData()
 
 const config = useRuntimeConfig()
 const base = config.app.baseURL
@@ -525,47 +478,10 @@ function selectFloor(floorNumber) {
   emit('floor-selected', { buildingId: currentBuildingId.value, floor: floorNumber })
 }
 
-const searchQuery = ref('')
-const searchResults = ref([])
-const isSearching = ref(false)
-let searchDebounce = null
 
-function onSearchInput() {
-  clearTimeout(searchDebounce)
-  const q = searchQuery.value.trim()
-  if (!q) {
-    searchResults.value = []
-    return
-  }
-  searchDebounce = setTimeout(async () => {
-    isSearching.value = true
-    try {
-      const rawResults = await searchRooms(q, 50)
-      
-      if (currentBuildingId.value) {
-        searchResults.value = rawResults
-          .filter(r => r.buildingId === currentBuildingId.value)
-          .slice(0, 8)
-      } else {
-        searchResults.value = rawResults.slice(0, 8)
-      }
-    } finally {
-      isSearching.value = false
-    }
-  }, 250)
-}
-
-function onSearchBlur() {
-  setTimeout(() => {
-    searchResults.value = []
-    searchQuery.value = ''
-  }, 200)
-}
 
 async function goToRoom(result) {
   if (!result?.buildingId) return
-  searchQuery.value = ''
-  searchResults.value = []
 
   if (currentBuildingId.value !== result.buildingId) {
     currentBuildingId.value = null
@@ -643,9 +559,6 @@ function exitBuilding() {
   isGeolocated.value = false
   currentBuildingGeojson = null
   
-  searchQuery.value = ''
-  searchResults.value = []
-
   clearRoomMarkers()
   clearEquipmentLayer()
   updateRoomHighlightPaint()
@@ -843,114 +756,6 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
 }
 :deep(.maplibregl-popup-tip) { border-top-color: rgba(15, 30, 54, 0.95); }
 
-/* ═══════════════════════════════════════════
-   GLOBAL SEARCH — SINGLE GLASSMORPHISM PILL
-   ═══════════════════════════════════════════ */
-
-.global-search-container {
-  position: absolute;
-  top: calc(var(--header-h, 64px) + 12px);
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 70;
-  width: 340px;
-  max-width: 92vw;
-}
-
-/* The pill — all chrome in one element */
-.search-wrapper {
-  position: relative;
-  width: 100%;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(11, 17, 32, 0.85);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
-  transition: border-color 0.2s ease;
-}
-
-.search-wrapper:focus-within {
-  border-color: #EF5A24;
-}
-
-/* Magnifier icon — absolutely positioned at left: 14px */
-.search-icon {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 15px;
-  height: 15px;
-  color: #64748b;
-  pointer-events: none;
-  flex-shrink: 0;
-}
-
-/* Input — left padding clears the icon */
-.global-search-input {
-  flex: 1;
-  min-width: 0;
-  height: 100%;
-  padding: 0 16px 0 40px;   /* 14px icon-left + 15px icon-width + ~11px gap */
-  background: transparent;
-  border: none;
-  outline: none;
-  color: #fff;
-  font-family: 'Space Mono', monospace;
-  font-size: 13px;
-  line-height: 1;
-  border-radius: 999px;      /* keeps focus-ring clipped to pill shape */
-}
-
-.global-search-input::placeholder {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.global-search-results {
-  margin-top: 8px;
-  width: 100%;
-  max-height: 320px;
-  overflow-y: auto;
-  background: rgba(11, 17, 32, 0.95);
-  border: 1px solid rgba(239, 90, 36, 0.3);
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  padding: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  backdrop-filter: blur(8px);
-}
-
-.global-search-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  text-align: left;
-  background: transparent;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 12px;
-  cursor: pointer;
-  color: #e2e8f0;
-  transition: background 0.15s;
-}
-.global-search-item:hover { background: rgba(239, 90, 36, 0.15); }
-
-.rs-info { display: flex; flex-direction: column; gap: 2px; }
-.rs-id { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: #EF5A24; }
-.rs-name { font-size: 11px; color: #94a3b8; }
-.rs-building {
-  font-size: 10px; font-weight: 700; color: #94a3b8;
-  background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; margin-left: 10px;
-}
-.room-search-empty { padding: 10px; font-size: 11px; color: #64748b; text-align: center; }
-
-.global-search-results::-webkit-scrollbar { width: 6px; }
-.global-search-results::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
 
 .floor-bar {
   position: absolute;
@@ -1037,11 +842,6 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
 }
 
 @media (max-width: 640px) {
-  .global-search-container { width: min(360px, 94vw); top: calc(var(--header-h-mobile, 54px) + 8px); left: 50%; transform: translateX(-50%); }
-  .search-wrapper { height: 40px; }
-  /* .search-icon left stays at 14px — no change needed */
-  .global-search-input { font-size: 12px; }
-  .global-search-results { max-height: 38vh; }
   .floor-bar { top: calc(var(--header-h-mobile, 54px) + 76px); bottom: auto; left: 50%; transform: translateX(-50%); z-index: 115; gap: 6px; padding: 6px 8px; max-width: 92vw; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
   .floor-bar::-webkit-scrollbar { display: none; }
   .floor-btn { width: 38px; height: 38px; font-size: 11px; flex-shrink: 0; touch-action: manipulation; }
