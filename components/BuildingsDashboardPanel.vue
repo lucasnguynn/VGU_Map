@@ -166,7 +166,8 @@ onMounted(async () => {
      the visual layout, so --panels-left-width can be computed correctly
      without waiting for any child component to call setPanelState(). */
   transform: translateX(0);
-  transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+  /* SYNC: identical duration + cubic-bezier as FloorPanel for the push handoff */
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
   will-change: transform;
 }
 
@@ -193,15 +194,25 @@ onMounted(async () => {
   background: #070A12;
   border-right: 1px solid rgba(0, 255, 204, 0.1);
   transform: translateX(0);
-  transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+  /* SYNC: matches .buildings-panel and FloorPanel */
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
   will-change: transform;
 }
 
-/* ── Toggle tab ── */
+/* ── Toggle tab ──
+   FIX: previously animated the `left` property (layout-thrashing, causes jitter).
+   Now `left` is permanently anchored at 0 and we use `transform: translateX()`
+   to reposition the tab — runs entirely on the GPU compositor thread.
+
+   Default (panel expanded): translateX(300px) → tab sits at the right edge of
+   the 300px panel body, appearing as a right-side stub.
+   Collapsed:                translateX(0)     → tab sits flush at the left edge,
+   appearing as a left-edge stub for the user to re-open the panel. */
 .toggle-tab {
   position: absolute;
   top: 20px;
-  left: 300px;
+  left: 0;                          /* FIX: was 300px — now anchored; position via transform only */
+  transform: translateX(300px);     /* FIX: was `left: 300px` — GPU-composited, zero layout cost */
   width: 36px;
   height: 64px;
   background: #0D1B30;
@@ -215,12 +226,12 @@ onMounted(async () => {
   justify-content: center;
   z-index: 1;
   transition:
-    left 0.38s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.4s cubic-bezier(0.25, 1, 0.5, 1),  /* FIX: was `left` — now transform only */
     color 0.15s, background 0.15s, border-color 0.15s;
-  will-change: left;
+  will-change: transform;           /* FIX: was `left` */
 }
 .buildings-panel.is-collapsed .toggle-tab {
-  left: 0;
+  transform: translateX(0);         /* FIX: was `left: 0` — tab glides to left edge via transform */
   border-color: rgba(0, 255, 204, 0.28);
   background: #0F1E36;
 }
@@ -304,8 +315,10 @@ onMounted(async () => {
 @media (max-width: 1024px) {
   .buildings-panel { width: 280px; }
   .panel-body { width: 280px; }
-  .toggle-tab { left: 280px; }
-  .buildings-panel.is-collapsed .toggle-tab { left: 0; }
+  /* FIX: was `left: 280px` — use transform to match desktop pattern; no layout cost */
+  .toggle-tab { transform: translateX(280px); }
+  /* FIX: was `left: 0` */
+  .buildings-panel.is-collapsed .toggle-tab { transform: translateX(0); }
 }
 
 /* ── Mobile (≤640px): bottom sheet ──
