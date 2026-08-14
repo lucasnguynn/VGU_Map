@@ -166,17 +166,56 @@ onMounted(async () => {
      the visual layout, so --panels-left-width can be computed correctly
      without waiting for any child component to call setPanelState(). */
   transform: translateX(0);
-  /* SYNC: identical duration + cubic-bezier as FloorPanel for the push handoff */
-  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  opacity: 1;
+  /* GUARD: explicit base state so visibility can be transitioned back in.
+     visibility 0s linear (no delay) = element becomes visible INSTANTLY when
+     is-offscreen is removed, ensuring the slide-in animation is always seen. */
+  visibility: visible;
+  /* SYNC: identical duration + cubic-bezier as FloorPanel for the push handoff.
+     opacity + visibility included here to govern the ENTER (re-activation) path. */
+  transition:
+    transform 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+    opacity   0.4s cubic-bezier(0.25, 1, 0.5, 1),
+    visibility 0s linear;   /* 0s delay = visible immediately on re-entry */
   will-change: transform;
 }
 
-/* is-offscreen: entire panel exits left (body AND tab disappear).
-   FloorPanel then sits at left:0 with no collision. */
+/* is-offscreen: entire panel exits left — body AND tab must disappear completely.
+   ─────────────────────────────────────────────────────────────────────────────
+   BUG: translateX(-100%) = -300px. The .toggle-tab has `transform: translateX(300px)`
+   so its net screen position was: -300 + 300 = 0px — sitting exactly on the left
+   edge, colliding with FloorPanel's toggle button.
+
+   FIX 1 — Extra clearance:
+   calc(-100% - 40px) = -340px. Tab net position: -340 + 300 = -40px → off-screen. ✓
+
+   FIX 2 — Opacity guard:
+   opacity: 0 fades the panel out alongside the slide. If any subpixel rounding
+   or a non-standard viewport zoom causes the tab to land on-screen, it will be
+   invisible. Animates via the transition below.
+
+   FIX 3 — Visibility guard:
+   visibility: hidden removes the panel from hit-testing AND the accessibility tree
+   so the tab can never receive focus or be announced by a screen reader while
+   off-screen. The transition override uses a 0.4s delay so visibility only becomes
+   hidden AFTER the slide+fade animation has already completed — preventing an
+   instant-hide that would kill the exit animation.
+
+   The base .buildings-panel rule uses `visibility 0s linear` (no delay) so that
+   when is-offscreen is removed, visibility snaps back to visible immediately and
+   the slide-in animation is fully visible from frame 1. */
 .buildings-panel.is-offscreen {
-  transform: translateX(-100%);
-  /* Keep pointer-events off while hidden so no ghost click targets linger */
-  pointer-events: none;
+  transform: translateX(calc(-100% - 40px));  /* FIX 1: tab pushed -40px beyond left edge */
+  opacity: 0;                                  /* FIX 2: invisible if anything bleeds through */
+  visibility: hidden;                          /* FIX 3: out of a11y tree and hit-testing */
+  pointer-events: none;                        /* belt-and-suspenders: no ghost clicks during animation */
+  /* EXIT transition: visibility hides only AFTER the 0.4s slide+fade completes.
+     When is-offscreen is REMOVED, the base element's `visibility 0s linear`
+     (no delay) takes over instead, so the panel is instantly visible on re-entry. */
+  transition:
+    transform   0.4s cubic-bezier(0.25, 1, 0.5, 1),
+    opacity     0.4s cubic-bezier(0.25, 1, 0.5, 1),
+    visibility  0s linear 0.4s;  /* delay = animation duration → hides after slide completes */
 }
 
 /* is-collapsed: only the body slides; the tab stub remains at left:0. */
@@ -308,6 +347,7 @@ onMounted(async () => {
 /* ── Motion preferences ── */
 @media (prefers-reduced-motion: reduce) {
   .pulse-dot { animation: none; }
+  /* Disable all transitions; opacity + visibility still apply as instant final states */
   .buildings-panel, .panel-body, .toggle-tab, .tab-chevron { transition: none; }
 }
 
