@@ -6,23 +6,18 @@
   <div class="global-search-container">
     <div class="search-wrapper">
 
-      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <!-- Search icon -->
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <circle cx="11" cy="11" r="8"></circle>
         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
       </svg>
 
+      <!-- RIGHT SEGMENT: naked input, flex: 1 fills all remaining space -->
       <input
         v-model="searchQuery"
         type="text"
         class="global-search-input"
-        :placeholder="
-          currentBuildingId && currentFloor != null
-            ? `Tìm phòng trong Toà ${currentBuildingId} - Tầng ${currentFloor}...`
-            : currentBuildingId
-              ? `Tìm phòng trong Toà ${currentBuildingId}...`
-              : 'Tìm phòng trên toàn Campus...'
-        "
+        :placeholder="currentBuildingId ? `Tìm phòng trong ${currentBuildingId}…` : 'Tìm phòng trên Campus…'"
         @input="onSearchInput"
         @focus="onSearchInput"
         @blur="onSearchBlur"
@@ -845,6 +840,9 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
 
 /* ═══════════════════════════════════════════
    GLOBAL SEARCH — SINGLE GLASSMORPHISM PILL
+   .search-wrapper        → pill shell (border + bg + border-radius)
+   .search-icon           → fixed-width icon, left-anchored
+   .global-search-input   → flex:1, transparent, naked input
    ═══════════════════════════════════════════ */
 
 .global-search-container {
@@ -857,12 +855,12 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
   max-width: 92vw;
 }
 
-/* The pill — all chrome in one element */
+/* THE PILL */
 .search-wrapper {
-  position: relative;
   width: 100%;
   height: 44px;
   display: flex;
+  flex-direction: row;
   align-items: center;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -876,25 +874,24 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
   border-color: #EF5A24;
 }
 
-/* Magnifier icon — absolutely positioned at left: 14px */
+/* ── Magnifier icon ── */
 .search-icon {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
+  /* flex child — NOT position:absolute */
+  flex-shrink: 0;
+  align-self: center;
   width: 15px;
   height: 15px;
+  margin: 0 10px 0 14px;
   color: #64748b;
   pointer-events: none;
-  flex-shrink: 0;
 }
 
-/* Input — left padding clears the icon */
+/* ── Right segment: naked text input ── */
 .global-search-input {
   flex: 1;
   min-width: 0;
   height: 100%;
-  padding: 0 16px 0 40px;   /* 14px icon-left + 15px icon-width + ~11px gap */
+  padding: 0 16px 0 0;
   background: transparent;
   border: none;
   outline: none;
@@ -902,12 +899,12 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
   font-family: 'Space Mono', monospace;
   font-size: 13px;
   line-height: 1;
-  border-radius: 999px;      /* keeps focus-ring clipped to pill shape */
 }
 
 .global-search-input::placeholder {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.35);
 }
+
 
 .global-search-results {
   margin-top: 8px;
@@ -1039,7 +1036,7 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
 @media (max-width: 640px) {
   .global-search-container { width: min(360px, 94vw); top: calc(var(--header-h-mobile, 54px) + 8px); left: 50%; transform: translateX(-50%); }
   .search-wrapper { height: 40px; }
-  /* .search-icon left stays at 14px — no change needed */
+  .search-icon { margin: 0 8px 0 10px; }
   .global-search-input { font-size: 12px; }
   .global-search-results { max-height: 38vh; }
   .floor-bar { top: calc(var(--header-h-mobile, 54px) + 76px); bottom: auto; left: 50%; transform: translateX(-50%); z-index: 115; gap: 6px; padding: 6px 8px; max-width: 92vw; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
