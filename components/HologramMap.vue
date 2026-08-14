@@ -292,19 +292,19 @@ onMounted(() => {
 
   // ── HTML marker zoom-declutter ────────────────────────────────────────────
   // HTML markers (renderRoomMarkers) are vanilla DOM nodes — MapLibre has no
-  // authority over their visibility. We track the zoom event and toggle
-  // opacity + pointerEvents directly on the element so they disappear at
-  // campus-overview zoom levels and reappear as the user zooms into a building.
-  // The CSS transition on .vgu-room-marker turns this into a smooth fade.
-  const ROOM_MARKER_MINZOOM = 17.5
-  const syncMarkerVisibilityByZoom = () => {
-    const visible = map.getZoom() >= ROOM_MARKER_MINZOOM
-    roomMarkers.forEach(({ el }) => {
-      el.style.opacity       = visible ? '1' : '0'
-      el.style.pointerEvents = visible ? 'auto' : 'none'
-    })
-  }
-  map.on('zoom', syncMarkerVisibilityByZoom)
+  // authority over their visibility. We imperatively toggle opacity +
+  // pointerEvents so they only appear when zoomed deep into a building.
+  //
+  // Threshold rationale:
+  //   z17.5 ≈ 50–100 m scale → markers visible too early, severe clutter
+  //   z19.0 ≈ 5–10 m scale  → correct: user must be inside a building floor
+  //
+  // updateRoomMarkerZoomVisibility() is defined at module scope (below) and
+  // called in two places:
+  //   1. map.on('zoom', …) — keeps state correct while panning/zooming
+  //   2. renderRoomMarkers() → requestAnimationFrame — fixes the init bug
+  //      where markers were visible on first render at campus-overview zoom
+  map.on('zoom', updateRoomMarkerZoomVisibility)
 
   // ── Hover: cursor + feature-state ────────────────────────────────────────
   // mouseenter/mouseleave are simpler than mousemove and avoid per-pixel
@@ -493,13 +493,14 @@ async function initRoomsLayer() {
   // ── Symbol label layer: text centred on each equipment polygon ─────────────
   // Attached to the same `vgu-equipment` source so labels auto-update with data.
   // Rendered after the fill layer so text sits on top in the draw order.
-  // DECLUTTER: minzoom:18.5 hides labels when zoomed out; interpolated
-  // text-opacity fades them in smoothly between z18.5→19 to avoid a hard snap.
+  // DECLUTTER: minzoom:19.5 hides labels when zoomed out; interpolated
+  // text-opacity fades them in smoothly between z19.5→19.8 to avoid a hard snap.
+  // Must be deeper than room markers (19.0) to preserve the zoom-reveal hierarchy.
   map.addLayer({
     id: 'vgu-equipment-labels',
     type: 'symbol',
     source: 'vgu-equipment',
-    minzoom: 18.5, // STRICT DIRECTIVE: Hide equipment labels when zoomed out
+    minzoom: 19.5, // Deeper than room markers (19.0) so equipment detail appears last
     layout: {
       // Display the short code (e.g. "E18") — falls back to equipment_id
       'text-field': [
@@ -525,12 +526,14 @@ async function initRoomsLayer() {
       'text-halo-width': 1.5,
       // FADE-IN: interpolate opacity at the minzoom boundary so labels
       // ease in rather than snapping on abruptly.
+      // Window z19.5→z19.8 keeps the fade tight (≈0.3 zoom units) so it
+      // feels snappy but not harsh.
       'text-opacity': [
         'interpolate',
         ['linear'],
         ['zoom'],
-        18.5, 0,   // fully invisible at the minzoom threshold
-        19,   1    // fully visible one zoom level deeper
+        19.5, 0,   // fully invisible at the minzoom threshold
+        19.8, 1    // fully visible 0.3 zoom units deeper
       ]
     }
   })
@@ -865,6 +868,24 @@ watch(
 
 let roomMarkers = []
 
+// ── Zoom-visibility constant ──────────────────────────────────────────────────
+// z19.0 ≈ 5–10 m scale: the user must be deeply zoomed into a building floor
+// before the rectangular HTML marker cards appear. At z17.5 (the old value,
+// ≈50–100 m) all markers stacked on top of each other at campus overview.
+const ROOM_MARKER_MINZOOM = 19.0
+
+// Called by: (1) map.on('zoom', …) and (2) renderRoomMarkers() via rAF.
+// Keeping it at module scope avoids a closure over the map.on callback and
+// allows renderRoomMarkers() to call it without a circular dependency.
+function updateRoomMarkerZoomVisibility() {
+  if (!map) return
+  const visible = map.getZoom() >= ROOM_MARKER_MINZOOM
+  roomMarkers.forEach(({ el }) => {
+    el.style.opacity       = visible ? '1' : '0'
+    el.style.pointerEvents = visible ? 'auto' : 'none'
+  })
+}
+
 function clearRoomMarkers() {
   roomMarkers.forEach(m => m.marker.remove())
   roomMarkers = []
@@ -933,6 +954,17 @@ function renderRoomMarkers(floorNumber) {
     roomMarkers.push({ marker, el, roomId })
   })
 
+  // Fix init bug: markers are in the DOM now but the zoom.on listener has
+  // never fired (it only fires on subsequent zoom events). Without this call,
+  // markers are visible at whatever zoom the map happened to load at —
+  // typically a campus-overview level where they hopelessly overlap.
+  // requestAnimationFrame defers one paint tick so MapLibre has finished
+  // positioning the Marker elements before we read / write their style.
+  requestAnimationFrame(() => {
+    updateRoomMarkerZoomVisibility()
+  })
+
+  // Separately apply the selected-room display filter (unchanged logic).
   updateMarkerVisibility()
 }
 
