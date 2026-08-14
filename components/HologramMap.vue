@@ -263,13 +263,20 @@ onMounted(() => {
   })
 
   map.on('click', 'vgu-rooms-fill', (e) => {
-    // If the click landed on an equipment polygon, the equipment handler already
-    // handled this interaction. Consume the flag and bail out so we don't reset
-    // the panel back to the room root view.
-    if (equipmentClickConsumed) {
-      equipmentClickConsumed = false
-      return
-    }
+    // ── MapLibre-native guard: queryRenderedFeatures ──────────────────────────
+    // MapLibre calls ALL layer handlers whose geometry overlaps the click point,
+    // in registration order — so this room handler fires BEFORE the equipment
+    // handler. A boolean flag set by the equipment handler arrives too late.
+    //
+    // The correct solution: query the equipment layer synchronously at the same
+    // pixel *right here*, before doing any room logic. If an equipment polygon
+    // sits under the cursor, abort immediately and let the equipment handler
+    // (which fires next) take ownership of this click.
+    const equipmentUnderCursor = map.queryRenderedFeatures(e.point, {
+      layers: ['vgu-equipment-fill']
+    })
+    if (equipmentUnderCursor.length > 0) return
+
     const feature = e.features[0]
     const roomId = feature.properties?.room_id
     if (roomId) {
@@ -310,20 +317,14 @@ onMounted(() => {
     const equipmentId = props?.equipment_id
     if (!equipmentId) return
 
-    // ── Stop the room handler from firing for this same click ────────────────
-    // e.originalEvent.stopPropagation() stops DOM bubbling but does NOT prevent
-    // other MapLibre layer handlers — MapLibre calls them all synchronously from
-    // its own internal loop. The flag approach is the only reliable solution.
-    e.originalEvent.stopPropagation()
-    equipmentClickConsumed = true
-
     // ── Update map highlight state ────────────────────────────────────────────
+    // The watcher on selectedEquipmentId triggers updateEquipmentHighlight().
     selectedEquipmentId.value = equipmentId
 
     // ── Emit with a fully-populated, reliable payload ─────────────────────────
-    // room_id is embedded in every equipment GeoJSON feature (e.g. "B5-105").
-    // Falling back to currentRoomId.value is safe but room_id from the feature
-    // is more authoritative and works even if currentRoomId hasn't been set yet.
+    // room_id comes directly from the GeoJSON feature — more authoritative than
+    // currentRoomId.value which may not be set yet if the user clicked equipment
+    // without first selecting the room from the panel.
     emit('equipment-selected', {
       equipmentId,
       roomId:     props.room_id     || currentRoomId.value,
@@ -741,20 +742,6 @@ function exitBuilding() {
 }
 
 let hoveredEquipmentId = null
-// ── Equipment-click guard ─────────────────────────────────────────────────────
-// MapLibre fires ALL layer click handlers whose geometry intersects the click
-// point — in handler-registration order, not layer z-order. Because
-// 'vgu-rooms-fill' was registered BEFORE 'vgu-equipment-fill', the room handler
-// fires first and calls selectRoom(), which emits 'room-selected' and resets the
-// panel to the root Room view. By the time the equipment handler fires,
-// openEquipment() lands on a freshly-reset panel and the state immediately gets
-// overwritten by a second 'room-selected' from selectRoom() — the panel never
-// shows the equipment detail.
-//
-// Fix: set this flag to true inside the equipment handler. The room handler
-// checks it, skips its work, and resets the flag. Both handlers still fire but
-// the room handler becomes a no-op for that tick.
-let equipmentClickConsumed = false
 const equipmentCache = new Map()
 
 async function loadEquipmentForRoom(buildingId, roomId) {
