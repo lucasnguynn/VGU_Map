@@ -248,7 +248,9 @@ const props = defineProps({
   initialEquipment: { type: Object, default: null }
 })
 
-const emit = defineEmits(['close'])
+// 'equipment-focused' fires whenever the user selects a machine from the list,
+// carrying the equipment_id so HologramMap can highlight the polygon on the map.
+const emit = defineEmits(['close', 'equipment-focused'])
 
 const config = useRuntimeConfig()
 
@@ -482,6 +484,12 @@ const loadMachineList = async () => {
 const selectMachine = async (m) => {
   viewMode.value = 'model'
   activePhotoIndex.value = 0
+
+  // Notify parent (RoomDetailPanel → index.vue → HologramMap) so the map
+  // polygon highlight updates immediately when the user picks from the list.
+  // m.id corresponds to equipment_id (e.g. "B5-105_E18").
+  emit('equipment-focused', m.id)
+
   // Attempt to enrich from Nuxt Content (e.g. the spectrometer-01.md file)
   if (typeof getEquipmentInfo === 'function' && m.id) {
     try {
