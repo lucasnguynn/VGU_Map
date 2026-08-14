@@ -59,6 +59,7 @@
         :room-id="selectedRoom"
         :building-id="selectedBuilding"
         @close="closePanel"
+        @equipment-focused="handleEquipmentFocused"
       />
     </transition>
 
@@ -151,6 +152,15 @@ const handleEquipmentSelected = async ({ roomId, buildingId, properties }) => {
     await nextTick()
   }
   roomDetailPanelRef.value?.openEquipment(properties)
+}
+
+// ── Panel → Map highlight sync ────────────────────────────────────────────────
+// When the user selects equipment from the list inside EquipmentSidePanel the
+// event bubbles up through RoomDetailPanel → here → HologramMap.highlightEquipment.
+// This keeps the map polygon highlight in sync with the panel's selected item
+// even when the selection originates from the UI list, not a map click.
+const handleEquipmentFocused = (equipmentId) => {
+  hologramMapRef.value?.highlightEquipment(equipmentId ?? null)
 }
 
 // Keyboard: Esc → close room panel; second Esc → exit building entirely.
