@@ -157,6 +157,7 @@
       :instruments="display.instruments"
       :initial-equipment="initialEquipment"
       @close="closeMachinePanel"
+      @equipment-focused="(id) => emit('equipment-focused', id)"
     />
   </div>
 </template>
@@ -199,7 +200,9 @@ const props = defineProps({
   buildingId: { type: String, default: null }
 })
 
-const emit = defineEmits(['close'])
+// 'equipment-focused' bubbles up from EquipmentSidePanel so index.vue can
+// call hologramMapRef.highlightEquipment(id) to sync the map polygon highlight.
+const emit = defineEmits(['close', 'equipment-focused'])
 const closePanel = () => emit('close')
 
 const { getRoomInfo, getDriveData } = useVguData()
