@@ -142,15 +142,20 @@ const onMapReady = async () => {
 }
 
 const handleEquipmentSelected = async ({ roomId, buildingId, properties }) => {
-  if (roomId && selectedRoom.value !== roomId) {
-    mapStore.focusOnRoom(
-      roomId,
-      buildingId ?? properties?.building_id ?? selectedBuilding.value,
-      properties?.floor ?? selectedFloor.value
-    )
+  const resolvedRoomId     = roomId     || properties?.room_id
+  const resolvedBuildingId = buildingId ?? properties?.building_id ?? selectedBuilding.value
+  const resolvedFloor      = properties?.floor ?? selectedFloor.value
+
+  if (resolvedRoomId && selectedRoom.value !== resolvedRoomId) {
+    // Room isn't open yet — focus it first, then wait for RoomDetailPanel to mount.
+    mapStore.focusOnRoom(resolvedRoomId, resolvedBuildingId, resolvedFloor)
+    // Three ticks: (1) store update, (2) v-if re-evaluation, (3) child onMounted
+    await nextTick()
     await nextTick()
     await nextTick()
   }
+  // At this point RoomDetailPanel is guaranteed to be mounted and its
+  // defineExpose({ openEquipment }) is callable.
   roomDetailPanelRef.value?.openEquipment(properties)
 }
 
