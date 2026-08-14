@@ -3,25 +3,37 @@
   <div ref="mapContainer" class="map-container"></div>
 
   <!-- ================= Thanh tìm kiếm toàn cục (Global Search) ================= -->
-  <!-- Đứng độc lập, luôn hiển thị. Sẽ tự thay đổi placeholder và logic lọc khi click vào toà -->
+  <!-- Unified control pill: context badge + search input in one cohesive component -->
   <div class="global-search-container">
-    <div class="search-wrapper">
-      <!-- Icon kính lúp -->
+    <div class="search-wrapper" :class="{ 'has-context': currentBuildingId }">
+
+      <!-- Context badge — only renders when inside a building, flush-left inside the pill -->
+      <Transition name="ctx-badge">
+        <div v-if="currentBuildingId" class="search-context-badge">
+          <span class="ctx-building">{{ currentBuildingId }}</span>
+          <span v-if="currentFloor != null" class="ctx-sep">·</span>
+          <span v-if="currentFloor != null" class="ctx-floor">L{{ currentFloor }}</span>
+        </div>
+      </Transition>
+
+      <!-- Search icon — shifts right when badge is present -->
       <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="11" cy="11" r="8"></circle>
         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
       </svg>
+
       <input
         v-model="searchQuery"
         type="text"
         class="global-search-input"
-        :placeholder="currentBuildingId ? `Tìm phòng trong toà ${currentBuildingId}…` : 'Tìm phòng trên toàn Campus…'"
+        :class="{ 'with-badge': currentBuildingId }"
+        :placeholder="currentBuildingId ? `Tìm phòng…` : 'Tìm phòng trên Campus…'"
         @input="onSearchInput"
         @focus="onSearchInput"
         @blur="onSearchBlur"
       />
     </div>
-    
+
     <div v-if="searchResults.length > 0" class="global-search-results">
       <button
         v-for="r in searchResults"
@@ -838,6 +850,7 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
 }
 :deep(.maplibregl-popup-tip) { border-top-color: rgba(15, 30, 54, 0.95); }
 
+/* ── Global Search Container ── */
 .global-search-container {
   position: absolute;
   top: calc(var(--header-h, 64px) + 12px);
@@ -848,39 +861,126 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
   max-width: 90vw;
 }
 
+/* ── Search Wrapper: the pill itself ── */
 .search-wrapper {
   position: relative;
   width: 100%;
-}
-
-.search-icon {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 16px;
-  height: 16px;
-  color: #94a3b8;
-}
-
-.global-search-input {
-  width: 100%;
+  display: flex;
+  align-items: center;
   height: 44px;
-  padding: 0 16px 0 40px; 
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(11, 17, 32, 0.85);
-  color: #fff;
-  font-family: 'Space Mono', monospace;
-  font-size: 16px;
-  outline: none;
   backdrop-filter: blur(8px);
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  transition: border-color 0.2s ease, background 0.2s ease;
 }
 
-.global-search-input::placeholder { color: rgba(255, 255, 255, 0.5); }
-.global-search-input:focus { border-color: #EF5A24; background: rgba(11, 17, 32, 0.95); }
+.search-wrapper:focus-within {
+  border-color: #EF5A24;
+  background: rgba(11, 17, 32, 0.95);
+}
+
+/* ── Context Badge (flush-left inside the pill) ── */
+.search-context-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  height: 100%;
+  padding: 0 10px 0 14px;
+  border-right: 1px solid rgba(239, 90, 36, 0.25);
+  background: rgba(239, 90, 36, 0.08);
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+.ctx-building {
+  color: #EF5A24;
+  text-transform: uppercase;
+}
+
+.ctx-sep {
+  color: rgba(239, 90, 36, 0.45);
+  font-size: 9px;
+}
+
+.ctx-floor {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* ── Search icon ── */
+.search-icon {
+  position: absolute;
+  /* Default: no badge present */
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 15px;
+  height: 15px;
+  color: #94a3b8;
+  pointer-events: none;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+/* When badge is present, icon anchors just after the badge.
+   We measure via the input's left padding shift. */
+.search-wrapper.has-context .search-icon {
+  /* Badge is ~80px wide; position icon inside the input area */
+  left: auto;
+  right: 14px;
+  color: #64748b;
+}
+
+/* ── Text input ── */
+.global-search-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  /* Default: magnifier on left */
+  padding: 0 16px 0 40px;
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  outline: none;
+  transition: padding 0.2s ease;
+}
+
+/* When badge is shown: icon moves to the right, so padding swaps */
+.global-search-input.with-badge {
+  padding: 0 36px 0 12px;
+}
+
+.global-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.38);
+  font-size: 12px;
+}
+
+/* Badge enter/leave animation */
+.ctx-badge-enter-active,
+.ctx-badge-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease, max-width 0.25s ease;
+  overflow: hidden;
+}
+.ctx-badge-enter-from,
+.ctx-badge-leave-to {
+  opacity: 0;
+  transform: translateX(-6px);
+  max-width: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
 
 .global-search-results {
   margin-top: 8px;
@@ -1010,7 +1110,9 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding })
 }
 
 @media (max-width: 640px) {
-  .global-search-container { width: min(340px, 90vw); top: calc(var(--header-h-mobile, 54px) + 8px); left: 50%; transform: translateX(-50%); }
+  .global-search-container { width: min(360px, 94vw); top: calc(var(--header-h-mobile, 54px) + 8px); left: 50%; transform: translateX(-50%); }
+  .search-context-badge { padding: 0 8px 0 12px; font-size: 10px; }
+  .global-search-input { font-size: 12px; }
   .global-search-results { max-height: 38vh; }
   .floor-bar { top: calc(var(--header-h-mobile, 54px) + 76px); bottom: auto; left: 50%; transform: translateX(-50%); z-index: 115; gap: 6px; padding: 6px 8px; max-width: 92vw; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
   .floor-bar::-webkit-scrollbar { display: none; }
