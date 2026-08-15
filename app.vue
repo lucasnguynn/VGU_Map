@@ -102,7 +102,11 @@ a, button {
 .app-root {
   position: relative;
   width: 100vw;
-  height: 100vh;
+  height: 100%;        /* Fallback for browsers without dvh support */
+  height: 100dvh;      /* Dynamic Viewport Height: shrinks to the true visual
+                          bottom on mobile, accounting for retractable browser
+                          chrome (address bar, nav bar). Prevents bottom-anchored
+                          panels from floating above the real viewport edge. */
   overflow: hidden;
 }
 
