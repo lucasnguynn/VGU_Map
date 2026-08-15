@@ -527,8 +527,8 @@ async function initRoomsLayer() {
         'interpolate',
         ['linear'],
         ['zoom'],
-        20.5, 0,   // fully invisible at the minzoom threshold
-        20.8, 1    // fully visible 0.3 zoom units deeper
+        21.5, 0,   // fully invisible at the minzoom threshold
+        21.8, 1    // fully visible 0.3 zoom units deeper
       ]
     }
   })
