@@ -889,7 +889,7 @@ watch(
 let roomMarkers = []
 
 // ── Zoom-gate: CSS-class strategy ────────────────────────────────────────────
-const ROOM_MARKER_MINZOOM = 19.5
+const ROOM_MARKER_MINZOOM = 19.0
 
 function syncZoomVisibility() {
   if (!map) return
