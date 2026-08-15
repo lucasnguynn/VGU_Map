@@ -1244,16 +1244,14 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding, highlightEquipment })
   :deep(.room-marker-id) { font-size: 9px; }
   :deep(.room-marker-name) { font-size: 8px; line-clamp: 1; -webkit-line-clamp: 1; }
 
-  /* ── MapLibre controls cleanup ──────────────────────────────────────────────
-     Scale bar (bottom-left): hidden entirely on mobile — it overlaps the bottom
-     sheet and is redundant on small screens where finger-pinch sets mental scale.
-     Attribution (bottom-right): dropped behind the bottom sheet via z-index: 1
-     so it satisfies the CARTO licence requirement without cluttering the UI.   */
-  :deep(.maplibregl-ctrl-bottom-left) {
-    display: none !important;
-  }
+  /* ── MapLibre controls: eradicated on mobile ────────────────────────────────
+     Both bottom control containers are killed completely. The attribution widget
+     inherits the global .maplibregl-ctrl dark-panel style and was still visually
+     bleeding through the safe-area gap even at z-index: 1. display:none removes
+     the nodes from layout and paint entirely — no bleed, no overlap, no jitter. */
+  :deep(.maplibregl-ctrl-bottom-left),
   :deep(.maplibregl-ctrl-bottom-right) {
-    z-index: 1;
+    display: none !important;
   }
 }
 </style>
