@@ -369,7 +369,10 @@ onMounted(async () => {
 @media (max-width: 640px) {
   .buildings-panel {
     top: auto;
-    left: 0; right: 0; bottom: 0;
+    left: 0; right: 0;
+    /* ① Pinned flush to the very bottom edge — no gap, no margin. */
+    bottom: 0;
+    margin-bottom: 0;
     width: 100%;
     flex-direction: column-reverse;
     z-index: var(--z-panel-buildings);
@@ -389,6 +392,8 @@ onMounted(async () => {
     border-right: none;
     border-top: 1px solid rgba(0, 255, 204, 0.12);
     transition: max-height 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    /* ③ Safe-area inset: keeps content above the iOS/Android home-indicator bar. */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   .buildings-panel.is-collapsed .panel-body {
     max-height: 0;
