@@ -409,7 +409,8 @@ onMounted(async () => {
     top: auto;
     left: 0; right: 0; bottom: 0;
     width: 100%;
-    flex-direction: column-reverse;
+    flex-direction: column;       /* FIX: was column-reverse — .toggle-tab now sits on top */
+    justify-content: flex-end;    /* anchors the stack firmly against bottom: 0           */
     z-index: var(--z-panel-buildings);
     transform: none !important;
     transition: none;
@@ -423,6 +424,7 @@ onMounted(async () => {
     max-height: 52vh;
     transform: none !important;
     border-right: none;
+    border-radius: 0;             /* no top radius — unified sheet under .toggle-tab      */
     border-top: 1px solid rgba(0, 255, 204, 0.12);
     transition: max-height 0.32s cubic-bezier(0.4, 0, 0.2, 1);
     padding-bottom: env(safe-area-inset-bottom, 0px);
