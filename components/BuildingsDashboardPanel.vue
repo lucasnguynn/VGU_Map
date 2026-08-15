@@ -32,15 +32,24 @@
       :aria-label="isCollapsed ? 'Mở danh sách toà nhà' : 'Thu gọn'"
       :aria-expanded="!isCollapsed"
     >
-      <svg
-        class="tab-chevron"
-        :class="{ flipped: isCollapsed }"
-        width="14" height="14" viewBox="0 0 24 24"
-        fill="none" stroke="currentColor" stroke-width="2.5"
-        stroke-linecap="round" stroke-linejoin="round"
-      >
-        <polyline points="15 18 9 12 15 6"></polyline>
-      </svg>
+      <!-- Desktop: left/right chevron for the side-drawer -->
+      <span class="desktop-only">
+        <svg
+          class="tab-chevron"
+          :class="{ flipped: isCollapsed }"
+          width="14" height="14" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round"
+        >
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </span>
+
+      <!-- Mobile: iOS-style drag handle for the bottom sheet -->
+      <div class="mobile-only mobile-handle">
+        <span class="drag-pill" aria-hidden="true"></span>
+        <span v-if="isCollapsed" class="mobile-label">Danh sách Toà nhà</span>
+      </div>
     </button>
 
     <div class="panel-body">
@@ -280,6 +289,34 @@ onMounted(async () => {
 .tab-chevron { transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1); }
 .tab-chevron.flipped { transform: rotate(180deg); }
 
+/* ── Responsive visibility switches ──
+   desktop-only: flex so the SVG wrapper inherits .toggle-tab's alignment.
+   mobile-only:  hidden by default; revealed inside the mobile @media block.   */
+.desktop-only {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mobile-only { display: none; }
+
+/* ── Mobile handle internals (sized here; layout controlled in @media) ── */
+.drag-pill {
+  display: block;
+  width: 36px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+}
+.mobile-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
 /* ── Header ── */
 .panel-head { padding: 18px 18px 14px; flex-shrink: 0; }
 .eyebrow {
@@ -367,20 +404,16 @@ onMounted(async () => {
    use display:none instead of translateX so there is zero z-index interference
    with FloorPanel's bottom sheet. */
 @media (max-width: 640px) {
+  /* ── Panel layout ── */
   .buildings-panel {
     top: auto;
-    left: 0; right: 0;
-    /* ① Pinned flush to the very bottom edge — no gap, no margin. */
-    bottom: 0;
-    margin-bottom: 0;
+    left: 0; right: 0; bottom: 0;
     width: 100%;
     flex-direction: column-reverse;
     z-index: var(--z-panel-buildings);
-    /* Override the translateX transition with max-height for mobile sheet */
     transform: none !important;
     transition: none;
   }
-  /* When off-screen on mobile: just hide entirely, no translateX */
   .buildings-panel.is-offscreen {
     display: none;
     pointer-events: none;
@@ -392,23 +425,69 @@ onMounted(async () => {
     border-right: none;
     border-top: 1px solid rgba(0, 255, 204, 0.12);
     transition: max-height 0.32s cubic-bezier(0.4, 0, 0.2, 1);
-    /* ③ Safe-area inset: keeps content above the iOS/Android home-indicator bar. */
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   .buildings-panel.is-collapsed .panel-body {
     max-height: 0;
     border-top-color: transparent;
   }
+
+  /* ── Toggle tab: native bottom-sheet handle ──
+     Replaces the desktop side-drawer tab entirely on mobile.
+     - Borderless, seamless background matching .panel-body (#070A12)
+     - Rounded top corners (14px) signal it as a sheet handle
+     - Taller hit-target (48px) for comfortable thumb tap
+     - flex column-reverse so drag-pill renders at the top of the tab
+       and the contextual label appears below it                        */
   .toggle-tab {
     position: static;
     left: auto !important;
+    /* Cancel the desktop/tablet translateX — position is now flow-based */
+    transform: none !important;
     width: 100%;
-    height: 36px;
-    border-radius: 12px 12px 0 0;
-    border: 1px solid rgba(0, 255, 204, 0.15);
-    border-bottom: none;
-    transition: color 0.15s, background 0.15s;
+    height: 48px;
+    background: #070A12;          /* seamless with .panel-body */
+    border: none;                  /* no teal outline on mobile */
+    border-radius: 14px 14px 0 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    color: rgba(255, 255, 255, 0.4);
+    transition: background 0.18s;
   }
+  /* Collapsed state: same bg — the label text is the only context cue */
+  .buildings-panel.is-collapsed .toggle-tab {
+    transform: none !important;
+    background: #070A12;
+    border-color: transparent;
+  }
+  /* Hover: very subtle lift so it doesn't flash like the desktop tab */
+  .toggle-tab:hover {
+    background: #0D1421;
+    border-color: transparent;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  /* ── Visibility swap ── */
+  .desktop-only { display: none; }
+  .mobile-only  { display: flex; }
+
+  /* ── Mobile handle layout ──
+     column: pill on top, label below
+     pointer-events: none so clicks bubble up to the <button>            */
+  .mobile-handle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    pointer-events: none;
+  }
+
+  /* ── Building list & cards (horizontal scroll on mobile) ── */
   .building-list {
     flex-direction: row;
     overflow-x: auto; overflow-y: hidden;
