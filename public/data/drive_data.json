@@ -1,24 +1,3 @@
-/**
- * generate_drive_data.gs
- *
- * Quét 5 folder Drive của 5 tòa còn lại (B1,B2,B3,B5,B6), GHÉP LUÔN với 232
- * phòng Admin (AD) đã có sẵn (nhúng cứng bên dưới, lấy từ public/data/
- * drive_data.json hiện tại) -> xuất ra 1 file DUY NHẤT tên đúng
- * "drive_data.json", sẵn sàng tải về và THAY THẾ TRỰC TIẾP file cũ trong
- * public/data/ — không cần gửi lại cho ai merge thủ công nữa.
- *
- * CÁCH DÙNG
- * 1. script.google.com -> New project -> dán toàn bộ file này -> Run
- *    (chọn hàm generateDriveData) -> cấp quyền Drive khi được hỏi.
- * 2. Xem Execution log (Ctrl+Enter) -> lấy link file Drive mới tên
- *    "drive_data.json" mà script vừa tạo.
- * 3. Tải file đó về, đưa vào repo tại đúng đường dẫn
- *    public/data/drive_data.json (ghi đè lên file cũ) -> commit -> push.
- *
- * LƯU Ý: bản này FOLDER_IDS và dữ liệu Admin được NHÚNG CỨNG trong code —
- * nếu sau này thêm tòa mới, cần tự thêm dòng vào mảng FOLDER_IDS bên dưới
- * (hoặc xin bản tự động quét theo folder cha, không cần sửa code mỗi lần).
- */
 
 function generateDriveData() {
   // 232 phòng tòa Admin (AD) hiện có sẵn — giữ nguyên, không quét lại.
