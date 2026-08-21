@@ -439,9 +439,12 @@ const display = computed(() => {
   /* aspect-ratio is the source of truth for height so the frame always renders
      even before the image loads. The explicit min-height is a belt-and-suspenders
      fallback for any browser that ignores aspect-ratio inside a grid cell. */
-  aspect-ratio: 3 / 2;
+  aspect-ratio: 4 / 3;
   min-height: 160px;
-  background-color: #1e293b;
+  /* Nền trắng vì bản vẽ mặt bằng (floor plan) thực tế có nền trắng —
+     dùng object-fit: contain nên phần nền lộ ra phải khớp màu ảnh gốc,
+     tránh viền tối lộ ra hai bên/trên dưới. */
+  background-color: #ffffff;
   border: 1px solid #334155;
   border-radius: 6px;
   overflow: hidden;
@@ -452,14 +455,15 @@ const display = computed(() => {
   flex-shrink: 0;
 }
 .room-image {
-  /* Fill the frame completely. position:absolute pins it to the
-     frame's padding box so it never affects the frame's own layout size,
-     which could otherwise create a circular sizing dependency. */
+  /* Hiển thị TRỌN VẸN ảnh thực tế (floor plan), không cắt bớt.
+     position:absolute pins it to the frame's padding box so it never
+     affects the frame's own layout size, which could otherwise create
+     a circular sizing dependency. */
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   /* border-radius matches the frame so the image is clipped cleanly
      at the rounded corners — overflow:hidden alone isn't enough in all
      browsers when the child is absolutely positioned. */
