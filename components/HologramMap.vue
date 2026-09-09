@@ -136,6 +136,7 @@ let floorsConfig = {}
 const floorCache = new Map()
 let buildingCenters = {}
 const roomNameMap = ref({})
+const roomStatusMap = ref({})
 
 const BUILDING_AFFINE = {
   B1: {
@@ -549,17 +550,29 @@ async function loadRoomNames() {
     const json = await response.json()
     const rows = Array.isArray(json) ? json : (json?.data || [])
     const map_ = {}
+    const statusMap_ = {}
     for (const r of rows) {
       const key = r.room_number
       if (!key) continue
       const en = (r.heading_1 || '').trim()
       const vi = (r.heading_2 || '').trim()
       if (en || vi) map_[key] = { en, vi }
+      statusMap_[key] = normalizeRoomStatus(r.status)
     }
     roomNameMap.value = map_
+    roomStatusMap.value = statusMap_
   } catch (error) {
     console.warn('[HologramMap] Không tải được info_data.json:', error)
   }
+}
+
+// Cùng logic chuẩn hoá status như useVguData.js, để màu chấm trên bản đồ
+// nhất quán với trạng thái hiển thị ở panel chi tiết phòng.
+function normalizeRoomStatus(raw) {
+  const s = (raw || '').toLowerCase()
+  if (s === 'occupied' || s === 'active') return 'active'
+  if (s === 'vacant') return 'inactive'
+  return 'unknown'
 }
 
 async function selectBuilding(buildingId) {
@@ -941,6 +954,15 @@ function renderRoomMarkers(floorNumber) {
     dot.appendChild(ping)
     dot.appendChild(core)
 
+    // Màu chấm theo trạng thái phòng: inactive = cam, active = xanh lá,
+    // unknown giữ nguyên màu cam mặc định (chưa xác định).
+    const status = roomStatusMap.value[roomId]
+    if (status === 'active') {
+      dot.classList.add('room-dot--active')
+    } else if (status === 'inactive') {
+      dot.classList.add('room-dot--inactive')
+    }
+
     const card = document.createElement('div')
     card.className = 'room-marker-card'
 
@@ -1205,6 +1227,11 @@ defineExpose({ goToRoom, closeRoomDetail, selectBuilding, highlightEquipment })
 :deep(.room-dot) { position: absolute; transform: translate(-50%, -50%); width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; }
 :deep(.room-ping) { position: absolute; display: inline-flex; width: 100%; height: 100%; border-radius: 50%; background: #EF5A24; opacity: 0.75; animation: room-ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite; }
 :deep(.room-core) { position: relative; width: 8px; height: 8px; border-radius: 50%; background: #EF5A24; box-shadow: 0 0 6px #EF5A24; }
+/* Trạng thái phòng: inactive = cam (mặc định), active = xanh lá */
+:deep(.room-dot--active .room-ping) { background: #22C55E; }
+:deep(.room-dot--active .room-core) { background: #22C55E; box-shadow: 0 0 6px #22C55E; }
+:deep(.room-dot--inactive .room-ping) { background: #EF5A24; }
+:deep(.room-dot--inactive .room-core) { background: #EF5A24; box-shadow: 0 0 6px #EF5A24; }
 @keyframes room-ping { 75%, 100% { transform: scale(2); opacity: 0; } }
 :deep(.room-marker-card) {
   position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
