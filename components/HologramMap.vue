@@ -569,9 +569,9 @@ async function loadRoomNames() {
 // Cùng logic chuẩn hoá status như useVguData.js, để màu chấm trên bản đồ
 // nhất quán với trạng thái hiển thị ở panel chi tiết phòng.
 function normalizeRoomStatus(raw) {
-  const s = (raw || '').toLowerCase()
-  if (s === 'occupied' || s === 'active') return 'active'
-  if (s === 'vacant') return 'inactive'
+  const s = (raw || '').trim()
+  if (s === 'Đang sử dụng') return 'active'
+  if (s === 'Chưa sử dụng') return 'inactive'
   return 'unknown'
 }
 
