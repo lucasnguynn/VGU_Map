@@ -1,6 +1,6 @@
 ---
 room_id: "AD-2.LB2"
-name: "SECURITY LOBBY - SECURITY LOBBY"
+name: "SECURITY LOBBY - SẢNH PHÍA ĐÔNG"
 building_id: "AD"
 floor: 1
 departments:

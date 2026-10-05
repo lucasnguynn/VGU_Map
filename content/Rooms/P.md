@@ -1,6 +1,6 @@
 ---
 room_id: "P"
-name: "PARKING AREA - PARKING AREA"
+name: "PARKING AREA - CHỖ ĐẬU XE ĐẠP"
 building_id: "B2"
 floor: 1
 departments:

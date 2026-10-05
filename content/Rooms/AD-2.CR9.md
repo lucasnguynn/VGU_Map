@@ -1,6 +1,6 @@
 ---
 room_id: "AD-2.CR9"
-name: "CORRIDOR - CORRIDOR"
+name: "CORRIDOR - HÀNH LANG"
 building_id: "AD"
 floor: 1
 departments:

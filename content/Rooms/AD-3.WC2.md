@@ -1,6 +1,6 @@
 ---
 room_id: "AD-3.WC2"
-name: "W-WC - W-WC"
+name: "W-WC - VỆ SINH NỮ"
 building_id: "AD"
 floor: 1
 departments:
